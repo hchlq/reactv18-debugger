@@ -4,11 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                                    
-                                                                            
 
 export const debugRenderPhaseSideEffectsForStrictMode = false;
 export const enableDebugTracing = false;
@@ -54,6 +51,6 @@ export const enableDoubleInvokingEffects = false;
 
 // Flow magic to verify the exports of this file match the original version.
 // eslint-disable-next-line no-unused-vars
-                                        
+
 // eslint-disable-next-line no-unused-expressions
-(null                                      );
+null;

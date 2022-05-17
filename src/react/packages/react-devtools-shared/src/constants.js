@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 // Flip this flag to true to enable verbose console debug logging.
@@ -55,10 +55,10 @@ let COMPACT_LINE_HEIGHT;
 
 try {
   // $FlowFixMe
-  const rawStyleString = require('!!raw-loader!react-devtools-shared/src/devtools/views/root.css')
-    .default;
+  const rawStyleString =
+    require('!!raw-loader!react-devtools-shared/src/devtools/views/root.css').default;
 
-  const extractVar = varName => {
+  const extractVar = (varName) => {
     const regExp = new RegExp(`${varName}: ([0-9]+)`);
     const match = rawStyleString.match(regExp);
     return parseInt(match[1], 10);

@@ -4,12 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                
-                                                                        
-                                                                     
 
 import invariant from 'shared/invariant';
 
@@ -30,7 +26,7 @@ import {enableFundamentalAPI} from 'shared/ReactFeatureFlags';
 
 const ReactCurrentOwner = ReactSharedInternals.ReactCurrentOwner;
 
-export function getNearestMountedFiber(fiber       )               {
+export function getNearestMountedFiber(fiber) {
   let node = fiber;
   let nearestMounted = fiber;
   if (!fiber.alternate) {
@@ -62,11 +58,9 @@ export function getNearestMountedFiber(fiber       )               {
   return null;
 }
 
-export function getSuspenseInstanceFromFiber(
-  fiber       ,
-)                          {
+export function getSuspenseInstanceFromFiber(fiber) {
   if (fiber.tag === SuspenseComponent) {
-    let suspenseState                       = fiber.memoizedState;
+    let suspenseState = fiber.memoizedState;
     if (suspenseState === null) {
       const current = fiber.alternate;
       if (current !== null) {
@@ -80,21 +74,19 @@ export function getSuspenseInstanceFromFiber(
   return null;
 }
 
-export function getContainerFromFiber(fiber       )                   {
-  return fiber.tag === HostRoot
-    ? (fiber.stateNode.containerInfo           )
-    : null;
+export function getContainerFromFiber(fiber) {
+  return fiber.tag === HostRoot ? fiber.stateNode.containerInfo : null;
 }
 
-export function isFiberMounted(fiber       )          {
+export function isFiberMounted(fiber) {
   return getNearestMountedFiber(fiber) === fiber;
 }
 
-export function isMounted(component                           )          {
+export function isMounted(component) {
   if (__DEV__) {
-    const owner = (ReactCurrentOwner.current     );
+    const owner = ReactCurrentOwner.current;
     if (owner !== null && owner.tag === ClassComponent) {
-      const ownerFiber        = owner;
+      const ownerFiber = owner;
       const instance = ownerFiber.stateNode;
       if (!instance._warnedAboutRefsInRender) {
         console.error(
@@ -110,7 +102,7 @@ export function isMounted(component                           )          {
     }
   }
 
-  const fiber         = getInstance(component);
+  const fiber = getInstance(component);
   if (!fiber) {
     return false;
   }
@@ -124,7 +116,7 @@ function assertIsMounted(fiber) {
   );
 }
 
-export function findCurrentFiberUsingSlowPath(fiber       )               {
+export function findCurrentFiberUsingSlowPath(fiber) {
   const alternate = fiber.alternate;
   if (!alternate) {
     // If there is no alternate, then we only need to check if it is mounted.
@@ -141,8 +133,8 @@ export function findCurrentFiberUsingSlowPath(fiber       )               {
   // If we have two possible branches, we'll walk backwards up to the root
   // to see what path the root points to. On the way we may hit one of the
   // special cases and we'll deal with them.
-  let a        = fiber;
-  let b        = alternate;
+  let a = fiber;
+  let b = alternate;
   while (true) {
     const parentA = a.return;
     if (parentA === null) {
@@ -263,14 +255,14 @@ export function findCurrentFiberUsingSlowPath(fiber       )               {
   return alternate;
 }
 
-export function findCurrentHostFiber(parent       )               {
+export function findCurrentHostFiber(parent) {
   const currentParent = findCurrentFiberUsingSlowPath(parent);
   if (!currentParent) {
     return null;
   }
 
   // Next we'll drill down this component to find the first HostComponent/Text.
-  let node        = currentParent;
+  let node = currentParent;
   while (true) {
     if (node.tag === HostComponent || node.tag === HostText) {
       return node;
@@ -296,14 +288,14 @@ export function findCurrentHostFiber(parent       )               {
   return null;
 }
 
-export function findCurrentHostFiberWithNoPortals(parent       )               {
+export function findCurrentHostFiberWithNoPortals(parent) {
   const currentParent = findCurrentFiberUsingSlowPath(parent);
   if (!currentParent) {
     return null;
   }
 
   // Next we'll drill down this component to find the first HostComponent/Text.
-  let node        = currentParent;
+  let node = currentParent;
   while (true) {
     if (
       node.tag === HostComponent ||
@@ -333,7 +325,7 @@ export function findCurrentHostFiberWithNoPortals(parent       )               {
   return null;
 }
 
-export function isFiberSuspenseAndTimedOut(fiber       )          {
+export function isFiberSuspenseAndTimedOut(fiber) {
   const memoizedState = fiber.memoizedState;
   return (
     fiber.tag === SuspenseComponent &&
@@ -342,10 +334,7 @@ export function isFiberSuspenseAndTimedOut(fiber       )          {
   );
 }
 
-export function doesFiberContain(
-  parentFiber       ,
-  childFiber       ,
-)          {
+export function doesFiberContain(parentFiber, childFiber) {
   let node = childFiber;
   const parentFiberAlternate = parentFiber.alternate;
   while (node !== null) {

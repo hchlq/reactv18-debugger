@@ -9,14 +9,14 @@
 
 'use strict';
 
-(function(global, factory) {
+(function (global, factory) {
   // eslint-disable-next-line no-unused-expressions
   typeof exports === 'object' && typeof module !== 'undefined'
     ? (module.exports = factory(require('react')))
     : typeof define === 'function' && define.amd // eslint-disable-line no-undef
     ? define(['react'], factory) // eslint-disable-line no-undef
     : (global.SchedulerTracing = factory(global));
-})(this, function(global) {
+})(this, function (global) {
   function unstable_clear() {
     return global.React.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.SchedulerTracing.unstable_clear.apply(
       this,

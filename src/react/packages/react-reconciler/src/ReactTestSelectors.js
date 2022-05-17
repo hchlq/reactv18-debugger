@@ -4,11 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                                   
-                                                     
 
 import invariant from 'shared/invariant';
 import {HostComponent, HostText} from 'react-reconciler/src/ReactWorkTags';
@@ -40,87 +37,49 @@ if (typeof Symbol === 'function' && Symbol.for) {
   TEXT_TYPE = symbolFor('selector.text');
 }
 
-                            
-
-                           
-                 
-                                               
-   
-
-                                
-                 
-                         
-   
-
-                      
-                 
-                
-   
-
-                      
-                 
-                
-   
-
-                          
-                 
-                
-   
-
-               
-                     
-                          
-                
-                
-                     
-
-export function createComponentSelector(
-  component                                       ,
-)                    {
+export function createComponentSelector(component) {
   return {
     $$typeof: COMPONENT_TYPE,
     value: component,
   };
 }
 
-export function createHasPsuedoClassSelector(
-  selectors                 ,
-)                         {
+export function createHasPsuedoClassSelector(selectors) {
   return {
     $$typeof: HAS_PSEUDO_CLASS_TYPE,
     value: selectors,
   };
 }
 
-export function createRoleSelector(role        )               {
+export function createRoleSelector(role) {
   return {
     $$typeof: ROLE_TYPE,
     value: role,
   };
 }
 
-export function createTextSelector(text        )               {
+export function createTextSelector(text) {
   return {
     $$typeof: TEXT_TYPE,
     value: text,
   };
 }
 
-export function createTestNameSelector(id        )                   {
+export function createTestNameSelector(id) {
   return {
     $$typeof: TEST_NAME_TYPE,
     value: id,
   };
 }
 
-function findFiberRootForHostRoot(hostRoot          )        {
-  const maybeFiber = getInstanceFromNode((hostRoot     ));
+function findFiberRootForHostRoot(hostRoot) {
+  const maybeFiber = getInstanceFromNode(hostRoot);
   if (maybeFiber != null) {
     invariant(
       typeof maybeFiber.memoizedProps['data-testname'] === 'string',
       'Invalid host root specified. Should be either a React container or a node with a testname attribute.',
     );
-    return ((maybeFiber     )       );
+    return maybeFiber;
   } else {
     const fiberRoot = findFiberRoot(hostRoot);
     invariant(
@@ -129,11 +88,11 @@ function findFiberRootForHostRoot(hostRoot          )        {
     );
     // The Flow type for FiberRoot is a little funky.
     // createFiberRoot() cheats this by treating the root as :any and adding stateNode lazily.
-    return ((fiberRoot     ).stateNode.current       );
+    return fiberRoot.stateNode.current;
   }
 }
 
-function matchSelector(fiber       , selector          )          {
+function matchSelector(fiber, selector) {
   switch (selector.$$typeof) {
     case COMPONENT_TYPE:
       if (fiber.type === selector.value) {
@@ -141,16 +100,11 @@ function matchSelector(fiber       , selector          )          {
       }
       break;
     case HAS_PSEUDO_CLASS_TYPE:
-      return hasMatchingPaths(
-        fiber,
-        ((selector     )                        ).value,
-      );
+      return hasMatchingPaths(fiber, selector.value);
     case ROLE_TYPE:
       if (fiber.tag === HostComponent) {
         const node = fiber.stateNode;
-        if (
-          matchAccessibilityRole(node, ((selector     )              ).value)
-        ) {
+        if (matchAccessibilityRole(node, selector.value)) {
           return true;
         }
       }
@@ -158,10 +112,7 @@ function matchSelector(fiber       , selector          )          {
     case TEXT_TYPE:
       if (fiber.tag === HostComponent || fiber.tag === HostText) {
         const textContent = getTextContent(fiber);
-        if (
-          textContent !== null &&
-          textContent.indexOf(((selector     )              ).value) >= 0
-        ) {
+        if (textContent !== null && textContent.indexOf(selector.value) >= 0) {
           return true;
         }
       }
@@ -171,8 +122,7 @@ function matchSelector(fiber       , selector          )          {
         const dataTestID = fiber.memoizedProps['data-testname'];
         if (
           typeof dataTestID === 'string' &&
-          dataTestID.toLowerCase() ===
-            ((selector     )                  ).value.toLowerCase()
+          dataTestID.toLowerCase() === selector.value.toLowerCase()
         ) {
           return true;
         }
@@ -186,7 +136,7 @@ function matchSelector(fiber       , selector          )          {
   return false;
 }
 
-function selectorToString(selector          )                {
+function selectorToString(selector) {
   switch (selector.$$typeof) {
     case COMPONENT_TYPE:
       const displayName = getComponentName(selector.value) || 'Unknown';
@@ -194,11 +144,11 @@ function selectorToString(selector          )                {
     case HAS_PSEUDO_CLASS_TYPE:
       return `:has(${selectorToString(selector) || ''})`;
     case ROLE_TYPE:
-      return `[role="${((selector     )              ).value}"]`;
+      return `[role="${selector.value}"]`;
     case TEXT_TYPE:
-      return `"${((selector     )              ).value}"`;
+      return `"${selector.value}"`;
     case TEST_NAME_TYPE:
-      return `[data-testname="${((selector     )                  ).value}"]`;
+      return `[data-testname="${selector.value}"]`;
     default:
       invariant(null, 'Invalid selector type %s specified.', selector);
       break;
@@ -207,14 +157,14 @@ function selectorToString(selector          )                {
   return null;
 }
 
-function findPaths(root       , selectors                 )               {
-  const matchingFibers               = [];
+function findPaths(root, selectors) {
+  const matchingFibers = [];
 
   const stack = [root, 0];
   let index = 0;
   while (index < stack.length) {
-    const fiber = ((stack[index++]     )       );
-    let selectorIndex = ((stack[index++]     )        );
+    const fiber = stack[index++];
+    let selectorIndex = stack[index++];
     let selector = selectors[selectorIndex];
 
     if (fiber.tag === HostComponent && isHiddenSubtree(fiber)) {
@@ -241,12 +191,12 @@ function findPaths(root       , selectors                 )               {
 }
 
 // Same as findPaths but with eager bailout on first match
-function hasMatchingPaths(root       , selectors                 )          {
+function hasMatchingPaths(root, selectors) {
   const stack = [root, 0];
   let index = 0;
   while (index < stack.length) {
-    const fiber = ((stack[index++]     )       );
-    let selectorIndex = ((stack[index++]     )        );
+    const fiber = stack[index++];
+    let selectorIndex = stack[index++];
     let selector = selectors[selectorIndex];
 
     if (fiber.tag === HostComponent && isHiddenSubtree(fiber)) {
@@ -272,10 +222,7 @@ function hasMatchingPaths(root       , selectors                 )          {
   return false;
 }
 
-export function findAllNodes(
-  hostRoot          ,
-  selectors                 ,
-)                  {
+export function findAllNodes(hostRoot, selectors) {
   if (!supportsTestSelectors) {
     invariant(false, 'Test selector API is not supported by this renderer.');
   }
@@ -283,12 +230,12 @@ export function findAllNodes(
   const root = findFiberRootForHostRoot(hostRoot);
   const matchingFibers = findPaths(root, selectors);
 
-  const instanceRoots                  = [];
+  const instanceRoots = [];
 
   const stack = Array.from(matchingFibers);
   let index = 0;
   while (index < stack.length) {
-    const node = ((stack[index++]     )       );
+    const node = stack[index++];
     if (node.tag === HostComponent) {
       if (isHiddenSubtree(node)) {
         continue;
@@ -306,25 +253,22 @@ export function findAllNodes(
   return instanceRoots;
 }
 
-export function getFindAllNodesFailureDescription(
-  hostRoot          ,
-  selectors                 ,
-)                {
+export function getFindAllNodesFailureDescription(hostRoot, selectors) {
   if (!supportsTestSelectors) {
     invariant(false, 'Test selector API is not supported by this renderer.');
   }
 
   const root = findFiberRootForHostRoot(hostRoot);
 
-  let maxSelectorIndex         = 0;
+  let maxSelectorIndex = 0;
   const matchedNames = [];
 
   // The logic of this loop should be kept in sync with findPaths()
   const stack = [root, 0];
   let index = 0;
   while (index < stack.length) {
-    const fiber = ((stack[index++]     )       );
-    let selectorIndex = ((stack[index++]     )        );
+    const fiber = stack[index++];
+    let selectorIndex = stack[index++];
     const selector = selectors[selectorIndex];
 
     if (fiber.tag === HostComponent && isHiddenSubtree(fiber)) {
@@ -364,24 +308,14 @@ export function getFindAllNodesFailureDescription(
   return null;
 }
 
-                             
-            
-            
-                
-                 
-   
-
-export function findBoundingRects(
-  hostRoot          ,
-  selectors                 ,
-)                      {
+export function findBoundingRects(hostRoot, selectors) {
   if (!supportsTestSelectors) {
     invariant(false, 'Test selector API is not supported by this renderer.');
   }
 
   const instanceRoots = findAllNodes(hostRoot, selectors);
 
-  const boundingRects                      = [];
+  const boundingRects = [];
   for (let i = 0; i < instanceRoots.length; i++) {
     boundingRects.push(getBoundingRect(instanceRoots[i]));
   }
@@ -461,10 +395,7 @@ export function findBoundingRects(
   return boundingRects;
 }
 
-export function focusWithin(
-  hostRoot          ,
-  selectors                 ,
-)          {
+export function focusWithin(hostRoot, selectors) {
   if (!supportsTestSelectors) {
     invariant(false, 'Test selector API is not supported by this renderer.');
   }
@@ -475,7 +406,7 @@ export function focusWithin(
   const stack = Array.from(matchingFibers);
   let index = 0;
   while (index < stack.length) {
-    const fiber = ((stack[index++]     )       );
+    const fiber = stack[index++];
     if (isHiddenSubtree(fiber)) {
       continue;
     }
@@ -495,26 +426,15 @@ export function focusWithin(
   return false;
 }
 
-const commitHooks                  = [];
+const commitHooks = [];
 
-export function onCommitRoot()       {
+export function onCommitRoot() {
   if (supportsTestSelectors) {
-    commitHooks.forEach(commitHook => commitHook());
+    commitHooks.forEach((commitHook) => commitHook());
   }
 }
 
-                                                 
-
-                                           
-                                                            
-          
-
-export function observeVisibleRects(
-  hostRoot          ,
-  selectors                 ,
-  callback                                                                     ,
-  options                              ,
-)                             {
+export function observeVisibleRects(hostRoot, selectors, callback, options) {
   if (!supportsTestSelectors) {
     invariant(false, 'Test selector API is not supported by this renderer.');
   }
@@ -531,13 +451,13 @@ export function observeVisibleRects(
   const commitHook = () => {
     const nextInstanceRoots = findAllNodes(hostRoot, selectors);
 
-    instanceRoots.forEach(target => {
+    instanceRoots.forEach((target) => {
       if (nextInstanceRoots.indexOf(target) < 0) {
         unobserve(target);
       }
     });
 
-    nextInstanceRoots.forEach(target => {
+    nextInstanceRoots.forEach((target) => {
       if (instanceRoots.indexOf(target) < 0) {
         observe(target);
       }

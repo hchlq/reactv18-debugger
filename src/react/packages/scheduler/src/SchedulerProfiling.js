@@ -4,14 +4,13 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
-                                                         
 import {enableProfiling} from './SchedulerFeatureFlags';
 
-let runIdCounter         = 0;
-let mainThreadIdCounter         = 0;
+let runIdCounter = 0;
+let mainThreadIdCounter = 0;
 
 // Bytes per element is 4
 const INITIAL_EVENT_LOG_SIZE = 131072;
@@ -55,14 +54,14 @@ function logEvent(entries) {
   }
 }
 
-export function startLoggingProfilingEvents()       {
+export function startLoggingProfilingEvents() {
   eventLogSize = INITIAL_EVENT_LOG_SIZE;
   eventLogBuffer = new ArrayBuffer(eventLogSize * 4);
   eventLog = new Int32Array(eventLogBuffer);
   eventLogIndex = 0;
 }
 
-export function stopLoggingProfilingEvents()                     {
+export function stopLoggingProfilingEvents() {
   const buffer = eventLogBuffer;
   eventLogSize = 0;
   eventLogBuffer = null;
@@ -72,12 +71,9 @@ export function stopLoggingProfilingEvents()                     {
 }
 
 export function markTaskStart(
-  task   
-               
-                                 
-       
-   ,
-  ms        ,
+  task,
+
+  ms,
 ) {
   if (enableProfiling) {
     if (eventLog !== null) {
@@ -90,12 +86,9 @@ export function markTaskStart(
 }
 
 export function markTaskCompleted(
-  task   
-               
-                                 
-       
-   ,
-  ms        ,
+  task,
+
+  ms,
 ) {
   if (enableProfiling) {
     if (eventLog !== null) {
@@ -105,12 +98,9 @@ export function markTaskCompleted(
 }
 
 export function markTaskCanceled(
-  task   
-               
-                                 
-       
-   ,
-  ms        ,
+  task,
+
+  ms,
 ) {
   if (enableProfiling) {
     if (eventLog !== null) {
@@ -120,12 +110,9 @@ export function markTaskCanceled(
 }
 
 export function markTaskErrored(
-  task   
-               
-                                 
-       
-   ,
-  ms        ,
+  task,
+
+  ms,
 ) {
   if (enableProfiling) {
     if (eventLog !== null) {
@@ -135,12 +122,9 @@ export function markTaskErrored(
 }
 
 export function markTaskRun(
-  task   
-               
-                                 
-       
-   ,
-  ms        ,
+  task,
+
+  ms,
 ) {
   if (enableProfiling) {
     runIdCounter++;
@@ -151,7 +135,7 @@ export function markTaskRun(
   }
 }
 
-export function markTaskYield(task                   , ms        ) {
+export function markTaskYield(task, ms) {
   if (enableProfiling) {
     if (eventLog !== null) {
       logEvent([TaskYieldEvent, ms * 1000, task.id, runIdCounter]);
@@ -159,7 +143,7 @@ export function markTaskYield(task                   , ms        ) {
   }
 }
 
-export function markSchedulerSuspended(ms        ) {
+export function markSchedulerSuspended(ms) {
   if (enableProfiling) {
     mainThreadIdCounter++;
 
@@ -169,7 +153,7 @@ export function markSchedulerSuspended(ms        ) {
   }
 }
 
-export function markSchedulerUnsuspended(ms        ) {
+export function markSchedulerUnsuspended(ms) {
   if (enableProfiling) {
     if (eventLog !== null) {
       logEvent([SchedulerResumeEvent, ms * 1000, mainThreadIdCounter]);

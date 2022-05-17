@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -27,7 +27,7 @@ const immutable = Immutable.fromJS({
   a: [{hello: 'there'}, 'fixed', true],
   b: 123,
   c: {
-    '1': 'xyz',
+    1: 'xyz',
     xyz: 1,
   },
 });
@@ -50,6 +50,6 @@ export default function UnserializableProps() {
   );
 }
 
-function ChildComponent(props     ) {
+function ChildComponent(props) {
   return null;
 }

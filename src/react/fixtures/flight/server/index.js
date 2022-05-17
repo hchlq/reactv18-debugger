@@ -11,7 +11,7 @@ const express = require('express');
 const app = express();
 
 // Application
-app.get('/', function(req, res) {
+app.get('/', function (req, res) {
   if (process.env.NODE_ENV === 'development') {
     for (var key in require.cache) {
       delete require.cache[key];
@@ -24,7 +24,7 @@ app.listen(3001, () => {
   console.log('Flight Server listening on port 3001...');
 });
 
-app.on('error', function(error) {
+app.on('error', function (error) {
   if (error.syscall !== 'listen') {
     throw error;
   }

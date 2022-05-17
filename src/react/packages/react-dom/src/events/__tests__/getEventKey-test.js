@@ -35,7 +35,7 @@ describe('getEventKey', () => {
         let key = null;
         class Comp extends React.Component {
           render() {
-            return <input onKeyDown={e => (key = e.key)} />;
+            return <input onKeyDown={(e) => (key = e.key)} />;
           }
         }
 
@@ -56,7 +56,7 @@ describe('getEventKey', () => {
         let key = null;
         class Comp extends React.Component {
           render() {
-            return <input onKeyDown={e => (key = e.key)} />;
+            return <input onKeyDown={(e) => (key = e.key)} />;
           }
         }
 
@@ -80,7 +80,7 @@ describe('getEventKey', () => {
           let key = null;
           class Comp extends React.Component {
             render() {
-              return <input onKeyPress={e => (key = e.key)} />;
+              return <input onKeyPress={(e) => (key = e.key)} />;
             }
           }
 
@@ -101,7 +101,7 @@ describe('getEventKey', () => {
           let key = null;
           class Comp extends React.Component {
             render() {
-              return <input onKeyPress={e => (key = e.key)} />;
+              return <input onKeyPress={(e) => (key = e.key)} />;
             }
           }
 
@@ -124,7 +124,7 @@ describe('getEventKey', () => {
           let key = null;
           class Comp extends React.Component {
             render() {
-              return <input onKeyDown={e => (key = e.key)} />;
+              return <input onKeyDown={(e) => (key = e.key)} />;
             }
           }
 
@@ -145,7 +145,7 @@ describe('getEventKey', () => {
           let key = null;
           class Comp extends React.Component {
             render() {
-              return <input onKeyDown={e => (key = e.key)} />;
+              return <input onKeyDown={(e) => (key = e.key)} />;
             }
           }
 

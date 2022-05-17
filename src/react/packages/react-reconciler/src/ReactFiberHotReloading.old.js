@@ -4,14 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                          
-                                                
-                                                    
-                                                     
-                                                     
 
 import {
   flushSync,
@@ -37,38 +31,21 @@ import {
   REACT_LAZY_TYPE,
 } from 'shared/ReactSymbols';
 
-                       
-               
-   
-
-                              
-                             
-                               
-   
-
 // Resolves type to a family.
-                                           
 
 // Used by React Refresh runtime through DevTools Global Hook.
-                                                                         
-                                                                               
-                                                                             
-                                           
-                  
-                          
-                   
 
-let resolveFamily                        = null;
+let resolveFamily = null;
 // $FlowFixMe Flow gets confused by a WeakSet feature check below.
-let failedBoundaries                        = null;
+let failedBoundaries = null;
 
-export const setRefreshHandler = (handler                       )       => {
+export const setRefreshHandler = (handler) => {
   if (__DEV__) {
     resolveFamily = handler;
   }
 };
 
-export function resolveFunctionForHotReloading(type     )      {
+export function resolveFunctionForHotReloading(type) {
   if (__DEV__) {
     if (resolveFamily === null) {
       // Hot reloading is disabled.
@@ -85,12 +62,12 @@ export function resolveFunctionForHotReloading(type     )      {
   }
 }
 
-export function resolveClassForHotReloading(type     )      {
+export function resolveClassForHotReloading(type) {
   // No implementation differences.
   return resolveFunctionForHotReloading(type);
 }
 
-export function resolveForwardRefForHotReloading(type     )      {
+export function resolveForwardRefForHotReloading(type) {
   if (__DEV__) {
     if (resolveFamily === null) {
       // Hot reloading is disabled.
@@ -114,7 +91,7 @@ export function resolveForwardRefForHotReloading(type     )      {
             render: currentRender,
           };
           if (type.displayName !== undefined) {
-            (syntheticType     ).displayName = type.displayName;
+            syntheticType.displayName = type.displayName;
           }
           return syntheticType;
         }
@@ -128,10 +105,7 @@ export function resolveForwardRefForHotReloading(type     )      {
   }
 }
 
-export function isCompatibleFamilyForHotReloading(
-  fiber       ,
-  element              ,
-)          {
+export function isCompatibleFamilyForHotReloading(fiber, element) {
   if (__DEV__) {
     if (resolveFamily === null) {
       // Hot reloading is disabled.
@@ -209,7 +183,7 @@ export function isCompatibleFamilyForHotReloading(
   }
 }
 
-export function markFailedErrorBoundaryForHotReloading(fiber       ) {
+export function markFailedErrorBoundaryForHotReloading(fiber) {
   if (__DEV__) {
     if (resolveFamily === null) {
       // Hot reloading is disabled.
@@ -225,10 +199,7 @@ export function markFailedErrorBoundaryForHotReloading(fiber       ) {
   }
 }
 
-export const scheduleRefresh                  = (
-  root           ,
-  update               ,
-)       => {
+export const scheduleRefresh = (root, update) => {
   if (__DEV__) {
     if (resolveFamily === null) {
       // Hot reloading is disabled.
@@ -246,10 +217,7 @@ export const scheduleRefresh                  = (
   }
 };
 
-export const scheduleRoot               = (
-  root           ,
-  element               ,
-)       => {
+export const scheduleRoot = (root, element) => {
   if (__DEV__) {
     if (root.context !== emptyContextObject) {
       // Super edge case: root has a legacy _renderSubtree context
@@ -265,9 +233,9 @@ export const scheduleRoot               = (
 };
 
 function scheduleFibersWithFamiliesRecursively(
-  fiber       ,
-  updatedFamilies             ,
-  staleFamilies             ,
+  fiber,
+  updatedFamilies,
+  staleFamilies,
 ) {
   if (__DEV__) {
     const {alternate, child, sibling, tag, type} = fiber;
@@ -338,13 +306,10 @@ function scheduleFibersWithFamiliesRecursively(
   }
 }
 
-export const findHostInstancesForRefresh                              = (
-  root           ,
-  families               ,
-)                => {
+export const findHostInstancesForRefresh = (root, families) => {
   if (__DEV__) {
     const hostInstances = new Set();
-    const types = new Set(families.map(family => family.current));
+    const types = new Set(families.map((family) => family.current));
     findHostInstancesForMatchingFibersRecursively(
       root.current,
       types,
@@ -359,9 +324,9 @@ export const findHostInstancesForRefresh                              = (
 };
 
 function findHostInstancesForMatchingFibersRecursively(
-  fiber       ,
-  types          ,
-  hostInstances               ,
+  fiber,
+  types,
+  hostInstances,
 ) {
   if (__DEV__) {
     const {child, sibling, tag, type} = fiber;
@@ -413,10 +378,7 @@ function findHostInstancesForMatchingFibersRecursively(
   }
 }
 
-function findHostInstancesForFiberShallowly(
-  fiber       ,
-  hostInstances               ,
-)       {
+function findHostInstancesForFiberShallowly(fiber, hostInstances) {
   if (__DEV__) {
     const foundHostInstances = findChildHostInstancesForFiberShallowly(
       fiber,
@@ -447,12 +409,9 @@ function findHostInstancesForFiberShallowly(
   }
 }
 
-function findChildHostInstancesForFiberShallowly(
-  fiber       ,
-  hostInstances               ,
-)          {
+function findChildHostInstancesForFiberShallowly(fiber, hostInstances) {
   if (__DEV__) {
-    let node        = fiber;
+    let node = fiber;
     let foundHostInstances = false;
     while (true) {
       if (node.tag === HostComponent) {

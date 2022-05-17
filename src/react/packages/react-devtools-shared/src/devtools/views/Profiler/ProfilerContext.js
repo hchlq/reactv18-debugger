@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -17,75 +17,10 @@ import {
 } from '../Components/TreeContext';
 import {StoreContext} from '../context';
 
-                                                   
-
-                                                                    
-
-                        
-                                              
-                       
-                             
-
-                                     
-                                                                                        
-                                                                    
-                                                                            
-                            
-                            
-                       
-                                              
-                         
-                        
-                             
-
-                                                   
-                                                
-                                                                                  
-                                                       
-                        
-                                  
-
-                                                       
-                                                                            
-                                                                              
-                                 
-                                                     
-                            
-                                                
-
-                                                                  
-                                                                                                
-                                                                                
-                                                  
-                                     
-                                                    
-
-                                                                          
-                                 
-                                   
-                                                                
-
-                                                                       
-                                       
-                                                 
-   
-
-const ProfilerContext = createContext         (((null     )         ));
+const ProfilerContext = createContext(null);
 ProfilerContext.displayName = 'ProfilerContext';
 
-                             
-                            
-                            
-                       
-                                              
-                             
-   
-
-               
-                       
-   
-
-function ProfilerContextController({children}       ) {
+function ProfilerContextController({children}) {
   const store = useContext(StoreContext);
   const {selectedElementID} = useContext(TreeStateContext);
   const dispatch = useContext(TreeDispatcherContext);
@@ -101,7 +36,7 @@ function ProfilerContextController({children}       ) {
         profilingData: profilerStore.profilingData,
         supportsProfiling: store.supportsProfiling,
       }),
-      subscribe: (callback          ) => {
+      subscribe: (callback) => {
         profilerStore.addListener('profilingData', callback);
         profilerStore.addListener('isProcessingData', callback);
         profilerStore.addListener('isProfiling', callback);
@@ -122,18 +57,15 @@ function ProfilerContextController({children}       ) {
     isProfiling,
     profilingData,
     supportsProfiling,
-  } = useSubscription                     (subscription);
+  } = useSubscription(subscription);
 
-  const [
-    prevProfilingData,
-    setPrevProfilingData,
-  ] = useState                              (null);
-  const [rootID, setRootID] = useState               (null);
-  const [selectedFiberID, selectFiberID] = useState               (null);
-  const [selectedFiberName, selectFiberName] = useState               (null);
+  const [prevProfilingData, setPrevProfilingData] = useState(null);
+  const [rootID, setRootID] = useState(null);
+  const [selectedFiberID, selectFiberID] = useState(null);
+  const [selectedFiberName, selectFiberName] = useState(null);
 
   const selectFiber = useCallback(
-    (id               , name               ) => {
+    (id, name) => {
       selectFiberID(id);
       selectFiberName(name);
 
@@ -159,7 +91,7 @@ function ProfilerContextController({children}       ) {
   );
 
   const setRootIDAndClearFiber = useCallback(
-    (id               ) => {
+    (id) => {
       selectFiber(null, null);
       setRootID(id);
     },
@@ -178,9 +110,8 @@ function ProfilerContextController({children}       ) {
         if (rootID === null || !dataForRoots.has(rootID)) {
           let selectedElementRootID = null;
           if (selectedElementID !== null) {
-            selectedElementRootID = store.getRootIDForElement(
-              selectedElementID,
-            );
+            selectedElementRootID =
+              store.getRootIDForElement(selectedElementID);
           }
           if (
             selectedElementRootID !== null &&
@@ -199,26 +130,23 @@ function ProfilerContextController({children}       ) {
     () => store.profilerStore.startProfiling(),
     [store],
   );
-  const stopProfiling = useCallback(() => store.profilerStore.stopProfiling(), [
-    store,
-  ]);
+  const stopProfiling = useCallback(
+    () => store.profilerStore.stopProfiling(),
+    [store],
+  );
 
-  const [
-    isCommitFilterEnabled,
-    setIsCommitFilterEnabled,
-  ] = useLocalStorage         ('React::DevTools::isCommitFilterEnabled', false);
-  const [minCommitDuration, setMinCommitDuration] = useLocalStorage        (
+  const [isCommitFilterEnabled, setIsCommitFilterEnabled] = useLocalStorage(
+    'React::DevTools::isCommitFilterEnabled',
+    false,
+  );
+  const [minCommitDuration, setMinCommitDuration] = useLocalStorage(
     'minCommitDuration',
     0,
   );
 
-  const [selectedCommitIndex, selectCommitIndex] = useState               (
-    null,
-  );
-  const [selectedTabID, selectTab] = useState       ('flame-chart');
-  const [selectedInteractionID, selectInteraction] = useState               (
-    null,
-  );
+  const [selectedCommitIndex, selectCommitIndex] = useState(null);
+  const [selectedTabID, selectTab] = useState('flame-chart');
+  const [selectedInteractionID, selectInteraction] = useState(null);
 
   if (isProfiling) {
     batchedUpdates(() => {

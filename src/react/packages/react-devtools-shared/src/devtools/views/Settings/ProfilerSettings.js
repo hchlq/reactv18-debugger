@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -15,7 +15,7 @@ import {ProfilerContext} from 'react-devtools-shared/src/devtools/views/Profiler
 
 import styles from './SettingsShared.css';
 
-export default function ProfilerSettings(_      ) {
+export default function ProfilerSettings(_) {
   const {
     isCommitFilterEnabled,
     minCommitDuration,
@@ -27,14 +27,14 @@ export default function ProfilerSettings(_      ) {
   const recordChangeDescriptionsSubscription = useMemo(
     () => ({
       getCurrentValue: () => store.recordChangeDescriptions,
-      subscribe: (callback          ) => {
+      subscribe: (callback) => {
         store.addListener('recordChangeDescriptions', callback);
         return () => store.removeListener('recordChangeDescriptions', callback);
       },
     }),
     [store],
   );
-  const recordChangeDescriptions = useSubscription         (
+  const recordChangeDescriptions = useSubscription(
     recordChangeDescriptionsSubscription,
   );
 
@@ -45,7 +45,7 @@ export default function ProfilerSettings(_      ) {
     [store],
   );
   const updateMinCommitDuration = useCallback(
-    (event                                  ) => {
+    (event) => {
       const newValue = parseFloat(event.currentTarget.value);
       setMinCommitDuration(
         Number.isNaN(newValue) || newValue <= 0 ? 0 : newValue,
@@ -54,7 +54,7 @@ export default function ProfilerSettings(_      ) {
     [setMinCommitDuration],
   );
   const updateIsCommitFilterEnabled = useCallback(
-    (event                                  ) => {
+    (event) => {
       const checked = event.currentTarget.checked;
       setIsCommitFilterEnabled(checked);
       if (checked) {
@@ -66,7 +66,7 @@ export default function ProfilerSettings(_      ) {
     [setIsCommitFilterEnabled],
   );
 
-  const minCommitDurationInputRef = useRef                         (null);
+  const minCommitDurationInputRef = useRef(null);
 
   return (
     <div className={styles.Settings}>

@@ -4,20 +4,17 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                                     
-                                                                  
 
 describe('editing interface', () => {
   let PropTypes;
   let React;
   let ReactDOM;
-  let bridge                ;
-  let store       ;
+  let bridge;
+  let store;
 
-  const act = (callback          ) => {
+  const act = (callback) => {
     callback();
 
     jest.runAllTimers(); // Flush Bridge operations
@@ -73,7 +70,7 @@ describe('editing interface', () => {
         ),
       );
 
-      id = ((store.getElementIDAtIndex(0)     )        );
+      id = store.getElementIDAtIndex(0);
 
       expect(committedProps).toStrictEqual({
         array: [1, 2, 3],
@@ -88,7 +85,7 @@ describe('editing interface', () => {
       mountTestApp();
 
       function overrideProps(path, value) {
-        const rendererID = ((store.getRendererIDForElement(id)     )        );
+        const rendererID = store.getRendererIDForElement(id);
         bridge.send('overrideValueAtPath', {
           id,
           path,
@@ -129,7 +126,7 @@ describe('editing interface', () => {
       mountTestApp();
 
       function renamePath(oldPath, newPath) {
-        const rendererID = ((store.getRendererIDForElement(id)     )        );
+        const rendererID = store.getRendererIDForElement(id);
         bridge.send('renamePath', {
           id,
           oldPath,
@@ -162,7 +159,7 @@ describe('editing interface', () => {
       await mountTestApp();
 
       function overrideProps(path, value) {
-        const rendererID = ((store.getRendererIDForElement(id)     )        );
+        const rendererID = store.getRendererIDForElement(id);
         bridge.send('overrideValueAtPath', {
           id,
           path,
@@ -210,7 +207,7 @@ describe('editing interface', () => {
       mountTestApp();
 
       function deletePath(path) {
-        const rendererID = ((store.getRendererIDForElement(id)     )        );
+        const rendererID = store.getRendererIDForElement(id);
         bridge.send('deletePath', {
           id,
           path,
@@ -271,7 +268,7 @@ describe('editing interface', () => {
         ),
       );
 
-      id = ((store.getElementIDAtIndex(0)     )        );
+      id = store.getElementIDAtIndex(0);
 
       expect(committedState).toStrictEqual({
         array: [1, 2, 3],
@@ -286,7 +283,7 @@ describe('editing interface', () => {
       mountTestApp();
 
       function overrideState(path, value) {
-        const rendererID = ((store.getRendererIDForElement(id)     )        );
+        const rendererID = store.getRendererIDForElement(id);
         bridge.send('overrideValueAtPath', {
           id,
           path,
@@ -323,7 +320,7 @@ describe('editing interface', () => {
       mountTestApp();
 
       function renamePath(oldPath, newPath) {
-        const rendererID = ((store.getRendererIDForElement(id)     )        );
+        const rendererID = store.getRendererIDForElement(id);
         bridge.send('renamePath', {
           id,
           oldPath,
@@ -357,7 +354,7 @@ describe('editing interface', () => {
       await mountTestApp();
 
       function overrideState(path, value) {
-        const rendererID = ((store.getRendererIDForElement(id)     )        );
+        const rendererID = store.getRendererIDForElement(id);
         bridge.send('overrideValueAtPath', {
           id,
           path,
@@ -405,7 +402,7 @@ describe('editing interface', () => {
       mountTestApp();
 
       function deletePath(path) {
-        const rendererID = ((store.getRendererIDForElement(id)     )        );
+        const rendererID = store.getRendererIDForElement(id);
         bridge.send('deletePath', {
           id,
           path,
@@ -442,7 +439,7 @@ describe('editing interface', () => {
     let id;
 
     function mountTestApp() {
-      class LegacyContextProvider extends React.Component      {
+      class LegacyContextProvider extends React.Component {
         static childContextTypes = {
           array: PropTypes.array,
           object: PropTypes.object,
@@ -462,7 +459,7 @@ describe('editing interface', () => {
         }
       }
 
-      class ClassComponent extends React.Component      {
+      class ClassComponent extends React.Component {
         static contextTypes = {
           array: PropTypes.array,
           object: PropTypes.object,
@@ -491,7 +488,7 @@ describe('editing interface', () => {
       // This test only covers Class components.
       // Function components using legacy context are not editable.
 
-      id = ((store.getElementIDAtIndex(1)     )        );
+      id = store.getElementIDAtIndex(1);
 
       expect(committedContext).toStrictEqual({
         array: [1, 2, 3],
@@ -506,7 +503,7 @@ describe('editing interface', () => {
       mountTestApp();
 
       function overrideContext(path, value) {
-        const rendererID = ((store.getRendererIDForElement(id)     )        );
+        const rendererID = store.getRendererIDForElement(id);
 
         bridge.send('overrideValueAtPath', {
           id,
@@ -550,7 +547,7 @@ describe('editing interface', () => {
       mountTestApp();
 
       function renamePath(oldPath, newPath) {
-        const rendererID = ((store.getRendererIDForElement(id)     )        );
+        const rendererID = store.getRendererIDForElement(id);
 
         bridge.send('renamePath', {
           id,
@@ -585,7 +582,7 @@ describe('editing interface', () => {
       await mountTestApp();
 
       function overrideContext(path, value) {
-        const rendererID = ((store.getRendererIDForElement(id)     )        );
+        const rendererID = store.getRendererIDForElement(id);
 
         bridge.send('overrideValueAtPath', {
           id,
@@ -634,7 +631,7 @@ describe('editing interface', () => {
       mountTestApp();
 
       function deletePath(path) {
-        const rendererID = ((store.getRendererIDForElement(id)     )        );
+        const rendererID = store.getRendererIDForElement(id);
 
         bridge.send('deletePath', {
           id,

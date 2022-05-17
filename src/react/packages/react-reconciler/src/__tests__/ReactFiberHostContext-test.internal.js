@@ -25,35 +25,35 @@ describe('ReactFiberHostContext', () => {
   it('works with null host context', () => {
     let creates = 0;
     const Renderer = ReactFiberReconciler({
-      prepareForCommit: function() {
+      prepareForCommit: function () {
         return null;
       },
-      resetAfterCommit: function() {},
-      getRootHostContext: function() {
+      resetAfterCommit: function () {},
+      getRootHostContext: function () {
         return null;
       },
-      getChildHostContext: function() {
+      getChildHostContext: function () {
         return null;
       },
-      shouldSetTextContent: function() {
+      shouldSetTextContent: function () {
         return false;
       },
-      createInstance: function() {
+      createInstance: function () {
         creates++;
       },
-      finalizeInitialChildren: function() {
+      finalizeInitialChildren: function () {
         return null;
       },
-      appendInitialChild: function() {
+      appendInitialChild: function () {
         return null;
       },
-      now: function() {
+      now: function () {
         return 0;
       },
-      appendChildToContainer: function() {
+      appendChildToContainer: function () {
         return null;
       },
-      clearContainer: function() {},
+      clearContainer: function () {},
       supportsMutation: true,
     });
 
@@ -77,38 +77,38 @@ describe('ReactFiberHostContext', () => {
   it('should send the context to prepareForCommit and resetAfterCommit', () => {
     const rootContext = {};
     const Renderer = ReactFiberReconciler({
-      prepareForCommit: function(hostContext) {
+      prepareForCommit: function (hostContext) {
         expect(hostContext).toBe(rootContext);
         return null;
       },
-      resetAfterCommit: function(hostContext) {
+      resetAfterCommit: function (hostContext) {
         expect(hostContext).toBe(rootContext);
       },
-      getRootHostContext: function() {
+      getRootHostContext: function () {
         return null;
       },
-      getChildHostContext: function() {
+      getChildHostContext: function () {
         return null;
       },
-      shouldSetTextContent: function() {
+      shouldSetTextContent: function () {
         return false;
       },
-      createInstance: function() {
+      createInstance: function () {
         return null;
       },
-      finalizeInitialChildren: function() {
+      finalizeInitialChildren: function () {
         return null;
       },
-      appendInitialChild: function() {
+      appendInitialChild: function () {
         return null;
       },
-      now: function() {
+      now: function () {
         return 0;
       },
-      appendChildToContainer: function() {
+      appendChildToContainer: function () {
         return null;
       },
-      clearContainer: function() {},
+      clearContainer: function () {},
       supportsMutation: true,
     });
 

@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -32,7 +32,7 @@ import Store from '../../store';
 
 import styles from './Profiler.css';
 
-function Profiler(_      ) {
+function Profiler(_) {
   const {
     didRecordCommits,
     isProcessingData,
@@ -178,7 +178,8 @@ const ProfilingNotSupported = () => (
         className={styles.Link}
         href="https://reactjs.org/link/profiling"
         rel="noopener noreferrer"
-        target="_blank">
+        target="_blank"
+      >
         reactjs.org/link/profiling
       </a>
       .
@@ -202,7 +203,7 @@ const RecordingInProgress = () => (
   </div>
 );
 
-function onErrorRetry(store       ) {
+function onErrorRetry(store) {
   // If an error happened in the Profiler,
   // we should clear data on retry (or it will just happen again).
   store.profilerStore.profilingData = null;

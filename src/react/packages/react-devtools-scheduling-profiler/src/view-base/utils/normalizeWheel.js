@@ -4,15 +4,10 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 // Adapted from: https://github.com/facebookarchive/fixed-data-table/blob/master/src/vendor_upstream/dom/normalizeWheel.js
-
-                                     
-                 
-                 
-   
 
 // Reasonable defaults
 const LINE_HEIGHT = 40;
@@ -67,7 +62,7 @@ const PAGE_HEIGHT = 800;
  *   OS X + Chrome  (trackpad)  -    2   pixel delta  (wheelDelta   -6)
  *   OS X + Firefox (trackpad)  -    1   pixel delta  (wheelDelta  N/A)
  */
-export function normalizeWheel(event            )                       {
+export function normalizeWheel(event) {
   let deltaX = event.deltaX;
   let deltaY = event.deltaY;
 

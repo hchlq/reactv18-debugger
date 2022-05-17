@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -43,7 +43,7 @@ function PrimaryFallbackTest({initialSuspend}) {
       <label>
         <input
           checked={suspend}
-          onChange={e => setSuspend(e.target.checked)}
+          onChange={(e) => setSuspend(e.target.checked)}
           type="checkbox"
         />
         Suspend
@@ -59,7 +59,7 @@ function PrimaryFallbackTest({initialSuspend}) {
 function useTestSequence(label, T1, T2) {
   const [step, setStep] = useState(0);
   const next = (
-    <button onClick={() => setStep(s => (s + 1) % allSteps.length)}>
+    <button onClick={() => setStep((s) => (s + 1) % allSteps.length)}>
       next {label} content
     </button>
   );
@@ -143,7 +143,8 @@ function LoadLater() {
     <Suspense
       fallback={
         <Fallback1 onClick={() => setLoadChild(true)}>Click to load</Fallback1>
-      }>
+      }
+    >
       {loadChild ? (
         <Primary1 onClick={() => setLoadChild(false)}>
           Loaded! Click to suspend again.
@@ -156,22 +157,22 @@ function LoadLater() {
 }
 
 function Never() {
-  throw new Promise(resolve => {});
+  throw new Promise((resolve) => {});
 }
 
-function Fallback1({prop, ...rest}     ) {
+function Fallback1({prop, ...rest}) {
   return <span {...rest} />;
 }
 
-function Fallback2({prop, ...rest}     ) {
+function Fallback2({prop, ...rest}) {
   return <span {...rest} />;
 }
 
-function Primary1({prop, ...rest}     ) {
+function Primary1({prop, ...rest}) {
   return <span {...rest} />;
 }
 
-function Primary2({prop, ...rest}     ) {
+function Primary2({prop, ...rest}) {
   return <span {...rest} />;
 }
 

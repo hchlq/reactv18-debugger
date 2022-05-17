@@ -4,43 +4,33 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                     
-                                 
-
-                                                     
-                                  
 
 /**
  * A function that takes a list of subviews, currently laid out in
  * `existingLayout`, and lays them out into `containingFrame`.
  */
-                        
-                         
-                        
-            
 
-function viewToLayoutInfo(view      )             {
+function viewToLayoutInfo(view) {
   return {view, frame: view.frame};
 }
 
-export function viewsToLayout(views        )         {
+export function viewsToLayout(views) {
   return views.map(viewToLayoutInfo);
 }
 
 /**
  * Applies `layout`'s `frame`s to its corresponding `view`.
  */
-export function collapseLayoutIntoViews(layout        ) {
+export function collapseLayoutIntoViews(layout) {
   layout.forEach(({view, frame}) => view.setFrame(frame));
 }
 
 /**
  * A no-operation layout; does not modify the layout.
  */
-export const noopLayout           = layout => layout;
+export const noopLayout = (layout) => layout;
 
 /**
  * Layer views on top of each other. All views' frames will be set to
@@ -52,16 +42,16 @@ export const noopLayout           = layout => layout;
  * - `containerWidthLayout`, and
  * - `containerHeightLayout`.
  */
-export const layeredLayout           = (layout, containerFrame) =>
-  layout.map(layoutInfo => ({...layoutInfo, frame: containerFrame}));
+export const layeredLayout = (layout, containerFrame) =>
+  layout.map((layoutInfo) => ({...layoutInfo, frame: containerFrame}));
 
 /**
  * Stacks `views` vertically in `frame`. All views in `views` will have their
  * widths set to the frame's width.
  */
-export const verticallyStackedLayout           = (layout, containerFrame) => {
+export const verticallyStackedLayout = (layout, containerFrame) => {
   let currentY = containerFrame.origin.y;
-  return layout.map(layoutInfo => {
+  return layout.map((layoutInfo) => {
     const desiredSize = layoutInfo.view.desiredSize();
     const height = desiredSize
       ? desiredSize.height
@@ -81,8 +71,8 @@ export const verticallyStackedLayout           = (layout, containerFrame) => {
 /**
  * A layouter that aligns all frames' lefts to the container frame's left.
  */
-export const alignToContainerXLayout           = (layout, containerFrame) => {
-  return layout.map(layoutInfo => ({
+export const alignToContainerXLayout = (layout, containerFrame) => {
+  return layout.map((layoutInfo) => ({
     ...layoutInfo,
     frame: {
       origin: {
@@ -97,8 +87,8 @@ export const alignToContainerXLayout           = (layout, containerFrame) => {
 /**
  * A layouter that aligns all frames' tops to the container frame's top.
  */
-export const alignToContainerYLayout           = (layout, containerFrame) => {
-  return layout.map(layoutInfo => ({
+export const alignToContainerYLayout = (layout, containerFrame) => {
+  return layout.map((layoutInfo) => ({
     ...layoutInfo,
     frame: {
       origin: {
@@ -113,8 +103,8 @@ export const alignToContainerYLayout           = (layout, containerFrame) => {
 /**
  * A layouter that sets all frames' widths to `containerFrame.size.width`.
  */
-export const containerWidthLayout           = (layout, containerFrame) => {
-  return layout.map(layoutInfo => ({
+export const containerWidthLayout = (layout, containerFrame) => {
+  return layout.map((layoutInfo) => ({
     ...layoutInfo,
     frame: {
       origin: layoutInfo.frame.origin,
@@ -129,8 +119,8 @@ export const containerWidthLayout           = (layout, containerFrame) => {
 /**
  * A layouter that sets all frames' heights to `containerFrame.size.height`.
  */
-export const containerHeightLayout           = (layout, containerFrame) => {
-  return layout.map(layoutInfo => ({
+export const containerHeightLayout = (layout, containerFrame) => {
+  return layout.map((layoutInfo) => ({
     ...layoutInfo,
     frame: {
       origin: layoutInfo.frame.origin,
@@ -146,8 +136,8 @@ export const containerHeightLayout           = (layout, containerFrame) => {
  * A layouter that sets all frames' heights to the desired height of its view.
  * If the view has no desired size, the frame's height is set to 0.
  */
-export const desiredHeightLayout           = layout => {
-  return layout.map(layoutInfo => {
+export const desiredHeightLayout = (layout) => {
+  return layout.map((layoutInfo) => {
     const desiredSize = layoutInfo.view.desiredSize();
     const height = desiredSize ? desiredSize.height : 0;
     return {
@@ -166,11 +156,11 @@ export const desiredHeightLayout           = layout => {
 /**
  * A layouter that sets all frames' heights to the height of the tallest frame.
  */
-export const uniformMaxSubviewHeightLayout           = layout => {
+export const uniformMaxSubviewHeightLayout = (layout) => {
   const maxHeight = Math.max(
-    ...layout.map(layoutInfo => layoutInfo.frame.size.height),
+    ...layout.map((layoutInfo) => layoutInfo.frame.size.height),
   );
-  return layout.map(layoutInfo => ({
+  return layout.map((layoutInfo) => ({
     ...layoutInfo,
     frame: {
       origin: layoutInfo.frame.origin,
@@ -187,11 +177,8 @@ export const uniformMaxSubviewHeightLayout           = layout => {
  * - If a frame's height >= `containerFrame.size.height`, the frame is left unchanged.
  * - Otherwise, sets the frame's height to `containerFrame.size.height`.
  */
-export const atLeastContainerHeightLayout           = (
-  layout,
-  containerFrame,
-) => {
-  return layout.map(layoutInfo => ({
+export const atLeastContainerHeightLayout = (layout, containerFrame) => {
+  return layout.map((layoutInfo) => ({
     ...layoutInfo,
     frame: {
       origin: layoutInfo.frame.origin,
@@ -210,10 +197,7 @@ export const atLeastContainerHeightLayout           = (
  * Forces last view to take up the space below the second-last view.
  * Intended to be used with a vertical stack layout.
  */
-export const lastViewTakesUpRemainingSpaceLayout           = (
-  layout,
-  containerFrame,
-) => {
+export const lastViewTakesUpRemainingSpaceLayout = (layout, containerFrame) => {
   if (layout.length === 0) {
     // Nothing to do
     return layout;
@@ -253,12 +237,12 @@ export const lastViewTakesUpRemainingSpaceLayout           = (
 /**
  * Create a layouter that applies each layouter in `layouters` in sequence.
  */
-export function createComposedLayout(...layouters            )           {
+export function createComposedLayout(...layouters) {
   if (layouters.length === 0) {
     return noopLayout;
   }
 
-  const composedLayout           = (layout, containerFrame) => {
+  const composedLayout = (layout, containerFrame) => {
     return layouters.reduce(
       (intermediateLayout, layouter) =>
         layouter(intermediateLayout, containerFrame),

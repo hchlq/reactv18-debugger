@@ -4,16 +4,13 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
-export default class EventEmitter                 {
-  listenersMap                               = new Map();
+export default class EventEmitter {
+  listenersMap = new Map();
 
-  addListener                      (
-    event       ,
-    listener                                         ,
-  )       {
+  addListener(event, listener) {
     const listeners = this.listenersMap.get(event);
     if (listeners === undefined) {
       this.listenersMap.set(event, [listener]);
@@ -25,10 +22,7 @@ export default class EventEmitter                 {
     }
   }
 
-  emit                      (
-    event       ,
-    ...args                             
-  )       {
+  emit(event, ...args) {
     const listeners = this.listenersMap.get(event);
     if (listeners !== undefined) {
       if (listeners.length === 1) {
@@ -59,11 +53,11 @@ export default class EventEmitter                 {
     }
   }
 
-  removeAllListeners()       {
+  removeAllListeners() {
     this.listenersMap.clear();
   }
 
-  removeListener(event               , listener          )       {
+  removeListener(event, listener) {
     const listeners = this.listenersMap.get(event);
     if (listeners !== undefined) {
       const index = listeners.indexOf(listener);

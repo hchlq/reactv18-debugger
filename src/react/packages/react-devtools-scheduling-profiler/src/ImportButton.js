@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -15,12 +15,8 @@ import ButtonIcon from 'react-devtools-shared/src/devtools/views/ButtonIcon';
 
 import styles from './ImportButton.css';
 
-               
-                                     
-   
-
-export default function ImportButton({onFileSelect}       ) {
-  const inputRef = useRef                         (null);
+export default function ImportButton({onFileSelect}) {
+  const inputRef = useRef(null);
 
   const handleFiles = useCallback(() => {
     const input = inputRef.current;

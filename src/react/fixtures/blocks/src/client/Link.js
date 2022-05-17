@@ -13,12 +13,13 @@ export default function Link({to, children, ...rest}) {
   return (
     <a
       href={to}
-      onClick={e => {
+      onClick={(e) => {
         e.preventDefault();
         window.history.pushState(null, null, to);
         navigate(to);
       }}
-      {...rest}>
+      {...rest}
+    >
       {children}
     </a>
   );

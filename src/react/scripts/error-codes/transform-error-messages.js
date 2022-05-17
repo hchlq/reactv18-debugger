@@ -11,7 +11,7 @@ const evalToString = require('../shared/evalToString');
 const invertObject = require('./invertObject');
 const helperModuleImports = require('@babel/helper-module-imports');
 
-module.exports = function(babel) {
+module.exports = function (babel) {
   const t = babel.types;
 
   const DEV_EXPRESSION = t.identifier('__DEV__');
@@ -44,7 +44,7 @@ module.exports = function(babel) {
           const errorMsgExpressions = Array.from(node.arguments.slice(2));
           const errorMsgQuasis = errorMsgLiteral
             .split('%s')
-            .map(raw => t.templateElement({raw, cooked: String.raw({raw})}));
+            .map((raw) => t.templateElement({raw, cooked: String.raw({raw})}));
 
           // Outputs:
           //   `A ${adj} message that contains ${noun}`;
@@ -118,11 +118,12 @@ module.exports = function(babel) {
           prodErrorId = parseInt(prodErrorId, 10);
 
           // Import ReactErrorProd
-          const formatProdErrorMessageIdentifier = helperModuleImports.addDefault(
-            path,
-            'shared/formatProdErrorMessage',
-            {nameHint: 'formatProdErrorMessage'}
-          );
+          const formatProdErrorMessageIdentifier =
+            helperModuleImports.addDefault(
+              path,
+              'shared/formatProdErrorMessage',
+              {nameHint: 'formatProdErrorMessage'}
+            );
 
           // Outputs:
           //   formatProdErrorMessage(ERR_CODE, adj, noun);

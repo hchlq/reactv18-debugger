@@ -37,7 +37,8 @@ function loadModules({
   ReactFeatureFlags.enableProfilerTimer = enableProfilerTimer;
   ReactFeatureFlags.enableProfilerCommitHooks = enableProfilerCommitHooks;
   ReactFeatureFlags.enableSchedulerTracing = enableSchedulerTracing;
-  ReactFeatureFlags.replayFailedUnitOfWorkWithInvokeGuardedCallback = replayFailedUnitOfWorkWithInvokeGuardedCallback;
+  ReactFeatureFlags.replayFailedUnitOfWorkWithInvokeGuardedCallback =
+    replayFailedUnitOfWorkWithInvokeGuardedCallback;
 
   React = require('react');
   Scheduler = require('scheduler');
@@ -113,8 +114,8 @@ function loadModules({
 
 describe('Profiler', () => {
   describe('works in profiling and non-profiling bundles', () => {
-    [true, false].forEach(enableSchedulerTracing => {
-      [true, false].forEach(enableProfilerTimer => {
+    [true, false].forEach((enableSchedulerTracing) => {
+      [true, false].forEach((enableProfilerTimer) => {
         describe(`enableSchedulerTracing:${
           enableSchedulerTracing ? 'enabled' : 'disabled'
         } enableProfilerTimer:${
@@ -193,7 +194,7 @@ describe('Profiler', () => {
     });
   });
 
-  [true, false].forEach(enableSchedulerTracing => {
+  [true, false].forEach((enableSchedulerTracing) => {
     describe(`onRender enableSchedulerTracing:${
       enableSchedulerTracing ? 'enabled' : 'disabled'
     }`, () => {
@@ -206,7 +207,7 @@ describe('Profiler', () => {
       });
 
       it('should handle errors thrown', () => {
-        const callback = jest.fn(id => {
+        const callback = jest.fn((id) => {
           if (id === 'throw') {
             throw Error('expected');
           }
@@ -267,7 +268,7 @@ describe('Profiler', () => {
       it('does not record times for components outside of Profiler tree', () => {
         // Mock the Scheduler module so we can track how many times the current
         // time is read
-        jest.mock('scheduler', obj => {
+        jest.mock('scheduler', (obj) => {
           const ActualScheduler = require.requireActual(
             'scheduler/unstable_mock',
           );
@@ -364,7 +365,7 @@ describe('Profiler', () => {
 
         renderer.update(<App />);
 
-        if (gate(flags => flags.new)) {
+        if (gate((flags) => flags.new)) {
           // None of the Profiler's subtree was rendered because App bailed out before the Profiler.
           // So we expect onRender not to be called.
           expect(callback).not.toHaveBeenCalled();
@@ -1025,7 +1026,7 @@ describe('Profiler', () => {
         });
 
         [true, false].forEach(
-          replayFailedUnitOfWorkWithInvokeGuardedCallback => {
+          (replayFailedUnitOfWorkWithInvokeGuardedCallback) => {
             describe(`replayFailedUnitOfWorkWithInvokeGuardedCallback ${
               replayFailedUnitOfWorkWithInvokeGuardedCallback
                 ? 'enabled'
@@ -1542,7 +1543,7 @@ describe('Profiler', () => {
         expect(call[3]).toBe(2); // commit start time (before mutations or effects)
         expect(call[4]).toEqual(enableSchedulerTracing ? new Set() : undefined); // interaction events
 
-        ReactTestRendererAct(() => setCountRef.current(count => count + 1));
+        ReactTestRendererAct(() => setCountRef.current((count) => count + 1));
 
         expect(callback).toHaveBeenCalledTimes(2);
 
@@ -1625,7 +1626,8 @@ describe('Profiler', () => {
                     effectDuration={100000000}
                     cleanupDuration={1000000000}
                   />
-                }>
+                }
+              >
                 <ComponentWithEffects
                   duration={10}
                   effectDuration={100}
@@ -1713,7 +1715,8 @@ describe('Profiler', () => {
                     effectDuration={100000000}
                     cleanupDuration={1000000000}
                   />
-                }>
+                }
+              >
                 <ComponentWithEffects
                   duration={10}
                   effectDuration={100}
@@ -1756,7 +1759,8 @@ describe('Profiler', () => {
                     effectDuration={100000000}
                     cleanupDuration={1000000000}
                   />
-                }>
+                }
+              >
                 <ComponentWithEffects
                   duration={10}
                   effectDuration={100}
@@ -2062,7 +2066,7 @@ describe('Profiler', () => {
         expect(call[3]).toBe(2); // commit start time (before mutations or effects)
         expect(call[4]).toEqual(enableSchedulerTracing ? new Set() : undefined); // interaction events
 
-        ReactTestRendererAct(() => setCountRef.current(count => count + 1));
+        ReactTestRendererAct(() => setCountRef.current((count) => count + 1));
 
         expect(callback).toHaveBeenCalledTimes(2);
 
@@ -2145,7 +2149,8 @@ describe('Profiler', () => {
                     effectDuration={100000000}
                     cleanupDuration={1000000000}
                   />
-                }>
+                }
+              >
                 <ComponentWithEffects
                   duration={10}
                   effectDuration={100}
@@ -2234,7 +2239,8 @@ describe('Profiler', () => {
                     effectDuration={100000000}
                     cleanupDuration={1000000000}
                   />
-                }>
+                }
+              >
                 <ComponentWithEffects
                   duration={10}
                   effectDuration={100}
@@ -2277,7 +2283,8 @@ describe('Profiler', () => {
                     effectDuration={100000000}
                     cleanupDuration={1000000000}
                   />
-                }>
+                }
+              >
                 <ComponentWithEffects
                   duration={10}
                   effectDuration={100}
@@ -2392,7 +2399,7 @@ describe('Profiler', () => {
     let throwInOnWorkStarted;
     let throwInOnWorkStopped;
 
-    const getWorkForReactThreads = mockFn =>
+    const getWorkForReactThreads = (mockFn) =>
       mockFn.mock.calls.filter(([interactions, threadID]) => threadID > 0);
 
     function loadModulesForTracing(params) {
@@ -2709,13 +2716,13 @@ describe('Profiler', () => {
           onInteractionScheduledWorkCompleted,
         ).toHaveBeenLastNotifiedOfInteraction(interactionCreation);
         expect(getWorkForReactThreads(onWorkStarted)).toHaveLength(1);
-        expect(
-          getWorkForReactThreads(onWorkStarted)[0][0],
-        ).toMatchInteractions([interactionCreation]);
+        expect(getWorkForReactThreads(onWorkStarted)[0][0]).toMatchInteractions(
+          [interactionCreation],
+        );
         expect(getWorkForReactThreads(onWorkStopped)).toHaveLength(1);
-        expect(
-          getWorkForReactThreads(onWorkStopped)[0][0],
-        ).toMatchInteractions([interactionCreation]);
+        expect(getWorkForReactThreads(onWorkStopped)[0][0]).toMatchInteractions(
+          [interactionCreation],
+        );
 
         onPostCommit.mockClear();
         onWorkScheduled.mockClear();
@@ -2880,13 +2887,13 @@ describe('Profiler', () => {
           onInteractionScheduledWorkCompleted,
         ).toHaveBeenLastNotifiedOfInteraction(interactionTwo);
         expect(getWorkForReactThreads(onWorkStarted)).toHaveLength(1);
-        expect(
-          getWorkForReactThreads(onWorkStarted)[0][0],
-        ).toMatchInteractions([interactionTwo]);
+        expect(getWorkForReactThreads(onWorkStarted)[0][0]).toMatchInteractions(
+          [interactionTwo],
+        );
         expect(getWorkForReactThreads(onWorkStopped)).toHaveLength(1);
-        expect(
-          getWorkForReactThreads(onWorkStopped)[0][0],
-        ).toMatchInteractions([interactionTwo]);
+        expect(getWorkForReactThreads(onWorkStopped)[0][0]).toMatchInteractions(
+          [interactionTwo],
+        );
       });
     });
 
@@ -2912,7 +2919,8 @@ describe('Profiler', () => {
           <React.Profiler
             id="root"
             onCommit={onCommit}
-            onPostCommit={onPostCommit}>
+            onPostCommit={onPostCommit}
+          >
             <ComponentWithEffects />
           </React.Profiler>,
         );
@@ -3193,19 +3201,19 @@ describe('Profiler', () => {
           onInteractionScheduledWorkCompleted,
         ).toHaveBeenLastNotifiedOfInteraction(interactionOne);
         expect(getWorkForReactThreads(onWorkStarted)).toHaveLength(2);
-        expect(
-          getWorkForReactThreads(onWorkStarted)[0][0],
-        ).toMatchInteractions([interactionOne]);
-        expect(
-          getWorkForReactThreads(onWorkStarted)[1][0],
-        ).toMatchInteractions([interactionOne]);
+        expect(getWorkForReactThreads(onWorkStarted)[0][0]).toMatchInteractions(
+          [interactionOne],
+        );
+        expect(getWorkForReactThreads(onWorkStarted)[1][0]).toMatchInteractions(
+          [interactionOne],
+        );
         expect(getWorkForReactThreads(onWorkStopped)).toHaveLength(2);
-        expect(
-          getWorkForReactThreads(onWorkStopped)[0][0],
-        ).toMatchInteractions([interactionOne]);
-        expect(
-          getWorkForReactThreads(onWorkStopped)[1][0],
-        ).toMatchInteractions([interactionOne]);
+        expect(getWorkForReactThreads(onWorkStopped)[0][0]).toMatchInteractions(
+          [interactionOne],
+        );
+        expect(getWorkForReactThreads(onWorkStopped)[1][0]).toMatchInteractions(
+          [interactionOne],
+        );
 
         expect(onPostCommit).toHaveBeenCalledTimes(2);
         let call = onPostCommit.mock.calls[0];
@@ -3264,19 +3272,19 @@ describe('Profiler', () => {
           onInteractionScheduledWorkCompleted,
         ).toHaveBeenLastNotifiedOfInteraction(interactionTwo);
         expect(getWorkForReactThreads(onWorkStarted)).toHaveLength(4);
-        expect(
-          getWorkForReactThreads(onWorkStarted)[2][0],
-        ).toMatchInteractions([interactionTwo]);
-        expect(
-          getWorkForReactThreads(onWorkStarted)[3][0],
-        ).toMatchInteractions([interactionTwo]);
+        expect(getWorkForReactThreads(onWorkStarted)[2][0]).toMatchInteractions(
+          [interactionTwo],
+        );
+        expect(getWorkForReactThreads(onWorkStarted)[3][0]).toMatchInteractions(
+          [interactionTwo],
+        );
         expect(getWorkForReactThreads(onWorkStopped)).toHaveLength(4);
-        expect(
-          getWorkForReactThreads(onWorkStopped)[2][0],
-        ).toMatchInteractions([interactionTwo]);
-        expect(
-          getWorkForReactThreads(onWorkStopped)[3][0],
-        ).toMatchInteractions([interactionTwo]);
+        expect(getWorkForReactThreads(onWorkStopped)[2][0]).toMatchInteractions(
+          [interactionTwo],
+        );
+        expect(getWorkForReactThreads(onWorkStopped)[3][0]).toMatchInteractions(
+          [interactionTwo],
+        );
 
         // Verify the cascading commit is associated with the origin event
         expect(onPostCommit).toHaveBeenCalledTimes(2);
@@ -3338,19 +3346,19 @@ describe('Profiler', () => {
           onInteractionScheduledWorkCompleted,
         ).toHaveBeenLastNotifiedOfInteraction(interactionThree);
         expect(getWorkForReactThreads(onWorkStarted)).toHaveLength(6);
-        expect(
-          getWorkForReactThreads(onWorkStarted)[4][0],
-        ).toMatchInteractions([interactionThree]);
-        expect(
-          getWorkForReactThreads(onWorkStarted)[5][0],
-        ).toMatchInteractions([interactionThree]);
+        expect(getWorkForReactThreads(onWorkStarted)[4][0]).toMatchInteractions(
+          [interactionThree],
+        );
+        expect(getWorkForReactThreads(onWorkStarted)[5][0]).toMatchInteractions(
+          [interactionThree],
+        );
         expect(getWorkForReactThreads(onWorkStopped)).toHaveLength(6);
-        expect(
-          getWorkForReactThreads(onWorkStopped)[4][0],
-        ).toMatchInteractions([interactionThree]);
-        expect(
-          getWorkForReactThreads(onWorkStopped)[5][0],
-        ).toMatchInteractions([interactionThree]);
+        expect(getWorkForReactThreads(onWorkStopped)[4][0]).toMatchInteractions(
+          [interactionThree],
+        );
+        expect(getWorkForReactThreads(onWorkStopped)[5][0]).toMatchInteractions(
+          [interactionThree],
+        );
 
         // Verify the cascading commit is associated with the origin event
         expect(onPostCommit).toHaveBeenCalledTimes(2);
@@ -3442,13 +3450,13 @@ describe('Profiler', () => {
           onInteractionScheduledWorkCompleted,
         ).toHaveBeenLastNotifiedOfInteraction(interaction);
         expect(getWorkForReactThreads(onWorkStarted)).toHaveLength(1);
-        expect(
-          getWorkForReactThreads(onWorkStarted)[0][0],
-        ).toMatchInteractions([interaction]);
+        expect(getWorkForReactThreads(onWorkStarted)[0][0]).toMatchInteractions(
+          [interaction],
+        );
         expect(getWorkForReactThreads(onWorkStopped)).toHaveLength(1);
-        expect(
-          getWorkForReactThreads(onWorkStopped)[0][0],
-        ).toMatchInteractions([interaction]);
+        expect(getWorkForReactThreads(onWorkStopped)[0][0]).toMatchInteractions(
+          [interaction],
+        );
       });
     });
 
@@ -3660,7 +3668,7 @@ describe('Profiler', () => {
         // because the resolved suspended subtree doesn't contain any passive effects.
         // If <AsyncComponentWithCascadingWork> or its decendents had a passive effect,
         // onPostCommit would be called again.
-        if (gate(flags => flags.new)) {
+        if (gate((flags) => flags.new)) {
           expect(Scheduler).toFlushAndYield([]);
         } else {
           expect(Scheduler).toFlushAndYield(['onPostCommit']);
@@ -4070,7 +4078,7 @@ describe('Profiler', () => {
         const onRender = jest.fn();
 
         let resolve = null;
-        const promise = new Promise(_resolve => {
+        const promise = new Promise((_resolve) => {
           resolve = _resolve;
         });
 

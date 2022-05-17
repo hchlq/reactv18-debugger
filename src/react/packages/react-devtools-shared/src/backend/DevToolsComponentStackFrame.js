@@ -4,17 +4,13 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 // This is a DevTools fork of ReactComponentStackFrame.
 // This fork enables DevTools to use the same "native" component stack format,
 // while still maintaining support for multiple renderer versions
 // (which use different values for ReactTypeOfWork).
-
-                                                    
-                                                       
-                                                  
 
 import {
   BLOCK_NUMBER,
@@ -36,11 +32,7 @@ import {
 import {disableLogs, reenableLogs} from 'shared/ConsolePatchingDev';
 
 let prefix;
-export function describeBuiltInComponentFrame(
-  name        ,
-  source                      ,
-  ownerFn                        ,
-)         {
+export function describeBuiltInComponentFrame(name, source, ownerFn) {
   if (prefix === undefined) {
     // Extract the VM specific prefix used by each line.
     try {
@@ -62,10 +54,10 @@ if (__DEV__) {
 }
 
 export function describeNativeComponentFrame(
-  fn          ,
-  construct         ,
-  currentDispatcherRef                      ,
-)         {
+  fn,
+  construct,
+  currentDispatcherRef,
+) {
   // If something asked for a stack inside a fake render, it should get ignored.
   if (!fn || reentry) {
     return '';
@@ -97,12 +89,12 @@ export function describeNativeComponentFrame(
     // This should throw.
     if (construct) {
       // Something should be setting the props in the constructor.
-      const Fake = function() {
+      const Fake = function () {
         throw Error();
       };
       // $FlowFixMe
       Object.defineProperty(Fake.prototype, 'props', {
-        set: function() {
+        set: function () {
           // We use a throwing setter instead of frozen or non-writable props
           // because that won't throw in a non-strict mode function.
           throw Error();
@@ -205,34 +197,34 @@ export function describeNativeComponentFrame(
 }
 
 export function describeClassComponentFrame(
-  ctor          ,
-  source                      ,
-  ownerFn                        ,
-  currentDispatcherRef                      ,
-)         {
+  ctor,
+  source,
+  ownerFn,
+  currentDispatcherRef,
+) {
   return describeNativeComponentFrame(ctor, true, currentDispatcherRef);
 }
 
 export function describeFunctionComponentFrame(
-  fn          ,
-  source                      ,
-  ownerFn                        ,
-  currentDispatcherRef                      ,
-)         {
+  fn,
+  source,
+  ownerFn,
+  currentDispatcherRef,
+) {
   return describeNativeComponentFrame(fn, false, currentDispatcherRef);
 }
 
-function shouldConstruct(Component          ) {
+function shouldConstruct(Component) {
   const prototype = Component.prototype;
   return !!(prototype && prototype.isReactComponent);
 }
 
 export function describeUnknownElementTypeFrameInDEV(
-  type     ,
-  source                      ,
-  ownerFn                        ,
-  currentDispatcherRef                      ,
-)         {
+  type,
+  source,
+  ownerFn,
+  currentDispatcherRef,
+) {
   if (!__DEV__) {
     return '';
   }
@@ -286,7 +278,7 @@ export function describeUnknownElementTypeFrameInDEV(
         );
       case LAZY_NUMBER:
       case LAZY_SYMBOL_STRING: {
-        const lazyComponent                          = (type     );
+        const lazyComponent = type;
         const payload = lazyComponent._payload;
         const init = lazyComponent._init;
         try {

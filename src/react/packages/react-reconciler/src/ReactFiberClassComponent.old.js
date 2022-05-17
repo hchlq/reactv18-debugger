@@ -4,12 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                
-                                            
-                                                        
 
 import * as React from 'react';
 import {Update, Snapshot} from './ReactFiberFlags';
@@ -94,11 +90,11 @@ if (__DEV__) {
 
   const didWarnOnInvalidCallback = new Set();
 
-  warnOnInvalidCallback = function(callback       , callerName        ) {
+  warnOnInvalidCallback = function (callback, callerName) {
     if (callback === null || typeof callback === 'function') {
       return;
     }
-    const key = callerName + '_' + (callback     );
+    const key = callerName + '_' + callback;
     if (!didWarnOnInvalidCallback.has(key)) {
       didWarnOnInvalidCallback.add(key);
       console.error(
@@ -110,7 +106,7 @@ if (__DEV__) {
     }
   };
 
-  warnOnUndefinedDerivedState = function(type, partialState) {
+  warnOnUndefinedDerivedState = function (type, partialState) {
     if (partialState === undefined) {
       const componentName = getComponentName(type) || 'Component';
       if (!didWarnAboutUndefinedDerivedState.has(componentName)) {
@@ -131,7 +127,7 @@ if (__DEV__) {
   // exception.
   Object.defineProperty(fakeInternalInstance, '_processChildContext', {
     enumerable: false,
-    value: function() {
+    value: function () {
       invariant(
         false,
         '_processChildContext is not available in React 16+. This likely ' +
@@ -147,10 +143,10 @@ if (__DEV__) {
 }
 
 export function applyDerivedStateFromProps(
-  workInProgress       ,
-  ctor     ,
-  getDerivedStateFromProps                                 ,
-  nextProps     ,
+  workInProgress,
+  ctor,
+  getDerivedStateFromProps,
+  nextProps,
 ) {
   const prevState = workInProgress.memoizedState;
 
@@ -185,7 +181,7 @@ export function applyDerivedStateFromProps(
   // base state.
   if (workInProgress.lanes === NoLanes) {
     // Queue is always non-null for classes
-    const updateQueue                   = (workInProgress.updateQueue     );
+    const updateQueue = workInProgress.updateQueue;
     updateQueue.baseState = memoizedState;
   }
 }
@@ -340,7 +336,7 @@ function checkShouldComponentUpdate(
   return true;
 }
 
-function checkClassInstance(workInProgress       , ctor     , newProps     ) {
+function checkClassInstance(workInProgress, ctor, newProps) {
   const instance = workInProgress.stateNode;
   if (__DEV__) {
     const name = getComponentName(ctor) || 'Component';
@@ -560,7 +556,7 @@ function checkClassInstance(workInProgress       , ctor     , newProps     ) {
   }
 }
 
-function adoptClassInstance(workInProgress       , instance     )       {
+function adoptClassInstance(workInProgress, instance) {
   instance.updater = classComponentUpdater;
   workInProgress.stateNode = instance;
   // The instance needs access to the fiber so that it can schedule updates
@@ -570,11 +566,7 @@ function adoptClassInstance(workInProgress       , instance     )       {
   }
 }
 
-function constructClassInstance(
-  workInProgress       ,
-  ctor     ,
-  props     ,
-)      {
+function constructClassInstance(workInProgress, ctor, props) {
   let isLegacyContextConsumer = false;
   let unmaskedContext = emptyContextObject;
   let context = emptyContextObject;
@@ -623,7 +615,7 @@ function constructClassInstance(
   }
 
   if (typeof contextType === 'object' && contextType !== null) {
-    context = readContext((contextType     ));
+    context = readContext(contextType);
   } else if (!disableLegacyContext) {
     unmaskedContext = getUnmaskedContext(workInProgress, ctor, true);
     const contextTypes = ctor.contextTypes;
@@ -804,12 +796,7 @@ function callComponentWillReceiveProps(
 }
 
 // Invokes the mount life-cycles on a previously never rendered instance.
-function mountClassInstance(
-  workInProgress       ,
-  ctor     ,
-  newProps     ,
-  renderLanes       ,
-)       {
+function mountClassInstance(workInProgress, ctor, newProps, renderLanes) {
   if (__DEV__) {
     checkClassInstance(workInProgress, ctor, newProps);
   }
@@ -894,12 +881,7 @@ function mountClassInstance(
   }
 }
 
-function resumeMountClassInstance(
-  workInProgress       ,
-  ctor     ,
-  newProps     ,
-  renderLanes       ,
-)          {
+function resumeMountClassInstance(workInProgress, ctor, newProps, renderLanes) {
   const instance = workInProgress.stateNode;
 
   const oldProps = workInProgress.memoizedProps;
@@ -1029,12 +1011,12 @@ function resumeMountClassInstance(
 
 // Invokes the update life-cycles and returns false if it shouldn't rerender.
 function updateClassInstance(
-  current       ,
-  workInProgress       ,
-  ctor     ,
-  newProps     ,
-  renderLanes       ,
-)          {
+  current,
+  workInProgress,
+  ctor,
+  newProps,
+  renderLanes,
+) {
   const instance = workInProgress.stateNode;
 
   cloneUpdateQueue(current, workInProgress);

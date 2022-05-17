@@ -4,21 +4,15 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import {useLayoutEffect, useRef} from 'react';
 
 const TOOLTIP_OFFSET = 4;
 
-export default function useSmartTooltip({
-  mouseX,
-  mouseY,
-}   
-                 
-                 
- ) {
-  const ref = useRef                    (null);
+export default function useSmartTooltip({mouseX, mouseY}) {
+  const ref = useRef(null);
 
   useLayoutEffect(() => {
     const element = ref.current;
@@ -33,9 +27,9 @@ export default function useSmartTooltip({
         // mouse cursor or finally aligned with the window's top edge.
         if (mouseY - TOOLTIP_OFFSET - element.offsetHeight > 0) {
           // We position the tooltip above the mouse cursor if it fits there.
-          element.style.top = `${mouseY -
-            element.offsetHeight -
-            TOOLTIP_OFFSET}px`;
+          element.style.top = `${
+            mouseY - element.offsetHeight - TOOLTIP_OFFSET
+          }px`;
         } else {
           // Otherwise we align the tooltip with the window's top edge.
           element.style.top = '0px';
@@ -53,9 +47,9 @@ export default function useSmartTooltip({
         if (mouseX - TOOLTIP_OFFSET - element.offsetWidth > 0) {
           // We position the tooltip at the left of the mouse cursor if it fits
           // there.
-          element.style.left = `${mouseX -
-            element.offsetWidth -
-            TOOLTIP_OFFSET}px`;
+          element.style.left = `${
+            mouseX - element.offsetWidth - TOOLTIP_OFFSET
+          }px`;
         } else {
           // Otherwise, align the tooltip with the window's left edge.
           element.style.left = '0px';

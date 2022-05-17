@@ -32,10 +32,10 @@ export function memo<Props>(
     Object.defineProperty(elementType, 'displayName', {
       enumerable: false,
       configurable: true,
-      get: function() {
+      get: function () {
         return ownName;
       },
-      set: function(name) {
+      set: function (name) {
         ownName = name;
         if (type.displayName == null) {
           type.displayName = name;

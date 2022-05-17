@@ -39,7 +39,7 @@ describe('ReactDOMServerIntegration', () => {
     resetModules();
   });
 
-  describe('context', function() {
+  describe('context', function () {
     let Context, PurpleContextProvider, RedContextProvider, Consumer;
     beforeEach(() => {
       Context = React.createContext('none');
@@ -54,20 +54,20 @@ describe('ReactDOMServerIntegration', () => {
         }
       }
       Consumer = Context.Consumer;
-      PurpleContextProvider = props => (
+      PurpleContextProvider = (props) => (
         <Parent text="purple">{props.children}</Parent>
       );
-      RedContextProvider = props => (
+      RedContextProvider = (props) => (
         <Parent text="red">{props.children}</Parent>
       );
     });
 
-    itRenders('class child with context', async render => {
+    itRenders('class child with context', async (render) => {
       class ClassChildWithContext extends React.Component {
         render() {
           return (
             <div>
-              <Consumer>{text => text}</Consumer>
+              <Consumer>{(text) => text}</Consumer>
             </div>
           );
         }
@@ -81,9 +81,9 @@ describe('ReactDOMServerIntegration', () => {
       expect(e.textContent).toBe('purple');
     });
 
-    itRenders('stateless child with context', async render => {
+    itRenders('stateless child with context', async (render) => {
       function FunctionChildWithContext(props) {
-        return <Consumer>{text => text}</Consumer>;
+        return <Consumer>{(text) => text}</Consumer>;
       }
 
       const e = await render(
@@ -94,12 +94,12 @@ describe('ReactDOMServerIntegration', () => {
       expect(e.textContent).toBe('purple');
     });
 
-    itRenders('class child with default context', async render => {
+    itRenders('class child with default context', async (render) => {
       class ClassChildWithWrongContext extends React.Component {
         render() {
           return (
             <div id="classWrongChild">
-              <Consumer>{text => text}</Consumer>
+              <Consumer>{(text) => text}</Consumer>
             </div>
           );
         }
@@ -109,11 +109,11 @@ describe('ReactDOMServerIntegration', () => {
       expect(e.textContent).toBe('none');
     });
 
-    itRenders('stateless child with wrong context', async render => {
+    itRenders('stateless child with wrong context', async (render) => {
       function FunctionChildWithWrongContext(props) {
         return (
           <div id="statelessWrongChild">
-            <Consumer>{text => text}</Consumer>
+            <Consumer>{(text) => text}</Consumer>
           </div>
         );
       }
@@ -122,16 +122,16 @@ describe('ReactDOMServerIntegration', () => {
       expect(e.textContent).toBe('none');
     });
 
-    itRenders('with context passed through to a grandchild', async render => {
+    itRenders('with context passed through to a grandchild', async (render) => {
       function Grandchild(props) {
         return (
           <div>
-            <Consumer>{text => text}</Consumer>
+            <Consumer>{(text) => text}</Consumer>
           </div>
         );
       }
 
-      const Child = props => <Grandchild />;
+      const Child = (props) => <Grandchild />;
 
       const e = await render(
         <PurpleContextProvider>
@@ -141,11 +141,11 @@ describe('ReactDOMServerIntegration', () => {
       expect(e.textContent).toBe('purple');
     });
 
-    itRenders('a child context overriding a parent context', async render => {
-      const Grandchild = props => {
+    itRenders('a child context overriding a parent context', async (render) => {
+      const Grandchild = (props) => {
         return (
           <div>
-            <Consumer>{text => text}</Consumer>
+            <Consumer>{(text) => text}</Consumer>
           </div>
         );
       };
@@ -160,7 +160,7 @@ describe('ReactDOMServerIntegration', () => {
       expect(e.textContent).toBe('red');
     });
 
-    itRenders('readContext() in different components', async render => {
+    itRenders('readContext() in different components', async (render) => {
       function readContext(Ctx, observedBits) {
         const dispatcher =
           React.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED
@@ -199,7 +199,7 @@ describe('ReactDOMServerIntegration', () => {
       expect(e.textContent).toBe('redredredredred');
     });
 
-    itRenders('multiple contexts', async render => {
+    itRenders('multiple contexts', async (render) => {
       const Theme = React.createContext('dark');
       const Language = React.createContext('french');
       class Parent extends React.Component {
@@ -220,14 +220,14 @@ describe('ReactDOMServerIntegration', () => {
         );
       }
 
-      const Grandchild = props => {
+      const Grandchild = (props) => {
         return (
           <div>
             <Theme.Consumer>
-              {theme => <div id="theme">{theme}</div>}
+              {(theme) => <div id="theme">{theme}</div>}
             </Theme.Consumer>
             <Language.Consumer>
-              {language => <div id="language">{language}</div>}
+              {(language) => <div id="language">{language}</div>}
             </Language.Consumer>
           </div>
         );
@@ -238,7 +238,7 @@ describe('ReactDOMServerIntegration', () => {
       expect(e.querySelector('#language').textContent).toBe('english');
     });
 
-    itRenders('nested context unwinding', async render => {
+    itRenders('nested context unwinding', async (render) => {
       const Theme = React.createContext('dark');
       const Language = React.createContext('french');
 
@@ -248,11 +248,11 @@ describe('ReactDOMServerIntegration', () => {
             <Language.Provider value="english">
               <Theme.Provider value="dark">
                 <Theme.Consumer>
-                  {theme => <div id="theme1">{theme}</div>}
+                  {(theme) => <div id="theme1">{theme}</div>}
                 </Theme.Consumer>
               </Theme.Provider>
               <Theme.Consumer>
-                {theme => <div id="theme2">{theme}</div>}
+                {(theme) => <div id="theme2">{theme}</div>}
               </Theme.Consumer>
               <Language.Provider value="sanskrit">
                 <Theme.Provider value="blue">
@@ -262,17 +262,17 @@ describe('ReactDOMServerIntegration', () => {
                         <Language.Provider value="chinese">
                           <Language.Provider value="hungarian" />
                           <Language.Consumer>
-                            {language => <div id="language1">{language}</div>}
+                            {(language) => <div id="language1">{language}</div>}
                           </Language.Consumer>
                         </Language.Provider>
                       )}
                     </Language.Consumer>
                   </Theme.Provider>
                   <Language.Consumer>
-                    {language => (
+                    {(language) => (
                       <>
                         <Theme.Consumer>
-                          {theme => <div id="theme3">{theme}</div>}
+                          {(theme) => <div id="theme3">{theme}</div>}
                         </Theme.Consumer>
                         <div id="language2">{language}</div>
                       </>
@@ -283,7 +283,7 @@ describe('ReactDOMServerIntegration', () => {
             </Language.Provider>
           </Theme.Provider>
           <Language.Consumer>
-            {language => <div id="language3">{language}</div>}
+            {(language) => <div id="language3">{language}</div>}
           </Language.Consumer>
         </div>
       );
@@ -298,7 +298,7 @@ describe('ReactDOMServerIntegration', () => {
 
     itRenders(
       'should warn with an error message when using Context as consumer in DEV',
-      async render => {
+      async (render) => {
         const Theme = React.createContext('dark');
         const Language = React.createContext('french');
 
@@ -307,7 +307,7 @@ describe('ReactDOMServerIntegration', () => {
             <Theme.Provider value="light">
               <Language.Provider value="english">
                 <Theme.Provider value="dark">
-                  <Theme>{theme => <div id="theme1">{theme}</div>}</Theme>
+                  <Theme>{(theme) => <div id="theme1">{theme}</div>}</Theme>
                 </Theme.Provider>
               </Language.Provider>
             </Theme.Provider>
@@ -321,7 +321,7 @@ describe('ReactDOMServerIntegration', () => {
     // False positive regression test.
     itRenders(
       'should not warn when using Consumer from React < 16.6 with newer renderer',
-      async render => {
+      async (render) => {
         const Theme = React.createContext('dark');
         const Language = React.createContext('french');
         // React 16.5 and earlier didn't have a separate object.
@@ -332,7 +332,7 @@ describe('ReactDOMServerIntegration', () => {
             <Theme.Provider value="light">
               <Language.Provider value="english">
                 <Theme.Provider value="dark">
-                  <Theme>{theme => <div id="theme1">{theme}</div>}</Theme>
+                  <Theme>{(theme) => <div id="theme1">{theme}</div>}</Theme>
                 </Theme.Provider>
               </Language.Provider>
             </Theme.Provider>
@@ -345,7 +345,7 @@ describe('ReactDOMServerIntegration', () => {
 
     itRenders(
       'should warn with an error message when using nested context consumers in DEV',
-      async render => {
+      async (render) => {
         const App = () => {
           const Theme = React.createContext('dark');
           const Language = React.createContext('french');
@@ -356,7 +356,7 @@ describe('ReactDOMServerIntegration', () => {
                 <Language.Provider value="english">
                   <Theme.Provider value="dark">
                     <Theme.Consumer.Consumer>
-                      {theme => <div id="theme1">{theme}</div>}
+                      {(theme) => <div id="theme1">{theme}</div>}
                     </Theme.Consumer.Consumer>
                   </Theme.Provider>
                 </Language.Provider>
@@ -371,7 +371,7 @@ describe('ReactDOMServerIntegration', () => {
 
     itRenders(
       'should warn with an error message when using Context.Consumer.Provider DEV',
-      async render => {
+      async (render) => {
         const App = () => {
           const Theme = React.createContext('dark');
           const Language = React.createContext('french');
@@ -382,7 +382,7 @@ describe('ReactDOMServerIntegration', () => {
                 <Language.Provider value="english">
                   <Theme.Consumer.Provider value="dark">
                     <Theme.Consumer>
-                      {theme => <div id="theme1">{theme}</div>}
+                      {(theme) => <div id="theme1">{theme}</div>}
                     </Theme.Consumer>
                   </Theme.Consumer.Provider>
                 </Language.Provider>
@@ -398,13 +398,13 @@ describe('ReactDOMServerIntegration', () => {
     it('does not pollute parallel node streams', () => {
       const LoggedInUser = React.createContext();
 
-      const AppWithUser = user => (
+      const AppWithUser = (user) => (
         <LoggedInUser.Provider value={user}>
           <header>
-            <LoggedInUser.Consumer>{whoAmI => whoAmI}</LoggedInUser.Consumer>
+            <LoggedInUser.Consumer>{(whoAmI) => whoAmI}</LoggedInUser.Consumer>
           </header>
           <footer>
-            <LoggedInUser.Consumer>{whoAmI => whoAmI}</LoggedInUser.Consumer>
+            <LoggedInUser.Consumer>{(whoAmI) => whoAmI}</LoggedInUser.Consumer>
           </footer>
         </LoggedInUser.Provider>
       );
@@ -431,13 +431,13 @@ describe('ReactDOMServerIntegration', () => {
     it('does not pollute parallel node streams when many are used', () => {
       const CurrentIndex = React.createContext();
 
-      const NthRender = index => (
+      const NthRender = (index) => (
         <CurrentIndex.Provider value={index}>
           <header>
-            <CurrentIndex.Consumer>{idx => idx}</CurrentIndex.Consumer>
+            <CurrentIndex.Consumer>{(idx) => idx}</CurrentIndex.Consumer>
           </header>
           <footer>
-            <CurrentIndex.Consumer>{idx => idx}</CurrentIndex.Consumer>
+            <CurrentIndex.Consumer>{(idx) => idx}</CurrentIndex.Consumer>
           </footer>
         </CurrentIndex.Provider>
       );
@@ -490,10 +490,10 @@ describe('ReactDOMServerIntegration', () => {
     it('does not pollute later renders when stream destroyed', () => {
       const LoggedInUser = React.createContext('default');
 
-      const AppWithUser = user => (
+      const AppWithUser = (user) => (
         <LoggedInUser.Provider value={user}>
           <header>
-            <LoggedInUser.Consumer>{whoAmI => whoAmI}</LoggedInUser.Consumer>
+            <LoggedInUser.Consumer>{(whoAmI) => whoAmI}</LoggedInUser.Consumer>
           </header>
         </LoggedInUser.Provider>
       );
@@ -512,7 +512,7 @@ describe('ReactDOMServerIntegration', () => {
       stream.destroy();
 
       const AppWithUserNoProvider = () => (
-        <LoggedInUser.Consumer>{whoAmI => whoAmI}</LoggedInUser.Consumer>
+        <LoggedInUser.Consumer>{(whoAmI) => whoAmI}</LoggedInUser.Consumer>
       );
 
       const stream2 = ReactDOMServer.renderToNodeStream(
@@ -532,10 +532,10 @@ describe('ReactDOMServerIntegration', () => {
     it('frees context value reference when stream destroyed', () => {
       const LoggedInUser = React.createContext('default');
 
-      const AppWithUser = user => (
+      const AppWithUser = (user) => (
         <LoggedInUser.Provider value={user}>
           <header>
-            <LoggedInUser.Consumer>{whoAmI => whoAmI}</LoggedInUser.Consumer>
+            <LoggedInUser.Consumer>{(whoAmI) => whoAmI}</LoggedInUser.Consumer>
           </header>
         </LoggedInUser.Provider>
       );
@@ -560,9 +560,9 @@ describe('ReactDOMServerIntegration', () => {
       const Crash = () => {
         throw new Error('Boo!');
       };
-      const AppWithUser = user => (
+      const AppWithUser = (user) => (
         <LoggedInUser.Provider value={user}>
-          <LoggedInUser.Consumer>{whoAmI => whoAmI}</LoggedInUser.Consumer>
+          <LoggedInUser.Consumer>{(whoAmI) => whoAmI}</LoggedInUser.Consumer>
           <Crash />
         </LoggedInUser.Provider>
       );
@@ -574,7 +574,7 @@ describe('ReactDOMServerIntegration', () => {
       // Should not report a value from failed render
       expect(
         ReactDOMServer.renderToString(
-          <LoggedInUser.Consumer>{whoAmI => whoAmI}</LoggedInUser.Consumer>,
+          <LoggedInUser.Consumer>{(whoAmI) => whoAmI}</LoggedInUser.Consumer>,
         ),
       ).toBe('default');
     });

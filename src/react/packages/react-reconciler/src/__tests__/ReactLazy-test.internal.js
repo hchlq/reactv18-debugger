@@ -9,7 +9,7 @@ let lazy;
 function normalizeCodeLocInfo(str) {
   return (
     str &&
-    str.replace(/\n +(?:at|in) ([\S]+)[^\n]*/g, function(m, name) {
+    str.replace(/\n +(?:at|in) ([\S]+)[^\n]*/g, function (m, name) {
       return '\n    in ' + name + ' (at **)';
     })
   );
@@ -35,7 +35,7 @@ describe('ReactLazy', () => {
   }
 
   function delay(ms) {
-    return new Promise(resolve => setTimeout(() => resolve(), ms));
+    return new Promise((resolve) => setTimeout(() => resolve(), ms));
   }
 
   async function fakeImport(result) {
@@ -862,7 +862,7 @@ describe('ReactLazy', () => {
   });
 
   it('respects propTypes on outer memo component with defaultProps', async () => {
-    let Add = props => {
+    let Add = (props) => {
       expect(props.innerWithDefault).toBe(42);
       return props.inner + props.outer;
     };
@@ -878,7 +878,7 @@ describe('ReactLazy', () => {
   });
 
   it('respects propTypes on outer memo component without defaultProps', async () => {
-    let Add = props => {
+    let Add = (props) => {
       return props.inner + props.outer;
     };
     Add = React.memo(Add);
@@ -889,7 +889,7 @@ describe('ReactLazy', () => {
   });
 
   it('respects propTypes on inner memo component with defaultProps', async () => {
-    const Add = props => {
+    const Add = (props) => {
       expect(props.innerWithDefault).toBe(42);
       return props.inner + props.outer;
     };
@@ -905,7 +905,7 @@ describe('ReactLazy', () => {
   });
 
   it('respects propTypes on inner memo component without defaultProps', async () => {
-    const Add = props => {
+    const Add = (props) => {
       return props.inner + props.outer;
     };
     Add.displayName = 'Add';
@@ -916,7 +916,7 @@ describe('ReactLazy', () => {
   });
 
   it('uses outer resolved props for validating propTypes on memo', async () => {
-    let T = props => {
+    let T = (props) => {
       return <Text text={props.text} />;
     };
     T.defaultProps = {
@@ -966,7 +966,9 @@ describe('ReactLazy', () => {
   it('includes lazy-loaded component in warning stack', async () => {
     const LazyFoo = lazy(() => {
       Scheduler.unstable_yieldValue('Started loading');
-      const Foo = props => <div>{[<Text text="A" />, <Text text="B" />]}</div>;
+      const Foo = (props) => (
+        <div>{[<Text text="A" />, <Text text="B" />]}</div>
+      );
       return fakeImport(Foo);
     });
 
@@ -1038,7 +1040,7 @@ describe('ReactLazy', () => {
 
   // Regression test for #14310
   it('supports defaultProps defined on the memo() return value', async () => {
-    const Add = React.memo(props => {
+    const Add = React.memo((props) => {
       return props.inner + props.outer;
     });
     Add.defaultProps = {
@@ -1117,7 +1119,7 @@ describe('ReactLazy', () => {
   });
 
   it('merges defaultProps in the correct order', async () => {
-    let Add = React.memo(props => {
+    let Add = React.memo((props) => {
       return props.inner + props.outer;
     });
     Add.defaultProps = {
@@ -1166,7 +1168,7 @@ describe('ReactLazy', () => {
 
   it('warns about ref on functions for lazy-loaded components', async () => {
     const LazyFoo = lazy(() => {
-      const Foo = props => <div />;
+      const Foo = (props) => <div />;
       return fakeImport(Foo);
     });
 

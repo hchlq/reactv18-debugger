@@ -206,7 +206,7 @@ async function prepareNpmPackages() {
     return;
   }
   const builtPackageFolders = readdirSync('build/node_modules').filter(
-    dir => dir.charAt(0) !== '.'
+    (dir) => dir.charAt(0) !== '.'
   );
   await Promise.all(builtPackageFolders.map(prepareNpmPackage));
 }

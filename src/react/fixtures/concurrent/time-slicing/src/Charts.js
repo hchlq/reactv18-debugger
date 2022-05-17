@@ -25,7 +25,8 @@ export default class Charts extends PureComponent {
               parent: {
                 backgroundColor: '#222',
               },
-            }}>
+            }}
+          >
             <VictoryAxis
               style={{
                 axis: {stroke: 'white'},
@@ -44,7 +45,7 @@ export default class Charts extends PureComponent {
               size={6}
               style={{
                 data: {
-                  fill: d => colors[d.x % 5],
+                  fill: (d) => colors[d.x % 5],
                 },
               }}
             />
@@ -59,7 +60,8 @@ export default class Charts extends PureComponent {
                 backgroundColor: '#222',
               },
             }}
-            domainPadding={[20, 20]}>
+            domainPadding={[20, 20]}
+          >
             <VictoryAxis
               style={{
                 axis: {stroke: 'white'},
@@ -77,7 +79,7 @@ export default class Charts extends PureComponent {
               data={streamData[0]}
               style={{
                 data: {
-                  fill: d => colors[d.x % 5],
+                  fill: (d) => colors[d.x % 5],
                   stroke: 'none',
                   padding: 5,
                 },
@@ -90,7 +92,8 @@ export default class Charts extends PureComponent {
             display: 'flex',
             position: 'relative',
             top: '-50px',
-          }}>
+          }}
+        >
           <VictoryChart
             theme={VictoryTheme.material}
             width={800}
@@ -99,7 +102,8 @@ export default class Charts extends PureComponent {
               parent: {
                 backgroundColor: '#222',
               },
-            }}>
+            }}
+          >
             <VictoryAxis
               style={{
                 axis: {stroke: 'white'},

@@ -113,10 +113,11 @@ describe('ReactDOMServerSelectiveHydration', () => {
       Scheduler.unstable_yieldValue(text);
       return (
         <span
-          onClick={e => {
+          onClick={(e) => {
             e.preventDefault();
             Scheduler.unstable_yieldValue('Clicked ' + text);
-          }}>
+          }}
+        >
           {text}
         </span>
       );
@@ -174,7 +175,7 @@ describe('ReactDOMServerSelectiveHydration', () => {
   it('hydrates at higher pri if sync did not work first time', async () => {
     let suspend = false;
     let resolve;
-    const promise = new Promise(resolvePromise => (resolve = resolvePromise));
+    const promise = new Promise((resolvePromise) => (resolve = resolvePromise));
 
     function Child({text}) {
       if ((text === 'A' || text === 'D') && suspend) {
@@ -183,10 +184,11 @@ describe('ReactDOMServerSelectiveHydration', () => {
       Scheduler.unstable_yieldValue(text);
       return (
         <span
-          onClick={e => {
+          onClick={(e) => {
             e.preventDefault();
             Scheduler.unstable_yieldValue('Clicked ' + text);
-          }}>
+          }}
+        >
           {text}
         </span>
       );
@@ -259,7 +261,7 @@ describe('ReactDOMServerSelectiveHydration', () => {
   it('hydrates at higher pri for secondary discrete events', async () => {
     let suspend = false;
     let resolve;
-    const promise = new Promise(resolvePromise => (resolve = resolvePromise));
+    const promise = new Promise((resolvePromise) => (resolve = resolvePromise));
 
     function Child({text}) {
       if ((text === 'A' || text === 'D') && suspend) {
@@ -268,10 +270,11 @@ describe('ReactDOMServerSelectiveHydration', () => {
       Scheduler.unstable_yieldValue(text);
       return (
         <span
-          onClick={e => {
+          onClick={(e) => {
             e.preventDefault();
             Scheduler.unstable_yieldValue('Clicked ' + text);
-          }}>
+          }}
+        >
           {text}
         </span>
       );
@@ -422,7 +425,7 @@ describe('ReactDOMServerSelectiveHydration', () => {
     let suspend = false;
     let isServerRendering = true;
     let resolve;
-    const promise = new Promise(resolvePromise => (resolve = resolvePromise));
+    const promise = new Promise((resolvePromise) => (resolve = resolvePromise));
     const setClick = ReactDOM.unstable_createEventHandle('click');
 
     function Child({text}) {
@@ -511,7 +514,7 @@ describe('ReactDOMServerSelectiveHydration', () => {
     let suspend = false;
     let isServerRendering = true;
     let resolve;
-    const promise = new Promise(resolvePromise => (resolve = resolvePromise));
+    const promise = new Promise((resolvePromise) => (resolve = resolvePromise));
 
     function Child({text}) {
       const ref = React.useRef(null);
@@ -606,7 +609,7 @@ describe('ReactDOMServerSelectiveHydration', () => {
   it('hydrates the hovered targets as higher priority for continuous events', async () => {
     let suspend = false;
     let resolve;
-    const promise = new Promise(resolvePromise => (resolve = resolvePromise));
+    const promise = new Promise((resolvePromise) => (resolve = resolvePromise));
 
     function Child({text}) {
       if ((text === 'A' || text === 'D') && suspend) {
@@ -615,14 +618,15 @@ describe('ReactDOMServerSelectiveHydration', () => {
       Scheduler.unstable_yieldValue(text);
       return (
         <span
-          onClick={e => {
+          onClick={(e) => {
             e.preventDefault();
             Scheduler.unstable_yieldValue('Clicked ' + text);
           }}
-          onMouseEnter={e => {
+          onMouseEnter={(e) => {
             e.preventDefault();
             Scheduler.unstable_yieldValue('Hover ' + text);
-          }}>
+          }}
+        >
           {text}
         </span>
       );
@@ -707,7 +711,7 @@ describe('ReactDOMServerSelectiveHydration', () => {
   it('hydrates the last target path first for continuous events', async () => {
     let suspend = false;
     let resolve;
-    const promise = new Promise(resolvePromise => (resolve = resolvePromise));
+    const promise = new Promise((resolvePromise) => (resolve = resolvePromise));
 
     function Child({text}) {
       if ((text === 'A' || text === 'D') && suspend) {
@@ -716,10 +720,11 @@ describe('ReactDOMServerSelectiveHydration', () => {
       Scheduler.unstable_yieldValue(text);
       return (
         <span
-          onMouseEnter={e => {
+          onMouseEnter={(e) => {
             e.preventDefault();
             Scheduler.unstable_yieldValue('Hover ' + text);
-          }}>
+          }}
+        >
           {text}
         </span>
       );
@@ -844,7 +849,7 @@ describe('ReactDOMServerSelectiveHydration', () => {
       Scheduler.unstable_yieldValue(text);
       return <span>{text}</span>;
     }
-    const ChildWithBoundary = React.memo(function({text}) {
+    const ChildWithBoundary = React.memo(function ({text}) {
       return (
         <Suspense fallback="Loading...">
           <Child text={text} />

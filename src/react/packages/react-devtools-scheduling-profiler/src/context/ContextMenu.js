@@ -4,10 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                    
 
 import * as React from 'react';
 import {useContext, useEffect, useLayoutEffect, useRef, useState} from 'react';
@@ -16,7 +14,7 @@ import {RegistryContext} from './Contexts';
 
 import styles from './ContextMenu.css';
 
-function repositionToFit(element             , pageX        , pageY        ) {
+function repositionToFit(element, pageX, pageY) {
   const ownerWindow = element.ownerDocument.defaultView;
   if (element !== null) {
     if (pageY + element.offsetHeight >= ownerWindow.innerHeight) {
@@ -48,21 +46,14 @@ const HIDDEN_STATE = {
   pageY: 0,
 };
 
-               
-                                         
-             
-   
-
-export default function ContextMenu({children, id}       ) {
-  const {hideMenu, registerMenu} = useContext                     (
-    RegistryContext,
-  );
+export default function ContextMenu({children, id}) {
+  const {hideMenu, registerMenu} = useContext(RegistryContext);
 
   const [state, setState] = useState(HIDDEN_STATE);
 
-  const bodyAccessorRef = useRef                       (null);
-  const containerRef = useRef                       (null);
-  const menuRef = useRef                       (null);
+  const bodyAccessorRef = useRef(null);
+  const containerRef = useRef(null);
+  const menuRef = useRef(null);
 
   useEffect(() => {
     if (!bodyAccessorRef.current) {
@@ -98,9 +89,7 @@ export default function ContextMenu({children, id}       ) {
       return;
     }
 
-    const hideUnlessContains                     
-                         
-                           = event => {
+    const hideUnlessContains = (event) => {
       if (event.target instanceof HTMLElement && !menu.contains(event.target)) {
         hideMenu();
       }

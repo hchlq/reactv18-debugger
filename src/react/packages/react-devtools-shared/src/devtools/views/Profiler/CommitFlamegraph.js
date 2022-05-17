@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -23,48 +23,32 @@ import Tooltip from './Tooltip';
 
 import styles from './CommitFlamegraph.css';
 
-                                                         
-                                                                   
-                                        
-
-                         
-                       
-                                                             
-                                  
-                                                           
-                                      
-                                 
-                                                                
-                
-   
-
-export default function CommitFlamegraphAutoSizer(_      ) {
+export default function CommitFlamegraphAutoSizer(_) {
   const {profilerStore} = useContext(StoreContext);
-  const {rootID, selectedCommitIndex, selectFiber} = useContext(
-    ProfilerContext,
-  );
+  const {rootID, selectedCommitIndex, selectFiber} =
+    useContext(ProfilerContext);
   const {profilingCache} = profilerStore;
 
   const deselectCurrentFiber = useCallback(
-    event => {
+    (event) => {
       event.stopPropagation();
       selectFiber(null, null);
     },
     [selectFiber],
   );
 
-  let commitTree                    = null;
-  let chartData                   = null;
+  let commitTree = null;
+  let chartData = null;
   if (selectedCommitIndex !== null) {
     commitTree = profilingCache.getCommitTree({
       commitIndex: selectedCommitIndex,
-      rootID: ((rootID     )        ),
+      rootID: rootID,
     });
 
     chartData = profilingCache.getFlamegraphChartData({
       commitIndex: selectedCommitIndex,
       commitTree,
-      rootID: ((rootID     )        ),
+      rootID: rootID,
     });
   }
 
@@ -76,8 +60,8 @@ export default function CommitFlamegraphAutoSizer(_      ) {
             // Force Flow types to avoid checking for `null` here because there's no static proof that
             // by the time this render prop function is called, the values of the `let` variables have not changed.
             <CommitFlamegraph
-              chartData={((chartData     )           )}
-              commitTree={((commitTree     )            )}
+              chartData={chartData}
+              commitTree={commitTree}
               height={height}
               width={width}
             />
@@ -90,26 +74,14 @@ export default function CommitFlamegraphAutoSizer(_      ) {
   }
 }
 
-               
-                       
-                         
-                 
-                
-   
-
-function CommitFlamegraph({chartData, commitTree, height, width}       ) {
-  const [
-    hoveredFiberData,
-    setHoveredFiberData,
-  ] = useState                         (null);
+function CommitFlamegraph({chartData, commitTree, height, width}) {
+  const [hoveredFiberData, setHoveredFiberData] = useState(null);
   const {lineHeight} = useContext(SettingsContext);
   const {selectFiber, selectedFiberID} = useContext(ProfilerContext);
-  const {
-    highlightNativeElement,
-    clearHighlightNativeElement,
-  } = useHighlightNativeElement();
+  const {highlightNativeElement, clearHighlightNativeElement} =
+    useHighlightNativeElement();
 
-  const selectedChartNodeIndex = useMemo        (() => {
+  const selectedChartNodeIndex = useMemo(() => {
     if (selectedFiberID === null) {
       return 0;
     }
@@ -123,7 +95,7 @@ function CommitFlamegraph({chartData, commitTree, height, width}       ) {
     if (selectedFiberID !== null) {
       return (
         chartData.rows[selectedChartNodeIndex].find(
-          chartNode => chartNode.id === selectedFiberID,
+          (chartNode) => chartNode.id === selectedFiberID,
         ) || null
       );
     }
@@ -143,7 +115,7 @@ function CommitFlamegraph({chartData, commitTree, height, width}       ) {
     setHoveredFiberData(null); // clear hovered fiber data for tooltip
   }, [clearHighlightNativeElement]);
 
-  const itemData = useMemo          (
+  const itemData = useMemo(
     () => ({
       chartData,
       onElementMouseEnter: handleElementMouseEnter,
@@ -189,7 +161,8 @@ function CommitFlamegraph({chartData, commitTree, height, width}       ) {
         itemCount={chartData.depth}
         itemData={itemData}
         itemSize={lineHeight}
-        width={width}>
+        width={width}
+      >
         {CommitFlamegraphListItem}
       </FixedSizeList>
     </Tooltip>
@@ -203,7 +176,8 @@ const InnerElementType = forwardRef(({children, ...rest}, ref) => (
         id="didNotRenderPattern"
         patternUnits="userSpaceOnUse"
         width="4"
-        height="4">
+        height="4"
+      >
         <path
           d="M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2"
           className={styles.PatternPath}

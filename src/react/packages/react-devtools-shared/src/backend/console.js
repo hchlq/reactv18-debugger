@@ -4,11 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                                   
-                                                                             
 
 import {getInternalReactConstants} from './renderer';
 import {getStackByFiberInDevAndProd} from './DevToolsFiberComponentStack';
@@ -22,27 +19,18 @@ const PREFIX_REGEX = /\s{4}(in|at)\s{1}/;
 // but we can fallback to looking for location info (e.g. "foo.js:12:345")
 const ROW_COLUMN_NUMBER_REGEX = /:\d+:\d+(\n|$)/;
 
-const injectedRenderers      
-                
-    
-                                               
-                                        
-                           
-     
-  = new Map();
+const injectedRenderers = new Map();
 
-let targetConsole         = console;
+let targetConsole = console;
 let targetConsoleMethods = {};
 for (const method in console) {
   targetConsoleMethods[method] = console[method];
 }
 
-let unpatchFn                      = null;
+let unpatchFn = null;
 
 // Enables e.g. Jest tests to inject a mock console object.
-export function dangerous_setTargetConsoleForTesting(
-  targetConsoleForTesting        ,
-)       {
+export function dangerous_setTargetConsoleForTesting(targetConsoleForTesting) {
   targetConsole = targetConsoleForTesting;
 
   targetConsoleMethods = {};
@@ -54,7 +42,7 @@ export function dangerous_setTargetConsoleForTesting(
 // v16 renderers should use this method to inject internals necessary to generate a component stack.
 // These internals will be used if the console is patched.
 // Injecting them separately allows the console to easily be patched or un-patched later (at runtime).
-export function registerRenderer(renderer               )       {
+export function registerRenderer(renderer) {
   const {
     currentDispatcherRef,
     getCurrentFiber,
@@ -87,13 +75,7 @@ const consoleSettingsRef = {
 
 // Patches console methods to append component stack for the current fiber.
 // Call unpatch() to remove the injected behavior.
-export function patch({
-  appendComponentStack,
-  breakOnConsoleErrors,
-}   
-                                
-                                
- )       {
+export function patch({appendComponentStack, breakOnConsoleErrors}) {
   // Settings may change after we've patched the console.
   // Using a shared ref allows the patch function to read the latest values.
   consoleSettingsRef.appendComponentStack = appendComponentStack;
@@ -115,7 +97,7 @@ export function patch({
     }
   };
 
-  APPEND_STACK_TO_METHODS.forEach(method => {
+  APPEND_STACK_TO_METHODS.forEach((method) => {
     try {
       const originalMethod = (originalConsoleMethods[method] =
         targetConsole[method]);
@@ -145,7 +127,7 @@ export function patch({
                 getCurrentFiber,
                 workTagMap,
               } of injectedRenderers.values()) {
-                const current         = getCurrentFiber();
+                const current = getCurrentFiber();
                 if (current != null) {
                   const componentStack = getStackByFiberInDevAndProd(
                     workTagMap,
@@ -185,7 +167,7 @@ export function patch({
 }
 
 // Removed component stack patch from console methods.
-export function unpatch()       {
+export function unpatch() {
   if (unpatchFn !== null) {
     unpatchFn();
     unpatchFn = null;

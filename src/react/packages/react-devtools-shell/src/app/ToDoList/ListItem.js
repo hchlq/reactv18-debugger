@@ -4,22 +4,14 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
 import {memo, useCallback} from 'react';
 import styles from './ListItem.css';
 
-                                 
-
-               
-             
-                                   
-                                   
-   
-
-function ListItem({item, removeItem, toggleItem}       ) {
+function ListItem({item, removeItem, toggleItem}) {
   const handleDelete = useCallback(() => {
     removeItem(item);
   }, [item, removeItem]);
@@ -46,4 +38,4 @@ function ListItem({item, removeItem, toggleItem}       ) {
   );
 }
 
-export default memo       (ListItem);
+export default memo(ListItem);

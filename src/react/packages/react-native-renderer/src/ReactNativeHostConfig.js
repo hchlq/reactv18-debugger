@@ -4,10 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                               
 
 import invariant from 'shared/invariant';
 
@@ -28,33 +26,8 @@ import ReactNativeFiberHostComponent from './ReactNativeFiberHostComponent';
 
 const {get: getViewConfigForType} = ReactNativeViewConfigRegistry;
 
-                          
-                           
-                               
-                                                     
-                                  
-                                                         
-                                      
-                                      
-                           
-    
-                                    // Unused
-                             // Unused
-
-                                      
-                           
-                                
-
-                                                   
-                                                              
-                                                       
-                                    
-                          
-                      
-                      
-                                                          
-            
-    
+// Unused
+// Unused
 
 const UPDATE_SIGNAL = {};
 if (__DEV__) {
@@ -74,14 +47,14 @@ function allocateTag() {
   return tag;
 }
 
-function recursivelyUncacheFiberNode(node                         ) {
+function recursivelyUncacheFiberNode(node) {
   if (typeof node === 'number') {
     // Leaf node (eg text)
     uncacheFiberNode(node);
   } else {
-    uncacheFiberNode((node     )._nativeTag);
+    uncacheFiberNode(node._nativeTag);
 
-    (node     )._children.forEach(recursivelyUncacheFiberNode);
+    node._children.forEach(recursivelyUncacheFiberNode);
   }
 }
 
@@ -90,20 +63,17 @@ export * from 'react-reconciler/src/ReactFiberHostConfigWithNoHydration';
 export * from 'react-reconciler/src/ReactFiberHostConfigWithNoScopes';
 export * from 'react-reconciler/src/ReactFiberHostConfigWithNoTestSelectors';
 
-export function appendInitialChild(
-  parentInstance          ,
-  child                         ,
-)       {
+export function appendInitialChild(parentInstance, child) {
   parentInstance._children.push(child);
 }
 
 export function createInstance(
-  type        ,
-  props       ,
-  rootContainerInstance           ,
-  hostContext             ,
-  internalInstanceHandle        ,
-)           {
+  type,
+  props,
+  rootContainerInstance,
+  hostContext,
+  internalInstanceHandle,
+) {
   const tag = allocateTag();
   const viewConfig = getViewConfigForType(type);
 
@@ -135,15 +105,15 @@ export function createInstance(
 
   // Not sure how to avoid this cast. Flow is okay if the component is defined
   // in the same file but if it's external it can't see the types.
-  return ((component     )          );
+  return component;
 }
 
 export function createTextInstance(
-  text        ,
-  rootContainerInstance           ,
-  hostContext             ,
-  internalInstanceHandle        ,
-)               {
+  text,
+  rootContainerInstance,
+  hostContext,
+  internalInstanceHandle,
+) {
   invariant(
     hostContext.isInAParentText,
     'Text strings must be rendered within a <Text> component.',
@@ -164,12 +134,12 @@ export function createTextInstance(
 }
 
 export function finalizeInitialChildren(
-  parentInstance          ,
-  type        ,
-  props       ,
-  rootContainerInstance           ,
-  hostContext             ,
-)          {
+  parentInstance,
+  type,
+  props,
+  rootContainerInstance,
+  hostContext,
+) {
   // Don't send a no-op message over the bridge.
   if (parentInstance._children.length === 0) {
     return false;
@@ -177,7 +147,7 @@ export function finalizeInitialChildren(
 
   // Map from child objects to native tags.
   // Either way we need to pass a copy of the Array to prevent it from being frozen.
-  const nativeTags = parentInstance._children.map(child =>
+  const nativeTags = parentInstance._children.map((child) =>
     typeof child === 'number'
       ? child // Leaf node (eg text)
       : child._nativeTag,
@@ -191,17 +161,15 @@ export function finalizeInitialChildren(
   return false;
 }
 
-export function getRootHostContext(
-  rootContainerInstance           ,
-)              {
+export function getRootHostContext(rootContainerInstance) {
   return {isInAParentText: false};
 }
 
 export function getChildHostContext(
-  parentHostContext             ,
-  type        ,
-  rootContainerInstance           ,
-)              {
+  parentHostContext,
+  type,
+  rootContainerInstance,
+) {
   const prevIsInAParentText = parentHostContext.isInAParentText;
   const isInAParentText =
     type === 'AndroidTextInput' || // Android
@@ -217,27 +185,27 @@ export function getChildHostContext(
   }
 }
 
-export function getPublicInstance(instance          )    {
+export function getPublicInstance(instance) {
   return instance;
 }
 
-export function prepareForCommit(containerInfo           )                {
+export function prepareForCommit(containerInfo) {
   // Noop
   return null;
 }
 
 export function prepareUpdate(
-  instance          ,
-  type        ,
-  oldProps       ,
-  newProps       ,
-  rootContainerInstance           ,
-  hostContext             ,
-)                {
+  instance,
+  type,
+  oldProps,
+  newProps,
+  rootContainerInstance,
+  hostContext,
+) {
   return UPDATE_SIGNAL;
 }
 
-export function resetAfterCommit(containerInfo           )       {
+export function resetAfterCommit(containerInfo) {
   // Noop
 }
 
@@ -248,7 +216,7 @@ export const scheduleTimeout = setTimeout;
 export const cancelTimeout = clearTimeout;
 export const noTimeout = -1;
 
-export function shouldSetTextContent(type        , props       )          {
+export function shouldSetTextContent(type, props) {
   // TODO (bvaughn) Revisit this decision.
   // Always returning false simplifies the createInstance() implementation,
   // But creates an additional child Fiber for raw text children.
@@ -264,10 +232,7 @@ export function shouldSetTextContent(type        , props       )          {
 
 export const supportsMutation = true;
 
-export function appendChild(
-  parentInstance          ,
-  child                         ,
-)       {
+export function appendChild(parentInstance, child) {
   const childTag = typeof child === 'number' ? child : child._nativeTag;
   const children = parentInstance._children;
   const index = children.indexOf(child);
@@ -298,10 +263,7 @@ export function appendChild(
   }
 }
 
-export function appendChildToContainer(
-  parentInstance           ,
-  child                         ,
-)       {
+export function appendChildToContainer(parentInstance, child) {
   const childTag = typeof child === 'number' ? child : child._nativeTag;
   UIManager.setChildren(
     parentInstance, // containerTag
@@ -309,11 +271,7 @@ export function appendChildToContainer(
   );
 }
 
-export function commitTextUpdate(
-  textInstance              ,
-  oldText        ,
-  newText        ,
-)       {
+export function commitTextUpdate(textInstance, oldText, newText) {
   UIManager.updateView(
     textInstance, // reactTag
     'RCTRawText', // viewName
@@ -321,23 +279,18 @@ export function commitTextUpdate(
   );
 }
 
-export function commitMount(
-  instance          ,
-  type        ,
-  newProps       ,
-  internalInstanceHandle        ,
-)       {
+export function commitMount(instance, type, newProps, internalInstanceHandle) {
   // Noop
 }
 
 export function commitUpdate(
-  instance          ,
-  updatePayloadTODO        ,
-  type        ,
-  oldProps       ,
-  newProps       ,
-  internalInstanceHandle        ,
-)       {
+  instance,
+  updatePayloadTODO,
+  type,
+  oldProps,
+  newProps,
+  internalInstanceHandle,
+) {
   const viewConfig = instance.viewConfig;
 
   updateFiberProps(instance._nativeTag, newProps);
@@ -356,12 +309,8 @@ export function commitUpdate(
   }
 }
 
-export function insertBefore(
-  parentInstance          ,
-  child                         ,
-  beforeChild                         ,
-)       {
-  const children = (parentInstance     )._children;
+export function insertBefore(parentInstance, child, beforeChild) {
+  const children = parentInstance._children;
   const index = children.indexOf(child);
 
   // Move existing child or add new child?
@@ -371,7 +320,7 @@ export function insertBefore(
     children.splice(beforeChildIndex, 0, child);
 
     UIManager.manageChildren(
-      (parentInstance     )._nativeTag, // containerID
+      parentInstance._nativeTag, // containerID
       [index], // moveFromIndices
       [beforeChildIndex], // moveToIndices
       [], // addChildReactTags
@@ -385,7 +334,7 @@ export function insertBefore(
     const childTag = typeof child === 'number' ? child : child._nativeTag;
 
     UIManager.manageChildren(
-      (parentInstance     )._nativeTag, // containerID
+      parentInstance._nativeTag, // containerID
       [], // moveFromIndices
       [], // moveToIndices
       [childTag], // addChildReactTags
@@ -395,11 +344,7 @@ export function insertBefore(
   }
 }
 
-export function insertInContainerBefore(
-  parentInstance           ,
-  child                         ,
-  beforeChild                         ,
-)       {
+export function insertInContainerBefore(parentInstance, child, beforeChild) {
   // TODO (bvaughn): Remove this check when...
   // We create a wrapper object for the container in ReactNative render()
   // Or we refactor to remove wrapper objects entirely.
@@ -410,10 +355,7 @@ export function insertInContainerBefore(
   );
 }
 
-export function removeChild(
-  parentInstance          ,
-  child                         ,
-)       {
+export function removeChild(parentInstance, child) {
   recursivelyUncacheFiberNode(child);
   const children = parentInstance._children;
   const index = children.indexOf(child);
@@ -430,10 +372,7 @@ export function removeChild(
   );
 }
 
-export function removeChildFromContainer(
-  parentInstance           ,
-  child                         ,
-)       {
+export function removeChildFromContainer(parentInstance, child) {
   recursivelyUncacheFiberNode(child);
   UIManager.manageChildren(
     parentInstance, // containerID
@@ -445,11 +384,11 @@ export function removeChildFromContainer(
   );
 }
 
-export function resetTextContent(instance          )       {
+export function resetTextContent(instance) {
   // Noop
 }
 
-export function hideInstance(instance          )       {
+export function hideInstance(instance) {
   const viewConfig = instance.viewConfig;
   const updatePayload = create(
     {style: {display: 'none'}},
@@ -462,11 +401,11 @@ export function hideInstance(instance          )       {
   );
 }
 
-export function hideTextInstance(textInstance              )       {
+export function hideTextInstance(textInstance) {
   throw new Error('Not yet implemented.');
 }
 
-export function unhideInstance(instance          , props       )       {
+export function unhideInstance(instance, props) {
   const viewConfig = instance.viewConfig;
   const updatePayload = diff(
     {...props, style: [props.style, {display: 'none'}]},
@@ -480,57 +419,52 @@ export function unhideInstance(instance          , props       )       {
   );
 }
 
-export function clearContainer(container           )       {
+export function clearContainer(container) {
   // TODO Implement this for React Native
   // UIManager does not expose a "remove all" type method.
 }
 
-export function unhideTextInstance(
-  textInstance              ,
-  text        ,
-)       {
+export function unhideTextInstance(textInstance, text) {
   throw new Error('Not yet implemented.');
 }
 
-export function getFundamentalComponentInstance(fundamentalInstance     ) {
+export function getFundamentalComponentInstance(fundamentalInstance) {
   throw new Error('Not yet implemented.');
 }
 
-export function mountFundamentalComponent(fundamentalInstance     ) {
+export function mountFundamentalComponent(fundamentalInstance) {
   throw new Error('Not yet implemented.');
 }
 
-export function shouldUpdateFundamentalComponent(fundamentalInstance     ) {
+export function shouldUpdateFundamentalComponent(fundamentalInstance) {
   throw new Error('Not yet implemented.');
 }
 
-export function updateFundamentalComponent(fundamentalInstance     ) {
+export function updateFundamentalComponent(fundamentalInstance) {
   throw new Error('Not yet implemented.');
 }
 
-export function unmountFundamentalComponent(fundamentalInstance     ) {
+export function unmountFundamentalComponent(fundamentalInstance) {
   throw new Error('Not yet implemented.');
 }
 
-export function getInstanceFromNode(node     ) {
+export function getInstanceFromNode(node) {
   throw new Error('Not yet implemented.');
 }
 
-export function isOpaqueHydratingObject(value       )          {
+export function isOpaqueHydratingObject(value) {
   throw new Error('Not yet implemented');
 }
 
-export function makeOpaqueHydratingObject(
-  attemptToReadValue            ,
-)               {
+export function makeOpaqueHydratingObject(attemptToReadValue) {
   throw new Error('Not yet implemented.');
 }
 
-export function makeClientId()               {
+export function makeClientId() {
   throw new Error('Not yet implemented');
 }
 
-export function makeClientIdInDEV(warnOnAccessInDEV            )               {
+export function makeClientIdInDEV(warnOnAccessInDEV) {
   throw new Error('Not yet implemented');
 }
 
@@ -542,6 +476,6 @@ export function afterActiveInstanceBlur() {
   // noop
 }
 
-export function preparePortalMount(portalInstance          )       {
+export function preparePortalMount(portalInstance) {
   // noop
 }

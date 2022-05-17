@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -21,35 +21,7 @@ import {useModalDismissSignal} from './hooks';
 
 import styles from './ModalDialog.css';
 
-                            
-               
-   
-                            
-               
-                           
-                      
-                            
-   
-
-                                                      
-
-                                         
-
-               
-                          
-                             
-                     
-                           
-   
-
-                                
-           
-                     
-   
-
-const ModalDialogContext = createContext                        (
-  ((null     )                        ),
-);
+const ModalDialogContext = createContext(null);
 ModalDialogContext.displayName = 'ModalDialogContext';
 
 function dialogReducer(state, action) {
@@ -73,19 +45,15 @@ function dialogReducer(state, action) {
   }
 }
 
-               
-                       
-   
-
-function ModalDialogContextController({children}       ) {
-  const [state, dispatch] = useReducer                      (dialogReducer, {
+function ModalDialogContextController({children}) {
+  const [state, dispatch] = useReducer(dialogReducer, {
     canBeDismissed: true,
     content: null,
     isVisible: false,
     title: null,
   });
 
-  const value = useMemo                        (
+  const value = useMemo(
     () => ({
       canBeDismissed: state.canBeDismissed,
       content: state.content,
@@ -103,21 +71,20 @@ function ModalDialogContextController({children}       ) {
   );
 }
 
-function ModalDialog(_      ) {
+function ModalDialog(_) {
   const {isVisible} = useContext(ModalDialogContext);
   return isVisible ? <ModalDialogImpl /> : null;
 }
 
-function ModalDialogImpl(_      ) {
-  const {canBeDismissed, content, dispatch, title} = useContext(
-    ModalDialogContext,
-  );
+function ModalDialogImpl(_) {
+  const {canBeDismissed, content, dispatch, title} =
+    useContext(ModalDialogContext);
   const dismissModal = useCallback(() => {
     if (canBeDismissed) {
       dispatch({type: 'HIDE'});
     }
   }, [canBeDismissed, dispatch]);
-  const dialogRef = useRef                       (null);
+  const dialogRef = useRef(null);
 
   // It's important to trap click events within the dialog,
   // so the dismiss hook will use it for click hit detection.
@@ -127,7 +94,7 @@ function ModalDialogImpl(_      ) {
 
   // Clicks on the dialog should not bubble.
   // This way we can dismiss by listening to clicks on the background.
-  const handleDialogClick = (event     ) => {
+  const handleDialogClick = (event) => {
     event.stopPropagation();
 
     // It is important that we don't also prevent default,
@@ -139,7 +106,8 @@ function ModalDialogImpl(_      ) {
       <div
         ref={dialogRef}
         className={styles.Dialog}
-        onClick={handleDialogClick}>
+        onClick={handleDialogClick}
+      >
         {title !== null && <div className={styles.Title}>{title}</div>}
         {content}
         {canBeDismissed && (
@@ -147,7 +115,8 @@ function ModalDialogImpl(_      ) {
             <Button
               autoFocus={true}
               className={styles.Button}
-              onClick={dismissModal}>
+              onClick={dismissModal}
+            >
               Okay
             </Button>
           </div>

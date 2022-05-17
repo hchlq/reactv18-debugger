@@ -4,17 +4,12 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import {REACT_PROVIDER_TYPE, REACT_CONTEXT_TYPE} from 'shared/ReactSymbols';
 
-                                                    
-
-export function createContext   (
-  defaultValue   ,
-  calculateChangedBits                         ,
-)                  {
+export function createContext(defaultValue, calculateChangedBits) {
   if (calculateChangedBits === undefined) {
     calculateChangedBits = null;
   } else {
@@ -32,7 +27,7 @@ export function createContext   (
     }
   }
 
-  const context                  = {
+  const context = {
     $$typeof: REACT_CONTEXT_TYPE,
     _calculateChangedBits: calculateChangedBits,
     // As a workaround to support multiple concurrent renderers, we categorize
@@ -46,8 +41,8 @@ export function createContext   (
     // supports within in a single renderer. Such as parallel server rendering.
     _threadCount: 0,
     // These are circular
-    Provider: (null     ),
-    Consumer: (null     ),
+    Provider: null,
+    Consumer: null,
   };
 
   context.Provider = {

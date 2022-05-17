@@ -221,9 +221,9 @@ describe('ReactIncrementalTriangle', () => {
         const {counter, remainingDepth} = this.props;
         return (
           <ActiveContext.Consumer>
-            {activeContext => (
+            {(activeContext) => (
               <CounterContext.Consumer>
-                {counterContext => {
+                {(counterContext) => {
                   const activeDepthProp = this.state.isActive
                     ? this.props.activeDepth + 1
                     : this.props.activeDepth;
@@ -540,7 +540,7 @@ ${formatActions(actions)}
         const generator = roots.get(rootID);
         generator.next(action);
       });
-      roots.forEach(generator => {
+      roots.forEach((generator) => {
         generator.next(STOP);
       });
     }

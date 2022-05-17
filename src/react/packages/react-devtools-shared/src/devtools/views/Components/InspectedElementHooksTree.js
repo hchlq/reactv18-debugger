@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import {copy} from 'clipboard-js';
@@ -21,24 +21,12 @@ import styles from './InspectedElementHooksTree.css';
 import useContextMenu from '../../ContextMenu/useContextMenu';
 import {meta} from '../../../hydration';
 
-                                              
-                                                                       
-                                                                                
-                                                                     
-
-                            
-                         
-                                                   
-                                     
-               
-   
-
 export function InspectedElementHooksTree({
   bridge,
   getInspectedElementPath,
   inspectedElement,
   store,
-}                    ) {
+}) {
   const {hooks, id} = inspectedElement;
 
   const handleCopy = () => copy(serializeHooksForCopy(hooks));
@@ -66,21 +54,13 @@ export function InspectedElementHooksTree({
   }
 }
 
-                                 
-                                                   
-                   
-             
-                                     
-                               
-   
-
 export function InnerHooksTreeView({
   getInspectedElementPath,
   hooks,
   id,
   inspectedElement,
   path,
-}                         ) {
+}) {
   // $FlowFixMe "Missing type annotation for U" whatever that means
   return hooks.map((hook, index) => (
     <HookView
@@ -94,26 +74,9 @@ export function InnerHooksTreeView({
   ));
 }
 
-                       
-                                                   
-                  
-             
-                                     
-                               
-   
-
-function HookView({
-  getInspectedElementPath,
-  hook,
-  id,
-  inspectedElement,
-  path,
-}               ) {
-  const {
-    canEditHooks,
-    canEditHooksAndDeletePaths,
-    canEditHooksAndRenamePaths,
-  } = inspectedElement;
+function HookView({getInspectedElementPath, hook, id, inspectedElement, path}) {
+  const {canEditHooks, canEditHooksAndDeletePaths, canEditHooksAndRenamePaths} =
+    inspectedElement;
   const {name, id: hookID, isStateEditable, subHooks, value} = hook;
 
   const isReadOnly = hookID == null || !isStateEditable;
@@ -125,10 +88,10 @@ function HookView({
   const bridge = useContext(BridgeContext);
   const store = useContext(StoreContext);
 
-  const [isOpen, setIsOpen] = useState         (false);
+  const [isOpen, setIsOpen] = useState(false);
 
   const toggleIsOpen = useCallback(
-    () => setIsOpen(prevIsOpen => !prevIsOpen),
+    () => setIsOpen((prevIsOpen) => !prevIsOpen),
     [],
   );
 
@@ -141,7 +104,7 @@ function HookView({
         hook !== null &&
         typeof hook === 'object' &&
         hook.hasOwnProperty(meta.type)
-          ? hook[(meta.type     )]
+          ? hook[meta.type]
           : typeof value,
     },
     id: 'InspectedElement',
@@ -164,7 +127,7 @@ function HookView({
 
   // Certain hooks are not editable at all (as identified by react-debug-tools).
   // Primative hook names (e.g. the "State" name for useState) are also never editable.
-  const canRenamePathsAtDepth = depth => isStateEditable && depth > 1;
+  const canRenamePathsAtDepth = (depth) => isStateEditable && depth > 1;
 
   const isCustomHook = subHooks.length > 0;
 
@@ -175,7 +138,7 @@ function HookView({
 
   // Format data for display to mimic the props/state/context for now.
   if (type === 'string') {
-    displayValue = `"${((value     )        )}"`;
+    displayValue = `"${value}"`;
   } else if (type === 'boolean') {
     displayValue = value ? 'true' : 'false';
   } else if (type === 'number') {
@@ -228,7 +191,8 @@ function HookView({
             <ExpandCollapseToggle isOpen={isOpen} setIsOpen={setIsOpen} />
             <span
               onClick={toggleIsOpen}
-              className={name !== '' ? styles.Name : styles.NameAnonymous}>
+              className={name !== '' ? styles.Name : styles.NameAnonymous}
+            >
               {name || 'Anonymous'}
             </span>
             <span className={styles.Value} onClick={toggleIsOpen}>
@@ -264,7 +228,8 @@ function HookView({
             <ExpandCollapseToggle isOpen={isOpen} setIsOpen={setIsOpen} />
             <span
               onClick={toggleIsOpen}
-              className={name !== '' ? styles.Name : styles.NameAnonymous}>
+              className={name !== '' ? styles.Name : styles.NameAnonymous}
+            >
               {name || 'Anonymous'}
             </span>{' '}
             {/* $FlowFixMe */}

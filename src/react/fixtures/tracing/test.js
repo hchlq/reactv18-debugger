@@ -6,24 +6,18 @@ const {
   unstable_wrap: wrap,
 } = SchedulerTracing;
 
-const createLogger = (backgroundColor, color, enabled) => (
-  message,
-  ...args
-) => {
-  if (enabled === false) return;
-  console.groupCollapsed(
-    `%c${message}`,
-    `background-color: ${backgroundColor}; color: ${color}; padding: 2px 4px;`,
-    ...args
-  );
-  console.log(
-    new Error('stack').stack
-      .split('\n')
-      .slice(2)
-      .join('\n')
-  );
-  console.groupEnd();
-};
+const createLogger =
+  (backgroundColor, color, enabled) =>
+  (message, ...args) => {
+    if (enabled === false) return;
+    console.groupCollapsed(
+      `%c${message}`,
+      `background-color: ${backgroundColor}; color: ${color}; padding: 2px 4px;`,
+      ...args
+    );
+    console.log(new Error('stack').stack.split('\n').slice(2).join('\n'));
+    console.groupEnd();
+  };
 
 window.log = {
   app: createLogger('#37474f', '#fff'),
@@ -35,11 +29,11 @@ window.log = {
 
 // Fake suspense
 const resolvedValues = {};
-const read = key => {
+const read = (key) => {
   if (!resolvedValues[key]) {
     log.app(`Suspending for "${key}" ...`);
     throw new Promise(
-      wrap(resolve => {
+      wrap((resolve) => {
         setTimeout(
           wrap(() => {
             log.app(`Loaded "${key}" ...`);
@@ -71,20 +65,20 @@ const SuspendingChild = ({text}) => {
 };
 
 subscribe({
-  onInteractionScheduledWorkCompleted: interaction =>
+  onInteractionScheduledWorkCompleted: (interaction) =>
     log.interaction(
       'onInteractionScheduledWorkCompleted',
       JSON.stringify(interaction)
     ),
-  onInteractionTraced: interaction =>
+  onInteractionTraced: (interaction) =>
     log.interaction('onInteractionTraced', JSON.stringify(interaction)),
-  onWorkCanceled: interactions =>
+  onWorkCanceled: (interactions) =>
     log.work('onWorkCanceled', JSON.stringify(Array.from(interactions))),
-  onWorkScheduled: interactions =>
+  onWorkScheduled: (interactions) =>
     log.work('onWorkScheduled', JSON.stringify(Array.from(interactions))),
-  onWorkStarted: interactions =>
+  onWorkStarted: (interactions) =>
     log.work('onWorkStarted', JSON.stringify(Array.from(interactions))),
-  onWorkStopped: interactions =>
+  onWorkStopped: (interactions) =>
     log.work('onWorkStopped', JSON.stringify(Array.from(interactions))),
 });
 

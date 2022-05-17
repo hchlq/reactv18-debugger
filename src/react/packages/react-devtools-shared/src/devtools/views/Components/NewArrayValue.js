@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -14,21 +14,6 @@ import EditableName from './EditableName';
 import {smartParse} from '../../utils';
 import {parseHookPathForEdit} from './utils';
 import styles from './NewArrayValue.css';
-
-                                              
-                                                                     
-
-               
-                         
-                
-                  
-                   
-                
-                                     
-                               
-               
-                                                
-   
 
 export default function NewArrayValue({
   bridge,
@@ -40,8 +25,8 @@ export default function NewArrayValue({
   path,
   store,
   type,
-}       ) {
-  const [key, setKey] = useState        (0);
+}) {
+  const [key, setKey] = useState(0);
   const [isInvalid, setIsInvalid] = useState(false);
 
   // This is a bit of an unusual usage of the EditableName component,
@@ -89,7 +74,8 @@ export default function NewArrayValue({
       hidden={hidden}
       style={{
         paddingLeft: `${(depth - 1) * 0.75}rem`,
-      }}>
+      }}
+    >
       <div className={styles.NewArrayValue}>
         <EditableName
           allowWhiteSpace={true}

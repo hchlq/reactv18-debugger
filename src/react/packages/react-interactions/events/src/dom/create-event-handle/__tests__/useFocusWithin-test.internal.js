@@ -41,7 +41,7 @@ function initializeModules(hasPointerEvents) {
 const forcePointerEvents = true;
 const table = [[forcePointerEvents], [!forcePointerEvents]];
 
-describe.each(table)(`useFocus`, hasPointerEvents => {
+describe.each(table)(`useFocus`, (hasPointerEvents) => {
   let container;
   let container2;
 
@@ -329,7 +329,7 @@ describe.each(table)(`useFocus`, hasPointerEvents => {
 
     beforeEach(() => {
       onBeforeBlurWithin = jest.fn();
-      onAfterBlurWithin = jest.fn(e => {
+      onAfterBlurWithin = jest.fn((e) => {
         e.persist();
       });
       ref = React.createRef();
@@ -481,7 +481,9 @@ describe.each(table)(`useFocus`, hasPointerEvents => {
       const Suspense = React.Suspense;
       let suspend = false;
       let resolve;
-      const promise = new Promise(resolvePromise => (resolve = resolvePromise));
+      const promise = new Promise(
+        (resolvePromise) => (resolve = resolvePromise),
+      );
 
       function Child() {
         if (suspend) {
@@ -539,7 +541,9 @@ describe.each(table)(`useFocus`, hasPointerEvents => {
       const Suspense = React.Suspense;
       let suspend = false;
       let resolve;
-      const promise = new Promise(resolvePromise => (resolve = resolvePromise));
+      const promise = new Promise(
+        (resolvePromise) => (resolve = resolvePromise),
+      );
       const buttonRef = React.createRef();
 
       function Child() {

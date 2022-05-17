@@ -4,30 +4,13 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
 import {useCallback, useState} from 'react';
 import AutoSizeInput from './NativeStyleEditor/AutoSizeInput';
 import styles from './EditableName.css';
-
-                                                    
-                       
-                                  
-                                  
-          
-
-                           
-                       
-                            
-                      
-                     
-                        
-                               
-                               
-             
-   
 
 export default function EditableName({
   allowEmpty = false,
@@ -38,7 +21,7 @@ export default function EditableName({
   overrideName,
   path,
   type,
-}                   ) {
+}) {
   const [editableName, setEditableName] = useState(initialValue);
   const [isValid, setIsValid] = useState(false);
 
@@ -61,7 +44,7 @@ export default function EditableName({
   );
 
   const handleKeyDown = useCallback(
-    event => {
+    (event) => {
       // Prevent keydown events from e.g. change selected element in the tree
       event.stopPropagation();
 

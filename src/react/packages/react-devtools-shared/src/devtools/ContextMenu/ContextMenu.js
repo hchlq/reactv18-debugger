@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -14,9 +14,7 @@ import {RegistryContext} from './Contexts';
 
 import styles from './ContextMenu.css';
 
-                                                    
-
-function repositionToFit(element             , pageX        , pageY        ) {
+function repositionToFit(element, pageX, pageY) {
   const ownerWindow = element.ownerDocument.defaultView;
   if (element !== null) {
     if (pageY + element.offsetHeight >= ownerWindow.innerHeight) {
@@ -48,13 +46,8 @@ const HIDDEN_STATE = {
   pageY: 0,
 };
 
-               
-                                         
-             
-   
-
-export default function ContextMenu({children, id}       ) {
-  const {registerMenu} = useContext                     (RegistryContext);
+export default function ContextMenu({children, id}) {
+  const {registerMenu} = useContext(RegistryContext);
 
   const [state, setState] = useState(HIDDEN_STATE);
 
@@ -87,16 +80,16 @@ export default function ContextMenu({children, id}       ) {
       return;
     }
 
-    const menu = ((menuRef.current     )             );
+    const menu = menuRef.current;
     const container = containerRef.current;
     if (container !== null) {
-      const hideUnlessContains = event => {
+      const hideUnlessContains = (event) => {
         if (!menu.contains(event.target)) {
           setState(HIDDEN_STATE);
         }
       };
 
-      const hide = event => {
+      const hide = (event) => {
         setState(HIDDEN_STATE);
       };
 

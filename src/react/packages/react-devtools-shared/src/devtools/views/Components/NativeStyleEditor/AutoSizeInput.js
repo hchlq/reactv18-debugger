@@ -4,19 +4,11 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
 import styles from './AutoSizeInput.css';
-
-              
-                     
-                                        
-                       
-             
-     
-  
 
 export default function AutoSizeInput({
   className,
@@ -24,8 +16,8 @@ export default function AutoSizeInput({
   placeholder = '',
   value,
   ...rest
-}       ) {
-  const onFocusWrapper = event => {
+}) {
+  const onFocusWrapper = (event) => {
     const input = event.target;
     if (input !== null) {
       input.selectionStart = 0;

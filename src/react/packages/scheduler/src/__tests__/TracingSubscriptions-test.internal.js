@@ -124,7 +124,7 @@ describe('TracingSubscriptions', () => {
     });
 
     describe('error handling', () => {
-      it('should cover onInteractionTraced/onWorkStarted within', done => {
+      it('should cover onInteractionTraced/onWorkStarted within', (done) => {
         SchedulerTracing.unstable_trace(firstEvent.name, currentTime, () => {
           const mock = jest.fn();
 
@@ -165,7 +165,7 @@ describe('TracingSubscriptions', () => {
         });
       });
 
-      it('should cover onWorkStopped within trace', done => {
+      it('should cover onWorkStopped within trace', (done) => {
         SchedulerTracing.unstable_trace(firstEvent.name, currentTime, () => {
           let innerInteraction;
           const mock = jest.fn(() => {
@@ -199,7 +199,7 @@ describe('TracingSubscriptions', () => {
         });
       });
 
-      it('should cover onInteractionScheduledWorkCompleted within trace', done => {
+      it('should cover onInteractionScheduledWorkCompleted within trace', (done) => {
         SchedulerTracing.unstable_trace(firstEvent.name, currentTime, () => {
           const mock = jest.fn();
 
@@ -227,7 +227,7 @@ describe('TracingSubscriptions', () => {
         });
       });
 
-      it('should cover the callback within trace', done => {
+      it('should cover the callback within trace', (done) => {
         expect(onWorkStarted).not.toHaveBeenCalled();
         expect(onWorkStopped).not.toHaveBeenCalled();
 
@@ -243,7 +243,7 @@ describe('TracingSubscriptions', () => {
         done();
       });
 
-      it('should cover onWorkScheduled within wrap', done => {
+      it('should cover onWorkScheduled within wrap', (done) => {
         SchedulerTracing.unstable_trace(firstEvent.name, currentTime, () => {
           const interaction = Array.from(
             SchedulerTracing.unstable_getCurrent(),
@@ -287,7 +287,7 @@ describe('TracingSubscriptions', () => {
         expect(secondSubscriber.onWorkStarted).toHaveBeenCalledTimes(2);
       });
 
-      it('should cover onWorkStopped within wrap', done => {
+      it('should cover onWorkStopped within wrap', (done) => {
         SchedulerTracing.unstable_trace(firstEvent.name, currentTime, () => {
           const outerInteraction = Array.from(
             SchedulerTracing.unstable_getCurrent(),
@@ -331,7 +331,7 @@ describe('TracingSubscriptions', () => {
         });
       });
 
-      it('should cover the callback within wrap', done => {
+      it('should cover the callback within wrap', (done) => {
         expect(onWorkStarted).not.toHaveBeenCalled();
         expect(onWorkStopped).not.toHaveBeenCalled();
 

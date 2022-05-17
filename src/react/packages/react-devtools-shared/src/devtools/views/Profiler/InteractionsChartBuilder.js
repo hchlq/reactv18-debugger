@@ -4,30 +4,16 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import ProfilerStore from 'react-devtools-shared/src/devtools/ProfilerStore';
 
-                                         
+const cachedChartData = new Map();
 
-                          
-                                   
-                              
-                            
-   
-
-const cachedChartData                         = new Map();
-
-export function getChartData({
-  profilerStore,
-  rootID,
-}    
-                               
-                 
-  )            {
+export function getChartData({profilerStore, rootID}) {
   if (cachedChartData.has(rootID)) {
-    return ((cachedChartData.get(rootID)     )           );
+    return cachedChartData.get(rootID);
   }
 
   const dataForRoot = profilerStore.getDataForRoot(rootID);
@@ -42,7 +28,7 @@ export function getChartData({
 
   let maxCommitDuration = 0;
 
-  commitData.forEach(commitDatum => {
+  commitData.forEach((commitDatum) => {
     maxCommitDuration = Math.max(maxCommitDuration, commitDatum.duration);
   });
 
@@ -57,6 +43,6 @@ export function getChartData({
   return chartData;
 }
 
-export function invalidateChartData()       {
+export function invalidateChartData() {
   cachedChartData.clear();
 }

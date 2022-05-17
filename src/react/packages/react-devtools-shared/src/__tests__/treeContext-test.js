@@ -4,31 +4,23 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                           
-                                                                     
-                                                                  
-             
-                    
-               
-                                                                         
 
 describe('TreeListContext', () => {
   let React;
   let ReactDOM;
-  let TestRenderer                   ;
-  let bridge                ;
-  let store       ;
+  let TestRenderer;
+  let bridge;
+  let store;
   let utils;
 
   let BridgeContext;
   let StoreContext;
   let TreeContext;
 
-  let dispatch                   ;
-  let state              ;
+  let dispatch;
+  let state;
 
   beforeEach(() => {
     utils = require('./utils');
@@ -42,17 +34,17 @@ describe('TreeListContext', () => {
     ReactDOM = require('react-dom');
     TestRenderer = utils.requireTestRenderer();
 
-    BridgeContext = require('react-devtools-shared/src/devtools/views/context')
-      .BridgeContext;
-    StoreContext = require('react-devtools-shared/src/devtools/views/context')
-      .StoreContext;
+    BridgeContext =
+      require('react-devtools-shared/src/devtools/views/context').BridgeContext;
+    StoreContext =
+      require('react-devtools-shared/src/devtools/views/context').StoreContext;
     TreeContext = require('react-devtools-shared/src/devtools/views/Components/TreeContext');
   });
 
   afterEach(() => {
     // Reset between tests
-    dispatch = ((null     )                   );
-    state = ((null     )              );
+    dispatch = null;
+    state = null;
   });
 
   const Capture = () => {
@@ -102,7 +94,7 @@ describe('TreeListContext', () => {
         state.selectedElementIndex !== null &&
         state.selectedElementIndex < store.numElements - 1
       ) {
-        const index = ((state.selectedElementIndex     )        );
+        const index = state.selectedElementIndex;
         utils.act(() => dispatch({type: 'SELECT_NEXT_ELEMENT_IN_TREE'}));
         utils.act(() => renderer.update(<Contexts />));
         expect(state).toMatchSnapshot(`3: select element after (${index})`);
@@ -112,7 +104,7 @@ describe('TreeListContext', () => {
         state.selectedElementIndex !== null &&
         state.selectedElementIndex > 0
       ) {
-        const index = ((state.selectedElementIndex     )        );
+        const index = state.selectedElementIndex;
         utils.act(() => dispatch({type: 'SELECT_PREVIOUS_ELEMENT_IN_TREE'}));
         utils.act(() => renderer.update(<Contexts />));
         expect(state).toMatchSnapshot(`4: select element before (${index})`);
@@ -221,9 +213,9 @@ describe('TreeListContext', () => {
       expect(state).toEqual(previousState);
     });
 
-    it('should clear selection if the selected element is unmounted', async done => {
-      const Grandparent = props => props.children || null;
-      const Parent = props => props.children || null;
+    it('should clear selection if the selected element is unmounted', async (done) => {
+      const Grandparent = (props) => props.children || null;
+      const Parent = (props) => props.children || null;
       const Child = () => null;
 
       const container = document.createElement('div');
@@ -305,7 +297,7 @@ describe('TreeListContext', () => {
       let renderer;
       utils.act(() => (renderer = TestRenderer.create(<Contexts />)));
 
-      const firstParentID = ((store.getElementIDAtIndex(1)     )        );
+      const firstParentID = store.getElementIDAtIndex(1);
 
       utils.act(() =>
         dispatch({type: 'SELECT_ELEMENT_BY_ID', payload: firstParentID}),
@@ -384,7 +376,7 @@ describe('TreeListContext', () => {
       let renderer;
       utils.act(() => (renderer = TestRenderer.create(<Contexts />)));
 
-      const childID = ((store.getElementIDAtIndex(7)     )        );
+      const childID = store.getElementIDAtIndex(7);
       utils.act(() =>
         dispatch({type: 'SELECT_ELEMENT_BY_ID', payload: childID}),
       );
@@ -436,7 +428,7 @@ describe('TreeListContext', () => {
       expect(state.selectedElementIndex).toBe(6);
       expect(state.ownerSubtreeLeafElementID).toBeNull();
 
-      const parentID = ((store.getElementIDAtIndex(5)     )        );
+      const parentID = store.getElementIDAtIndex(5);
       utils.act(() =>
         dispatch({type: 'SELECT_ELEMENT_BY_ID', payload: parentID}),
       );
@@ -572,7 +564,7 @@ describe('TreeListContext', () => {
       expect(state).toMatchSnapshot('8: wrap to first result');
     });
 
-    it('should add newly mounted elements to the search results set if they match the current text', async done => {
+    it('should add newly mounted elements to the search results set if they match the current text', async (done) => {
       const Foo = () => null;
       const Bar = () => null;
       const Baz = () => null;
@@ -615,7 +607,7 @@ describe('TreeListContext', () => {
       done();
     });
 
-    it('should remove unmounted elements from the search results set', async done => {
+    it('should remove unmounted elements from the search results set', async (done) => {
       const Foo = () => null;
       const Bar = () => null;
       const Baz = () => null;
@@ -684,7 +676,7 @@ describe('TreeListContext', () => {
       utils.act(() => (renderer = TestRenderer.create(<Contexts />)));
       expect(state).toMatchSnapshot('1: initial state');
 
-      const parentID = ((store.getElementIDAtIndex(1)     )        );
+      const parentID = store.getElementIDAtIndex(1);
       utils.act(() => dispatch({type: 'SELECT_OWNER', payload: parentID}));
       utils.act(() => renderer.update(<Contexts />));
       expect(state).toMatchSnapshot('2: parent owners tree');
@@ -694,7 +686,7 @@ describe('TreeListContext', () => {
       expect(state).toMatchSnapshot('3: final state');
     });
 
-    it('should remove an element from the owners list if it is unmounted', async done => {
+    it('should remove an element from the owners list if it is unmounted', async (done) => {
       const Grandparent = ({count}) => <Parent count={count} />;
       const Parent = ({count}) =>
         new Array(count).fill(true).map((_, index) => <Child key={index} />);
@@ -709,7 +701,7 @@ describe('TreeListContext', () => {
       utils.act(() => (renderer = TestRenderer.create(<Contexts />)));
       expect(state).toMatchSnapshot('1: initial state');
 
-      const parentID = ((store.getElementIDAtIndex(1)     )        );
+      const parentID = store.getElementIDAtIndex(1);
       utils.act(() => dispatch({type: 'SELECT_OWNER', payload: parentID}));
       utils.act(() => renderer.update(<Contexts />));
       expect(state).toMatchSnapshot('2: parent owners tree');
@@ -727,8 +719,8 @@ describe('TreeListContext', () => {
       done();
     });
 
-    it('should exit the owners list if the current owner is unmounted', async done => {
-      const Parent = props => props.children || null;
+    it('should exit the owners list if the current owner is unmounted', async (done) => {
+      const Parent = (props) => props.children || null;
       const Child = () => null;
 
       const container = document.createElement('div');
@@ -747,7 +739,7 @@ describe('TreeListContext', () => {
       utils.act(() => (renderer = TestRenderer.create(<Contexts />)));
       expect(state).toMatchSnapshot('1: initial state');
 
-      const childID = ((store.getElementIDAtIndex(1)     )        );
+      const childID = store.getElementIDAtIndex(1);
       utils.act(() => dispatch({type: 'SELECT_OWNER', payload: childID}));
       utils.act(() => renderer.update(<Contexts />));
       expect(state).toMatchSnapshot('2: child owners tree');
@@ -755,7 +747,7 @@ describe('TreeListContext', () => {
       await utils.actAsync(() => ReactDOM.render(<Parent />, container));
       expect(state).toMatchSnapshot('3: remove child');
 
-      const parentID = ((store.getElementIDAtIndex(0)     )        );
+      const parentID = store.getElementIDAtIndex(0);
       utils.act(() => dispatch({type: 'SELECT_OWNER', payload: parentID}));
       utils.act(() => renderer.update(<Contexts />));
       expect(state).toMatchSnapshot('4: parent owners tree');
@@ -789,9 +781,9 @@ describe('TreeListContext', () => {
       utils.act(() => (renderer = TestRenderer.create(<Contexts />)));
       expect(state).toMatchSnapshot('1: initial state');
 
-      const outerSuspenseID = ((store.getElementIDAtIndex(1)     )        );
-      const childID = ((store.getElementIDAtIndex(2)     )        );
-      const innerSuspenseID = ((store.getElementIDAtIndex(3)     )        );
+      const outerSuspenseID = store.getElementIDAtIndex(1);
+      const childID = store.getElementIDAtIndex(2);
+      const innerSuspenseID = store.getElementIDAtIndex(3);
 
       utils.act(() => dispatch({type: 'SELECT_OWNER', payload: childID}));
       utils.act(() => renderer.update(<Contexts />));

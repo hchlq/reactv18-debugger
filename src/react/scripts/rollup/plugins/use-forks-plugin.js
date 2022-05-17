@@ -29,7 +29,7 @@ function resolveRelatively(importee, importer) {
 let resolveCache = new Map();
 function useForks(forks) {
   let resolvedForks = new Map();
-  Object.keys(forks).forEach(srcModule => {
+  Object.keys(forks).forEach((srcModule) => {
     const targetModule = forks[srcModule];
     resolvedForks.set(
       require.resolve(srcModule),

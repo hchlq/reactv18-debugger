@@ -4,14 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                             
-                                                                   
-                                                                  
-                                                           
-                                                          
 
 import {
   SyntheticEvent,
@@ -50,26 +44,26 @@ import {IS_CAPTURE_PHASE} from '../EventSystemFlags';
 import {enableCreateEventHandleAPI} from 'shared/ReactFeatureFlags';
 
 function extractEvents(
-  dispatchQueue               ,
-  domEventName              ,
-  targetInst              ,
-  nativeEvent                ,
-  nativeEventTarget                    ,
-  eventSystemFlags                  ,
-  targetContainer             ,
-)       {
+  dispatchQueue,
+  domEventName,
+  targetInst,
+  nativeEvent,
+  nativeEventTarget,
+  eventSystemFlags,
+  targetContainer,
+) {
   const reactName = topLevelEventsToReactNames.get(domEventName);
   if (reactName === undefined) {
     return;
   }
   let SyntheticEventCtor = SyntheticEvent;
-  let reactEventType         = domEventName;
+  let reactEventType = domEventName;
   switch (domEventName) {
     case 'keypress':
       // Firefox creates a keypress event for function keys too. This removes
       // the unwanted keypress events. Enter is however both printable and
       // non-printable. One would expect Tab to be as well (but it isn't).
-      if (getEventCharCode(((nativeEvent     )               )) === 0) {
+      if (getEventCharCode(nativeEvent) === 0) {
         return;
       }
     /* falls through */
@@ -166,7 +160,7 @@ function extractEvents(
     const listeners = accumulateEventHandleNonManagedNodeListeners(
       // TODO: this cast may not make sense for events like
       // "focus" where React listens to e.g. "focusin".
-      ((reactEventType     )              ),
+      reactEventType,
       targetContainer,
       inCapturePhase,
     );

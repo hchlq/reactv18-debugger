@@ -36,7 +36,7 @@ function initializeModules(hasPointerEvents) {
 const forcePointerEvents = true;
 const table = [[forcePointerEvents], [!forcePointerEvents]];
 
-describe.each(table)(`useFocus hasPointerEvents=%s`, hasPointerEvents => {
+describe.each(table)(`useFocus hasPointerEvents=%s`, (hasPointerEvents) => {
   let container;
 
   beforeEach(() => {
@@ -275,7 +275,7 @@ describe.each(table)(`useFocus hasPointerEvents=%s`, hasPointerEvents => {
       const events = [];
       const innerRef = React.createRef();
       const outerRef = React.createRef();
-      const createEventHandler = msg => () => {
+      const createEventHandler = (msg) => () => {
         events.push(msg);
       };
 

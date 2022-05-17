@@ -22,11 +22,7 @@ describe(getLanesFromTransportDecimalBitmask, () => {
     expect(getLanesFromTransportDecimalBitmask('512')).toEqual([9]);
     expect(getLanesFromTransportDecimalBitmask('3')).toEqual([0, 1]);
     expect(getLanesFromTransportDecimalBitmask('1234')).toEqual([
-      1,
-      4,
-      6,
-      7,
-      10,
+      1, 4, 6, 7, 10,
     ]); // 2 + 16 + 64 + 128 + 1024
     expect(
       getLanesFromTransportDecimalBitmask('1073741824'), // 0b1000000000000000000000000000000

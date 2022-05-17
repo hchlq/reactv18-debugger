@@ -17,7 +17,7 @@ function HTML() {
   );
 }
 
-module.exports = function(req, res) {
+module.exports = function (req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   let model = {
     content: <HTML />,

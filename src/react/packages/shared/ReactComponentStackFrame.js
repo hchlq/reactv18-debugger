@@ -4,11 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                    
-                                                       
 
 import {enableComponentStackLocations} from 'shared/ReactFeatureFlags';
 
@@ -28,11 +25,7 @@ import ReactSharedInternals from 'shared/ReactSharedInternals';
 const {ReactCurrentDispatcher} = ReactSharedInternals;
 
 let prefix;
-export function describeBuiltInComponentFrame(
-  name        ,
-  source                      ,
-  ownerFn                        ,
-)         {
+export function describeBuiltInComponentFrame(name, source, ownerFn) {
   if (enableComponentStackLocations) {
     if (prefix === undefined) {
       // Extract the VM specific prefix used by each line.
@@ -61,10 +54,7 @@ if (__DEV__) {
   componentFrameCache = new PossiblyWeakMap();
 }
 
-export function describeNativeComponentFrame(
-  fn          ,
-  construct         ,
-)         {
+export function describeNativeComponentFrame(fn, construct) {
   // If something asked for a stack inside a fake render, it should get ignored.
   if (!fn || reentry) {
     return '';
@@ -95,12 +85,12 @@ export function describeNativeComponentFrame(
     // This should throw.
     if (construct) {
       // Something should be setting the props in the constructor.
-      const Fake = function() {
+      const Fake = function () {
         throw Error();
       };
       // $FlowFixMe
       Object.defineProperty(Fake.prototype, 'props', {
-        set: function() {
+        set: function () {
           // We use a throwing setter instead of frozen or non-writable props
           // because that won't throw in a non-strict mode function.
           throw Error();
@@ -202,11 +192,7 @@ export function describeNativeComponentFrame(
 
 const BEFORE_SLASH_RE = /^(.*)[\\\/]/;
 
-function describeComponentFrame(
-  name               ,
-  source                      ,
-  ownerName               ,
-) {
+function describeComponentFrame(name, source, ownerName) {
   let sourceInfo = '';
   if (__DEV__ && source) {
     const path = source.fileName;
@@ -230,11 +216,7 @@ function describeComponentFrame(
   return '\n    in ' + (name || 'Unknown') + sourceInfo;
 }
 
-export function describeClassComponentFrame(
-  ctor          ,
-  source                      ,
-  ownerFn                        ,
-)         {
+export function describeClassComponentFrame(ctor, source, ownerFn) {
   if (enableComponentStackLocations) {
     return describeNativeComponentFrame(ctor, true);
   } else {
@@ -242,11 +224,7 @@ export function describeClassComponentFrame(
   }
 }
 
-export function describeFunctionComponentFrame(
-  fn          ,
-  source                      ,
-  ownerFn                        ,
-)         {
+export function describeFunctionComponentFrame(fn, source, ownerFn) {
   if (enableComponentStackLocations) {
     return describeNativeComponentFrame(fn, false);
   } else {
@@ -262,16 +240,12 @@ export function describeFunctionComponentFrame(
   }
 }
 
-function shouldConstruct(Component          ) {
+function shouldConstruct(Component) {
   const prototype = Component.prototype;
   return !!(prototype && prototype.isReactComponent);
 }
 
-export function describeUnknownElementTypeFrameInDEV(
-  type     ,
-  source                      ,
-  ownerFn                        ,
-)         {
+export function describeUnknownElementTypeFrameInDEV(type, source, ownerFn) {
   if (!__DEV__) {
     return '';
   }
@@ -304,7 +278,7 @@ export function describeUnknownElementTypeFrameInDEV(
       case REACT_BLOCK_TYPE:
         return describeFunctionComponentFrame(type._render, source, ownerFn);
       case REACT_LAZY_TYPE: {
-        const lazyComponent                          = (type     );
+        const lazyComponent = type;
         const payload = lazyComponent._payload;
         const init = lazyComponent._init;
         try {

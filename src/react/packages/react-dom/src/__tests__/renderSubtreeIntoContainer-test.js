@@ -13,8 +13,8 @@ const React = require('react');
 const PropTypes = require('prop-types');
 const ReactDOM = require('react-dom');
 const ReactTestUtils = require('react-dom/test-utils');
-const renderSubtreeIntoContainer = require('react-dom')
-  .unstable_renderSubtreeIntoContainer;
+const renderSubtreeIntoContainer =
+  require('react-dom').unstable_renderSubtreeIntoContainer;
 
 const ReactFeatureFlags = require('shared/ReactFeatureFlags');
 
@@ -50,7 +50,7 @@ describe('renderSubtreeIntoContainer', () => {
       componentDidMount() {
         if (ReactFeatureFlags.warnUnstableRenderSubtreeIntoContainer) {
           expect(
-            function() {
+            function () {
               renderSubtreeIntoContainer(this, <Component />, portal);
             }.bind(this),
           ).toWarnDev(
@@ -99,7 +99,7 @@ describe('renderSubtreeIntoContainer', () => {
       }
 
       componentDidMount() {
-        expect(function() {
+        expect(function () {
           renderSubtreeIntoContainer(<Parent />, <Component />, portal);
         }).toThrowError('parentComponentmust be a valid React Component');
       }

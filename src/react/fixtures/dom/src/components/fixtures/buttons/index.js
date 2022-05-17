@@ -13,7 +13,8 @@ export default class ButtonTestCases extends React.Component {
       <FixtureSet title="Buttons">
         <TestCase
           title="onClick with disabled buttons"
-          description="The onClick event handler should not be invoked when clicking on a disabled button">
+          description="The onClick event handler should not be invoked when clicking on a disabled button"
+        >
           <TestCase.Steps>
             <li>Click on the disabled button</li>
           </TestCase.Steps>
@@ -26,7 +27,8 @@ export default class ButtonTestCases extends React.Component {
         </TestCase>
         <TestCase
           title="onClick with disabled buttons containing other elements"
-          description="The onClick event handler should not be invoked when clicking on a disabled button that contains other elements">
+          description="The onClick event handler should not be invoked when clicking on a disabled button that contains other elements"
+        >
           <TestCase.Steps>
             <li>Click on the disabled button, which contains a span</li>
           </TestCase.Steps>

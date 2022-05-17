@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import {gte} from 'semver';
@@ -77,51 +77,9 @@ import {
   MEMO_SYMBOL_STRING,
 } from './ReactSymbols';
 
-                                                                   
-             
-                    
-                    
-               
-                   
-                          
-                   
-             
-        
-            
-            
-                       
-                              
-                
-                    
-             
-                 
-                                                                                         
-             
-                  
-              
-                                         
-
-                                                                  
-                                                        
-
-                                 
-                            
-                               
-                         
-                      
-                       
-                     
-   
-
-                                   
-                  
-                        
-                    
-   
-
-function getFiberFlags(fiber       )         {
+function getFiberFlags(fiber) {
   // The name of this field changed from "effectTag" to "flags"
-  return fiber.flags !== undefined ? fiber.flags : (fiber     ).effectTag;
+  return fiber.flags !== undefined ? fiber.flags : fiber.effectTag;
 }
 
 // Some environments (e.g. React Native / Hermes) don't support the performance API yet.
@@ -130,16 +88,8 @@ const getCurrentTime =
     ? () => performance.now()
     : () => Date.now();
 
-export function getInternalReactConstants(
-  version        ,
-)    
-                                                     
-                                   
-                                               
-                                                   
-                              
-   {
-  const ReactTypeOfSideEffect                            = {
+export function getInternalReactConstants(version) {
+  const ReactTypeOfSideEffect = {
     NoFlags: 0b00,
     PerformedWork: 0b01,
     Placement: 0b10,
@@ -152,7 +102,7 @@ export function getInternalReactConstants(
   // Technically these priority levels are invalid for versions before 16.9,
   // but 16.9 is the first version to report priority level to DevTools,
   // so we can avoid checking for earlier versions and support pre-16.9 canary releases in the process.
-  const ReactPriorityLevels                          = {
+  const ReactPriorityLevels = {
     ImmediatePriority: 99,
     UserBlockingPriority: 98,
     NormalPriority: 97,
@@ -161,7 +111,7 @@ export function getInternalReactConstants(
     NoPriority: 90,
   };
 
-  let ReactTypeOfWork             = ((null     )            );
+  let ReactTypeOfWork = null;
 
   // **********************************************************
   // The section below is copied from files in React repo.
@@ -284,7 +234,7 @@ export function getInternalReactConstants(
   // End of copied code.
   // **********************************************************
 
-  function getTypeSymbol(type     )                  {
+  function getTypeSymbol(type) {
     const symbolOrNumber =
       typeof type === 'object' && type !== null ? type.$$typeof : type;
 
@@ -311,7 +261,7 @@ export function getInternalReactConstants(
     SuspenseListComponent,
   } = ReactTypeOfWork;
 
-  function resolveFiberType(type     ) {
+  function resolveFiberType(type) {
     const typeSymbol = getTypeSymbol(type);
     switch (typeSymbol) {
       case MEMO_NUMBER:
@@ -327,7 +277,7 @@ export function getInternalReactConstants(
   }
 
   // NOTICE Keep in sync with shouldFilterFiber() and other get*ForFiber methods
-  function getDisplayNameForFiber(fiber       )                {
+  function getDisplayNameForFiber(fiber) {
     const {type, tag} = fiber;
 
     let resolvedType = type;
@@ -335,7 +285,7 @@ export function getInternalReactConstants(
       resolvedType = resolveFiberType(type);
     }
 
-    let resolvedContext      = null;
+    let resolvedContext = null;
 
     switch (tag) {
       case ClassComponent:
@@ -416,12 +366,7 @@ export function getInternalReactConstants(
   };
 }
 
-export function attach(
-  hook              ,
-  rendererID        ,
-  renderer               ,
-  global        ,
-)                    {
+export function attach(hook, rendererID, renderer, global) {
   const {
     getDisplayNameForFiber,
     getTypeSymbol,
@@ -495,7 +440,7 @@ export function attach(
     }
   }
 
-  const debug = (name        , fiber       , parentFiber        )       => {
+  const debug = (name, fiber, parentFiber) => {
     if (__DEBUG__) {
       const displayName = getDisplayNameForFiber(fiber) || 'null';
       const id = getFiberID(fiber);
@@ -517,20 +462,20 @@ export function attach(
   };
 
   // Configurable Components tree filters.
-  const hideElementsWithDisplayNames              = new Set();
-  const hideElementsWithPaths              = new Set();
-  const hideElementsWithTypes                   = new Set();
+  const hideElementsWithDisplayNames = new Set();
+  const hideElementsWithPaths = new Set();
+  const hideElementsWithTypes = new Set();
 
   // Highlight updates
-  let traceUpdatesEnabled          = false;
-  const traceUpdatesForNodes                  = new Set();
+  let traceUpdatesEnabled = false;
+  const traceUpdatesForNodes = new Set();
 
-  function applyComponentFilters(componentFilters                        ) {
+  function applyComponentFilters(componentFilters) {
     hideElementsWithTypes.clear();
     hideElementsWithDisplayNames.clear();
     hideElementsWithPaths.clear();
 
-    componentFilters.forEach(componentFilter => {
+    componentFilters.forEach((componentFilter) => {
       if (!componentFilter.isEnabled) {
         return;
       }
@@ -582,7 +527,7 @@ export function attach(
   // For example, we could add a new recursive unmount tree operation.
   // The unmount operations are already significantly smaller than mount operations though.
   // This is something to keep in mind for later.
-  function updateComponentFilters(componentFilters                        ) {
+  function updateComponentFilters(componentFilters) {
     if (isProfiling) {
       // Re-mounting a tree while profiling is in progress might break a lot of assumptions.
       // If necessary, we could support this- but it doesn't seem like a necessary use case.
@@ -590,7 +535,7 @@ export function attach(
     }
 
     // Recursively unmount all roots.
-    hook.getFiberRoots(rendererID).forEach(root => {
+    hook.getFiberRoots(rendererID).forEach((root) => {
       currentRootID = getFiberID(getPrimaryFiber(root.current));
       unmountFiberChildrenRecursively(root.current);
       recordUnmount(root.current, false);
@@ -603,7 +548,7 @@ export function attach(
     rootDisplayNameCounter.clear();
 
     // Recursively re-mount all roots with new filter criteria applied.
-    hook.getFiberRoots(rendererID).forEach(root => {
+    hook.getFiberRoots(rendererID).forEach((root) => {
       currentRootID = getFiberID(getPrimaryFiber(root.current));
       setRootPseudoKey(currentRootID, root.current);
       mountFiberRecursively(root.current, null, false, false);
@@ -613,7 +558,7 @@ export function attach(
   }
 
   // NOTICE Keep in sync with get*ForFiber methods
-  function shouldFilterFiber(fiber       )          {
+  function shouldFilterFiber(fiber) {
     const {_debugSource, tag, type} = fiber;
 
     switch (tag) {
@@ -677,7 +622,7 @@ export function attach(
     return false;
   }
   // NOTICE Keep in sync with shouldFilterFiber() and other get*ForFiber methods
-  function getElementTypeForFiber(fiber       )              {
+  function getElementTypeForFiber(fiber) {
     const {type, tag} = fiber;
 
     switch (tag) {
@@ -734,7 +679,7 @@ export function attach(
   // It is currently necessary because DevTools wants to use unique objects as keys for instances.
   // However fibers have two versions.
   // We use this set to remember first encountered fiber for each conceptual instance.
-  function getPrimaryFiber(fiber       )        {
+  function getPrimaryFiber(fiber) {
     if (primaryFibers.has(fiber)) {
       return fiber;
     }
@@ -746,36 +691,33 @@ export function attach(
     return fiber;
   }
 
-  const fiberToIDMap                     = new Map();
-  const idToFiberMap                     = new Map();
-  const primaryFibers             = new Set();
+  const fiberToIDMap = new Map();
+  const idToFiberMap = new Map();
+  const primaryFibers = new Set();
 
   // When profiling is supported, we store the latest tree base durations for each Fiber.
   // This is so that we can quickly capture a snapshot of those values if profiling starts.
   // If we didn't store these values, we'd have to crawl the tree when profiling started,
   // and use a slow path to find each of the current Fibers.
-  const idToTreeBaseDurationMap                      = new Map();
+  const idToTreeBaseDurationMap = new Map();
 
   // When profiling is supported, we store the latest tree base durations for each Fiber.
   // This map enables us to filter these times by root when sending them to the frontend.
-  const idToRootMap                      = new Map();
+  const idToRootMap = new Map();
 
   // When a mount or update is in progress, this value tracks the root that is being operated on.
-  let currentRootID         = -1;
+  let currentRootID = -1;
 
-  function getFiberID(primaryFiber       )         {
+  function getFiberID(primaryFiber) {
     if (!fiberToIDMap.has(primaryFiber)) {
       const id = getUID();
       fiberToIDMap.set(primaryFiber, id);
       idToFiberMap.set(id, primaryFiber);
     }
-    return ((fiberToIDMap.get(primaryFiber)     )        );
+    return fiberToIDMap.get(primaryFiber);
   }
 
-  function getChangeDescription(
-    prevFiber              ,
-    nextFiber       ,
-  )                           {
+  function getChangeDescription(prevFiber, nextFiber) {
     switch (getElementTypeForFiber(nextFiber)) {
       case ElementTypeClass:
       case ElementTypeFunction:
@@ -812,7 +754,7 @@ export function attach(
     }
   }
 
-  function updateContextsForFiber(fiber       ) {
+  function updateContextsForFiber(fiber) {
     switch (getElementTypeForFiber(fiber)) {
       case ElementTypeClass:
         if (idToContextsMap !== null) {
@@ -831,7 +773,7 @@ export function attach(
   // Differentiates between a null context value and no context.
   const NO_CONTEXT = {};
 
-  function getContextsForFiber(fiber       )                       {
+  function getContextsForFiber(fiber) {
     switch (getElementTypeForFiber(fiber)) {
       case ElementTypeClass:
         const instance = fiber.stateNode;
@@ -859,7 +801,7 @@ export function attach(
   // Record all contexts at the time profiling is started.
   // Fibers only store the current context value,
   // so we need to track them separately in order to determine changed keys.
-  function crawlToInitializeContextsMap(fiber       ) {
+  function crawlToInitializeContextsMap(fiber) {
     updateContextsForFiber(fiber);
     let current = fiber.child;
     while (current !== null) {
@@ -868,7 +810,7 @@ export function attach(
     }
   }
 
-  function getContextChangedKeys(fiber       )                                 {
+  function getContextChangedKeys(fiber) {
     switch (getElementTypeForFiber(fiber)) {
       case ElementTypeClass:
         if (idToContextsMap !== null) {
@@ -898,7 +840,7 @@ export function attach(
     return null;
   }
 
-  function didHooksChange(prev     , next     )          {
+  function didHooksChange(prev, next) {
     if (prev == null || next == null) {
       return false;
     }
@@ -923,7 +865,7 @@ export function attach(
     return false;
   }
 
-  function getChangedKeys(prev     , next     )                       {
+  function getChangedKeys(prev, next) {
     if (prev == null || next == null) {
       return null;
     }
@@ -951,7 +893,7 @@ export function attach(
   }
 
   // eslint-disable-next-line no-unused-vars
-  function didFiberRender(prevFiber       , nextFiber       )          {
+  function didFiberRender(prevFiber, nextFiber) {
     switch (nextFiber.tag) {
       case ClassComponent:
       case FunctionComponent:
@@ -975,15 +917,15 @@ export function attach(
     }
   }
 
-  const pendingOperations                = [];
-  const pendingRealUnmountedIDs                = [];
-  const pendingSimulatedUnmountedIDs                = [];
-  let pendingOperationsQueue                              = [];
-  const pendingStringTable                      = new Map();
-  let pendingStringTableLength         = 0;
-  let pendingUnmountedRootID                = null;
+  const pendingOperations = [];
+  const pendingRealUnmountedIDs = [];
+  const pendingSimulatedUnmountedIDs = [];
+  let pendingOperationsQueue = [];
+  const pendingStringTable = new Map();
+  let pendingStringTableLength = 0;
+  let pendingUnmountedRootID = null;
 
-  function pushOperation(op        )       {
+  function pushOperation(op) {
     if (__DEV__) {
       if (!Number.isInteger(op)) {
         console.error(
@@ -995,7 +937,7 @@ export function attach(
     pendingOperations.push(op);
   }
 
-  function flushPendingEvents(root        )       {
+  function flushPendingEvents(root) {
     if (
       pendingOperations.length === 0 &&
       pendingRealUnmountedIDs.length === 0 &&
@@ -1023,8 +965,8 @@ export function attach(
     const operations = new Array(
       // Identify which renderer this update is coming from.
       2 + // [rendererID, rootFiberID]
-      // How big is the string table?
-      1 + // [stringTableLength]
+        // How big is the string table?
+        1 + // [stringTableLength]
         // Then goes the actual string table.
         pendingStringTableLength +
         // All unmounts are batched in a single message.
@@ -1106,7 +1048,7 @@ export function attach(
     pendingStringTableLength = 0;
   }
 
-  function getStringID(str               )         {
+  function getStringID(str) {
     if (str === null) {
       return 0;
     }
@@ -1123,7 +1065,7 @@ export function attach(
     return stringID;
   }
 
-  function recordMount(fiber       , parentFiber              ) {
+  function recordMount(fiber, parentFiber) {
     if (__DEBUG__) {
       debug('recordMount()', fiber, parentFiber);
     }
@@ -1181,7 +1123,7 @@ export function attach(
     }
   }
 
-  function recordUnmount(fiber       , isSimulated         ) {
+  function recordUnmount(fiber, isSimulated) {
     if (__DEBUG__) {
       debug('recordUnmount()', fiber);
     }
@@ -1237,10 +1179,10 @@ export function attach(
   }
 
   function mountFiberRecursively(
-    fiber       ,
-    parentFiber              ,
-    traverseSiblings         ,
-    traceNearestHostComponentUpdate         ,
+    fiber,
+    parentFiber,
+    traverseSiblings,
+    traceNearestHostComponentUpdate,
   ) {
     if (__DEBUG__) {
       debug('mountFiberRecursively()', fiber, parentFiber);
@@ -1248,9 +1190,8 @@ export function attach(
 
     // If we have the tree selection from previous reload, try to match this Fiber.
     // Also remember whether to do the same for siblings.
-    const mightSiblingsBeOnTrackedPath = updateTrackedPathStateBeforeMount(
-      fiber,
-    );
+    const mightSiblingsBeOnTrackedPath =
+      updateTrackedPathStateBeforeMount(fiber);
 
     const shouldIncludeInTree = !shouldFilterFiber(fiber);
     if (shouldIncludeInTree) {
@@ -1294,7 +1235,7 @@ export function attach(
           );
         }
       } else {
-        let primaryChild               = null;
+        let primaryChild = null;
         const areSuspenseChildrenConditionallyWrapped =
           OffscreenComponent === -1;
         if (areSuspenseChildrenConditionallyWrapped) {
@@ -1338,7 +1279,7 @@ export function attach(
 
   // We use this to simulate unmounting for Suspense trees
   // when we switch from primary to fallback.
-  function unmountFiberChildrenRecursively(fiber       ) {
+  function unmountFiberChildrenRecursively(fiber) {
     if (__DEBUG__) {
       debug('unmountFiberChildrenRecursively()', fiber);
     }
@@ -1370,7 +1311,7 @@ export function attach(
     }
   }
 
-  function recordProfilingDurations(fiber       ) {
+  function recordProfilingDurations(fiber) {
     const id = getFiberID(getPrimaryFiber(fiber));
     const {actualDuration, treeBaseDuration} = fiber;
 
@@ -1414,7 +1355,7 @@ export function attach(
           // Note that we should do this for any fiber we performed work on, regardless of its actualDuration value.
           // In some cases actualDuration might be 0 for fibers we worked on (particularly if we're using Date.now)
           // In other cases (e.g. Memo) actualDuration might be greater than 0 even if we "bailed out".
-          const metadata = ((currentCommitProfilingMetadata     )                     );
+          const metadata = currentCommitProfilingMetadata;
           metadata.durations.push(id, actualDuration, selfDuration);
           metadata.maxActualDuration = Math.max(
             metadata.maxActualDuration,
@@ -1436,11 +1377,11 @@ export function attach(
     }
   }
 
-  function recordResetChildren(fiber       , childSet       ) {
+  function recordResetChildren(fiber, childSet) {
     // The frontend only really cares about the displayName, key, and children.
     // The first two don't really change, so we are only concerned with the order of children here.
     // This is trickier than a simple comparison though, since certain types of fibers are filtered.
-    const nextChildren                = [];
+    const nextChildren = [];
 
     // This is a naive implementation that shallowly recourses children.
     // We might want to revisit this if it proves to be too inefficient.
@@ -1463,10 +1404,7 @@ export function attach(
     }
   }
 
-  function findReorderedChildrenRecursively(
-    fiber       ,
-    nextChildren               ,
-  ) {
+  function findReorderedChildrenRecursively(fiber, nextChildren) {
     if (!shouldFilterFiber(fiber)) {
       nextChildren.push(getFiberID(getPrimaryFiber(fiber)));
     } else {
@@ -1480,11 +1418,11 @@ export function attach(
 
   // Returns whether closest unfiltered fiber parent needs to reset its child list.
   function updateFiberRecursively(
-    nextFiber       ,
-    prevFiber       ,
-    parentFiber              ,
-    traceNearestHostComponentUpdate         ,
-  )          {
+    nextFiber,
+    prevFiber,
+    parentFiber,
+    traceNearestHostComponentUpdate,
+  ) {
     if (__DEBUG__) {
       debug('updateFiberRecursively()', nextFiber, parentFiber);
     }
@@ -1661,7 +1599,7 @@ export function attach(
             const hostFibers = findAllCurrentHostFibers(
               getFiberID(getPrimaryFiber(nextFiber)),
             );
-            hostFibers.forEach(hostFiber => {
+            hostFibers.forEach((hostFiber) => {
               traceUpdatesForNodes.add(hostFiber.stateNode);
             });
           }
@@ -1716,7 +1654,7 @@ export function attach(
     ) {
       // We may have already queued up some operations before the frontend connected
       // If so, let the frontend know about them.
-      localPendingOperationsQueue.forEach(operations => {
+      localPendingOperationsQueue.forEach((operations) => {
         hook.emit('operations', operations);
       });
     } else {
@@ -1726,7 +1664,7 @@ export function attach(
         mightBeOnTrackedPath = true;
       }
       // If we have not been profiling, then we can just walk the tree and build up its current state as-is.
-      hook.getFiberRoots(rendererID).forEach(root => {
+      hook.getFiberRoots(rendererID).forEach((root) => {
         currentRootID = getFiberID(getPrimaryFiber(root.current));
         setRootPseudoKey(currentRootID, root.current);
 
@@ -1740,7 +1678,7 @@ export function attach(
             durations: [],
             commitTime: getCurrentTime() - profilingStartTime,
             interactions: Array.from(root.memoizedInteractions).map(
-              (interaction             ) => ({
+              (interaction) => ({
                 ...interaction,
                 timestamp: interaction.timestamp - profilingStartTime,
               }),
@@ -1792,7 +1730,7 @@ export function attach(
         durations: [],
         commitTime: getCurrentTime() - profilingStartTime,
         interactions: Array.from(root.memoizedInteractions).map(
-          (interaction             ) => ({
+          (interaction) => ({
             ...interaction,
             timestamp: interaction.timestamp - profilingStartTime,
           }),
@@ -1829,18 +1767,14 @@ export function attach(
     }
 
     if (isProfiling && isProfilingSupported) {
-      const commitProfilingMetadata = ((rootToCommitProfilingMetadataMap     )                            ).get(
-        currentRootID,
-      );
+      const commitProfilingMetadata =
+        rootToCommitProfilingMetadataMap.get(currentRootID);
       if (commitProfilingMetadata != null) {
-        commitProfilingMetadata.push(
-          ((currentCommitProfilingMetadata     )                     ),
-        );
+        commitProfilingMetadata.push(currentCommitProfilingMetadata);
       } else {
-        ((rootToCommitProfilingMetadataMap     )                            ).set(
-          currentRootID,
-          [((currentCommitProfilingMetadata     )                     )],
-        );
+        rootToCommitProfilingMetadataMap.set(currentRootID, [
+          currentCommitProfilingMetadata,
+        ]);
       }
     }
 
@@ -1854,7 +1788,7 @@ export function attach(
     currentRootID = -1;
   }
 
-  function findAllCurrentHostFibers(id        )                        {
+  function findAllCurrentHostFibers(id) {
     const fibers = [];
     const fiber = findCurrentFiberUsingSlowPathById(id);
     if (!fiber) {
@@ -1862,7 +1796,7 @@ export function attach(
     }
 
     // Next we'll drill down this component to find all HostComponent/Text.
-    let node        = fiber;
+    let node = fiber;
     while (true) {
       if (node.tag === HostComponent || node.tag === HostText) {
         fibers.push(node);
@@ -1888,7 +1822,7 @@ export function attach(
     return fibers;
   }
 
-  function findNativeNodesForFiberID(id        ) {
+  function findNativeNodesForFiberID(id) {
     try {
       let fiber = findCurrentFiberUsingSlowPathById(id);
       if (fiber === null) {
@@ -1906,7 +1840,7 @@ export function attach(
         }
       }
       const hostFibers = findAllCurrentHostFibers(id);
-      return hostFibers.map(hostFiber => hostFiber.stateNode).filter(Boolean);
+      return hostFibers.map((hostFiber) => hostFiber.stateNode).filter(Boolean);
     } catch (err) {
       // The fiber might have unmounted by now.
       return null;
@@ -1915,7 +1849,7 @@ export function attach(
 
   function getDisplayNameForFiberID(id) {
     const fiber = idToFiberMap.get(id);
-    return fiber != null ? getDisplayNameForFiber(((fiber     )       )) : null;
+    return fiber != null ? getDisplayNameForFiber(fiber) : null;
   }
 
   function getFiberIDForNative(
@@ -1929,7 +1863,7 @@ export function attach(
           fiber = fiber.return;
         }
       }
-      return getFiberID(getPrimaryFiber(((fiber     )       )));
+      return getFiberID(getPrimaryFiber(fiber));
     }
     return null;
   }
@@ -1940,7 +1874,7 @@ export function attach(
 
   // This function is copied from React and should be kept in sync:
   // https://github.com/facebook/react/blob/master/packages/react-reconciler/src/ReactFiberTreeReflection.js
-  function isFiberMountedImpl(fiber       )         {
+  function isFiberMountedImpl(fiber) {
     let node = fiber;
     if (!fiber.alternate) {
       // If there is no alternate, this might be a new tree that isn't inserted
@@ -1973,7 +1907,7 @@ export function attach(
   // https://github.com/facebook/react/blob/master/packages/react-reconciler/src/ReactFiberTreeReflection.js
   // It would be nice if we updated React to inject this function directly (vs just indirectly via findDOMNode).
   // BEGIN copied code
-  function findCurrentFiberUsingSlowPathById(id        )               {
+  function findCurrentFiberUsingSlowPathById(id) {
     const fiber = idToFiberMap.get(id);
     if (fiber == null) {
       console.warn(`Could not find Fiber with id "${id}"`);
@@ -1995,8 +1929,8 @@ export function attach(
     // If we have two possible branches, we'll walk backwards up to the root
     // to see what path the root points to. On the way we may hit one of the
     // special cases and we'll deal with them.
-    let a        = fiber;
-    let b        = alternate;
+    let a = fiber;
+    let b = alternate;
     while (true) {
       const parentA = a.return;
       if (parentA === null) {
@@ -2123,20 +2057,14 @@ export function attach(
   }
   // END copied code
 
-  function prepareViewAttributeSource(
-    id        ,
-    path                        ,
-  )       {
+  function prepareViewAttributeSource(id, path) {
     const isCurrent = isMostRecentlyInspectedElementCurrent(id);
     if (isCurrent) {
-      window.$attribute = getInObject(
-        ((mostRecentlyInspectedElement     )                  ),
-        path,
-      );
+      window.$attribute = getInObject(mostRecentlyInspectedElement, path);
     }
   }
 
-  function prepareViewElementSource(id        )       {
+  function prepareViewElementSource(id) {
     const fiber = idToFiberMap.get(id);
     if (fiber == null) {
       console.warn(`Could not find Fiber with id "${id}"`);
@@ -2168,7 +2096,7 @@ export function attach(
     }
   }
 
-  function getOwnersList(id        )                      {
+  function getOwnersList(id) {
     const fiber = findCurrentFiberUsingSlowPathById(id);
     if (fiber == null) {
       return null;
@@ -2202,7 +2130,7 @@ export function attach(
   // Fast path props lookup for React Native style editor.
   // Could use inspectElementRaw() but that would require shallow rendering hooks components,
   // and could also mess with memoization.
-  function getInstanceAndStyle(id        )                   {
+  function getInstanceAndStyle(id) {
     let instance = null;
     let style = null;
 
@@ -2218,7 +2146,7 @@ export function attach(
     return {instance, style};
   }
 
-  function inspectElementRaw(id        )                          {
+  function inspectElementRaw(id) {
     const fiber = findCurrentFiberUsingSlowPathById(id);
     if (fiber == null) {
       return null;
@@ -2281,7 +2209,7 @@ export function attach(
       context = consumerResolvedContext._currentValue || null;
 
       // Look for overridden value.
-      let current = ((fiber     )       ).return;
+      let current = fiber.return;
       while (current !== null) {
         const currentType = current.type;
         const currentTypeSymbol = getTypeSymbol(currentType);
@@ -2344,10 +2272,7 @@ export function attach(
       }
 
       try {
-        hooks = inspectHooksOfFiber(
-          fiber,
-          (renderer.currentDispatcherRef     ),
-        );
+        hooks = inspectHooksOfFiber(fiber, renderer.currentDispatcherRef);
       } finally {
         // Restore original console functionality.
         for (const method in originalConsoleMethods) {
@@ -2424,11 +2349,11 @@ export function attach(
     };
   }
 
-  let mostRecentlyInspectedElement                          = null;
-  let hasElementUpdatedSinceLastInspected          = false;
-  let currentlyInspectedPaths         = {};
+  let mostRecentlyInspectedElement = null;
+  let hasElementUpdatedSinceLastInspected = false;
+  let currentlyInspectedPaths = {};
 
-  function isMostRecentlyInspectedElementCurrent(id        )          {
+  function isMostRecentlyInspectedElementCurrent(id) {
     return (
       mostRecentlyInspectedElement !== null &&
       mostRecentlyInspectedElement.id === id &&
@@ -2438,9 +2363,9 @@ export function attach(
 
   // Track the intersection of currently inspected paths,
   // so that we can send their data along if the element is re-rendered.
-  function mergeInspectedPaths(path                        ) {
+  function mergeInspectedPaths(path) {
     let current = currentlyInspectedPaths;
-    path.forEach(key => {
+    path.forEach((key) => {
       if (!current[key]) {
         current[key] = {};
       }
@@ -2448,13 +2373,10 @@ export function attach(
     });
   }
 
-  function createIsPathAllowed(
-    key               ,
-    secondaryCategory                ,
-  ) {
+  function createIsPathAllowed(key, secondaryCategory) {
     // This function helps prevent previously-inspected paths from being dehydrated in updates.
     // This is important to avoid a bad user experience where expanded toggles collapse on update.
-    return function isPathAllowed(path                        )          {
+    return function isPathAllowed(path) {
       switch (secondaryCategory) {
         case 'hooks':
           if (path.length === 1) {
@@ -2490,7 +2412,7 @@ export function attach(
     };
   }
 
-  function updateSelectedElement(inspectedElement                  )       {
+  function updateSelectedElement(inspectedElement) {
     const {hooks, id, props} = inspectedElement;
 
     const fiber = idToFiberMap.get(id);
@@ -2536,18 +2458,11 @@ export function attach(
     }
   }
 
-  function storeAsGlobal(
-    id        ,
-    path                        ,
-    count        ,
-  )       {
+  function storeAsGlobal(id, path, count) {
     const isCurrent = isMostRecentlyInspectedElementCurrent(id);
 
     if (isCurrent) {
-      const value = getInObject(
-        ((mostRecentlyInspectedElement     )                  ),
-        path,
-      );
+      const value = getInObject(mostRecentlyInspectedElement, path);
       const key = `$reactTemp${count}`;
 
       window[key] = value;
@@ -2557,23 +2472,15 @@ export function attach(
     }
   }
 
-  function copyElementPath(id        , path                        )       {
+  function copyElementPath(id, path) {
     const isCurrent = isMostRecentlyInspectedElementCurrent(id);
 
     if (isCurrent) {
-      copyToClipboard(
-        getInObject(
-          ((mostRecentlyInspectedElement     )                  ),
-          path,
-        ),
-      );
+      copyToClipboard(getInObject(mostRecentlyInspectedElement, path));
     }
   }
 
-  function inspectElement(
-    id        ,
-    path                         ,
-  )                          {
+  function inspectElement(id, path) {
     const isCurrent = isMostRecentlyInspectedElementCurrent(id);
 
     if (isCurrent) {
@@ -2592,10 +2499,7 @@ export function attach(
           type: 'hydrated-path',
           path,
           value: cleanForBridge(
-            getInObject(
-              ((mostRecentlyInspectedElement     )                  ),
-              path,
-            ),
+            getInObject(mostRecentlyInspectedElement, path),
             createIsPathAllowed(null, secondaryCategory),
             path,
           ),
@@ -2707,12 +2611,7 @@ export function attach(
     }
   }
 
-  function deletePath(
-    type                                         ,
-    id        ,
-    hookID         ,
-    path                        ,
-  )       {
+  function deletePath(type, id, hookID, path) {
     const fiber = findCurrentFiberUsingSlowPathById(id);
     if (fiber !== null) {
       const instance = fiber.stateNode;
@@ -2741,7 +2640,7 @@ export function attach(
           break;
         case 'hooks':
           if (typeof overrideHookStateDeletePath === 'function') {
-            overrideHookStateDeletePath(fiber, ((hookID     )        ), path);
+            overrideHookStateDeletePath(fiber, hookID, path);
           }
           break;
         case 'props':
@@ -2762,13 +2661,7 @@ export function attach(
     }
   }
 
-  function renamePath(
-    type                                         ,
-    id        ,
-    hookID         ,
-    oldPath                        ,
-    newPath                        ,
-  )       {
+  function renamePath(type, id, hookID, oldPath, newPath) {
     const fiber = findCurrentFiberUsingSlowPathById(id);
     if (fiber !== null) {
       const instance = fiber.stateNode;
@@ -2798,12 +2691,7 @@ export function attach(
           break;
         case 'hooks':
           if (typeof overrideHookStateRenamePath === 'function') {
-            overrideHookStateRenamePath(
-              fiber,
-              ((hookID     )        ),
-              oldPath,
-              newPath,
-            );
+            overrideHookStateRenamePath(fiber, hookID, oldPath, newPath);
           }
           break;
         case 'props':
@@ -2828,13 +2716,7 @@ export function attach(
     }
   }
 
-  function overrideValueAtPath(
-    type                                         ,
-    id        ,
-    hookID         ,
-    path                        ,
-    value     ,
-  )       {
+  function overrideValueAtPath(type, id, hookID, path, value) {
     const fiber = findCurrentFiberUsingSlowPathById(id);
     if (fiber !== null) {
       const instance = fiber.stateNode;
@@ -2864,7 +2746,7 @@ export function attach(
           break;
         case 'hooks':
           if (typeof overrideHookState === 'function') {
-            overrideHookState(fiber, ((hookID     )        ), path, value);
+            overrideHookState(fiber, hookID, path, value);
           }
           break;
         case 'props':
@@ -2885,30 +2767,18 @@ export function attach(
     }
   }
 
-                               
-                                                              
-                       
-                             
-                                     
-                              
-                                 
-     
+  let currentCommitProfilingMetadata = null;
+  let displayNamesByRootID = null;
+  let idToContextsMap = null;
+  let initialTreeBaseDurationsMap = null;
+  let initialIDToRootMap = null;
+  let isProfiling = false;
+  let profilingStartTime = 0;
+  let recordChangeDescriptions = false;
+  let rootToCommitProfilingMetadataMap = null;
 
-                                                                            
-                                                  
-
-  let currentCommitProfilingMetadata                             = null;
-  let displayNamesByRootID                              = null;
-  let idToContextsMap                          = null;
-  let initialTreeBaseDurationsMap                             = null;
-  let initialIDToRootMap                             = null;
-  let isProfiling          = false;
-  let profilingStartTime         = 0;
-  let recordChangeDescriptions          = false;
-  let rootToCommitProfilingMetadataMap                                    = null;
-
-  function getProfilingData()                       {
-    const dataForRoots                                     = [];
+  function getProfilingData() {
+    const dataForRoots = [];
 
     if (rootToCommitProfilingMetadataMap === null) {
       throw Error(
@@ -2918,10 +2788,10 @@ export function attach(
 
     rootToCommitProfilingMetadataMap.forEach(
       (commitProfilingMetadata, rootID) => {
-        const commitData                           = [];
-        const initialTreeBaseDurations                          = [];
-        const allInteractions                           = new Map();
-        const interactionCommits                             = new Map();
+        const commitData = [];
+        const initialTreeBaseDurations = [];
+        const allInteractions = new Map();
+        const interactionCommits = new Map();
 
         const displayName =
           (displayNamesByRootID !== null && displayNamesByRootID.get(rootID)) ||
@@ -2950,9 +2820,9 @@ export function attach(
             commitTime,
           } = commitProfilingData;
 
-          const interactionIDs                = [];
+          const interactionIDs = [];
 
-          interactions.forEach(interaction => {
+          interactions.forEach((interaction) => {
             if (!allInteractions.has(interaction.id)) {
               allInteractions.set(interaction.id, interaction);
             }
@@ -2967,8 +2837,8 @@ export function attach(
             }
           });
 
-          const fiberActualDurations                          = [];
-          const fiberSelfDurations                          = [];
+          const fiberActualDurations = [];
+          const fiberSelfDurations = [];
           for (let i = 0; i < durations.length; i += 3) {
             const fiberID = durations[i];
             fiberActualDurations.push([fiberID, durations[i + 1]]);
@@ -3006,7 +2876,7 @@ export function attach(
     };
   }
 
-  function startProfiling(shouldRecordChangeDescriptions         ) {
+  function startProfiling(shouldRecordChangeDescriptions) {
     if (isProfiling) {
       return;
     }
@@ -3022,12 +2892,9 @@ export function attach(
     initialIDToRootMap = new Map(idToRootMap);
     idToContextsMap = new Map();
 
-    hook.getFiberRoots(rendererID).forEach(root => {
+    hook.getFiberRoots(rendererID).forEach((root) => {
       const rootID = getFiberID(getPrimaryFiber(root.current));
-      ((displayNamesByRootID     )                      ).set(
-        rootID,
-        getDisplayNameForRoot(root.current),
-      );
+      displayNamesByRootID.set(rootID, getDisplayNameForRoot(root.current));
 
       if (shouldRecordChangeDescriptions) {
         // Record all contexts at the time profiling is started.
@@ -3066,7 +2933,7 @@ export function attach(
 
   const forceFallbackForSuspenseIDs = new Set();
   function shouldSuspendFiberAccordingToSet(fiber) {
-    const id = getFiberID(getPrimaryFiber(((fiber     )       )));
+    const id = getFiberID(getPrimaryFiber(fiber));
     return forceFallbackForSuspenseIDs.has(id);
   }
 
@@ -3100,12 +2967,12 @@ export function attach(
 
   // Remember if we're trying to restore the selection after reload.
   // In that case, we'll do some extra checks for matching mounts.
-  let trackedPath                          = null;
-  let trackedPathMatchFiber               = null;
+  let trackedPath = null;
+  let trackedPathMatchFiber = null;
   let trackedPathMatchDepth = -1;
   let mightBeOnTrackedPath = false;
 
-  function setTrackedPath(path                         ) {
+  function setTrackedPath(path) {
     if (path === null) {
       trackedPathMatchFiber = null;
       trackedPathMatchDepth = -1;
@@ -3117,7 +2984,7 @@ export function attach(
   // We call this before traversing a new mount.
   // It remembers whether this Fiber is the next best match for tracked path.
   // The return value signals whether we should keep matching siblings or not.
-  function updateTrackedPathStateBeforeMount(fiber       )          {
+  function updateTrackedPathStateBeforeMount(fiber) {
     if (trackedPath === null || !mightBeOnTrackedPath) {
       // Fast path: there's nothing to track so do nothing and ignore siblings.
       return false;
@@ -3176,10 +3043,10 @@ export function attach(
   // A root's "pseudo key" is "childDisplayName:indexWithThatName".
   // For example, "App:0" or, in case of similar roots, "Story:0", "Story:1", etc.
   // We will use this to try to disambiguate roots when restoring selection between reloads.
-  const rootPseudoKeys                      = new Map();
-  const rootDisplayNameCounter                      = new Map();
+  const rootPseudoKeys = new Map();
+  const rootDisplayNameCounter = new Map();
 
-  function setRootPseudoKey(id        , fiber       ) {
+  function setRootPseudoKey(id, fiber) {
     const name = getDisplayNameForRoot(fiber);
     const counter = rootDisplayNameCounter.get(name) || 0;
     rootDisplayNameCounter.set(name, counter + 1);
@@ -3187,7 +3054,7 @@ export function attach(
     rootPseudoKeys.set(id, pseudoKey);
   }
 
-  function removeRootPseudoKey(id        ) {
+  function removeRootPseudoKey(id) {
     const pseudoKey = rootPseudoKeys.get(id);
     if (pseudoKey === undefined) {
       throw new Error('Expected root pseudo key to be known.');
@@ -3205,7 +3072,7 @@ export function attach(
     rootPseudoKeys.delete(id);
   }
 
-  function getDisplayNameForRoot(fiber       )         {
+  function getDisplayNameForRoot(fiber) {
     let preferredDisplayName = null;
     let fallbackDisplayName = null;
     let child = fiber.child;
@@ -3235,7 +3102,7 @@ export function attach(
     return preferredDisplayName || fallbackDisplayName || 'Anonymous';
   }
 
-  function getPathFrame(fiber       )            {
+  function getPathFrame(fiber) {
     const {key} = fiber;
     let displayName = getDisplayNameForFiber(fiber);
     const index = fiber.index;
@@ -3267,7 +3134,7 @@ export function attach(
   // of identifying a particular Fiber between page reloads.
   // The return path will contain Fibers that are "invisible" to the store
   // because their keys and indexes are important to restoring the selection.
-  function getPathForElement(id        )                          {
+  function getPathForElement(id) {
     let fiber = idToFiberMap.get(id);
     if (fiber == null) {
       return null;
@@ -3281,7 +3148,7 @@ export function attach(
     return keyPath;
   }
 
-  function getBestMatchForTrackedPath()                   {
+  function getBestMatchForTrackedPath() {
     if (trackedPath === null) {
       // Nothing to match.
       return null;
@@ -3304,7 +3171,7 @@ export function attach(
     };
   }
 
-  const formatPriorityLevel = (priorityLevel         ) => {
+  const formatPriorityLevel = (priorityLevel) => {
     if (priorityLevel == null) {
       return 'Unknown';
     }
@@ -3326,7 +3193,7 @@ export function attach(
     }
   };
 
-  function setTraceUpdatesEnabled(isEnabled         )       {
+  function setTraceUpdatesEnabled(isEnabled) {
     traceUpdatesEnabled = isEnabled;
   }
 

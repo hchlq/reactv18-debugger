@@ -4,7 +4,7 @@
 
 const hasOwnProperty = Object.prototype.hasOwnProperty;
 
-const _assign = function(to, from) {
+const _assign = function (to, from) {
   for (const key in from) {
     if (hasOwnProperty.call(from, key)) {
       to[key] = from[key];
@@ -13,7 +13,7 @@ const _assign = function(to, from) {
 };
 
 export default Object.assign ||
-  function(target, sources) {
+  function (target, sources) {
     if (target == null) {
       throw new TypeError('Object.assign target cannot be null or undefined');
     }

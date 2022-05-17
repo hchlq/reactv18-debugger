@@ -5,12 +5,10 @@
  * LICENSE file in the root directory of this source tree.
  *
  * @format
- *      
+ *
  */
 
 'use strict';
-
-                                                        
 
 let ReactNative;
 
@@ -20,4 +18,4 @@ if (__DEV__) {
   ReactNative = require('../implementations/ReactNativeRenderer-prod');
 }
 
-module.exports = (ReactNative                 );
+module.exports = ReactNative;

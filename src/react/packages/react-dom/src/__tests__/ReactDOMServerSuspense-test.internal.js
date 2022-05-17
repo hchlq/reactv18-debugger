@@ -35,11 +35,8 @@ function initModules() {
   };
 }
 
-const {
-  itThrowsWhenRendering,
-  resetModules,
-  serverRender,
-} = ReactDOMServerIntegrationUtils(initModules);
+const {itThrowsWhenRendering, resetModules, serverRender} =
+  ReactDOMServerIntegrationUtils(initModules);
 
 describe('ReactDOMServerSuspense', () => {
   beforeEach(() => {
@@ -142,7 +139,7 @@ describe('ReactDOMServerSuspense', () => {
   if (__EXPERIMENTAL__) {
     itThrowsWhenRendering(
       'a suspending component outside a Suspense node',
-      async render => {
+      async (render) => {
         await render(
           <div>
             <React.Suspense />
@@ -157,7 +154,7 @@ describe('ReactDOMServerSuspense', () => {
 
     itThrowsWhenRendering(
       'a suspending component without a Suspense above',
-      async render => {
+      async (render) => {
         await render(
           <div>
             <AsyncText text="Children" />

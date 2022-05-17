@@ -74,14 +74,14 @@ function readModule(record, createPromise) {
   }
   if (!record.promise) {
     record.promise = createPromise().then(
-      value => {
+      (value) => {
         if (record.status === 'pending') {
           record.status = 'fulfilled';
           record.promise = null;
           record.result = value;
         }
       },
-      error => {
+      (error) => {
         if (record.status === 'pending') {
           record.status = 'rejected';
           record.promise = null;

@@ -4,23 +4,13 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                    
-                 
-                 
-               
-                
-              
-                
-     
-  
 
 // Get the window object for the document that a node belongs to,
 // or return null if it cannot be found (node not attached to DOM,
 // etc).
-export function getOwnerWindow(node             )                       {
+export function getOwnerWindow(node) {
   if (!node.ownerDocument) {
     return null;
   }
@@ -29,7 +19,7 @@ export function getOwnerWindow(node             )                       {
 
 // Get the iframe containing a node, or return null if it cannot
 // be found (node not within iframe, etc).
-export function getOwnerIframe(node             )                     {
+export function getOwnerIframe(node) {
   const nodeWindow = getOwnerWindow(node);
   if (nodeWindow) {
     return nodeWindow.frameElement;
@@ -39,7 +29,7 @@ export function getOwnerIframe(node             )                     {
 
 // Get a bounding client rect for a node, with an
 // offset added to compensate for its border.
-export function getBoundingClientRectWithBorderOffset(node             ) {
+export function getBoundingClientRectWithBorderOffset(node) {
   const dimensions = getElementDimensions(node);
   return mergeRectOffsets([
     node.getBoundingClientRect(),
@@ -59,7 +49,7 @@ export function getBoundingClientRectWithBorderOffset(node             ) {
 
 // Add together the top, left, bottom, and right properties of
 // each ClientRect, but keep the width and height of the first one.
-export function mergeRectOffsets(rects             )       {
+export function mergeRectOffsets(rects) {
   return rects.reduce((previousRect, rect) => {
     if (previousRect == null) {
       return rect;
@@ -78,10 +68,7 @@ export function mergeRectOffsets(rects             )       {
 
 // Calculate a boundingClientRect for a node relative to boundaryWindow,
 // taking into account any offsets caused by intermediate iframes.
-export function getNestedBoundingClientRect(
-  node             ,
-  boundaryWindow               ,
-)       {
+export function getNestedBoundingClientRect(node, boundaryWindow) {
   const ownerIframe = getOwnerIframe(node);
   if (ownerIframe && ownerIframe !== boundaryWindow) {
     const rects = [node.getBoundingClientRect()];
@@ -109,7 +96,7 @@ export function getNestedBoundingClientRect(
   }
 }
 
-export function getElementDimensions(domElement         ) {
+export function getElementDimensions(domElement) {
   const calculatedStyle = window.getComputedStyle(domElement);
   return {
     borderLeft: parseInt(calculatedStyle.borderLeftWidth, 10),

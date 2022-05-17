@@ -4,15 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-             
-             
-                       
-                       
-                  
-                                                                                
 
 import {
   ColorView,
@@ -48,16 +41,16 @@ const colorGenerator = new ColorGenerator(
 );
 colorGenerator.setColorForID('', {h: 43.6, s: 45.8, l: 90.6, a: 100});
 
-function defaultHslaColorForStackFrame({scriptUrl}                      ) {
+function defaultHslaColorForStackFrame({scriptUrl}) {
   return colorGenerator.colorForID(scriptUrl ?? '');
 }
 
-function defaultColorForStackFrame(stackFrame                      )         {
+function defaultColorForStackFrame(stackFrame) {
   const color = defaultHslaColorForStackFrame(stackFrame);
   return hslaColorToString(color);
 }
 
-function hoverColorForStackFrame(stackFrame                      )         {
+function hoverColorForStackFrame(stackFrame) {
   const color = dimmedColor(
     defaultHslaColorForStackFrame(stackFrame),
     COLOR_HOVER_DIM_DELTA,
@@ -66,11 +59,7 @@ function hoverColorForStackFrame(stackFrame                      )         {
 }
 
 const cachedFlamechartTextWidths = new Map();
-const trimFlamechartText = (
-  context                          ,
-  text        ,
-  width        ,
-) => {
+const trimFlamechartText = (context, text, width) => {
   for (let i = text.length - 1; i >= 0; i--) {
     const trimmedText = i === text.length - 1 ? text : text.substr(0, i) + '…';
 
@@ -90,22 +79,17 @@ const trimFlamechartText = (
 
 class FlamechartStackLayerView extends View {
   /** Layer to display */
-  _stackLayer                      ;
+  _stackLayer;
 
   /** A set of `stackLayer`'s frames, for efficient lookup. */
-  _stackFrameSet                           ;
+  _stackFrameSet;
 
-  _intrinsicSize      ;
+  _intrinsicSize;
 
-  _hoveredStackFrame                              = null;
-  _onHover                                                       = null;
+  _hoveredStackFrame = null;
+  _onHover = null;
 
-  constructor(
-    surface         ,
-    frame      ,
-    stackLayer                      ,
-    duration        ,
-  ) {
+  constructor(surface, frame, stackLayer, duration) {
     super(surface, frame);
     this._stackLayer = stackLayer;
     this._stackFrameSet = new Set(stackLayer);
@@ -119,9 +103,7 @@ class FlamechartStackLayerView extends View {
     return this._intrinsicSize;
   }
 
-  setHoveredFlamechartStackFrame(
-    hoveredStackFrame                             ,
-  ) {
+  setHoveredFlamechartStackFrame(hoveredStackFrame) {
     if (this._hoveredStackFrame === hoveredStackFrame) {
       return; // We're already hovering over this frame
     }
@@ -138,7 +120,7 @@ class FlamechartStackLayerView extends View {
     this.setNeedsDisplay();
   }
 
-  draw(context                          ) {
+  draw(context) {
     const {
       frame,
       _stackLayer,
@@ -171,7 +153,7 @@ class FlamechartStackLayerView extends View {
       }
 
       const x = Math.floor(timestampToPosition(timestamp, scaleFactor, frame));
-      const nodeRect       = {
+      const nodeRect = {
         origin: {x, y: frame.origin.y},
         size: {
           width: Math.floor(width - BORDER_SIZE),
@@ -240,7 +222,7 @@ class FlamechartStackLayerView extends View {
   /**
    * @private
    */
-  _handleMouseMove(interaction                      ) {
+  _handleMouseMove(interaction) {
     const {_stackLayer, frame, _intrinsicSize, _onHover, visibleArea} = this;
     const {location} = interaction.payload;
     if (!_onHover || !rectContainsPoint(location, visibleArea)) {
@@ -273,7 +255,7 @@ class FlamechartStackLayerView extends View {
     _onHover(null);
   }
 
-  handleInteraction(interaction             ) {
+  handleInteraction(interaction) {
     switch (interaction.type) {
       case 'mousemove':
         this._handleMouseMove(interaction);
@@ -283,25 +265,20 @@ class FlamechartStackLayerView extends View {
 }
 
 export class FlamechartView extends View {
-  _flamechartRowViews                             = [];
+  _flamechartRowViews = [];
 
   /** Container view that vertically stacks flamechart rows */
-  _verticalStackView      ;
+  _verticalStackView;
 
-  _hoveredStackFrame                              = null;
-  _onHover                                                       = null;
+  _hoveredStackFrame = null;
+  _onHover = null;
 
-  constructor(
-    surface         ,
-    frame      ,
-    flamechart            ,
-    duration        ,
-  ) {
+  constructor(surface, frame, flamechart, duration) {
     super(surface, frame, layeredLayout);
     this.setDataAndUpdateSubviews(flamechart, duration);
   }
 
-  setDataAndUpdateSubviews(flamechart            , duration        ) {
+  setDataAndUpdateSubviews(flamechart, duration) {
     const {surface, frame, _onHover, _hoveredStackFrame} = this;
 
     // Clear existing rows on data update
@@ -311,7 +288,7 @@ export class FlamechartView extends View {
     }
 
     this._verticalStackView = new View(surface, frame, verticallyStackedLayout);
-    this._flamechartRowViews = flamechart.map(stackLayer => {
+    this._flamechartRowViews = flamechart.map((stackLayer) => {
       const rowView = new FlamechartStackLayerView(
         surface,
         frame,
@@ -333,18 +310,16 @@ export class FlamechartView extends View {
     this.addSubview(this._verticalStackView);
   }
 
-  setHoveredFlamechartStackFrame(
-    hoveredStackFrame                             ,
-  ) {
+  setHoveredFlamechartStackFrame(hoveredStackFrame) {
     this._hoveredStackFrame = hoveredStackFrame;
-    this._flamechartRowViews.forEach(rowView =>
+    this._flamechartRowViews.forEach((rowView) =>
       rowView.setHoveredFlamechartStackFrame(hoveredStackFrame),
     );
   }
 
-  setOnHover(onHover                                             ) {
+  setOnHover(onHover) {
     this._onHover = onHover;
-    this._flamechartRowViews.forEach(rowView => (rowView._onHover = onHover));
+    this._flamechartRowViews.forEach((rowView) => (rowView._onHover = onHover));
   }
 
   desiredSize() {
@@ -355,7 +330,7 @@ export class FlamechartView extends View {
   /**
    * @private
    */
-  _handleMouseMove(interaction                      ) {
+  _handleMouseMove(interaction) {
     const {_onHover, visibleArea} = this;
     if (!_onHover) {
       return;
@@ -368,7 +343,7 @@ export class FlamechartView extends View {
     }
   }
 
-  handleInteraction(interaction             ) {
+  handleInteraction(interaction) {
     switch (interaction.type) {
       case 'mousemove':
         this._handleMouseMove(interaction);

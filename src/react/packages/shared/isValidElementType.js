@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import {
@@ -27,7 +27,7 @@ import {
 } from 'shared/ReactSymbols';
 import {enableScopeAPI} from './ReactFeatureFlags';
 
-export default function isValidElementType(type       ) {
+export default function isValidElementType(type) {
   if (typeof type === 'string' || typeof type === 'function') {
     return true;
   }
@@ -55,7 +55,7 @@ export default function isValidElementType(type       ) {
       type.$$typeof === REACT_FORWARD_REF_TYPE ||
       type.$$typeof === REACT_FUNDAMENTAL_TYPE ||
       type.$$typeof === REACT_BLOCK_TYPE ||
-      type[(0     )] === REACT_SERVER_BLOCK_TYPE
+      type[0] === REACT_SERVER_BLOCK_TYPE
     ) {
       return true;
     }

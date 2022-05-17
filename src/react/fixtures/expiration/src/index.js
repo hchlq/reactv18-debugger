@@ -5,7 +5,7 @@ class Counter extends React.unstable_AsyncComponent {
   state = {counter: 0};
   onCommit() {
     setImmediate(() => {
-      this.setState(state => ({
+      this.setState((state) => ({
         counter: state.counter + 1,
       }));
     });

@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import Agent from './agent';
@@ -12,39 +12,21 @@ import Agent from './agent';
 import {attach} from './renderer';
 import {attach as attachLegacy} from './legacy/renderer';
 
-                                                                            
-
-export function initBackend(
-  hook              ,
-  agent       ,
-  global        ,
-)             {
+export function initBackend(hook, agent, global) {
   if (hook == null) {
     // DevTools didn't get injected into this page (maybe b'c of the contentType).
     return () => {};
   }
   const subs = [
-    hook.sub(
-      'renderer-attached',
-      ({
-        id,
-        renderer,
-        rendererInterface,
-      }   
-                   
-                                
-                                             
-           
-       ) => {
-        agent.setRendererInterface(id, rendererInterface);
+    hook.sub('renderer-attached', ({id, renderer, rendererInterface}) => {
+      agent.setRendererInterface(id, rendererInterface);
 
-        // Now that the Store and the renderer interface are connected,
-        // it's time to flush the pending operation codes to the frontend.
-        rendererInterface.flushInitialOperations();
-      },
-    ),
+      // Now that the Store and the renderer interface are connected,
+      // it's time to flush the pending operation codes to the frontend.
+      rendererInterface.flushInitialOperations();
+    }),
 
-    hook.sub('unsupported-renderer-version', (id        ) => {
+    hook.sub('unsupported-renderer-version', (id) => {
       agent.onUnsupportedRenderer(id);
     }),
 
@@ -54,7 +36,7 @@ export function initBackend(
     // TODO Add additional subscriptions required for profiling mode
   ];
 
-  const attachRenderer = (id        , renderer               ) => {
+  const attachRenderer = (id, renderer) => {
     let rendererInterface = hook.rendererInterfaces.get(id);
 
     // Inject any not-yet-injected renderers (if we didn't reload-and-profile)
@@ -94,19 +76,16 @@ export function initBackend(
 
   // Connect any new renderers that injected themselves.
   subs.push(
-    hook.sub(
-      'renderer',
-      ({id, renderer}                                            ) => {
-        attachRenderer(id, renderer);
-      },
-    ),
+    hook.sub('renderer', ({id, renderer}) => {
+      attachRenderer(id, renderer);
+    }),
   );
 
   hook.emit('react-devtools', agent);
   hook.reactDevtoolsAgent = agent;
   const onAgentShutdown = () => {
-    subs.forEach(fn => fn());
-    hook.rendererInterfaces.forEach(rendererInterface => {
+    subs.forEach((fn) => fn());
+    hook.rendererInterfaces.forEach((rendererInterface) => {
       rendererInterface.cleanup();
     });
     hook.reactDevtoolsAgent = null;
@@ -117,6 +96,6 @@ export function initBackend(
   });
 
   return () => {
-    subs.forEach(fn => fn());
+    subs.forEach((fn) => fn());
   };
 }

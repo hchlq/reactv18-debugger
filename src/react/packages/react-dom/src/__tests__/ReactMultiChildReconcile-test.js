@@ -12,7 +12,7 @@
 const React = require('react');
 const ReactDOM = require('react-dom');
 
-const stripEmptyValues = function(obj) {
+const stripEmptyValues = function (obj) {
   const ret = {};
   for (const name in obj) {
     if (!obj.hasOwnProperty(name)) {
@@ -250,7 +250,7 @@ function prepareChildrenArray(childrenArray) {
 
 function prepareChildrenLegacyIterable(childrenArray) {
   return {
-    '@@iterator': function*() {
+    '@@iterator': function* () {
       // eslint-disable-next-line no-for-of-loops/no-for-of-loops
       for (const child of childrenArray) {
         yield child;
@@ -261,7 +261,7 @@ function prepareChildrenLegacyIterable(childrenArray) {
 
 function prepareChildrenModernIterable(childrenArray) {
   return {
-    [Symbol.iterator]: function*() {
+    [Symbol.iterator]: function* () {
       // eslint-disable-next-line no-for-of-loops/no-for-of-loops
       for (const child of childrenArray) {
         yield child;

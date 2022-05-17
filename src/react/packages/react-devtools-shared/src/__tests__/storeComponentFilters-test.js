@@ -4,22 +4,19 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                                     
-                                                                  
 
 describe('Store component filters', () => {
   let React;
   let ReactDOM;
   let TestUtils;
   let Types;
-  let bridge                ;
-  let store       ;
+  let bridge;
+  let store;
   let utils;
 
-  const act = (callback          ) => {
+  const act = (callback) => {
     TestUtils.unstable_concurrentAct(() => {
       callback();
     });
@@ -48,7 +45,7 @@ describe('Store component filters', () => {
   });
 
   it('should support filtering by element type', () => {
-    class Root extends React.Component                           {
+    class Root extends React.Component {
       render() {
         return <div>{this.props.children}</div>;
       }
@@ -201,7 +198,7 @@ describe('Store component filters', () => {
   it('should not send a bridge update if the set of enabled filters has not changed', () => {
     act(() => (store.componentFilters = [utils.createHOCFilter(true)]));
 
-    bridge.addListener('updateComponentFilters', componentFilters => {
+    bridge.addListener('updateComponentFilters', (componentFilters) => {
       throw Error('Unexpected component update');
     });
 

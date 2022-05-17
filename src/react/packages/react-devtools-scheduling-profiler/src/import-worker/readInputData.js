@@ -4,13 +4,13 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import nullthrows from 'nullthrows';
 import InvalidProfileError from './InvalidProfileError';
 
-export const readInputData = (file      )                  => {
+export const readInputData = (file) => {
   if (!file.name.endsWith('.json')) {
     throw new InvalidProfileError(
       'Invalid file type. Only JSON performance profiles are supported',

@@ -48,7 +48,7 @@ describe('ReactDOMServerIntegration', () => {
     resetModules();
   });
 
-  describe('elements and children', function() {
+  describe('elements and children', function () {
     function expectNode(node, type, value) {
       expect(node).not.toBe(null);
       expect(node.nodeType).toBe(type);
@@ -59,27 +59,27 @@ describe('ReactDOMServerIntegration', () => {
       expectNode(node, TEXT_NODE_TYPE, text);
     }
 
-    describe('text children', function() {
-      itRenders('a div with text', async render => {
+    describe('text children', function () {
+      itRenders('a div with text', async (render) => {
         const e = await render(<div>Text</div>);
         expect(e.tagName).toBe('DIV');
         expect(e.childNodes.length).toBe(1);
         expectNode(e.firstChild, TEXT_NODE_TYPE, 'Text');
       });
 
-      itRenders('a div with text with flanking whitespace', async render => {
+      itRenders('a div with text with flanking whitespace', async (render) => {
         // prettier-ignore
         const e = await render(<div>  Text </div>);
         expect(e.childNodes.length).toBe(1);
         expectNode(e.childNodes[0], TEXT_NODE_TYPE, '  Text ');
       });
 
-      itRenders('a div with an empty text child', async render => {
+      itRenders('a div with an empty text child', async (render) => {
         const e = await render(<div>{''}</div>);
         expect(e.childNodes.length).toBe(0);
       });
 
-      itRenders('a div with multiple empty text children', async render => {
+      itRenders('a div with multiple empty text children', async (render) => {
         const e = await render(
           <div>
             {''}
@@ -100,7 +100,7 @@ describe('ReactDOMServerIntegration', () => {
         }
       });
 
-      itRenders('a div with multiple whitespace children', async render => {
+      itRenders('a div with multiple whitespace children', async (render) => {
         // prettier-ignore
         const e = await render(<div>{' '}{' '}{' '}</div>);
         if (
@@ -122,7 +122,7 @@ describe('ReactDOMServerIntegration', () => {
         }
       });
 
-      itRenders('a div with text sibling to a node', async render => {
+      itRenders('a div with text sibling to a node', async (render) => {
         const e = await render(
           <div>
             Text<span>More Text</span>
@@ -136,7 +136,7 @@ describe('ReactDOMServerIntegration', () => {
         expectNode(spanNode.firstChild, TEXT_NODE_TYPE, 'More Text');
       });
 
-      itRenders('a non-standard element with text', async render => {
+      itRenders('a non-standard element with text', async (render) => {
         // This test suite generally assumes that we get exactly
         // the same warnings (or none) for all scenarios including
         // SSR + innerHTML, hydration, and client-side rendering.
@@ -153,14 +153,14 @@ describe('ReactDOMServerIntegration', () => {
         expectNode(e.firstChild, TEXT_NODE_TYPE, 'Text');
       });
 
-      itRenders('a custom element with text', async render => {
+      itRenders('a custom element with text', async (render) => {
         const e = await render(<custom-element>Text</custom-element>);
         expect(e.tagName).toBe('CUSTOM-ELEMENT');
         expect(e.childNodes.length).toBe(1);
         expectNode(e.firstChild, TEXT_NODE_TYPE, 'Text');
       });
 
-      itRenders('a leading blank child with a text sibling', async render => {
+      itRenders('a leading blank child with a text sibling', async (render) => {
         const e = await render(<div>{''}foo</div>);
         if (render === serverRender || render === streamRender) {
           expect(e.childNodes.length).toBe(1);
@@ -172,20 +172,23 @@ describe('ReactDOMServerIntegration', () => {
         }
       });
 
-      itRenders('a trailing blank child with a text sibling', async render => {
-        const e = await render(<div>foo{''}</div>);
-        // with Fiber, there are just two text nodes.
-        if (render === serverRender || render === streamRender) {
-          expect(e.childNodes.length).toBe(1);
-          expectTextNode(e.childNodes[0], 'foo');
-        } else {
-          expect(e.childNodes.length).toBe(2);
-          expectTextNode(e.childNodes[0], 'foo');
-          expectTextNode(e.childNodes[1], '');
-        }
-      });
+      itRenders(
+        'a trailing blank child with a text sibling',
+        async (render) => {
+          const e = await render(<div>foo{''}</div>);
+          // with Fiber, there are just two text nodes.
+          if (render === serverRender || render === streamRender) {
+            expect(e.childNodes.length).toBe(1);
+            expectTextNode(e.childNodes[0], 'foo');
+          } else {
+            expect(e.childNodes.length).toBe(2);
+            expectTextNode(e.childNodes[0], 'foo');
+            expectTextNode(e.childNodes[1], '');
+          }
+        },
+      );
 
-      itRenders('an element with two text children', async render => {
+      itRenders('an element with two text children', async (render) => {
         const e = await render(
           <div>
             {'foo'}
@@ -210,7 +213,7 @@ describe('ReactDOMServerIntegration', () => {
 
       itRenders(
         'a component returning text node between two text nodes',
-        async render => {
+        async (render) => {
           const B = () => 'b';
           const e = await render(
             <div>
@@ -238,7 +241,7 @@ describe('ReactDOMServerIntegration', () => {
         },
       );
 
-      itRenders('a tree with sibling host and text nodes', async render => {
+      itRenders('a tree with sibling host and text nodes', async (render) => {
         class X extends React.Component {
           render() {
             return [null, [<Y key="1" />], false];
@@ -287,19 +290,19 @@ describe('ReactDOMServerIntegration', () => {
       });
     });
 
-    describe('number children', function() {
-      itRenders('a number as single child', async render => {
+    describe('number children', function () {
+      itRenders('a number as single child', async (render) => {
         const e = await render(<div>{3}</div>);
         expect(e.textContent).toBe('3');
       });
 
       // zero is falsey, so it could look like no children if the code isn't careful.
-      itRenders('zero as single child', async render => {
+      itRenders('zero as single child', async (render) => {
         const e = await render(<div>{0}</div>);
         expect(e.textContent).toBe('0');
       });
 
-      itRenders('an element with number and text children', async render => {
+      itRenders('an element with number and text children', async (render) => {
         const e = await render(
           <div>
             {'foo'}
@@ -324,23 +327,23 @@ describe('ReactDOMServerIntegration', () => {
       });
     });
 
-    describe('null, false, and undefined children', function() {
-      itRenders('null single child as blank', async render => {
+    describe('null, false, and undefined children', function () {
+      itRenders('null single child as blank', async (render) => {
         const e = await render(<div>{null}</div>);
         expect(e.childNodes.length).toBe(0);
       });
 
-      itRenders('false single child as blank', async render => {
+      itRenders('false single child as blank', async (render) => {
         const e = await render(<div>{false}</div>);
         expect(e.childNodes.length).toBe(0);
       });
 
-      itRenders('undefined single child as blank', async render => {
+      itRenders('undefined single child as blank', async (render) => {
         const e = await render(<div>{undefined}</div>);
         expect(e.childNodes.length).toBe(0);
       });
 
-      itRenders('a null component children as empty', async render => {
+      itRenders('a null component children as empty', async (render) => {
         const NullComponent = () => null;
         const e = await render(
           <div>
@@ -350,19 +353,19 @@ describe('ReactDOMServerIntegration', () => {
         expect(e.childNodes.length).toBe(0);
       });
 
-      itRenders('null children as blank', async render => {
+      itRenders('null children as blank', async (render) => {
         const e = await render(<div>{null}foo</div>);
         expect(e.childNodes.length).toBe(1);
         expectTextNode(e.childNodes[0], 'foo');
       });
 
-      itRenders('false children as blank', async render => {
+      itRenders('false children as blank', async (render) => {
         const e = await render(<div>{false}foo</div>);
         expect(e.childNodes.length).toBe(1);
         expectTextNode(e.childNodes[0], 'foo');
       });
 
-      itRenders('null and false children together as blank', async render => {
+      itRenders('null and false children together as blank', async (render) => {
         const e = await render(
           <div>
             {false}
@@ -374,7 +377,7 @@ describe('ReactDOMServerIntegration', () => {
         expectTextNode(e.childNodes[0], 'foo');
       });
 
-      itRenders('only null and false children as blank', async render => {
+      itRenders('only null and false children as blank', async (render) => {
         const e = await render(
           <div>
             {false}
@@ -387,15 +390,15 @@ describe('ReactDOMServerIntegration', () => {
       });
     });
 
-    describe('elements with implicit namespaces', function() {
-      itRenders('an svg element', async render => {
+    describe('elements with implicit namespaces', function () {
+      itRenders('an svg element', async (render) => {
         const e = await render(<svg />);
         expect(e.childNodes.length).toBe(0);
         expect(e.tagName).toBe('svg');
         expect(e.namespaceURI).toBe('http://www.w3.org/2000/svg');
       });
 
-      itRenders('svg child element with an attribute', async render => {
+      itRenders('svg child element with an attribute', async (render) => {
         const e = await render(<svg viewBox="0 0 0 0" />);
         expect(e.childNodes.length).toBe(0);
         expect(e.tagName).toBe('svg');
@@ -405,7 +408,7 @@ describe('ReactDOMServerIntegration', () => {
 
       itRenders(
         'svg child element with a namespace attribute',
-        async render => {
+        async (render) => {
           let e = await render(
             <svg>
               <image xlinkHref="http://i.imgur.com/w7GCRPb.png" />
@@ -421,36 +424,39 @@ describe('ReactDOMServerIntegration', () => {
         },
       );
 
-      itRenders('svg child element with a badly cased alias', async render => {
-        let e = await render(
-          <svg>
-            <image xlinkhref="http://i.imgur.com/w7GCRPb.png" />
-          </svg>,
-          1,
-        );
-        e = e.firstChild;
-        expect(e.hasAttributeNS('http://www.w3.org/1999/xlink', 'href')).toBe(
-          false,
-        );
-        expect(e.getAttribute('xlinkhref')).toBe(
-          'http://i.imgur.com/w7GCRPb.png',
-        );
-      });
+      itRenders(
+        'svg child element with a badly cased alias',
+        async (render) => {
+          let e = await render(
+            <svg>
+              <image xlinkhref="http://i.imgur.com/w7GCRPb.png" />
+            </svg>,
+            1,
+          );
+          e = e.firstChild;
+          expect(e.hasAttributeNS('http://www.w3.org/1999/xlink', 'href')).toBe(
+            false,
+          );
+          expect(e.getAttribute('xlinkhref')).toBe(
+            'http://i.imgur.com/w7GCRPb.png',
+          );
+        },
+      );
 
-      itRenders('svg element with a tabIndex attribute', async render => {
+      itRenders('svg element with a tabIndex attribute', async (render) => {
         const e = await render(<svg tabIndex="1" />);
         expect(e.tabIndex).toBe(1);
       });
 
       itRenders(
         'svg element with a badly cased tabIndex attribute',
-        async render => {
+        async (render) => {
           const e = await render(<svg tabindex="1" />, 1);
           expect(e.tabIndex).toBe(1);
         },
       );
 
-      itRenders('svg element with a mixed case name', async render => {
+      itRenders('svg element with a mixed case name', async (render) => {
         let e = await render(
           <svg>
             <filter>
@@ -464,7 +470,7 @@ describe('ReactDOMServerIntegration', () => {
         expect(e.namespaceURI).toBe('http://www.w3.org/2000/svg');
       });
 
-      itRenders('a math element', async render => {
+      itRenders('a math element', async (render) => {
         const e = await render(<math />);
         expect(e.childNodes.length).toBe(0);
         expect(e.tagName).toBe('math');
@@ -473,21 +479,21 @@ describe('ReactDOMServerIntegration', () => {
     });
     // specially wrapped components
     // (see the big switch near the beginning ofReactDOMComponent.mountComponent)
-    itRenders('an img', async render => {
+    itRenders('an img', async (render) => {
       const e = await render(<img />);
       expect(e.childNodes.length).toBe(0);
       expect(e.nextSibling).toBe(null);
       expect(e.tagName).toBe('IMG');
     });
 
-    itRenders('a button', async render => {
+    itRenders('a button', async (render) => {
       const e = await render(<button />);
       expect(e.childNodes.length).toBe(0);
       expect(e.nextSibling).toBe(null);
       expect(e.tagName).toBe('BUTTON');
     });
 
-    itRenders('a div with dangerouslySetInnerHTML number', async render => {
+    itRenders('a div with dangerouslySetInnerHTML number', async (render) => {
       // Put dangerouslySetInnerHTML one level deeper because otherwise
       // hydrating from a bad markup would cause a mismatch (since we don't
       // patch dangerouslySetInnerHTML as text content).
@@ -503,7 +509,7 @@ describe('ReactDOMServerIntegration', () => {
       expect(e.textContent).toBe('0');
     });
 
-    itRenders('a div with dangerouslySetInnerHTML boolean', async render => {
+    itRenders('a div with dangerouslySetInnerHTML boolean', async (render) => {
       // Put dangerouslySetInnerHTML one level deeper because otherwise
       // hydrating from a bad markup would cause a mismatch (since we don't
       // patch dangerouslySetInnerHTML as text content).
@@ -521,7 +527,7 @@ describe('ReactDOMServerIntegration', () => {
 
     itRenders(
       'a div with dangerouslySetInnerHTML text string',
-      async render => {
+      async (render) => {
         // Put dangerouslySetInnerHTML one level deeper because otherwise
         // hydrating from a bad markup would cause a mismatch (since we don't
         // patch dangerouslySetInnerHTML as text content).
@@ -540,7 +546,7 @@ describe('ReactDOMServerIntegration', () => {
 
     itRenders(
       'a div with dangerouslySetInnerHTML element string',
-      async render => {
+      async (render) => {
         const e = await render(
           <div dangerouslySetInnerHTML={{__html: "<span id='child'/>"}} />,
         );
@@ -551,7 +557,7 @@ describe('ReactDOMServerIntegration', () => {
       },
     );
 
-    itRenders('a div with dangerouslySetInnerHTML object', async render => {
+    itRenders('a div with dangerouslySetInnerHTML object', async (render) => {
       const obj = {
         toString() {
           return "<span id='child'/>";
@@ -566,7 +572,7 @@ describe('ReactDOMServerIntegration', () => {
 
     itRenders(
       'a div with dangerouslySetInnerHTML set to null',
-      async render => {
+      async (render) => {
         const e = await render(
           <div dangerouslySetInnerHTML={{__html: null}} />,
         );
@@ -576,7 +582,7 @@ describe('ReactDOMServerIntegration', () => {
 
     itRenders(
       'a div with dangerouslySetInnerHTML set to undefined',
-      async render => {
+      async (render) => {
         const e = await render(
           <div dangerouslySetInnerHTML={{__html: undefined}} />,
         );
@@ -584,7 +590,7 @@ describe('ReactDOMServerIntegration', () => {
       },
     );
 
-    itRenders('a noscript with children', async render => {
+    itRenders('a noscript with children', async (render) => {
       const e = await render(
         <noscript>
           <div>Enable JavaScript to run this app.</div>
@@ -602,39 +608,42 @@ describe('ReactDOMServerIntegration', () => {
       }
     });
 
-    describe('newline-eating elements', function() {
+    describe('newline-eating elements', function () {
       itRenders(
         'a newline-eating tag with content not starting with \\n',
-        async render => {
+        async (render) => {
           const e = await render(<pre>Hello</pre>);
           expect(e.textContent).toBe('Hello');
         },
       );
       itRenders(
         'a newline-eating tag with content starting with \\n',
-        async render => {
+        async (render) => {
           const e = await render(<pre>{'\nHello'}</pre>);
           expect(e.textContent).toBe('\nHello');
         },
       );
-      itRenders('a normal tag with content starting with \\n', async render => {
-        const e = await render(<div>{'\nHello'}</div>);
-        expect(e.textContent).toBe('\nHello');
-      });
+      itRenders(
+        'a normal tag with content starting with \\n',
+        async (render) => {
+          const e = await render(<div>{'\nHello'}</div>);
+          expect(e.textContent).toBe('\nHello');
+        },
+      );
     });
 
-    describe('different component implementations', function() {
+    describe('different component implementations', function () {
       function checkFooDiv(e) {
         expect(e.childNodes.length).toBe(1);
         expectNode(e.firstChild, TEXT_NODE_TYPE, 'foo');
       }
 
-      itRenders('stateless components', async render => {
+      itRenders('stateless components', async (render) => {
         const FunctionComponent = () => <div>foo</div>;
         checkFooDiv(await render(<FunctionComponent />));
       });
 
-      itRenders('ES6 class components', async render => {
+      itRenders('ES6 class components', async (render) => {
         class ClassComponent extends React.Component {
           render() {
             return <div>foo</div>;
@@ -646,10 +655,10 @@ describe('ReactDOMServerIntegration', () => {
       if (require('shared/ReactFeatureFlags').disableModulePatternComponents) {
         itThrowsWhenRendering(
           'factory components',
-          async render => {
+          async (render) => {
             const FactoryComponent = () => {
               return {
-                render: function() {
+                render: function () {
                   return <div>foo</div>;
                 },
               };
@@ -659,10 +668,10 @@ describe('ReactDOMServerIntegration', () => {
           'Objects are not valid as a React child (found: object with keys {render})',
         );
       } else {
-        itRenders('factory components', async render => {
+        itRenders('factory components', async (render) => {
           const FactoryComponent = () => {
             return {
-              render: function() {
+              render: function () {
                 return <div>foo</div>;
               },
             };
@@ -672,9 +681,9 @@ describe('ReactDOMServerIntegration', () => {
       }
     });
 
-    describe('component hierarchies', function() {
-      itRenders('single child hierarchies of components', async render => {
-        const Component = props => <div>{props.children}</div>;
+    describe('component hierarchies', function () {
+      itRenders('single child hierarchies of components', async (render) => {
+        const Component = (props) => <div>{props.children}</div>;
         let e = await render(
           <Component>
             <Component>
@@ -693,8 +702,8 @@ describe('ReactDOMServerIntegration', () => {
         expect(e.childNodes.length).toBe(0);
       });
 
-      itRenders('multi-child hierarchies of components', async render => {
-        const Component = props => <div>{props.children}</div>;
+      itRenders('multi-child hierarchies of components', async (render) => {
+        const Component = (props) => <div>{props.children}</div>;
         const e = await render(
           <Component>
             <Component>
@@ -721,7 +730,7 @@ describe('ReactDOMServerIntegration', () => {
         }
       });
 
-      itRenders('a div with a child', async render => {
+      itRenders('a div with a child', async (render) => {
         const e = await render(
           <div id="parent">
             <div id="child" />
@@ -733,7 +742,7 @@ describe('ReactDOMServerIntegration', () => {
         expect(e.childNodes[0].childNodes.length).toBe(0);
       });
 
-      itRenders('a div with multiple children', async render => {
+      itRenders('a div with multiple children', async (render) => {
         const e = await render(
           <div id="parent">
             <div id="child1" />
@@ -750,7 +759,7 @@ describe('ReactDOMServerIntegration', () => {
 
       itRenders(
         'a div with multiple children separated by whitespace',
-        async render => {
+        async (render) => {
           const e = await render(
             <div id="parent">
               <div id="child1" /> <div id="child2" />
@@ -771,7 +780,7 @@ describe('ReactDOMServerIntegration', () => {
 
       itRenders(
         'a div with a single child surrounded by whitespace',
-        async render => {
+        async (render) => {
           // prettier-ignore
           const e = await render(<div id="parent">  <div id="child" />   </div>); // eslint-disable-line no-multi-spaces
           expect(e.childNodes.length).toBe(3);
@@ -786,8 +795,8 @@ describe('ReactDOMServerIntegration', () => {
         },
       );
 
-      itRenders('a composite with multiple children', async render => {
-        const Component = props => props.children;
+      itRenders('a composite with multiple children', async (render) => {
+        const Component = (props) => props.children;
         const e = await render(
           <Component>{['a', 'b', [undefined], [[false, 'c']]]}</Component>,
         );
@@ -813,14 +822,14 @@ describe('ReactDOMServerIntegration', () => {
       });
     });
 
-    describe('escaping >, <, and &', function() {
-      itRenders('>,<, and & as single child', async render => {
+    describe('escaping >, <, and &', function () {
+      itRenders('>,<, and & as single child', async (render) => {
         const e = await render(<div>{'<span>Text&quot;</span>'}</div>);
         expect(e.childNodes.length).toBe(1);
         expectNode(e.firstChild, TEXT_NODE_TYPE, '<span>Text&quot;</span>');
       });
 
-      itRenders('>,<, and & as multiple children', async render => {
+      itRenders('>,<, and & as multiple children', async (render) => {
         const e = await render(
           <div>
             {'<span>Text1&quot;</span>'}
@@ -852,7 +861,7 @@ describe('ReactDOMServerIntegration', () => {
 
       itRenders(
         'an element with one text child with special characters',
-        async render => {
+        async (render) => {
           const e = await render(<div>{'foo\rbar\r\nbaz\nqux\u0000'}</div>);
           if (render === serverRender || render === streamRender) {
             expect(e.childNodes.length).toBe(1);
@@ -874,7 +883,7 @@ describe('ReactDOMServerIntegration', () => {
 
       itRenders(
         'an element with two text children with special characters',
-        async render => {
+        async (render) => {
           const e = await render(
             <div>
               {'foo\rbar'}
@@ -905,7 +914,7 @@ describe('ReactDOMServerIntegration', () => {
 
       itRenders(
         'an element with an attribute value with special characters',
-        async render => {
+        async (render) => {
           const e = await render(<a title={'foo\rbar\r\nbaz\nqux\u0000'} />);
           if (
             render === serverRender ||
@@ -924,10 +933,10 @@ describe('ReactDOMServerIntegration', () => {
       );
     });
 
-    describe('components that throw errors', function() {
+    describe('components that throw errors', function () {
       itThrowsWhenRendering(
         'a function returning undefined',
-        async render => {
+        async (render) => {
           const UndefinedComponent = () => undefined;
           await render(<UndefinedComponent />, 1);
         },
@@ -938,7 +947,7 @@ describe('ReactDOMServerIntegration', () => {
 
       itThrowsWhenRendering(
         'a class returning undefined',
-        async render => {
+        async (render) => {
           class UndefinedComponent extends React.Component {
             render() {
               return undefined;
@@ -953,7 +962,7 @@ describe('ReactDOMServerIntegration', () => {
 
       itThrowsWhenRendering(
         'a function returning an object',
-        async render => {
+        async (render) => {
           const ObjectComponent = () => ({x: 123});
           await render(<ObjectComponent />, 1);
         },
@@ -966,7 +975,7 @@ describe('ReactDOMServerIntegration', () => {
 
       itThrowsWhenRendering(
         'a class returning an object',
-        async render => {
+        async (render) => {
           class ObjectComponent extends React.Component {
             render() {
               return {x: 123};
@@ -983,7 +992,7 @@ describe('ReactDOMServerIntegration', () => {
 
       itThrowsWhenRendering(
         'top-level object',
-        async render => {
+        async (render) => {
           await render({x: 123});
         },
         'Objects are not valid as a React child (found: object with keys {x}).' +
@@ -994,10 +1003,10 @@ describe('ReactDOMServerIntegration', () => {
       );
     });
 
-    describe('badly-typed elements', function() {
+    describe('badly-typed elements', function () {
       itThrowsWhenRendering(
         'object',
-        async render => {
+        async (render) => {
           let EmptyComponent = {};
           expect(() => {
             EmptyComponent = <EmptyComponent />;
@@ -1021,7 +1030,7 @@ describe('ReactDOMServerIntegration', () => {
 
       itThrowsWhenRendering(
         'null',
-        async render => {
+        async (render) => {
           let NullComponent = null;
           expect(() => {
             NullComponent = <NullComponent />;
@@ -1039,7 +1048,7 @@ describe('ReactDOMServerIntegration', () => {
 
       itThrowsWhenRendering(
         'undefined',
-        async render => {
+        async (render) => {
           let UndefinedComponent = undefined;
           expect(() => {
             UndefinedComponent = <UndefinedComponent />;

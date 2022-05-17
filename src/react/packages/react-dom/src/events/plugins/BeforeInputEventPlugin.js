@@ -4,14 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                             
-                                                                   
-                                                                  
-                                                           
-                                                          
 
 import {canUseDOM} from 'shared/ExecutionEnvironment';
 
@@ -95,7 +89,7 @@ let hasSpaceKeypress = false;
  * This is required because Firefox fires `keypress` events for key commands
  * (cut, copy, select-all, etc.) even though no character is inserted.
  */
-function isKeypressCommand(nativeEvent     ) {
+function isKeypressCommand(nativeEvent) {
   return (
     (nativeEvent.ctrlKey || nativeEvent.altKey || nativeEvent.metaKey) &&
     // ctrlKey && altKey is equivalent to AltGr, and is not a command.
@@ -106,7 +100,7 @@ function isKeypressCommand(nativeEvent     ) {
 /**
  * Translate native top level events into event types.
  */
-function getCompositionEventType(domEventName              ) {
+function getCompositionEventType(domEventName) {
   switch (domEventName) {
     case 'compositionstart':
       return 'onCompositionStart';
@@ -121,20 +115,14 @@ function getCompositionEventType(domEventName              ) {
  * Does our fallback best-guess model think this event signifies that
  * composition has begun?
  */
-function isFallbackCompositionStart(
-  domEventName              ,
-  nativeEvent     ,
-)          {
+function isFallbackCompositionStart(domEventName, nativeEvent) {
   return domEventName === 'keydown' && nativeEvent.keyCode === START_KEYCODE;
 }
 
 /**
  * Does our fallback mode think that this event is the end of composition?
  */
-function isFallbackCompositionEnd(
-  domEventName              ,
-  nativeEvent     ,
-)          {
+function isFallbackCompositionEnd(domEventName, nativeEvent) {
   switch (domEventName) {
     case 'keyup':
       // Command keys insert or clear IME input.
@@ -162,7 +150,7 @@ function isFallbackCompositionEnd(
  * @param {object} nativeEvent
  * @return {?string}
  */
-function getDataFromCustomEvent(nativeEvent     ) {
+function getDataFromCustomEvent(nativeEvent) {
   const detail = nativeEvent.detail;
   if (typeof detail === 'object' && 'data' in detail) {
     return detail.data;
@@ -180,7 +168,7 @@ function getDataFromCustomEvent(nativeEvent     ) {
  * @param {object} nativeEvent
  * @return {boolean}
  */
-function isUsingKoreanIME(nativeEvent     ) {
+function isUsingKoreanIME(nativeEvent) {
   return nativeEvent.locale === 'ko';
 }
 
@@ -249,10 +237,7 @@ function extractCompositionEvent(
   }
 }
 
-function getNativeBeforeInputChars(
-  domEventName              ,
-  nativeEvent     ,
-)          {
+function getNativeBeforeInputChars(domEventName, nativeEvent) {
   switch (domEventName) {
     case 'compositionend':
       return getDataFromCustomEvent(nativeEvent);
@@ -302,10 +287,7 @@ function getNativeBeforeInputChars(
  * For browsers that do not provide the `textInput` event, extract the
  * appropriate string to use for SyntheticInputEvent.
  */
-function getFallbackBeforeInputChars(
-  domEventName              ,
-  nativeEvent     ,
-)          {
+function getFallbackBeforeInputChars(domEventName, nativeEvent) {
   // If we are currently composing (IME) and using a fallback to do so,
   // try to extract the composed characters from the fallback object.
   // If composition event is available, we extract a string only at
@@ -429,14 +411,14 @@ function extractBeforeInputEvent(
  * `composition` event types.
  */
 function extractEvents(
-  dispatchQueue               ,
-  domEventName              ,
-  targetInst              ,
-  nativeEvent                ,
-  nativeEventTarget                    ,
-  eventSystemFlags                  ,
-  targetContainer             ,
-)       {
+  dispatchQueue,
+  domEventName,
+  targetInst,
+  nativeEvent,
+  nativeEventTarget,
+  eventSystemFlags,
+  targetContainer,
+) {
   extractCompositionEvent(
     dispatchQueue,
     domEventName,

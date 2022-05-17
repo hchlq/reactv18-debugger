@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -13,20 +13,13 @@ import ButtonIcon from '../ButtonIcon';
 
 import styles from './ExpandCollapseToggle.css';
 
-                                   
-                  
-                      
-   
-
-export default function ExpandCollapseToggle({
-  isOpen,
-  setIsOpen,
-}                           ) {
+export default function ExpandCollapseToggle({isOpen, setIsOpen}) {
   return (
     <Button
       className={styles.ExpandCollapseToggle}
-      onClick={() => setIsOpen(prevIsOpen => !prevIsOpen)}
-      title={`${isOpen ? 'Collapse' : 'Expand'} prop value`}>
+      onClick={() => setIsOpen((prevIsOpen) => !prevIsOpen)}
+      title={`${isOpen ? 'Collapse' : 'Expand'} prop value`}
+    >
       <ButtonIcon type={isOpen ? 'expanded' : 'collapsed'} />
     </Button>
   );

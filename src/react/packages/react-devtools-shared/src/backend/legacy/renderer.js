@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import {
@@ -37,26 +37,7 @@ import {
 } from '../../constants';
 import {decorateMany, forceUpdate, restoreMany} from './utils';
 
-             
-               
-                      
-                          
-                   
-             
-            
-            
-                    
-                  
-             
-                  
-              
-                                         
-                                                      
-
-                                      
-                             
-
-function getData(internalInstance                  ) {
+function getData(internalInstance) {
   let displayName = null;
   let key = null;
 
@@ -80,7 +61,7 @@ function getData(internalInstance                  ) {
   };
 }
 
-function getElementType(internalInstance                  )              {
+function getElementType(internalInstance) {
   // != used deliberately here to catch undefined and null
   if (internalInstance._currentElement != null) {
     const elementType = internalInstance._currentElement.type;
@@ -98,7 +79,7 @@ function getElementType(internalInstance                  )              {
   return ElementTypeOtherOrUnknown;
 }
 
-function getChildren(internalInstance        )             {
+function getChildren(internalInstance) {
   const children = [];
 
   // If the parent is a native node without rendered children, but with
@@ -130,33 +111,21 @@ function getChildren(internalInstance        )             {
   return children;
 }
 
-export function attach(
-  hook              ,
-  rendererID        ,
-  renderer                ,
-  global        ,
-)                    {
-  const idToInternalInstanceMap                                = new Map();
-  const internalInstanceToIDMap          
-                     
-           
-    = new WeakMap();
-  const internalInstanceToRootIDMap          
-                     
-           
-    = new WeakMap();
+export function attach(hook, rendererID, renderer, global) {
+  const idToInternalInstanceMap = new Map();
+  const internalInstanceToIDMap = new WeakMap();
+  const internalInstanceToRootIDMap = new WeakMap();
 
-  let getInternalIDForNative                      = ((null     )                     );
-  let findNativeNodeForInternalID                             ;
+  let getInternalIDForNative = null;
+  let findNativeNodeForInternalID;
 
   if (renderer.ComponentTree) {
     getInternalIDForNative = (node, findNearestUnfilteredAncestor) => {
-      const internalInstance = renderer.ComponentTree.getClosestInstanceFromNode(
-        node,
-      );
+      const internalInstance =
+        renderer.ComponentTree.getClosestInstanceFromNode(node);
       return internalInstanceToIDMap.get(internalInstance) || null;
     };
-    findNativeNodeForInternalID = (id        ) => {
+    findNativeNodeForInternalID = (id) => {
       const internalInstance = idToInternalInstanceMap.get(id);
       return renderer.ComponentTree.getNodeFromInstance(internalInstance);
     };
@@ -165,18 +134,18 @@ export function attach(
       // Not implemented.
       return null;
     };
-    findNativeNodeForInternalID = (id        ) => {
+    findNativeNodeForInternalID = (id) => {
       // Not implemented.
       return null;
     };
   }
 
-  function getDisplayNameForFiberID(id        )                {
+  function getDisplayNameForFiberID(id) {
     const internalInstance = idToInternalInstanceMap.get(id);
     return internalInstance ? getData(internalInstance).displayName : null;
   }
 
-  function getID(internalInstance                  )         {
+  function getID(internalInstance) {
     if (typeof internalInstance !== 'object' || internalInstance === null) {
       throw new Error('Invalid internal instance: ' + internalInstance);
     }
@@ -185,7 +154,7 @@ export function attach(
       internalInstanceToIDMap.set(internalInstance, id);
       idToInternalInstanceMap.set(id, internalInstance);
     }
-    return ((internalInstanceToIDMap.get(internalInstance)     )        );
+    return internalInstanceToIDMap.get(internalInstance);
   }
 
   function areEqualArrays(a, b) {
@@ -361,11 +330,7 @@ export function attach(
     oldReconcilerMethods = null;
   }
 
-  function recordMount(
-    internalInstance                  ,
-    id        ,
-    parentID        ,
-  ) {
+  function recordMount(internalInstance, id, parentID) {
     const isRoot = parentID === 0;
 
     if (__DEBUG__) {
@@ -410,11 +375,7 @@ export function attach(
     }
   }
 
-  function recordReorder(
-    internalInstance                  ,
-    id        ,
-    nextChildren                         ,
-  ) {
+  function recordReorder(internalInstance, id, nextChildren) {
     pushOperation(TREE_OPERATION_REORDER_CHILDREN);
     pushOperation(id);
     const nextChildIDs = nextChildren.map(getID);
@@ -424,16 +385,12 @@ export function attach(
     }
   }
 
-  function recordUnmount(internalInstance                  , id        ) {
+  function recordUnmount(internalInstance, id) {
     pendingUnmountedIDs.push(id);
     idToInternalInstanceMap.delete(id);
   }
 
-  function crawlAndRecordInitialMounts(
-    id        ,
-    parentID        ,
-    rootID        ,
-  ) {
+  function crawlAndRecordInitialMounts(id, parentID, rootID) {
     if (__DEBUG__) {
       console.group('crawlAndRecordInitialMounts() id:', id);
     }
@@ -442,7 +399,7 @@ export function attach(
     if (internalInstance != null) {
       internalInstanceToRootIDMap.set(internalInstance, rootID);
       recordMount(internalInstance, id, parentID);
-      getChildren(internalInstance).forEach(child =>
+      getChildren(internalInstance).forEach((child) =>
         crawlAndRecordInitialMounts(getID(child), id, rootID),
       );
     }
@@ -467,13 +424,13 @@ export function attach(
     }
   }
 
-  const pendingOperations                = [];
-  const pendingStringTable                      = new Map();
-  let pendingUnmountedIDs                = [];
-  let pendingStringTableLength         = 0;
-  let pendingUnmountedRootID                = null;
+  const pendingOperations = [];
+  const pendingStringTable = new Map();
+  let pendingUnmountedIDs = [];
+  let pendingStringTableLength = 0;
+  let pendingUnmountedRootID = null;
 
-  function flushPendingEvents(rootID        ) {
+  function flushPendingEvents(rootID) {
     if (
       pendingOperations.length === 0 &&
       pendingUnmountedIDs.length === 0 &&
@@ -488,8 +445,8 @@ export function attach(
     const operations = new Array(
       // Identify which renderer this update is coming from.
       2 + // [rendererID, rootFiberID]
-      // How big is the string table?
-      1 + // [stringTableLength]
+        // How big is the string table?
+        1 + // [stringTableLength]
         // Then goes the actual string table.
         pendingStringTableLength +
         // All unmounts are batched in a single message.
@@ -554,7 +511,7 @@ export function attach(
     pendingStringTableLength = 0;
   }
 
-  function pushOperation(op        )       {
+  function pushOperation(op) {
     if (__DEV__) {
       if (!Number.isInteger(op)) {
         console.error(
@@ -566,7 +523,7 @@ export function attach(
     pendingOperations.push(op);
   }
 
-  function getStringID(str               )         {
+  function getStringID(str) {
     if (str === null) {
       return 0;
     }
@@ -583,14 +540,14 @@ export function attach(
     return stringID;
   }
 
-  let currentlyInspectedElementID                = null;
-  let currentlyInspectedPaths         = {};
+  let currentlyInspectedElementID = null;
+  let currentlyInspectedPaths = {};
 
   // Track the intersection of currently inspected paths,
   // so that we can send their data along if the element is re-rendered.
-  function mergeInspectedPaths(path                        ) {
+  function mergeInspectedPaths(path) {
     let current = currentlyInspectedPaths;
-    path.forEach(key => {
+    path.forEach((key) => {
       if (!current[key]) {
         current[key] = {};
       }
@@ -598,10 +555,10 @@ export function attach(
     });
   }
 
-  function createIsPathAllowed(key        ) {
+  function createIsPathAllowed(key) {
     // This function helps prevent previously-inspected paths from being dehydrated in updates.
     // This is important to avoid a bad user experience where expanded toggles collapse on update.
-    return function isPathAllowed(path                        )          {
+    return function isPathAllowed(path) {
       let current = currentlyInspectedPaths[key];
       if (!current) {
         return false;
@@ -617,7 +574,7 @@ export function attach(
   }
 
   // Fast path props lookup for React Native style editor.
-  function getInstanceAndStyle(id        )                   {
+  function getInstanceAndStyle(id) {
     let instance = null;
     let style = null;
 
@@ -637,7 +594,7 @@ export function attach(
     };
   }
 
-  function updateSelectedElement(id        )       {
+  function updateSelectedElement(id) {
     const internalInstance = idToInternalInstanceMap.get(id);
     if (internalInstance == null) {
       console.warn(`Could not find instance with id "${id}"`);
@@ -666,11 +623,7 @@ export function attach(
     }
   }
 
-  function storeAsGlobal(
-    id        ,
-    path                        ,
-    count        ,
-  )       {
+  function storeAsGlobal(id, path, count) {
     const inspectedElement = inspectElementRaw(id);
     if (inspectedElement !== null) {
       const value = getInObject(inspectedElement, path);
@@ -683,17 +636,14 @@ export function attach(
     }
   }
 
-  function copyElementPath(id        , path                        )       {
+  function copyElementPath(id, path) {
     const inspectedElement = inspectElementRaw(id);
     if (inspectedElement !== null) {
       copyToClipboard(getInObject(inspectedElement, path));
     }
   }
 
-  function inspectElement(
-    id        ,
-    path                         ,
-  )                          {
+  function inspectElement(id, path) {
     if (currentlyInspectedElementID !== id) {
       currentlyInspectedElementID = id;
       currentlyInspectedPaths = {};
@@ -736,7 +686,7 @@ export function attach(
     };
   }
 
-  function inspectElementRaw(id        )                          {
+  function inspectElementRaw(id) {
     const internalInstance = idToInternalInstanceMap.get(id);
 
     if (internalInstance == null) {
@@ -825,7 +775,7 @@ export function attach(
     };
   }
 
-  function logElementToConsole(id        )       {
+  function logElementToConsole(id) {
     const result = inspectElementRaw(id);
     if (result === null) {
       console.warn(`Could not find element with id "${id}"`);
@@ -863,17 +813,14 @@ export function attach(
     }
   }
 
-  function prepareViewAttributeSource(
-    id        ,
-    path                        ,
-  )       {
+  function prepareViewAttributeSource(id, path) {
     const inspectedElement = inspectElementRaw(id);
     if (inspectedElement !== null) {
       window.$attribute = getInObject(inspectedElement, path);
     }
   }
 
-  function prepareViewElementSource(id        )       {
+  function prepareViewElementSource(id) {
     const internalInstance = idToInternalInstanceMap.get(id);
     if (internalInstance == null) {
       console.warn(`Could not find instance with id "${id}"`);
@@ -889,12 +836,7 @@ export function attach(
     global.$type = element.type;
   }
 
-  function deletePath(
-    type                                         ,
-    id        ,
-    hookID         ,
-    path                        ,
-  )       {
+  function deletePath(type, id, hookID, path) {
     const internalInstance = idToInternalInstanceMap.get(id);
     if (internalInstance != null) {
       const publicInstance = internalInstance._instance;
@@ -923,13 +865,7 @@ export function attach(
     }
   }
 
-  function renamePath(
-    type                                         ,
-    id        ,
-    hookID         ,
-    oldPath                        ,
-    newPath                        ,
-  )       {
+  function renamePath(type, id, hookID, oldPath, newPath) {
     const internalInstance = idToInternalInstanceMap.get(id);
     if (internalInstance != null) {
       const publicInstance = internalInstance._instance;
@@ -958,13 +894,7 @@ export function attach(
     }
   }
 
-  function overrideValueAtPath(
-    type                                         ,
-    id        ,
-    hookID         ,
-    path                        ,
-    value     ,
-  )       {
+  function overrideValueAtPath(type, id, hookID, path, value) {
     const internalInstance = idToInternalInstanceMap.get(id);
     if (internalInstance != null) {
       const publicInstance = internalInstance._instance;
@@ -1013,29 +943,29 @@ export function attach(
     // Do not throw, since this would break a multi-root scenario where v15 and v16 were both present.
   };
 
-  function getBestMatchForTrackedPath()                   {
+  function getBestMatchForTrackedPath() {
     // Not implemented.
     return null;
   }
 
-  function getPathForElement(id        )                          {
+  function getPathForElement(id) {
     // Not implemented.
     return null;
   }
 
-  function updateComponentFilters(componentFilters                        ) {
+  function updateComponentFilters(componentFilters) {
     // Not implemented.
   }
 
-  function setTraceUpdatesEnabled(enabled         ) {
+  function setTraceUpdatesEnabled(enabled) {
     // Not implemented.
   }
 
-  function setTrackedPath(path                         ) {
+  function setTrackedPath(path) {
     // Not implemented.
   }
 
-  function getOwnersList(id        )                      {
+  function getOwnersList(id) {
     // Not implemented.
     return null;
   }
@@ -1049,7 +979,7 @@ export function attach(
     getDisplayNameForFiberID,
     getFiberIDForNative: getInternalIDForNative,
     getInstanceAndStyle,
-    findNativeNodesForFiberID: (id        ) => {
+    findNativeNodesForFiberID: (id) => {
       const nativeNode = findNativeNodeForInternalID(id);
       return nativeNode == null ? null : [nativeNode];
     },

@@ -31,7 +31,7 @@ describe('SyntheticWheelEvent', () => {
 
   it('should normalize properties from the MouseEvent interface', () => {
     const events = [];
-    const onWheel = event => {
+    const onWheel = (event) => {
       event.persist();
       events.push(event);
     };
@@ -50,7 +50,7 @@ describe('SyntheticWheelEvent', () => {
 
   it('should normalize properties from the WheelEvent interface', () => {
     const events = [];
-    const onWheel = event => {
+    const onWheel = (event) => {
       event.persist();
       events.push(event);
     };
@@ -85,7 +85,7 @@ describe('SyntheticWheelEvent', () => {
 
   it('should be able to `preventDefault` and `stopPropagation`', () => {
     const events = [];
-    const onWheel = event => {
+    const onWheel = (event) => {
       expect(event.isDefaultPrevented()).toBe(false);
       event.preventDefault();
       expect(event.isDefaultPrevented()).toBe(true);

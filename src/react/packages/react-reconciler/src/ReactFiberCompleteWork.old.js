@@ -4,29 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                
-                                            
-             
-                                    
-                     
-                           
-                                                    
-             
-           
-       
-        
-            
-           
-                                
-             
-                
-                          
-                                           
-                                                                     
-                                                                   
 
 import {resetWorkInProgressVersions as resetMutableSourceWorkInProgressVersions} from './ReactMutableSource.old';
 
@@ -137,13 +116,13 @@ import {resetChildFibers} from './ReactChildFiber.old';
 import {createScopeInstance} from './ReactFiberScope.old';
 import {transferActualDuration} from './ReactProfilerTimer.old';
 
-function markUpdate(workInProgress       ) {
+function markUpdate(workInProgress) {
   // Tag the fiber with an update effect. This turns a Placement into
   // a PlacementAndUpdate.
   workInProgress.flags |= Update;
 }
 
-function markRef(workInProgress       ) {
+function markRef(workInProgress) {
   workInProgress.flags |= Ref;
 }
 
@@ -154,11 +133,11 @@ let updateHostText;
 if (supportsMutation) {
   // Mutation mode
 
-  appendAllChildren = function(
-    parent          ,
-    workInProgress       ,
-    needsVisibilityToggle         ,
-    isHidden         ,
+  appendAllChildren = function (
+    parent,
+    workInProgress,
+    needsVisibilityToggle,
+    isHidden,
   ) {
     // We only have the top Fiber that was created but we need recurse down its
     // children to find all the terminal nodes.
@@ -191,15 +170,15 @@ if (supportsMutation) {
     }
   };
 
-  updateHostContainer = function(workInProgress       ) {
+  updateHostContainer = function (workInProgress) {
     // Noop
   };
-  updateHostComponent = function(
-    current       ,
-    workInProgress       ,
-    type      ,
-    newProps       ,
-    rootContainerInstance           ,
+  updateHostComponent = function (
+    current,
+    workInProgress,
+    type,
+    newProps,
+    rootContainerInstance,
   ) {
     // If we have an alternate, that means this is an update and we need to
     // schedule a side-effect to do the updates.
@@ -214,7 +193,7 @@ if (supportsMutation) {
     // have newProps so we'll have to reuse them.
     // TODO: Split the update API as separate for the props vs. children.
     // Even better would be if children weren't special cased at all tho.
-    const instance           = workInProgress.stateNode;
+    const instance = workInProgress.stateNode;
     const currentHostContext = getHostContext();
     // TODO: Experiencing an error where oldProps is null. Suggests a host
     // component is hitting the resume path. Figure out why. Possibly
@@ -228,19 +207,14 @@ if (supportsMutation) {
       currentHostContext,
     );
     // TODO: Type this specific to this type of component.
-    workInProgress.updateQueue = (updatePayload     );
+    workInProgress.updateQueue = updatePayload;
     // If the update payload indicates that there is a change or if there
     // is a new ref we mark this as an update. All the work is done in commitWork.
     if (updatePayload) {
       markUpdate(workInProgress);
     }
   };
-  updateHostText = function(
-    current       ,
-    workInProgress       ,
-    oldText        ,
-    newText        ,
-  ) {
+  updateHostText = function (current, workInProgress, oldText, newText) {
     // If the text differs, mark it as an update. All the work in done in commitWork.
     if (oldText !== newText) {
       markUpdate(workInProgress);
@@ -249,11 +223,11 @@ if (supportsMutation) {
 } else if (supportsPersistence) {
   // Persistent host tree mode
 
-  appendAllChildren = function(
-    parent          ,
-    workInProgress       ,
-    needsVisibilityToggle         ,
-    isHidden         ,
+  appendAllChildren = function (
+    parent,
+    workInProgress,
+    needsVisibilityToggle,
+    isHidden,
   ) {
     // We only have the top Fiber that was created but we need recurse down its
     // children to find all the terminal nodes.
@@ -327,7 +301,7 @@ if (supportsMutation) {
         continue;
       }
       // $FlowFixMe This is correct but Flow is confused by the labeled break.
-      node = (node       );
+      node = node;
       if (node === workInProgress) {
         return;
       }
@@ -343,11 +317,11 @@ if (supportsMutation) {
   };
 
   // An unfortunate fork of appendAllChildren because we have two different parent types.
-  const appendAllChildrenToContainer = function(
-    containerChildSet          ,
-    workInProgress       ,
-    needsVisibilityToggle         ,
-    isHidden         ,
+  const appendAllChildrenToContainer = function (
+    containerChildSet,
+    workInProgress,
+    needsVisibilityToggle,
+    isHidden,
   ) {
     // We only have the top Fiber that was created but we need recurse down its
     // children to find all the terminal nodes.
@@ -421,7 +395,7 @@ if (supportsMutation) {
         continue;
       }
       // $FlowFixMe This is correct but Flow is confused by the labeled break.
-      node = (node       );
+      node = node;
       if (node === workInProgress) {
         return;
       }
@@ -435,12 +409,8 @@ if (supportsMutation) {
       node = node.sibling;
     }
   };
-  updateHostContainer = function(workInProgress       ) {
-    const portalOrRoot   
-                               
-                                
-         
-      = workInProgress.stateNode;
+  updateHostContainer = function (workInProgress) {
+    const portalOrRoot = workInProgress.stateNode;
     const childrenUnchanged = workInProgress.firstEffect === null;
     if (childrenUnchanged) {
       // No changes, just reuse the existing instance.
@@ -455,12 +425,12 @@ if (supportsMutation) {
       finalizeContainerChildren(container, newChildSet);
     }
   };
-  updateHostComponent = function(
-    current       ,
-    workInProgress       ,
-    type      ,
-    newProps       ,
-    rootContainerInstance           ,
+  updateHostComponent = function (
+    current,
+    workInProgress,
+    type,
+    newProps,
+    rootContainerInstance,
   ) {
     const currentInstance = current.stateNode;
     const oldProps = current.memoizedProps;
@@ -473,7 +443,7 @@ if (supportsMutation) {
       workInProgress.stateNode = currentInstance;
       return;
     }
-    const recyclableInstance           = workInProgress.stateNode;
+    const recyclableInstance = workInProgress.stateNode;
     const currentHostContext = getHostContext();
     let updatePayload = null;
     if (oldProps !== newProps) {
@@ -524,12 +494,7 @@ if (supportsMutation) {
       appendAllChildren(newInstance, workInProgress, false, false);
     }
   };
-  updateHostText = function(
-    current       ,
-    workInProgress       ,
-    oldText        ,
-    newText        ,
-  ) {
+  updateHostText = function (current, workInProgress, oldText, newText) {
     if (oldText !== newText) {
       // If the text content differs, we'll create a new text instance for it.
       const rootContainerInstance = getRootHostContainer();
@@ -549,32 +514,24 @@ if (supportsMutation) {
   };
 } else {
   // No host operations
-  updateHostContainer = function(workInProgress       ) {
+  updateHostContainer = function (workInProgress) {
     // Noop
   };
-  updateHostComponent = function(
-    current       ,
-    workInProgress       ,
-    type      ,
-    newProps       ,
-    rootContainerInstance           ,
+  updateHostComponent = function (
+    current,
+    workInProgress,
+    type,
+    newProps,
+    rootContainerInstance,
   ) {
     // Noop
   };
-  updateHostText = function(
-    current       ,
-    workInProgress       ,
-    oldText        ,
-    newText        ,
-  ) {
+  updateHostText = function (current, workInProgress, oldText, newText) {
     // Noop
   };
 }
 
-function cutOffTailIfNeeded(
-  renderState                         ,
-  hasRenderedATailFallback         ,
-) {
+function cutOffTailIfNeeded(renderState, hasRenderedATailFallback) {
   if (getIsHydrating()) {
     // If we're hydrating, we should consume as many items as we can
     // so we don't leave any behind.
@@ -642,11 +599,7 @@ function cutOffTailIfNeeded(
   }
 }
 
-function completeWork(
-  current              ,
-  workInProgress       ,
-  renderLanes       ,
-)               {
+function completeWork(current, workInProgress, renderLanes) {
   const newProps = workInProgress.pendingProps;
 
   switch (workInProgress.tag) {
@@ -672,7 +625,7 @@ function completeWork(
       popHostContainer(workInProgress);
       popTopLevelLegacyContextObject(workInProgress);
       resetMutableSourceWorkInProgressVersions();
-      const fiberRoot = (workInProgress.stateNode           );
+      const fiberRoot = workInProgress.stateNode;
       if (fiberRoot.pendingContext) {
         fiberRoot.context = fiberRoot.pendingContext;
         fiberRoot.pendingContext = null;
@@ -815,7 +768,7 @@ function completeWork(
     }
     case SuspenseComponent: {
       popSuspenseContext(workInProgress);
-      const nextState                       = workInProgress.memoizedState;
+      const nextState = workInProgress.memoizedState;
 
       if (enableSuspenseServerRenderer) {
         if (nextState !== null && nextState.dehydrated !== null) {
@@ -871,7 +824,7 @@ function completeWork(
           popHydrationState(workInProgress);
         }
       } else {
-        const prevState                       = current.memoizedState;
+        const prevState = current.memoizedState;
         prevDidTimeout = prevState !== null;
       }
 
@@ -896,7 +849,7 @@ function completeWork(
             hasInvisibleChildContext ||
             hasSuspenseContext(
               suspenseStackCursor.current,
-              (InvisibleParentSuspenseContext                 ),
+              InvisibleParentSuspenseContext,
             )
           ) {
             // If this was in an invisible tree or a new render, then showing
@@ -963,8 +916,7 @@ function completeWork(
     case SuspenseListComponent: {
       popSuspenseContext(workInProgress);
 
-      const renderState                                 =
-        workInProgress.memoizedState;
+      const renderState = workInProgress.memoizedState;
 
       if (renderState === null) {
         // We're running in the default, "independent" mode.
@@ -1186,10 +1138,7 @@ function completeWork(
     case FundamentalComponent: {
       if (enableFundamentalAPI) {
         const fundamentalImpl = workInProgress.type.impl;
-        let fundamentalInstance                                    
-              
-              
-                 = workInProgress.stateNode;
+        let fundamentalInstance = workInProgress.stateNode;
 
         if (fundamentalInstance === null) {
           const getInitialState = fundamentalImpl.getInitialState;
@@ -1197,15 +1146,14 @@ function completeWork(
           if (getInitialState !== undefined) {
             fundamentalState = getInitialState(newProps);
           }
-          fundamentalInstance = workInProgress.stateNode = createFundamentalStateInstance(
-            workInProgress,
-            newProps,
-            fundamentalImpl,
-            fundamentalState || {},
-          );
-          const instance = ((getFundamentalComponentInstance(
-            fundamentalInstance,
-          )     )          );
+          fundamentalInstance = workInProgress.stateNode =
+            createFundamentalStateInstance(
+              workInProgress,
+              newProps,
+              fundamentalImpl,
+              fundamentalState || {},
+            );
+          const instance = getFundamentalComponentInstance(fundamentalInstance);
           fundamentalInstance.instance = instance;
           if (fundamentalImpl.reconcileChildren === false) {
             return null;
@@ -1223,9 +1171,8 @@ function completeWork(
             fundamentalInstance.instance = instance;
             appendAllChildren(instance, workInProgress, false, false);
           }
-          const shouldUpdate = shouldUpdateFundamentalComponent(
-            fundamentalInstance,
-          );
+          const shouldUpdate =
+            shouldUpdateFundamentalComponent(fundamentalInstance);
           if (shouldUpdate) {
             markUpdate(workInProgress);
           }
@@ -1237,7 +1184,7 @@ function completeWork(
     case ScopeComponent: {
       if (enableScopeAPI) {
         if (current === null) {
-          const scopeInstance                     = createScopeInstance();
+          const scopeInstance = createScopeInstance();
           workInProgress.stateNode = scopeInstance;
           prepareScopeUpdate(scopeInstance, workInProgress);
           if (workInProgress.ref !== null) {
@@ -1265,8 +1212,8 @@ function completeWork(
     case LegacyHiddenComponent: {
       popRenderLanes(workInProgress);
       if (current !== null) {
-        const nextState                        = workInProgress.memoizedState;
-        const prevState                        = current.memoizedState;
+        const nextState = workInProgress.memoizedState;
+        const prevState = current.memoizedState;
 
         const prevIsHidden = prevState !== null;
         const nextIsHidden = nextState !== null;

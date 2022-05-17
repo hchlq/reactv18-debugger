@@ -4,15 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                          
-                                                          
-             
-                      
-                              
-                                 
 
 import {allNativeEvents} from '../events/EventRegistry';
 import {
@@ -36,11 +29,7 @@ import {
 } from 'shared/ReactFeatureFlags';
 import invariant from 'shared/invariant';
 
-                            
-                    
-   
-
-function getNearestRootOrPortalContainer(node       )                 {
+function getNearestRootOrPortalContainer(node) {
   while (node !== null) {
     const tag = node.tag;
     // Once we encounter a host container or root container
@@ -53,19 +42,15 @@ function getNearestRootOrPortalContainer(node       )                 {
   return null;
 }
 
-function isValidEventTarget(target                                  )          {
-  return typeof (target        ).addEventListener === 'function';
+function isValidEventTarget(target) {
+  return typeof target.addEventListener === 'function';
 }
 
-function isReactScope(target                                  )          {
-  return typeof (target        ).getChildContextValues === 'function';
+function isReactScope(target) {
+  return typeof target.getChildContextValues === 'function';
 }
 
-function createEventHandleListener(
-  type              ,
-  isCapturePhaseListener         ,
-  callback                                       ,
-)                              {
+function createEventHandleListener(type, isCapturePhaseListener, callback) {
   return {
     callback,
     capture: isCapturePhaseListener,
@@ -74,11 +59,11 @@ function createEventHandleListener(
 }
 
 function registerEventOnNearestTargetContainer(
-  targetFiber       ,
-  domEventName              ,
-  isCapturePhaseListener         ,
-  targetElement                ,
-)       {
+  targetFiber,
+  domEventName,
+  isCapturePhaseListener,
+  targetElement,
+) {
   if (!enableEagerRootListeners) {
     // If it is, find the nearest root or portal and make it
     // our event handle target container.
@@ -93,7 +78,7 @@ function registerEventOnNearestTargetContainer(
       return;
     }
     if (targetContainer.nodeType === COMMENT_NODE) {
-      targetContainer = ((targetContainer.parentNode     )         );
+      targetContainer = targetContainer.parentNode;
     }
     listenToNativeEvent(
       domEventName,
@@ -104,15 +89,11 @@ function registerEventOnNearestTargetContainer(
   }
 }
 
-function registerReactDOMEvent(
-  target                                  ,
-  domEventName              ,
-  isCapturePhaseListener         ,
-)       {
+function registerReactDOMEvent(target, domEventName, isCapturePhaseListener) {
   // Check if the target is a DOM element.
-  if ((target     ).nodeType === ELEMENT_NODE) {
+  if (target.nodeType === ELEMENT_NODE) {
     if (!enableEagerRootListeners) {
-      const targetElement = ((target     )         );
+      const targetElement = target;
       // Check if the DOM element is managed by React.
       const targetFiber = getClosestInstanceFromNode(targetElement);
       if (targetFiber === null) {
@@ -133,7 +114,7 @@ function registerReactDOMEvent(
     }
   } else if (enableScopeAPI && isReactScope(target)) {
     if (!enableEagerRootListeners) {
-      const scopeTarget = ((target     )                    );
+      const scopeTarget = target;
       const targetFiber = getFiberFromScopeInstance(scopeTarget);
       if (targetFiber === null) {
         // Scope is unmounted, do not proceed.
@@ -147,7 +128,7 @@ function registerReactDOMEvent(
       );
     }
   } else if (isValidEventTarget(target)) {
-    const eventTarget = ((target     )             );
+    const eventTarget = target;
     // These are valid event targets, but they are also
     // non-managed React nodes.
     listenToNativeEvent(
@@ -166,12 +147,9 @@ function registerReactDOMEvent(
   }
 }
 
-export function createEventHandle(
-  type        ,
-  options                     ,
-)                      {
+export function createEventHandle(type, options) {
   if (enableCreateEventHandleAPI) {
-    const domEventName = ((type     )              );
+    const domEventName = type;
 
     // We cannot support arbitrary native events with eager root listeners
     // because the eager strategy relies on knowing the whole list ahead of time.
@@ -196,10 +174,7 @@ export function createEventHandle(
       }
     }
 
-    const eventHandle = (
-      target                                  ,
-      callback                                       ,
-    ) => {
+    const eventHandle = (target, callback) => {
       invariant(
         typeof callback === 'function',
         'ReactDOM.createEventHandle: setter called with an invalid ' +
@@ -221,13 +196,11 @@ export function createEventHandle(
       }
       targetListeners.add(listener);
       return () => {
-        ((targetListeners     )                                  ).delete(
-          listener,
-        );
+        targetListeners.delete(listener);
       };
     };
 
     return eventHandle;
   }
-  return (null     );
+  return null;
 }

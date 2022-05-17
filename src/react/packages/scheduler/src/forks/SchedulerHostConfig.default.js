@@ -39,7 +39,7 @@ if (
   // fallback to a naive implementation.
   let _callback = null;
   let _timeoutID = null;
-  const _flushCallback = function() {
+  const _flushCallback = function () {
     if (_callback !== null) {
       try {
         const currentTime = getCurrentTime();
@@ -52,7 +52,7 @@ if (
       }
     }
   };
-  requestHostCallback = function(cb) {
+  requestHostCallback = function (cb) {
     if (_callback !== null) {
       // Protect against re-entrancy.
       setTimeout(requestHostCallback, 0, cb);
@@ -61,19 +61,19 @@ if (
       setTimeout(_flushCallback, 0);
     }
   };
-  cancelHostCallback = function() {
+  cancelHostCallback = function () {
     _callback = null;
   };
-  requestHostTimeout = function(cb, ms) {
+  requestHostTimeout = function (cb, ms) {
     _timeoutID = setTimeout(cb, ms);
   };
-  cancelHostTimeout = function() {
+  cancelHostTimeout = function () {
     clearTimeout(_timeoutID);
   };
-  shouldYieldToHost = function() {
+  shouldYieldToHost = function () {
     return false;
   };
-  requestPaint = forceFrameRate = function() {};
+  requestPaint = forceFrameRate = function () {};
 } else {
   // Capture local references to native APIs, in case a polyfill overrides them.
   const setTimeout = window.setTimeout;
@@ -127,7 +127,7 @@ if (
     navigator.scheduling.isInputPending !== undefined
   ) {
     const scheduling = navigator.scheduling;
-    shouldYieldToHost = function() {
+    shouldYieldToHost = function () {
       const currentTime = getCurrentTime();
       if (currentTime >= deadline) {
         // There's no time left. We may want to yield control of the main
@@ -151,21 +151,21 @@ if (
       }
     };
 
-    requestPaint = function() {
+    requestPaint = function () {
       needsPaint = true;
     };
   } else {
     // `isInputPending` is not available. Since we have no way of knowing if
     // there's pending input, always yield at the end of the frame.
-    shouldYieldToHost = function() {
+    shouldYieldToHost = function () {
       return getCurrentTime() >= deadline;
     };
 
     // Since we yield every frame regardless, `requestPaint` has no effect.
-    requestPaint = function() {};
+    requestPaint = function () {};
   }
 
-  forceFrameRate = function(fps) {
+  forceFrameRate = function (fps) {
     if (fps < 0 || fps > 125) {
       // Using console['error'] to evade Babel and ESLint
       console['error'](
@@ -221,7 +221,7 @@ if (
   const port = channel.port2;
   channel.port1.onmessage = performWorkUntilDeadline;
 
-  requestHostCallback = function(callback) {
+  requestHostCallback = function (callback) {
     scheduledHostCallback = callback;
     if (!isMessageLoopRunning) {
       isMessageLoopRunning = true;
@@ -229,17 +229,17 @@ if (
     }
   };
 
-  cancelHostCallback = function() {
+  cancelHostCallback = function () {
     scheduledHostCallback = null;
   };
 
-  requestHostTimeout = function(callback, ms) {
+  requestHostTimeout = function (callback, ms) {
     taskTimeoutID = setTimeout(() => {
       callback(getCurrentTime());
     }, ms);
   };
 
-  cancelHostTimeout = function() {
+  cancelHostTimeout = function () {
     clearTimeout(taskTimeoutID);
     taskTimeoutID = -1;
   };

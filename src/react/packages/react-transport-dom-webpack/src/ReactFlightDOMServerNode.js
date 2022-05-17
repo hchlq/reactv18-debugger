@@ -4,12 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                                   
-                                                                           
-                                     
 
 import {
   createRequest,
@@ -21,11 +17,7 @@ function createDrainHandler(destination, request) {
   return () => startFlowing(request);
 }
 
-function pipeToNodeWritable(
-  model            ,
-  destination          ,
-  webpackMap               ,
-)       {
+function pipeToNodeWritable(model, destination, webpackMap) {
   const request = createRequest(model, destination, webpackMap);
   destination.on('drain', createDrainHandler(destination, request));
   startWork(request);

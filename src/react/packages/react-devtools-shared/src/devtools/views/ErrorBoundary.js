@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -15,30 +15,17 @@ import Icon from './Icon';
 import styles from './ErrorBoundary.css';
 import Store from 'react-devtools-shared/src/devtools/store';
 
-               
-                       
-                                   
-               
-   
-
-               
-                           
-                                
-                              
-                    
-   
-
-const InitialState        = {
+const InitialState = {
   callStack: null,
   componentStack: null,
   errorMessage: null,
   hasError: false,
 };
 
-export default class ErrorBoundary extends Component               {
-  state        = InitialState;
+export default class ErrorBoundary extends Component {
+  state = InitialState;
 
-  componentDidCatch(error     , {componentStack}     ) {
+  componentDidCatch(error, {componentStack}) {
     const errorMessage =
       typeof error === 'object' && error.hasOwnProperty('message')
         ? error.message
@@ -46,10 +33,7 @@ export default class ErrorBoundary extends Component               {
 
     const callStack =
       typeof error === 'object' && error.hasOwnProperty('stack')
-        ? error.stack
-            .split('\n')
-            .slice(1)
-            .join('\n')
+        ? error.stack.split('\n').slice(1).join('\n')
         : null;
 
     this.setState({
@@ -99,7 +83,8 @@ export default class ErrorBoundary extends Component               {
             <Button
               className={styles.RetryButton}
               title="Retry"
-              onClick={this.handleRetry}>
+              onClick={this.handleRetry}
+            >
               <ButtonIcon className={styles.RetryIcon} type="reload" />
               Retry
             </Button>
@@ -111,7 +96,8 @@ export default class ErrorBoundary extends Component               {
                   href={bugURL}
                   rel="noopener noreferrer"
                   target="_blank"
-                  title="Report bug">
+                  title="Report bug"
+                >
                   Report this issue
                 </a>
               </>

@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -13,31 +13,15 @@ import * as ReactDOM from 'react-dom';
 const {useLayoutEffect, useRef} = React;
 const {unstable_createEventHandle} = ReactDOM;
 
-                        
-                
-                        
-                                                   
-            
-                    
-   
-
-export default function useEvent(
-  event        ,
-  options     
-                      
-    ,
-)                 {
-  const handleRef = useRef                       (null);
+export default function useEvent(event, options) {
+  const handleRef = useRef(null);
   let useEventHandle = handleRef.current;
 
   if (useEventHandle === null) {
     const setEventHandle = unstable_createEventHandle(event, options);
     const clears = new Map();
     useEventHandle = {
-      setListener(
-        target             ,
-        callback                                                ,
-      )       {
+      setListener(target, callback) {
         let clear = clears.get(target);
         if (clear !== undefined) {
           clear();
@@ -49,8 +33,8 @@ export default function useEvent(
         clear = setEventHandle(target, callback);
         clears.set(target, clear);
       },
-      clear()       {
-        clears.forEach(c => {
+      clear() {
+        clears.forEach((c) => {
           c();
         });
         clears.clear();

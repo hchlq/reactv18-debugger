@@ -4,22 +4,22 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import invariant from 'shared/invariant';
 import invokeGuardedCallbackImpl from './invokeGuardedCallbackImpl';
 
 // Used by Fiber to simulate a try-catch.
-let hasError          = false;
-let caughtError        = null;
+let hasError = false;
+let caughtError = null;
 
 // Used by event system to capture/rethrow the first error.
-let hasRethrowError          = false;
-let rethrowError        = null;
+let hasRethrowError = false;
+let rethrowError = null;
 
 const reporter = {
-  onError(error       ) {
+  onError(error) {
     hasError = true;
     caughtError = error;
   },
@@ -38,17 +38,7 @@ const reporter = {
  * @param {*} context The context to use when calling the function
  * @param {...*} args Arguments for function
  */
-export function invokeGuardedCallback                           (
-  name               ,
-  func                                               ,
-  context         ,
-  a   ,
-  b   ,
-  c   ,
-  d   ,
-  e   ,
-  f   ,
-)       {
+export function invokeGuardedCallback(name, func, context, a, b, c, d, e, f) {
   hasError = false;
   caughtError = null;
   invokeGuardedCallbackImpl.apply(reporter, arguments);
@@ -64,25 +54,17 @@ export function invokeGuardedCallback                           (
  * @param {*} context The context to use when calling the function
  * @param {...*} args Arguments for function
  */
-export function invokeGuardedCallbackAndCatchFirstError 
-    
-    
-    
-    
-    
-    
-          
- (
-  name               ,
-  func                                              ,
-  context         ,
-  a   ,
-  b   ,
-  c   ,
-  d   ,
-  e   ,
-  f   ,
-)       {
+export function invokeGuardedCallbackAndCatchFirstError(
+  name,
+  func,
+  context,
+  a,
+  b,
+  c,
+  d,
+  e,
+  f,
+) {
   invokeGuardedCallback.apply(this, arguments);
   if (hasError) {
     const error = clearCaughtError();

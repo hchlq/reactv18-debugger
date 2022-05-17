@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import EventEmitter from '../events';
@@ -27,18 +27,6 @@ import {
 } from './views/TraceUpdates';
 import {patch as patchConsole, unpatch as unpatchConsole} from './console';
 
-                                                                    
-             
-                   
-             
-             
-            
-            
-             
-                    
-                 
-                                              
-
 const debug = (methodName, ...args) => {
   if (__DEBUG__) {
     console.log(
@@ -50,101 +38,16 @@ const debug = (methodName, ...args) => {
   }
 };
 
-                              
-             
-                     
-   
+export default class Agent extends EventEmitter {
+  _bridge;
+  _isProfiling = false;
+  _recordChangeDescriptions = false;
+  _rendererInterfaces = {};
+  _persistedSelection = null;
+  _persistedSelectionMatch = null;
+  _traceUpdatesEnabled = false;
 
-                             
-                
-             
-                               
-                     
-   
-
-                           
-             
-                               
-                     
-   
-
-                              
-             
-                                
-                     
-   
-
-                            
-             
-                 
-                               
-                     
-                         
-             
-   
-
-                     
-             
-                               
-                     
-                         
-             
-   
-
-                                                        
-
-                          
-                 
-                   
-             
-                               
-                     
-   
-
-                          
-                 
-                   
-             
-                                  
-                                  
-                     
-   
-
-                                   
-                 
-                   
-             
-                               
-                     
-             
-   
-
-                                
-             
-                     
-                         
-   
-
-                            
-                     
-                         
-   
-
-export default class Agent extends EventEmitter   
-                          
-                                    
-               
-                                  
-    {
-  _bridge               ;
-  _isProfiling          = false;
-  _recordChangeDescriptions          = false;
-  _rendererInterfaces                                              = {};
-  _persistedSelection                            = null;
-  _persistedSelectionMatch                   = null;
-  _traceUpdatesEnabled          = false;
-
-  constructor(bridge               ) {
+  constructor(bridge) {
     super();
 
     if (
@@ -222,11 +125,11 @@ export default class Agent extends EventEmitter
     setupTraceUpdates(this);
   }
 
-  get rendererInterfaces()                                              {
+  get rendererInterfaces() {
     return this._rendererInterfaces;
   }
 
-  copyElementPath = ({id, path, rendererID}                   ) => {
+  copyElementPath = ({id, path, rendererID}) => {
     const renderer = this._rendererInterfaces[rendererID];
     if (renderer == null) {
       console.warn(`Invalid renderer id "${rendererID}" for element "${id}"`);
@@ -235,7 +138,7 @@ export default class Agent extends EventEmitter
     }
   };
 
-  deletePath = ({hookID, id, path, rendererID, type}                  ) => {
+  deletePath = ({hookID, id, path, rendererID, type}) => {
     const renderer = this._rendererInterfaces[rendererID];
     if (renderer == null) {
       console.warn(`Invalid renderer id "${rendererID}" for element "${id}"`);
@@ -244,10 +147,7 @@ export default class Agent extends EventEmitter
     }
   };
 
-  getInstanceAndStyle({
-    id,
-    rendererID,
-  }                      )                          {
+  getInstanceAndStyle({id, rendererID}) {
     const renderer = this._rendererInterfaces[rendererID];
     if (renderer == null) {
       console.warn(`Invalid renderer id "${rendererID}"`);
@@ -256,11 +156,9 @@ export default class Agent extends EventEmitter
     return renderer.getInstanceAndStyle(id);
   }
 
-  getIDForNode(node        )                {
+  getIDForNode(node) {
     for (const rendererID in this._rendererInterfaces) {
-      const renderer = ((this._rendererInterfaces[
-        (rendererID     )
-      ]     )                   );
+      const renderer = this._rendererInterfaces[rendererID];
 
       try {
         const id = renderer.getFiberIDForNative(node, true);
@@ -275,7 +173,7 @@ export default class Agent extends EventEmitter
     return null;
   }
 
-  getProfilingData = ({rendererID}                            ) => {
+  getProfilingData = ({rendererID}) => {
     const renderer = this._rendererInterfaces[rendererID];
     if (renderer == null) {
       console.warn(`Invalid renderer id "${rendererID}"`);
@@ -288,17 +186,17 @@ export default class Agent extends EventEmitter
     this._bridge.send('profilingStatus', this._isProfiling);
   };
 
-  getOwnersList = ({id, rendererID}                      ) => {
+  getOwnersList = ({id, rendererID}) => {
     const renderer = this._rendererInterfaces[rendererID];
     if (renderer == null) {
       console.warn(`Invalid renderer id "${rendererID}" for element "${id}"`);
     } else {
       const owners = renderer.getOwnersList(id);
-      this._bridge.send('ownersList', ({id, owners}            ));
+      this._bridge.send('ownersList', {id, owners});
     }
   };
 
-  inspectElement = ({id, path, rendererID}                      ) => {
+  inspectElement = ({id, path, rendererID}) => {
     const renderer = this._rendererInterfaces[rendererID];
     if (renderer == null) {
       console.warn(`Invalid renderer id "${rendererID}" for element "${id}"`);
@@ -325,7 +223,7 @@ export default class Agent extends EventEmitter
     }
   };
 
-  logElementToConsole = ({id, rendererID}                      ) => {
+  logElementToConsole = ({id, rendererID}) => {
     const renderer = this._rendererInterfaces[rendererID];
     if (renderer == null) {
       console.warn(`Invalid renderer id "${rendererID}" for element "${id}"`);
@@ -334,11 +232,7 @@ export default class Agent extends EventEmitter
     }
   };
 
-  overrideSuspense = ({
-    id,
-    rendererID,
-    forceFallback,
-  }                        ) => {
+  overrideSuspense = ({id, rendererID, forceFallback}) => {
     const renderer = this._rendererInterfaces[rendererID];
     if (renderer == null) {
       console.warn(`Invalid renderer id "${rendererID}" for element "${id}"`);
@@ -347,14 +241,7 @@ export default class Agent extends EventEmitter
     }
   };
 
-  overrideValueAtPath = ({
-    hookID,
-    id,
-    path,
-    rendererID,
-    type,
-    value,
-  }                           ) => {
+  overrideValueAtPath = ({hookID, id, path, rendererID, type, value}) => {
     const renderer = this._rendererInterfaces[rendererID];
     if (renderer == null) {
       console.warn(`Invalid renderer id "${rendererID}" for element "${id}"`);
@@ -365,13 +252,7 @@ export default class Agent extends EventEmitter
 
   // Temporarily support older standalone front-ends by forwarding the older message types
   // to the new "overrideValueAtPath" command the backend is now listening to.
-  overrideContext = ({
-    id,
-    path,
-    rendererID,
-    wasForwarded,
-    value,
-  }             ) => {
+  overrideContext = ({id, path, rendererID, wasForwarded, value}) => {
     // Don't forward a message that's already been forwarded by the front-end Bridge.
     // We only need to process the override command once!
     if (!wasForwarded) {
@@ -387,14 +268,7 @@ export default class Agent extends EventEmitter
 
   // Temporarily support older standalone front-ends by forwarding the older message types
   // to the new "overrideValueAtPath" command the backend is now listening to.
-  overrideHookState = ({
-    id,
-    hookID,
-    path,
-    rendererID,
-    wasForwarded,
-    value,
-  }                    ) => {
+  overrideHookState = ({id, hookID, path, rendererID, wasForwarded, value}) => {
     // Don't forward a message that's already been forwarded by the front-end Bridge.
     // We only need to process the override command once!
     if (!wasForwarded) {
@@ -410,13 +284,7 @@ export default class Agent extends EventEmitter
 
   // Temporarily support older standalone front-ends by forwarding the older message types
   // to the new "overrideValueAtPath" command the backend is now listening to.
-  overrideProps = ({
-    id,
-    path,
-    rendererID,
-    wasForwarded,
-    value,
-  }             ) => {
+  overrideProps = ({id, path, rendererID, wasForwarded, value}) => {
     // Don't forward a message that's already been forwarded by the front-end Bridge.
     // We only need to process the override command once!
     if (!wasForwarded) {
@@ -432,13 +300,7 @@ export default class Agent extends EventEmitter
 
   // Temporarily support older standalone front-ends by forwarding the older message types
   // to the new "overrideValueAtPath" command the backend is now listening to.
-  overrideState = ({
-    id,
-    path,
-    rendererID,
-    wasForwarded,
-    value,
-  }             ) => {
+  overrideState = ({id, path, rendererID, wasForwarded, value}) => {
     // Don't forward a message that's already been forwarded by the front-end Bridge.
     // We only need to process the override command once!
     if (!wasForwarded) {
@@ -452,7 +314,7 @@ export default class Agent extends EventEmitter
     }
   };
 
-  reloadAndProfile = (recordChangeDescriptions         ) => {
+  reloadAndProfile = (recordChangeDescriptions) => {
     sessionStorageSetItem(SESSION_STORAGE_RELOAD_AND_PROFILE_KEY, 'true');
     sessionStorageSetItem(
       SESSION_STORAGE_RECORD_CHANGE_DESCRIPTIONS_KEY,
@@ -465,14 +327,7 @@ export default class Agent extends EventEmitter
     this._bridge.send('reloadAppForProfiling');
   };
 
-  renamePath = ({
-    hookID,
-    id,
-    newPath,
-    oldPath,
-    rendererID,
-    type,
-  }                  ) => {
+  renamePath = ({hookID, id, newPath, oldPath, rendererID, type}) => {
     const renderer = this._rendererInterfaces[rendererID];
     if (renderer == null) {
       console.warn(`Invalid renderer id "${rendererID}" for element "${id}"`);
@@ -481,17 +336,14 @@ export default class Agent extends EventEmitter
     }
   };
 
-  selectNode(target        )       {
+  selectNode(target) {
     const id = this.getIDForNode(target);
     if (id !== null) {
       this._bridge.send('selectFiber', id);
     }
   }
 
-  setRendererInterface(
-    rendererID            ,
-    rendererInterface                   ,
-  ) {
+  setRendererInterface(rendererID, rendererInterface) {
     this._rendererInterfaces[rendererID] = rendererInterface;
 
     if (this._isProfiling) {
@@ -509,15 +361,13 @@ export default class Agent extends EventEmitter
     }
   }
 
-  setTraceUpdatesEnabled = (traceUpdatesEnabled         ) => {
+  setTraceUpdatesEnabled = (traceUpdatesEnabled) => {
     this._traceUpdatesEnabled = traceUpdatesEnabled;
 
     setTraceUpdatesEnabled(traceUpdatesEnabled);
 
     for (const rendererID in this._rendererInterfaces) {
-      const renderer = ((this._rendererInterfaces[
-        (rendererID     )
-      ]     )                   );
+      const renderer = this._rendererInterfaces[rendererID];
       renderer.setTraceUpdatesEnabled(traceUpdatesEnabled);
     }
   };
@@ -535,13 +385,11 @@ export default class Agent extends EventEmitter
     this.emit('shutdown');
   };
 
-  startProfiling = (recordChangeDescriptions         ) => {
+  startProfiling = (recordChangeDescriptions) => {
     this._recordChangeDescriptions = recordChangeDescriptions;
     this._isProfiling = true;
     for (const rendererID in this._rendererInterfaces) {
-      const renderer = ((this._rendererInterfaces[
-        (rendererID     )
-      ]     )                   );
+      const renderer = this._rendererInterfaces[rendererID];
       renderer.startProfiling(recordChangeDescriptions);
     }
     this._bridge.send('profilingStatus', this._isProfiling);
@@ -551,15 +399,13 @@ export default class Agent extends EventEmitter
     this._isProfiling = false;
     this._recordChangeDescriptions = false;
     for (const rendererID in this._rendererInterfaces) {
-      const renderer = ((this._rendererInterfaces[
-        (rendererID     )
-      ]     )                   );
+      const renderer = this._rendererInterfaces[rendererID];
       renderer.stopProfiling();
     }
     this._bridge.send('profilingStatus', this._isProfiling);
   };
 
-  storeAsGlobal = ({count, id, path, rendererID}                     ) => {
+  storeAsGlobal = ({count, id, path, rendererID}) => {
     const renderer = this._rendererInterfaces[rendererID];
     if (renderer == null) {
       console.warn(`Invalid renderer id "${rendererID}" for element "${id}"`);
@@ -571,10 +417,7 @@ export default class Agent extends EventEmitter
   updateConsolePatchSettings = ({
     appendComponentStack,
     breakOnConsoleErrors,
-  }    
-                                  
-                                  
-    ) => {
+  }) => {
     // If the frontend preference has change,
     // or in the case of React Native- if the backend is just finding out the preference-
     // then install or uninstall the console overrides.
@@ -586,16 +429,14 @@ export default class Agent extends EventEmitter
     }
   };
 
-  updateComponentFilters = (componentFilters                        ) => {
+  updateComponentFilters = (componentFilters) => {
     for (const rendererID in this._rendererInterfaces) {
-      const renderer = ((this._rendererInterfaces[
-        (rendererID     )
-      ]     )                   );
+      const renderer = this._rendererInterfaces[rendererID];
       renderer.updateComponentFilters(componentFilters);
     }
   };
 
-  viewAttributeSource = ({id, path, rendererID}                   ) => {
+  viewAttributeSource = ({id, path, rendererID}) => {
     const renderer = this._rendererInterfaces[rendererID];
     if (renderer == null) {
       console.warn(`Invalid renderer id "${rendererID}" for element "${id}"`);
@@ -604,7 +445,7 @@ export default class Agent extends EventEmitter
     }
   };
 
-  viewElementSource = ({id, rendererID}                      ) => {
+  viewElementSource = ({id, rendererID}) => {
     const renderer = this._rendererInterfaces[rendererID];
     if (renderer == null) {
       console.warn(`Invalid renderer id "${rendererID}" for element "${id}"`);
@@ -613,11 +454,11 @@ export default class Agent extends EventEmitter
     }
   };
 
-  onTraceUpdates = (nodes                 ) => {
+  onTraceUpdates = (nodes) => {
     this.emit('traceUpdates', nodes);
   };
 
-  onHookOperations = (operations               ) => {
+  onHookOperations = (operations) => {
     if (__DEBUG__) {
       debug('onHookOperations', operations);
     }
@@ -675,11 +516,11 @@ export default class Agent extends EventEmitter
     }
   };
 
-  onUnsupportedRenderer(rendererID        ) {
+  onUnsupportedRenderer(rendererID) {
     this._bridge.send('unsupportedRendererVersion', rendererID);
   }
 
-  _throttledPersistSelection = throttle((rendererID        , id        ) => {
+  _throttledPersistSelection = throttle((rendererID, id) => {
     // This is throttled, so both renderer and selected ID
     // might not be available by the time we read them.
     // This is why we need the defensive checks here.
@@ -688,7 +529,7 @@ export default class Agent extends EventEmitter
     if (path !== null) {
       sessionStorageSetItem(
         SESSION_STORAGE_LAST_SELECTION_KEY,
-        JSON.stringify(({rendererID, path}                    )),
+        JSON.stringify({rendererID, path}),
       );
     } else {
       sessionStorageRemoveItem(SESSION_STORAGE_LAST_SELECTION_KEY);

@@ -4,18 +4,10 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
-                      
-                     
-                                
-                       
-   
-                                                         
-                                                               
-
-function isCheckable(elem                  ) {
+function isCheckable(elem) {
   const type = elem.type;
   const nodeName = elem.nodeName;
   return (
@@ -25,15 +17,15 @@ function isCheckable(elem                  ) {
   );
 }
 
-function getTracker(node                         ) {
+function getTracker(node) {
   return node._valueTracker;
 }
 
-function detachTracker(node                         ) {
+function detachTracker(node) {
   node._valueTracker = null;
 }
 
-function getValueFromNode(node                  )         {
+function getValueFromNode(node) {
   let value = '';
   if (!node) {
     return value;
@@ -48,7 +40,7 @@ function getValueFromNode(node                  )         {
   return value;
 }
 
-function trackValueOnNode(node     )                {
+function trackValueOnNode(node) {
   const valueField = isCheckable(node) ? 'checked' : 'value';
   const descriptor = Object.getOwnPropertyDescriptor(
     node.constructor.prototype,
@@ -72,10 +64,10 @@ function trackValueOnNode(node     )                {
   const {get, set} = descriptor;
   Object.defineProperty(node, valueField, {
     configurable: true,
-    get: function() {
+    get: function () {
       return get.call(this);
     },
-    set: function(value) {
+    set: function (value) {
       currentValue = '' + value;
       set.call(this, value);
     },
@@ -103,7 +95,7 @@ function trackValueOnNode(node     )                {
   return tracker;
 }
 
-export function track(node                         ) {
+export function track(node) {
   if (getTracker(node)) {
     return;
   }
@@ -112,7 +104,7 @@ export function track(node                         ) {
   node._valueTracker = trackValueOnNode(node);
 }
 
-export function updateValueIfChanged(node                         ) {
+export function updateValueIfChanged(node) {
   if (!node) {
     return false;
   }
@@ -133,7 +125,7 @@ export function updateValueIfChanged(node                         ) {
   return false;
 }
 
-export function stopTracking(node                         ) {
+export function stopTracking(node) {
   const tracker = getTracker(node);
   if (tracker) {
     tracker.stopTracking();

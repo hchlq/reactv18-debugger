@@ -4,16 +4,12 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 /* eslint valid-typeof: 0 */
 
 import getEventCharCode from './getEventCharCode';
-
-                           
-                                                                          
-  
 
 function functionThatReturnsTrue() {
   return true;
@@ -25,7 +21,7 @@ function functionThatReturnsFalse() {
 
 // This is intentionally a factory so that we have different returned constructors.
 // If we had a single constructor, it would be megamorphic and engines would deopt.
-function createSyntheticEvent(Interface                    ) {
+function createSyntheticEvent(Interface) {
   /**
    * Synthetic events are dispatched by event plugins, typically in response to a
    * top-level event delegation handler.
@@ -40,11 +36,11 @@ function createSyntheticEvent(Interface                    ) {
    * DOM interface; custom application-specific events can also subclass this.
    */
   function SyntheticBaseEvent(
-    reactName               ,
-    reactEventType        ,
-    targetInst       ,
-    nativeEvent                             ,
-    nativeEventTarget                    ,
+    reactName,
+    reactEventType,
+    targetInst,
+    nativeEvent,
+    nativeEventTarget,
   ) {
     this._reactName = reactName;
     this._targetInst = targetInst;
@@ -79,7 +75,7 @@ function createSyntheticEvent(Interface                    ) {
   }
 
   Object.assign(SyntheticBaseEvent.prototype, {
-    preventDefault: function() {
+    preventDefault: function () {
       this.defaultPrevented = true;
       const event = this.nativeEvent;
       if (!event) {
@@ -95,7 +91,7 @@ function createSyntheticEvent(Interface                    ) {
       this.isDefaultPrevented = functionThatReturnsTrue;
     },
 
-    stopPropagation: function() {
+    stopPropagation: function () {
       const event = this.nativeEvent;
       if (!event) {
         return;
@@ -121,7 +117,7 @@ function createSyntheticEvent(Interface                    ) {
      * them back into the pool. This allows a way to hold onto a reference that
      * won't be added back into the pool.
      */
-    persist: function() {
+    persist: function () {
       // Modern event system doesn't use pooling.
     },
 
@@ -143,7 +139,7 @@ const EventInterface = {
   eventPhase: 0,
   bubbles: 0,
   cancelable: 0,
-  timeStamp: function(event) {
+  timeStamp: function (event) {
     return event.timeStamp || Date.now();
   },
   defaultPrevented: 0,
@@ -151,7 +147,7 @@ const EventInterface = {
 };
 export const SyntheticEvent = createSyntheticEvent(EventInterface);
 
-const UIEventInterface                     = {
+const UIEventInterface = {
   ...EventInterface,
   view: 0,
   detail: 0,
@@ -179,7 +175,7 @@ function updateMouseMovementPolyfillState(event) {
  * @interface MouseEvent
  * @see http://www.w3.org/TR/DOM-Level-3-Events/
  */
-const MouseEventInterface                     = {
+const MouseEventInterface = {
   ...UIEventInterface,
   screenX: 0,
   screenY: 0,
@@ -194,7 +190,7 @@ const MouseEventInterface                     = {
   getModifierState: getEventModifierState,
   button: 0,
   buttons: 0,
-  relatedTarget: function(event) {
+  relatedTarget: function (event) {
     if (event.relatedTarget === undefined)
       return event.fromElement === event.srcElement
         ? event.toElement
@@ -202,14 +198,14 @@ const MouseEventInterface                     = {
 
     return event.relatedTarget;
   },
-  movementX: function(event) {
+  movementX: function (event) {
     if ('movementX' in event) {
       return event.movementX;
     }
     updateMouseMovementPolyfillState(event);
     return lastMovementX;
   },
-  movementY: function(event) {
+  movementY: function (event) {
     if ('movementY' in event) {
       return event.movementY;
     }
@@ -225,7 +221,7 @@ export const SyntheticMouseEvent = createSyntheticEvent(MouseEventInterface);
  * @interface DragEvent
  * @see http://www.w3.org/TR/DOM-Level-3-Events/
  */
-const DragEventInterface                     = {
+const DragEventInterface = {
   ...MouseEventInterface,
   dataTransfer: 0,
 };
@@ -235,7 +231,7 @@ export const SyntheticDragEvent = createSyntheticEvent(DragEventInterface);
  * @interface FocusEvent
  * @see http://www.w3.org/TR/DOM-Level-3-Events/
  */
-const FocusEventInterface                     = {
+const FocusEventInterface = {
   ...UIEventInterface,
   relatedTarget: 0,
 };
@@ -246,7 +242,7 @@ export const SyntheticFocusEvent = createSyntheticEvent(FocusEventInterface);
  * @see http://www.w3.org/TR/css3-animations/#AnimationEvent-interface
  * @see https://developer.mozilla.org/en-US/docs/Web/API/AnimationEvent
  */
-const AnimationEventInterface                     = {
+const AnimationEventInterface = {
   ...EventInterface,
   animationName: 0,
   elapsedTime: 0,
@@ -260,9 +256,9 @@ export const SyntheticAnimationEvent = createSyntheticEvent(
  * @interface Event
  * @see http://www.w3.org/TR/clipboard-apis/
  */
-const ClipboardEventInterface                     = {
+const ClipboardEventInterface = {
   ...EventInterface,
-  clipboardData: function(event) {
+  clipboardData: function (event) {
     return 'clipboardData' in event
       ? event.clipboardData
       : window.clipboardData;
@@ -276,7 +272,7 @@ export const SyntheticClipboardEvent = createSyntheticEvent(
  * @interface Event
  * @see http://www.w3.org/TR/DOM-Level-3-Events/#events-compositionevents
  */
-const CompositionEventInterface                     = {
+const CompositionEventInterface = {
   ...EventInterface,
   data: 0,
 };
@@ -317,42 +313,42 @@ const normalizeKey = {
  * @see https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent#Key_names
  */
 const translateToKey = {
-  '8': 'Backspace',
-  '9': 'Tab',
-  '12': 'Clear',
-  '13': 'Enter',
-  '16': 'Shift',
-  '17': 'Control',
-  '18': 'Alt',
-  '19': 'Pause',
-  '20': 'CapsLock',
-  '27': 'Escape',
-  '32': ' ',
-  '33': 'PageUp',
-  '34': 'PageDown',
-  '35': 'End',
-  '36': 'Home',
-  '37': 'ArrowLeft',
-  '38': 'ArrowUp',
-  '39': 'ArrowRight',
-  '40': 'ArrowDown',
-  '45': 'Insert',
-  '46': 'Delete',
-  '112': 'F1',
-  '113': 'F2',
-  '114': 'F3',
-  '115': 'F4',
-  '116': 'F5',
-  '117': 'F6',
-  '118': 'F7',
-  '119': 'F8',
-  '120': 'F9',
-  '121': 'F10',
-  '122': 'F11',
-  '123': 'F12',
-  '144': 'NumLock',
-  '145': 'ScrollLock',
-  '224': 'Meta',
+  8: 'Backspace',
+  9: 'Tab',
+  12: 'Clear',
+  13: 'Enter',
+  16: 'Shift',
+  17: 'Control',
+  18: 'Alt',
+  19: 'Pause',
+  20: 'CapsLock',
+  27: 'Escape',
+  32: ' ',
+  33: 'PageUp',
+  34: 'PageDown',
+  35: 'End',
+  36: 'Home',
+  37: 'ArrowLeft',
+  38: 'ArrowUp',
+  39: 'ArrowRight',
+  40: 'ArrowDown',
+  45: 'Insert',
+  46: 'Delete',
+  112: 'F1',
+  113: 'F2',
+  114: 'F3',
+  115: 'F4',
+  116: 'F5',
+  117: 'F6',
+  118: 'F7',
+  119: 'F8',
+  120: 'F9',
+  121: 'F10',
+  122: 'F11',
+  123: 'F12',
+  144: 'NumLock',
+  145: 'ScrollLock',
+  224: 'Meta',
 };
 
 /**
@@ -433,7 +429,7 @@ const KeyboardEventInterface = {
   locale: 0,
   getModifierState: getEventModifierState,
   // Legacy Interface
-  charCode: function(event) {
+  charCode: function (event) {
     // `charCode` is the result of a KeyPress event and represents the value of
     // the actual printable character.
 
@@ -444,7 +440,7 @@ const KeyboardEventInterface = {
     }
     return 0;
   },
-  keyCode: function(event) {
+  keyCode: function (event) {
     // `keyCode` is the result of a KeyDown/Up event and represents the value of
     // physical keyboard key.
 
@@ -457,7 +453,7 @@ const KeyboardEventInterface = {
     }
     return 0;
   },
-  which: function(event) {
+  which: function (event) {
     // `which` is an alias for either `keyCode` or `charCode` depending on the
     // type of the event.
     if (event.type === 'keypress') {

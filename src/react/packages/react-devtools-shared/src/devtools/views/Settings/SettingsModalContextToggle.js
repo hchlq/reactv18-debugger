@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -20,29 +20,31 @@ export default function SettingsModalContextToggle() {
   const store = useContext(StoreContext);
   const {profilerStore} = store;
 
-  const showFilterModal = useCallback(() => setIsModalShowing(true), [
-    setIsModalShowing,
-  ]);
+  const showFilterModal = useCallback(
+    () => setIsModalShowing(true),
+    [setIsModalShowing],
+  );
 
   // Updating preferences while profiling is in progress could break things (e.g. filtering)
   // Explicitly disallow it for now.
   const isProfilingSubscription = useMemo(
     () => ({
       getCurrentValue: () => profilerStore.isProfiling,
-      subscribe: (callback          ) => {
+      subscribe: (callback) => {
         profilerStore.addListener('isProfiling', callback);
         return () => profilerStore.removeListener('isProfiling', callback);
       },
     }),
     [profilerStore],
   );
-  const isProfiling = useSubscription         (isProfilingSubscription);
+  const isProfiling = useSubscription(isProfilingSubscription);
 
   return (
     <Button
       disabled={isProfiling}
       onClick={showFilterModal}
-      title="View settings">
+      title="View settings"
+    >
       <ButtonIcon type="settings" />
     </Button>
   );

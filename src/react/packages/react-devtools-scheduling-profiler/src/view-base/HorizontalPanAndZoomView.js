@@ -4,21 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-             
-              
-                       
-                       
-                     
-                        
-                            
-                              
-                           
-                                
-                                     
-                                                     
 
 import {Surface} from './Surface';
 import {View} from './View';
@@ -37,23 +24,18 @@ import {
   MOVE_WHEEL_DELTA_THRESHOLD,
 } from './constants';
 
-                                                        
-                     
-                                 
-          
-
 export class HorizontalPanAndZoomView extends View {
-  _intrinsicContentWidth        ;
+  _intrinsicContentWidth;
   _isPanning = false;
-  _scrollState              = {offset: 0, length: 0};
-  _onStateChange                                           = () => {};
+  _scrollState = {offset: 0, length: 0};
+  _onStateChange = () => {};
 
   constructor(
-    surface         ,
-    frame      ,
-    contentView      ,
-    intrinsicContentWidth        ,
-    onStateChange                                           ,
+    surface,
+    frame,
+    contentView,
+    intrinsicContentWidth,
+    onStateChange,
   ) {
     super(surface, frame);
     this.addSubview(contentView);
@@ -65,14 +47,14 @@ export class HorizontalPanAndZoomView extends View {
     if (onStateChange) this._onStateChange = onStateChange;
   }
 
-  setFrame(newFrame      ) {
+  setFrame(newFrame) {
     super.setFrame(newFrame);
 
     // Revalidate scrollState
     this._setStateAndInformCallbacksIfChanged(this._scrollState);
   }
 
-  setScrollState(proposedState             ) {
+  setScrollState(proposedState) {
     this._setScrollState(proposedState);
   }
 
@@ -83,7 +65,7 @@ export class HorizontalPanAndZoomView extends View {
    * @returns Whether state was changed
    * @private
    */
-  _setScrollState(proposedState             )          {
+  _setScrollState(proposedState) {
     const clampedState = clampState({
       state: proposedState,
       minContentLength: this._intrinsicContentWidth * MIN_ZOOM_LEVEL,
@@ -101,7 +83,7 @@ export class HorizontalPanAndZoomView extends View {
   /**
    * @private
    */
-  _setStateAndInformCallbacksIfChanged(proposedState             ) {
+  _setStateAndInformCallbacksIfChanged(proposedState) {
     if (this._setScrollState(proposedState)) {
       this._onStateChange(this._scrollState, this);
     }
@@ -141,7 +123,7 @@ export class HorizontalPanAndZoomView extends View {
    *
    * Does not inform callbacks of state change since this is a public API.
    */
-  zoomToRange(rangeStart        , rangeEnd        ) {
+  zoomToRange(rangeStart, rangeEnd) {
     const newState = moveStateToRange({
       state: this._scrollState,
       rangeStart,
@@ -155,13 +137,13 @@ export class HorizontalPanAndZoomView extends View {
     this._setScrollState(newState);
   }
 
-  _handleMouseDown(interaction                      ) {
+  _handleMouseDown(interaction) {
     if (rectContainsPoint(interaction.payload.location, this.frame)) {
       this._isPanning = true;
     }
   }
 
-  _handleMouseMove(interaction                      ) {
+  _handleMouseMove(interaction) {
     if (!this._isPanning) {
       return;
     }
@@ -173,13 +155,13 @@ export class HorizontalPanAndZoomView extends View {
     this._setStateAndInformCallbacksIfChanged(newState);
   }
 
-  _handleMouseUp(interaction                    ) {
+  _handleMouseUp(interaction) {
     if (this._isPanning) {
       this._isPanning = false;
     }
   }
 
-  _handleWheelPlain(interaction                       ) {
+  _handleWheelPlain(interaction) {
     const {
       location,
       delta: {deltaX, deltaY},
@@ -206,12 +188,7 @@ export class HorizontalPanAndZoomView extends View {
     this._setStateAndInformCallbacksIfChanged(newState);
   }
 
-  _handleWheelZoom(
-    interaction 
-                                 
-                                   
-                                ,
-  ) {
+  _handleWheelZoom(interaction) {
     const {
       location,
       delta: {deltaY},
@@ -238,7 +215,7 @@ export class HorizontalPanAndZoomView extends View {
     this._setStateAndInformCallbacksIfChanged(newState);
   }
 
-  handleInteraction(interaction             ) {
+  handleInteraction(interaction) {
     switch (interaction.type) {
       case 'mousedown':
         this._handleMouseDown(interaction);

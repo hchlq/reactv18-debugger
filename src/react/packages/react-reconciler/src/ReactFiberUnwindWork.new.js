@@ -4,12 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                
-                                            
-                                                                     
 
 import {resetWorkInProgressVersions as resetMutableSourceWorkInProgressVersions} from './ReactMutableSource.new';
 import {
@@ -44,7 +40,7 @@ import {transferActualDuration} from './ReactProfilerTimer.new';
 
 import invariant from 'shared/invariant';
 
-function unwindWork(workInProgress       , renderLanes       ) {
+function unwindWork(workInProgress, renderLanes) {
   switch (workInProgress.tag) {
     case ClassComponent: {
       const Component = workInProgress.type;
@@ -85,8 +81,7 @@ function unwindWork(workInProgress       , renderLanes       ) {
     case SuspenseComponent: {
       popSuspenseContext(workInProgress);
       if (enableSuspenseServerRenderer) {
-        const suspenseState                       =
-          workInProgress.memoizedState;
+        const suspenseState = workInProgress.memoizedState;
         if (suspenseState !== null && suspenseState.dehydrated !== null) {
           invariant(
             workInProgress.alternate !== null,
@@ -131,7 +126,7 @@ function unwindWork(workInProgress       , renderLanes       ) {
   }
 }
 
-function unwindInterruptedWork(interruptedWork       ) {
+function unwindInterruptedWork(interruptedWork) {
   switch (interruptedWork.tag) {
     case ClassComponent: {
       const childContextTypes = interruptedWork.type.childContextTypes;

@@ -35,7 +35,7 @@ describe('ReactDOMComponentTree', () => {
     // events on elements in the tree and confirming the expected node is
     // set as the current target
     class Component extends React.Component {
-      handler = e => {
+      handler = (e) => {
         currentTargetID = e.currentTarget.id;
       };
       render() {
@@ -70,7 +70,7 @@ describe('ReactDOMComponentTree', () => {
     let currentTargetID = null;
 
     class ClosestInstance extends React.Component {
-      _onClick = e => {
+      _onClick = (e) => {
         currentTargetID = e.currentTarget.id;
       };
       render() {
@@ -127,7 +127,7 @@ describe('ReactDOMComponentTree', () => {
     }
 
     ReactDOM.render(
-      <HandlerFlipper key="1" ref={n => (instance = n)} />,
+      <HandlerFlipper key="1" ref={(n) => (instance = n)} />,
       container,
     );
     const node = container.firstChild;
@@ -148,13 +148,13 @@ describe('ReactDOMComponentTree', () => {
     class Controlled extends React.Component {
       state = {value: startValue};
       a = null;
-      _onChange = e => this.setState({value: e.currentTarget.value});
+      _onChange = (e) => this.setState({value: e.currentTarget.value});
       render() {
         return (
           <input
             id={inputID}
             type="text"
-            ref={n => (this.a = n)}
+            ref={(n) => (this.a = n)}
             value={this.state.value}
             onChange={this._onChange}
           />
@@ -190,9 +190,7 @@ describe('ReactDOMComponentTree', () => {
   it('finds instance of node that is attempted to be unmounted', () => {
     const component = <div />;
     const node = ReactDOM.render(<div>{component}</div>, container);
-    expect(() =>
-      ReactDOM.unmountComponentAtNode(node),
-    ).toErrorDev(
+    expect(() => ReactDOM.unmountComponentAtNode(node)).toErrorDev(
       "unmountComponentAtNode(): The node you're attempting to unmount " +
         'was rendered by React and is not a top-level container. You may ' +
         'have accidentally passed in a React root node instead of its ' +
@@ -209,9 +207,7 @@ describe('ReactDOMComponentTree', () => {
     );
     const anotherComponent = <div />;
     const instance = ReactDOM.render(component, container);
-    expect(() =>
-      ReactDOM.render(anotherComponent, instance),
-    ).toErrorDev(
+    expect(() => ReactDOM.render(anotherComponent, instance)).toErrorDev(
       'render(...): Replacing React-rendered children with a new root ' +
         'component. If you intended to update the children of this node, ' +
         'you should instead have the existing children update their state ' +

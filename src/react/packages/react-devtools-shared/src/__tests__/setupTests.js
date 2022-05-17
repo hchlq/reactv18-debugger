@@ -4,13 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-             
-                
-                 
-                                          
 
 const env = jasmine.getEnv();
 env.beforeEach(() => {
@@ -75,18 +70,18 @@ env.beforeEach(() => {
         }
       };
     },
-    send(event        , payload     , transferable             ) {
-      bridgeListeners.forEach(callback => callback({event, payload}));
+    send(event, payload, transferable) {
+      bridgeListeners.forEach((callback) => callback({event, payload}));
     },
   });
 
-  const agent = new Agent(((bridge     )               ));
+  const agent = new Agent(bridge);
 
   const hook = global.__REACT_DEVTOOLS_GLOBAL_HOOK__;
 
   initBackend(hook, agent, global);
 
-  const store = new Store(((bridge     )                ));
+  const store = new Store(bridge);
 
   global.agent = agent;
   global.bridge = bridge;

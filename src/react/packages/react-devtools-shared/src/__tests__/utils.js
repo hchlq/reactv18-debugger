@@ -4,17 +4,10 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
-                                                           
-
-                                                                     
-                                                                  
-                                                                                                   
-                                                                 
-
-export function act(callback          )       {
+export function act(callback) {
   const {act: actTestRenderer} = require('react-test-renderer');
   const {act: actDOM} = require('react-dom/test-utils');
 
@@ -34,10 +27,7 @@ export function act(callback          )       {
   }
 }
 
-export async function actAsync(
-  cb         ,
-  recursivelyFlush          = true,
-)                {
+export async function actAsync(cb, recursivelyFlush = true) {
   const {act: actTestRenderer} = require('react-test-renderer');
   const {act: actDOM} = require('react-dom/test-utils');
 
@@ -67,7 +57,7 @@ export async function actAsync(
   }
 }
 
-export function beforeEachProfiling()       {
+export function beforeEachProfiling() {
   // Mock React's timing information so that test runs are predictable.
   jest.mock('scheduler', () => jest.requireActual('scheduler/unstable_mock'));
 
@@ -80,10 +70,7 @@ export function beforeEachProfiling()       {
     );
 }
 
-export function createDisplayNameFilter(
-  source        ,
-  isEnabled          = true,
-) {
+export function createDisplayNameFilter(source, isEnabled = true) {
   const Types = require('react-devtools-shared/src/types');
   let isValid = true;
   try {
@@ -99,7 +86,7 @@ export function createDisplayNameFilter(
   };
 }
 
-export function createHOCFilter(isEnabled          = true) {
+export function createHOCFilter(isEnabled = true) {
   const Types = require('react-devtools-shared/src/types');
   return {
     type: Types.ComponentFilterHOC,
@@ -108,10 +95,7 @@ export function createHOCFilter(isEnabled          = true) {
   };
 }
 
-export function createElementTypeFilter(
-  elementType             ,
-  isEnabled          = true,
-) {
+export function createElementTypeFilter(elementType, isEnabled = true) {
   const Types = require('react-devtools-shared/src/types');
   return {
     type: Types.ComponentFilterElementType,
@@ -120,10 +104,7 @@ export function createElementTypeFilter(
   };
 }
 
-export function createLocationFilter(
-  source        ,
-  isEnabled          = true,
-) {
+export function createLocationFilter(source, isEnabled = true) {
   const Types = require('react-devtools-shared/src/types');
   let isValid = true;
   try {
@@ -139,13 +120,13 @@ export function createLocationFilter(
   };
 }
 
-export function getRendererID()         {
+export function getRendererID() {
   if (global.agent == null) {
     throw Error('Agent unavailable.');
   }
   const ids = Object.keys(global.agent._rendererInterfaces);
 
-  const id = ids.find(innerID => {
+  const id = ids.find((innerID) => {
     const rendererInterface = global.agent._rendererInterfaces[innerID];
     return rendererInterface.renderer.rendererPackageName === 'react-dom';
   });
@@ -157,7 +138,7 @@ export function getRendererID()         {
   return parseInt(id, 10);
 }
 
-export function requireTestRenderer()                    {
+export function requireTestRenderer() {
   let hook;
   try {
     // Hide the hook before requiring TestRenderer, so we don't end up with a loop.
@@ -170,7 +151,7 @@ export function requireTestRenderer()                    {
   }
 }
 
-export function exportImportHelper(bridge                , store       )       {
+export function exportImportHelper(bridge, store) {
   const {
     prepareProfilingDataExport,
     prepareProfilingDataFrontendFromExport,
@@ -180,7 +161,7 @@ export function exportImportHelper(bridge                , store       )       {
 
   expect(profilerStore.profilingData).not.toBeNull();
 
-  const profilingDataFrontendInitial = ((profilerStore.profilingData     )                       );
+  const profilingDataFrontendInitial = profilerStore.profilingData;
   expect(profilingDataFrontendInitial.imported).toBe(false);
 
   const profilingDataExport = prepareProfilingDataExport(
@@ -196,7 +177,7 @@ export function exportImportHelper(bridge                , store       )       {
   const parsedProfilingDataExport = JSON.parse(serializedProfilingDataExport);
 
   const profilingDataFrontend = prepareProfilingDataFrontendFromExport(
-    (parsedProfilingDataExport     ),
+    parsedProfilingDataExport,
   );
   expect(profilingDataFrontend.imported).toBe(true);
 

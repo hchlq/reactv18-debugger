@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -17,12 +17,7 @@ import {useSubscription} from '../hooks';
 
 import styles from './SelectedTreeHighlight.css';
 
-              
-                     
-                    
-   
-
-export default function SelectedTreeHighlight(_      ) {
+export default function SelectedTreeHighlight(_) {
   const {lineHeight} = useContext(SettingsContext);
   const store = useContext(StoreContext);
   const treeFocused = useContext(TreeFocusedContext);
@@ -74,7 +69,7 @@ export default function SelectedTreeHighlight(_      ) {
           stopIndex,
         };
       },
-      subscribe: (callback          ) => {
+      subscribe: (callback) => {
         store.addListener('mutated', callback);
         return () => {
           store.removeListener('mutated', callback);
@@ -83,7 +78,7 @@ export default function SelectedTreeHighlight(_      ) {
     }),
     [selectedElementID, store],
   );
-  const data = useSubscription             (subscription);
+  const data = useSubscription(subscription);
 
   if (ownerID !== null) {
     return null;

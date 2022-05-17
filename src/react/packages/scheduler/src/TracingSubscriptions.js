@@ -4,20 +4,18 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                       
 
 import {enableSchedulerTracing} from 'shared/ReactFeatureFlags';
 import {__subscriberRef} from './Tracing';
 
-let subscribers                  = (null     );
+let subscribers = null;
 if (enableSchedulerTracing) {
   subscribers = new Set();
 }
 
-export function unstable_subscribe(subscriber            )       {
+export function unstable_subscribe(subscriber) {
   if (enableSchedulerTracing) {
     subscribers.add(subscriber);
 
@@ -34,7 +32,7 @@ export function unstable_subscribe(subscriber            )       {
   }
 }
 
-export function unstable_unsubscribe(subscriber            )       {
+export function unstable_unsubscribe(subscriber) {
   if (enableSchedulerTracing) {
     subscribers.delete(subscriber);
 
@@ -44,11 +42,11 @@ export function unstable_unsubscribe(subscriber            )       {
   }
 }
 
-function onInteractionTraced(interaction             )       {
+function onInteractionTraced(interaction) {
   let didCatchError = false;
   let caughtError = null;
 
-  subscribers.forEach(subscriber => {
+  subscribers.forEach((subscriber) => {
     try {
       subscriber.onInteractionTraced(interaction);
     } catch (error) {
@@ -64,11 +62,11 @@ function onInteractionTraced(interaction             )       {
   }
 }
 
-function onInteractionScheduledWorkCompleted(interaction             )       {
+function onInteractionScheduledWorkCompleted(interaction) {
   let didCatchError = false;
   let caughtError = null;
 
-  subscribers.forEach(subscriber => {
+  subscribers.forEach((subscriber) => {
     try {
       subscriber.onInteractionScheduledWorkCompleted(interaction);
     } catch (error) {
@@ -84,14 +82,11 @@ function onInteractionScheduledWorkCompleted(interaction             )       {
   }
 }
 
-function onWorkScheduled(
-  interactions                  ,
-  threadID        ,
-)       {
+function onWorkScheduled(interactions, threadID) {
   let didCatchError = false;
   let caughtError = null;
 
-  subscribers.forEach(subscriber => {
+  subscribers.forEach((subscriber) => {
     try {
       subscriber.onWorkScheduled(interactions, threadID);
     } catch (error) {
@@ -107,11 +102,11 @@ function onWorkScheduled(
   }
 }
 
-function onWorkStarted(interactions                  , threadID        )       {
+function onWorkStarted(interactions, threadID) {
   let didCatchError = false;
   let caughtError = null;
 
-  subscribers.forEach(subscriber => {
+  subscribers.forEach((subscriber) => {
     try {
       subscriber.onWorkStarted(interactions, threadID);
     } catch (error) {
@@ -127,11 +122,11 @@ function onWorkStarted(interactions                  , threadID        )       {
   }
 }
 
-function onWorkStopped(interactions                  , threadID        )       {
+function onWorkStopped(interactions, threadID) {
   let didCatchError = false;
   let caughtError = null;
 
-  subscribers.forEach(subscriber => {
+  subscribers.forEach((subscriber) => {
     try {
       subscriber.onWorkStopped(interactions, threadID);
     } catch (error) {
@@ -147,14 +142,11 @@ function onWorkStopped(interactions                  , threadID        )       {
   }
 }
 
-function onWorkCanceled(
-  interactions                  ,
-  threadID        ,
-)       {
+function onWorkCanceled(interactions, threadID) {
   let didCatchError = false;
   let caughtError = null;
 
-  subscribers.forEach(subscriber => {
+  subscribers.forEach((subscriber) => {
     try {
       subscriber.onWorkCanceled(interactions, threadID);
     } catch (error) {

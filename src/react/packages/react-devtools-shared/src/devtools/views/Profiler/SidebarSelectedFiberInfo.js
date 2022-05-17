@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -18,9 +18,7 @@ import ButtonIcon from '../ButtonIcon';
 
 import styles from './SidebarSelectedFiberInfo.css';
 
-                         
-
-export default function SidebarSelectedFiberInfo(_       ) {
+export default function SidebarSelectedFiberInfo(_) {
   const {profilerStore} = useContext(StoreContext);
   const {
     rootID,
@@ -31,14 +29,14 @@ export default function SidebarSelectedFiberInfo(_       ) {
     selectFiber,
   } = useContext(ProfilerContext);
   const {profilingCache} = profilerStore;
-  const selectedListItemRef = useRef                    (null);
+  const selectedListItemRef = useRef(null);
 
   const commitIndices = profilingCache.getFiberCommits({
-    fiberID: ((selectedFiberID     )        ),
-    rootID: ((rootID     )        ),
+    fiberID: selectedFiberID,
+    rootID: rootID,
   });
 
-  const handleKeyDown = event => {
+  const handleKeyDown = (event) => {
     switch (event.key) {
       case 'ArrowUp':
         if (selectedCommitIndex !== null) {
@@ -79,7 +77,7 @@ export default function SidebarSelectedFiberInfo(_       ) {
     const commitIndex = commitIndices[i];
 
     const {duration, timestamp} = profilerStore.getCommitData(
-      ((rootID     )        ),
+      rootID,
       commitIndex,
     );
 
@@ -92,7 +90,8 @@ export default function SidebarSelectedFiberInfo(_       ) {
             ? styles.CurrentCommit
             : styles.Commit
         }
-        onClick={() => selectCommitIndex(commitIndex)}>
+        onClick={() => selectCommitIndex(commitIndex)}
+      >
         {formatTime(timestamp)}s for {formatDuration(duration)}ms
       </button>,
     );
@@ -108,12 +107,13 @@ export default function SidebarSelectedFiberInfo(_       ) {
         <Button
           className={styles.IconButton}
           onClick={() => selectFiber(null, null)}
-          title="Back to commit view">
+          title="Back to commit view"
+        >
           <ButtonIcon type="close" />
         </Button>
       </div>
       <div className={styles.Content} onKeyDown={handleKeyDown} tabIndex={0}>
-        <WhatChanged fiberID={((selectedFiberID     )        )} />
+        <WhatChanged fiberID={selectedFiberID} />
         {listItems.length > 0 && (
           <Fragment>
             <label className={styles.Label}>Rendered at</label>: {listItems}

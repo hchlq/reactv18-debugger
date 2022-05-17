@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import {
@@ -122,7 +122,7 @@ if (__DEV__) {
     webview: true,
   };
 
-  validatePropertiesInDevelopment = function(type, props) {
+  validatePropertiesInDevelopment = function (type, props) {
     validateARIAProperties(type, props);
     validateInputProperties(type, props);
     validateUnknownProperties(type, props, {
@@ -149,18 +149,14 @@ if (__DEV__) {
   const NORMALIZE_NEWLINES_REGEX = /\r\n?/g;
   const NORMALIZE_NULL_AND_REPLACEMENT_REGEX = /\u0000|\uFFFD/g;
 
-  normalizeMarkupForTextOrAttribute = function(markup       )         {
-    const markupString =
-      typeof markup === 'string' ? markup : '' + (markup     );
+  normalizeMarkupForTextOrAttribute = function (markup) {
+    const markupString = typeof markup === 'string' ? markup : '' + markup;
     return markupString
       .replace(NORMALIZE_NEWLINES_REGEX, '\n')
       .replace(NORMALIZE_NULL_AND_REPLACEMENT_REGEX, '');
   };
 
-  warnForTextDifference = function(
-    serverText        ,
-    clientText                 ,
-  ) {
+  warnForTextDifference = function (serverText, clientText) {
     if (didWarnInvalidHydration) {
       return;
     }
@@ -177,20 +173,14 @@ if (__DEV__) {
     );
   };
 
-  warnForPropDifference = function(
-    propName        ,
-    serverValue       ,
-    clientValue       ,
-  ) {
+  warnForPropDifference = function (propName, serverValue, clientValue) {
     if (didWarnInvalidHydration) {
       return;
     }
-    const normalizedClientValue = normalizeMarkupForTextOrAttribute(
-      clientValue,
-    );
-    const normalizedServerValue = normalizeMarkupForTextOrAttribute(
-      serverValue,
-    );
+    const normalizedClientValue =
+      normalizeMarkupForTextOrAttribute(clientValue);
+    const normalizedServerValue =
+      normalizeMarkupForTextOrAttribute(serverValue);
     if (normalizedServerValue === normalizedClientValue) {
       return;
     }
@@ -203,19 +193,19 @@ if (__DEV__) {
     );
   };
 
-  warnForExtraAttributes = function(attributeNames             ) {
+  warnForExtraAttributes = function (attributeNames) {
     if (didWarnInvalidHydration) {
       return;
     }
     didWarnInvalidHydration = true;
     const names = [];
-    attributeNames.forEach(function(name) {
+    attributeNames.forEach(function (name) {
       names.push(name);
     });
     console.error('Extra attributes from the server: %s', names);
   };
 
-  warnForInvalidEventListener = function(registrationName, listener) {
+  warnForInvalidEventListener = function (registrationName, listener) {
     if (listener === false) {
       console.error(
         'Expected `%s` listener to be a function, instead got `false`.\n\n' +
@@ -236,7 +226,7 @@ if (__DEV__) {
 
   // Parse the HTML and read it back to normalize the HTML string so that it
   // can be used for comparison.
-  normalizeHTML = function(parent         , html        ) {
+  normalizeHTML = function (parent, html) {
     // We could have created a separate document here to avoid
     // re-initializing custom elements if they exist. But this breaks
     // how <noscript> is being handled. So we use the same document.
@@ -245,7 +235,7 @@ if (__DEV__) {
       parent.namespaceURI === HTML_NAMESPACE
         ? parent.ownerDocument.createElement(parent.tagName)
         : parent.ownerDocument.createElementNS(
-            (parent.namespaceURI     ),
+            parent.namespaceURI,
             parent.tagName,
           );
     testElement.innerHTML = html;
@@ -254,10 +244,10 @@ if (__DEV__) {
 }
 
 export function ensureListeningTo(
-  rootContainerInstance                ,
-  reactPropEvent        ,
-  targetElement                ,
-)       {
+  rootContainerInstance,
+  reactPropEvent,
+  targetElement,
+) {
   if (!enableEagerRootListeners) {
     // If we have a comment node, then use the parent node,
     // which should be an element.
@@ -278,25 +268,19 @@ export function ensureListeningTo(
         );
       }
     }
-    listenToReactEvent(
-      reactPropEvent,
-      ((rootContainerElement     )         ),
-      targetElement,
-    );
+    listenToReactEvent(reactPropEvent, rootContainerElement, targetElement);
   }
 }
 
-function getOwnerDocumentFromRootContainer(
-  rootContainerElement                    ,
-)           {
+function getOwnerDocumentFromRootContainer(rootContainerElement) {
   return rootContainerElement.nodeType === DOCUMENT_NODE
-    ? (rootContainerElement     )
+    ? rootContainerElement
     : rootContainerElement.ownerDocument;
 }
 
 function noop() {}
 
-export function trapClickOnNonInteractiveElement(node             ) {
+export function trapClickOnNonInteractiveElement(node) {
   // Mobile Safari does not fire properly bubble click events on
   // non-interactive elements, which means delegated click listeners do not
   // fire. The workaround for this bug involves attaching an empty click
@@ -310,12 +294,12 @@ export function trapClickOnNonInteractiveElement(node             ) {
 }
 
 function setInitialDOMProperties(
-  tag        ,
-  domElement         ,
-  rootContainerElement                    ,
-  nextProps        ,
-  isCustomComponentTag         ,
-)       {
+  tag,
+  domElement,
+  rootContainerElement,
+  nextProps,
+  isCustomComponentTag,
+) {
   for (const propKey in nextProps) {
     if (!nextProps.hasOwnProperty(propKey)) {
       continue;
@@ -377,11 +361,11 @@ function setInitialDOMProperties(
 }
 
 function updateDOMProperties(
-  domElement         ,
-  updatePayload            ,
-  wasCustomComponentTag         ,
-  isCustomComponentTag         ,
-)       {
+  domElement,
+  updatePayload,
+  wasCustomComponentTag,
+  isCustomComponentTag,
+) {
   // TODO: Handle wasCustomComponentTag
   for (let i = 0; i < updatePayload.length; i += 2) {
     const propKey = updatePayload[i];
@@ -399,19 +383,17 @@ function updateDOMProperties(
 }
 
 export function createElement(
-  type        ,
-  props        ,
-  rootContainerElement                    ,
-  parentNamespace        ,
-)          {
+  type,
+  props,
+  rootContainerElement,
+  parentNamespace,
+) {
   let isCustomComponentTag;
 
   // We create tags in the namespace of their parent container, except HTML
   // tags get no namespace.
-  const ownerDocument           = getOwnerDocumentFromRootContainer(
-    rootContainerElement,
-  );
-  let domElement         ;
+  const ownerDocument = getOwnerDocumentFromRootContainer(rootContainerElement);
+  let domElement;
   let namespaceURI = parentNamespace;
   if (namespaceURI === HTML_NAMESPACE) {
     namespaceURI = getIntrinsicNamespace(type);
@@ -448,7 +430,7 @@ export function createElement(
       }
       div.innerHTML = '<script><' + '/script>'; // eslint-disable-line
       // This is guaranteed to yield a script element.
-      const firstChild = ((div.firstChild     )                   );
+      const firstChild = div.firstChild;
       domElement = div.removeChild(firstChild);
     } else if (typeof props.is === 'string') {
       // $FlowIssue `createElement` should be updated for Web Components
@@ -467,7 +449,7 @@ export function createElement(
       // See https://github.com/facebook/react/issues/13222
       // and https://github.com/facebook/react/issues/14239
       if (type === 'select') {
-        const node = ((domElement     )                   );
+        const node = domElement;
         if (props.multiple) {
           node.multiple = true;
         } else if (props.size) {
@@ -505,28 +487,25 @@ export function createElement(
   return domElement;
 }
 
-export function createTextNode(
-  text        ,
-  rootContainerElement                    ,
-)       {
+export function createTextNode(text, rootContainerElement) {
   return getOwnerDocumentFromRootContainer(rootContainerElement).createTextNode(
     text,
   );
 }
 
 export function setInitialProperties(
-  domElement         ,
-  tag        ,
-  rawProps        ,
-  rootContainerElement                    ,
-)       {
+  domElement,
+  tag,
+  rawProps,
+  rootContainerElement,
+) {
   const isCustomComponentTag = isCustomComponent(tag, rawProps);
   if (__DEV__) {
     validatePropertiesInDevelopment(tag, rawProps);
   }
 
   // TODO: Make sure that we check isMounted before firing any of these events.
-  let props        ;
+  let props;
   switch (tag) {
     case 'dialog':
       listenToNonDelegatedEvent('cancel', domElement);
@@ -629,13 +608,13 @@ export function setInitialProperties(
     case 'input':
       // TODO: Make sure we check if this is still unmounted or do any clean
       // up necessary since we never stop tracking anymore.
-      track((domElement     ));
+      track(domElement);
       ReactDOMInputPostMountWrapper(domElement, rawProps, false);
       break;
     case 'textarea':
       // TODO: Make sure we check if this is still unmounted or do any clean
       // up necessary since we never stop tracking anymore.
-      track((domElement     ));
+      track(domElement);
       ReactDOMTextareaPostMountWrapper(domElement, rawProps);
       break;
     case 'option':
@@ -647,7 +626,7 @@ export function setInitialProperties(
     default:
       if (typeof props.onClick === 'function') {
         // TODO: This cast may not be sound for SVG, MathML or custom elements.
-        trapClickOnNonInteractiveElement(((domElement     )             ));
+        trapClickOnNonInteractiveElement(domElement);
       }
       break;
   }
@@ -655,20 +634,20 @@ export function setInitialProperties(
 
 // Calculate the diff between the two objects.
 export function diffProperties(
-  domElement         ,
-  tag        ,
-  lastRawProps        ,
-  nextRawProps        ,
-  rootContainerElement                    ,
-)                      {
+  domElement,
+  tag,
+  lastRawProps,
+  nextRawProps,
+  rootContainerElement,
+) {
   if (__DEV__) {
     validatePropertiesInDevelopment(tag, nextRawProps);
   }
 
-  let updatePayload                    = null;
+  let updatePayload = null;
 
-  let lastProps        ;
-  let nextProps        ;
+  let lastProps;
+  let nextProps;
   switch (tag) {
     case 'input':
       lastProps = ReactDOMInputGetHostProps(domElement, lastRawProps);
@@ -698,7 +677,7 @@ export function diffProperties(
         typeof nextProps.onClick === 'function'
       ) {
         // TODO: This cast may not be sound for SVG, MathML or custom elements.
-        trapClickOnNonInteractiveElement(((domElement     )             ));
+        trapClickOnNonInteractiveElement(domElement);
       }
       break;
   }
@@ -865,12 +844,12 @@ export function diffProperties(
 
 // Apply the diff.
 export function updateProperties(
-  domElement         ,
-  updatePayload            ,
-  tag        ,
-  lastRawProps        ,
-  nextRawProps        ,
-)       {
+  domElement,
+  updatePayload,
+  tag,
+  lastRawProps,
+  nextRawProps,
+) {
   // Update checked *before* name.
   // In the middle of an update, it is possible to have multiple checked.
   // When a checked radio tries to change name, browser makes another radio's checked false.
@@ -912,7 +891,7 @@ export function updateProperties(
   }
 }
 
-function getPossibleStandardName(propName        )                {
+function getPossibleStandardName(propName) {
   if (__DEV__) {
     const lowerCasedName = propName.toLowerCase();
     if (!possibleStandardNames.hasOwnProperty(lowerCasedName)) {
@@ -924,14 +903,14 @@ function getPossibleStandardName(propName        )                {
 }
 
 export function diffHydratedProperties(
-  domElement         ,
-  tag        ,
-  rawProps        ,
-  parentNamespace        ,
-  rootContainerElement                    ,
-)                      {
+  domElement,
+  tag,
+  rawProps,
+  parentNamespace,
+  rootContainerElement,
+) {
   let isCustomComponentTag;
-  let extraAttributeNames             ;
+  let extraAttributeNames;
 
   if (__DEV__) {
     suppressHydrationWarning = rawProps[SUPPRESS_HYDRATION_WARNING] === true;
@@ -1197,13 +1176,13 @@ export function diffHydratedProperties(
     case 'input':
       // TODO: Make sure we check if this is still unmounted or do any clean
       // up necessary since we never stop tracking anymore.
-      track((domElement     ));
+      track(domElement);
       ReactDOMInputPostMountWrapper(domElement, rawProps, true);
       break;
     case 'textarea':
       // TODO: Make sure we check if this is still unmounted or do any clean
       // up necessary since we never stop tracking anymore.
-      track((domElement     ));
+      track(domElement);
       ReactDOMTextareaPostMountWrapper(domElement, rawProps);
       break;
     case 'select':
@@ -1217,7 +1196,7 @@ export function diffHydratedProperties(
     default:
       if (typeof rawProps.onClick === 'function') {
         // TODO: This cast may not be sound for SVG, MathML or custom elements.
-        trapClickOnNonInteractiveElement(((domElement     )             ));
+        trapClickOnNonInteractiveElement(domElement);
       }
       break;
   }
@@ -1225,21 +1204,18 @@ export function diffHydratedProperties(
   return updatePayload;
 }
 
-export function diffHydratedText(textNode      , text        )          {
+export function diffHydratedText(textNode, text) {
   const isDifferent = textNode.nodeValue !== text;
   return isDifferent;
 }
 
-export function warnForUnmatchedText(textNode      , text        ) {
+export function warnForUnmatchedText(textNode, text) {
   if (__DEV__) {
     warnForTextDifference(textNode.nodeValue, text);
   }
 }
 
-export function warnForDeletedHydratableElement(
-  parentNode                    ,
-  child         ,
-) {
+export function warnForDeletedHydratableElement(parentNode, child) {
   if (__DEV__) {
     if (didWarnInvalidHydration) {
       return;
@@ -1253,10 +1229,7 @@ export function warnForDeletedHydratableElement(
   }
 }
 
-export function warnForDeletedHydratableText(
-  parentNode                    ,
-  child      ,
-) {
+export function warnForDeletedHydratableText(parentNode, child) {
   if (__DEV__) {
     if (didWarnInvalidHydration) {
       return;
@@ -1270,11 +1243,7 @@ export function warnForDeletedHydratableText(
   }
 }
 
-export function warnForInsertedHydratedElement(
-  parentNode                    ,
-  tag        ,
-  props        ,
-) {
+export function warnForInsertedHydratedElement(parentNode, tag, props) {
   if (__DEV__) {
     if (didWarnInvalidHydration) {
       return;
@@ -1288,10 +1257,7 @@ export function warnForInsertedHydratedElement(
   }
 }
 
-export function warnForInsertedHydratedText(
-  parentNode                    ,
-  text        ,
-) {
+export function warnForInsertedHydratedText(parentNode, text) {
   if (__DEV__) {
     if (text === '') {
       // We expect to insert empty text nodes since they're not represented in
@@ -1312,11 +1278,7 @@ export function warnForInsertedHydratedText(
   }
 }
 
-export function restoreControlledState(
-  domElement         ,
-  tag        ,
-  props        ,
-)       {
+export function restoreControlledState(domElement, tag, props) {
   switch (tag) {
     case 'input':
       ReactDOMInputRestoreControlledState(domElement, props);

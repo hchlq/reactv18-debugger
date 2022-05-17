@@ -10,12 +10,12 @@ const {join} = require('path');
 const reactUrl = 'https://github.com/facebook/react.git';
 
 function cleanDir() {
-  return new Promise(_resolve => rimraf('remote-repo', _resolve));
+  return new Promise((_resolve) => rimraf('remote-repo', _resolve));
 }
 
 function executeCommand(command) {
-  return new Promise(_resolve =>
-    exec(command, error => {
+  return new Promise((_resolve) =>
+    exec(command, (error) => {
       if (!error) {
         _resolve();
       } else {
@@ -27,8 +27,8 @@ function executeCommand(command) {
 }
 
 function asyncCopyTo(from, to) {
-  return new Promise(_resolve => {
-    ncp(from, to, error => {
+  return new Promise((_resolve) => {
+    ncp(from, to, (error) => {
       if (error) {
         console.error(error);
         process.exit(1);

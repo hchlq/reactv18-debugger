@@ -4,10 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                      
 
 /**
  * This mirrors react-native/Libraries/Inspector/resolveBoxStyle.js (but without RTL support).
@@ -17,10 +15,7 @@
  * resolveBoxStyle('margin', {margin: 5, marginBottom: 10})
  * -> {top: 5, left: 5, right: 5, bottom: 10}
  */
-export default function resolveBoxStyle(
-  prefix        ,
-  style        ,
-)                  {
+export default function resolveBoxStyle(prefix, style) {
   let hasParts = false;
   const result = {
     bottom: 0,

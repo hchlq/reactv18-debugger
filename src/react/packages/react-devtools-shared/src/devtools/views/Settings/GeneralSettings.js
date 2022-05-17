@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -15,7 +15,7 @@ import {CHANGE_LOG_URL} from 'react-devtools-shared/src/constants';
 
 import styles from './SettingsShared.css';
 
-export default function GeneralSettings(_      ) {
+export default function GeneralSettings(_) {
   const {
     displayDensity,
     setDisplayDensity,
@@ -34,7 +34,8 @@ export default function GeneralSettings(_      ) {
         <select
           className={styles.Select}
           value={theme}
-          onChange={({currentTarget}) => setTheme(currentTarget.value)}>
+          onChange={({currentTarget}) => setTheme(currentTarget.value)}
+        >
           <option value="auto">Auto</option>
           <option value="light">Light</option>
           <option value="dark">Dark</option>
@@ -46,9 +47,8 @@ export default function GeneralSettings(_      ) {
         <select
           className={styles.Select}
           value={displayDensity}
-          onChange={({currentTarget}) =>
-            setDisplayDensity(currentTarget.value)
-          }>
+          onChange={({currentTarget}) => setDisplayDensity(currentTarget.value)}
+        >
           <option value="compact">Compact</option>
           <option value="comfortable">Comfortable</option>
         </select>
@@ -74,7 +74,8 @@ export default function GeneralSettings(_      ) {
           className={styles.ReleaseNotesLink}
           target="_blank"
           rel="noopener noreferrer"
-          href={CHANGE_LOG_URL}>
+          href={CHANGE_LOG_URL}
+        >
           View release notes
         </a>{' '}
         for DevTools version {process.env.DEVTOOLS_VERSION}

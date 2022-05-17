@@ -3,13 +3,12 @@
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
- *      
+ *
  */
 
 import invariant from 'shared/invariant';
 import {rethrowCaughtError} from 'shared/ReactErrorUtils';
 
-                                                                   
 import accumulateInto from './accumulateInto';
 import forEachAccumulated from './forEachAccumulated';
 import {executeDispatchesInOrder} from './EventPluginUtils';
@@ -18,7 +17,7 @@ import {executeDispatchesInOrder} from './EventPluginUtils';
  * Internal queue of events that have accumulated their dispatches and are
  * waiting to have their dispatches executed.
  */
-let eventQueue                                                      = null;
+let eventQueue = null;
 
 /**
  * Dispatches an event and releases it back into the pool, unless persistent.
@@ -26,7 +25,7 @@ let eventQueue                                                      = null;
  * @param {?object} event Synthetic event to be dispatched.
  * @private
  */
-const executeDispatchesAndRelease = function(event                     ) {
+const executeDispatchesAndRelease = function (event) {
   if (event) {
     executeDispatchesInOrder(event);
 
@@ -35,13 +34,11 @@ const executeDispatchesAndRelease = function(event                     ) {
     }
   }
 };
-const executeDispatchesAndReleaseTopLevel = function(e) {
+const executeDispatchesAndReleaseTopLevel = function (e) {
   return executeDispatchesAndRelease(e);
 };
 
-export function runEventsInBatch(
-  events                                                         ,
-) {
+export function runEventsInBatch(events) {
   if (events !== null) {
     eventQueue = accumulateInto(eventQueue, events);
   }

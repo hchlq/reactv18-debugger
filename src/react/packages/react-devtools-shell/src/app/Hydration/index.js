@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -126,7 +126,7 @@ export default function Hydration() {
   );
 }
 
-function DehydratableProps({array, object}     ) {
+function DehydratableProps({array, object}) {
   return (
     <ul>
       <li>array: {JSON.stringify(array, null, 2)}</li>
@@ -135,7 +135,7 @@ function DehydratableProps({array, object}     ) {
   );
 }
 
-function DeepHooks(props     ) {
+function DeepHooks(props) {
   const foo = useOuterFoo();
   const bar = useOuterBar();
   const baz = useOuterBaz();

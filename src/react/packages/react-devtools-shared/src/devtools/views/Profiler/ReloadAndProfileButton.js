@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -13,11 +13,6 @@ import Button from '../Button';
 import ButtonIcon from '../ButtonIcon';
 import {BridgeContext, StoreContext} from '../context';
 import {useSubscription} from '../hooks';
-
-                          
-                                    
-                                    
-   
 
 export default function ReloadAndProfileButton() {
   const bridge = useContext(BridgeContext);
@@ -29,7 +24,7 @@ export default function ReloadAndProfileButton() {
         recordChangeDescriptions: store.recordChangeDescriptions,
         supportsReloadAndProfile: store.supportsReloadAndProfile,
       }),
-      subscribe: (callback          ) => {
+      subscribe: (callback) => {
         store.addListener('recordChangeDescriptions', callback);
         store.addListener('supportsReloadAndProfile', callback);
         return () => {
@@ -40,10 +35,8 @@ export default function ReloadAndProfileButton() {
     }),
     [store],
   );
-  const {
-    recordChangeDescriptions,
-    supportsReloadAndProfile,
-  } = useSubscription                  (subscription);
+  const {recordChangeDescriptions, supportsReloadAndProfile} =
+    useSubscription(subscription);
 
   const reloadAndProfile = useCallback(() => {
     // TODO If we want to support reload-and-profile for e.g. React Native,
@@ -63,7 +56,8 @@ export default function ReloadAndProfileButton() {
     <Button
       disabled={!store.supportsProfiling}
       onClick={reloadAndProfile}
-      title="Reload and start profiling">
+      title="Reload and start profiling"
+    >
       <ButtonIcon type="reload" />
     </Button>
   );

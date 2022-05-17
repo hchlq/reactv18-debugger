@@ -196,7 +196,7 @@ describe('ReactStrictMode', () => {
       </React.StrictMode>,
       container,
     );
-    instance.setState(state => {
+    instance.setState((state) => {
       setStateCount++;
       return {
         count: state.count + 1,
@@ -339,7 +339,7 @@ describe('ReactStrictMode', () => {
       </StrictMode>,
       container,
     );
-    instance.setState(state => {
+    instance.setState((state) => {
       setStateCount++;
       return {
         count: state.count + 1,
@@ -535,17 +535,13 @@ Please update the following components: Parent`,
     const container = document.createElement('div');
     const root = ReactDOM.unstable_createRoot(container);
     root.render(<AsyncRoot foo={true} />);
-    expect(() =>
-      Scheduler.unstable_flushAll(),
-    ).toErrorDev(
+    expect(() => Scheduler.unstable_flushAll()).toErrorDev(
       'Using UNSAFE_componentWillMount in strict mode is not recommended',
       {withoutStack: true},
     );
 
     root.render(<AsyncRoot foo={false} />);
-    expect(() =>
-      Scheduler.unstable_flushAll(),
-    ).toErrorDev(
+    expect(() => Scheduler.unstable_flushAll()).toErrorDev(
       'Using UNSAFE_componentWillMount in strict mode is not recommended',
       {withoutStack: true},
     );
@@ -595,9 +591,7 @@ Please update the following components: Parent`,
 
     const container = document.createElement('div');
 
-    expect(() =>
-      ReactDOM.render(<SyncRoot />, container),
-    ).toErrorDev(
+    expect(() => ReactDOM.render(<SyncRoot />, container)).toErrorDev(
       'Using UNSAFE_componentWillReceiveProps in strict mode is not recommended',
       {withoutStack: true},
     );

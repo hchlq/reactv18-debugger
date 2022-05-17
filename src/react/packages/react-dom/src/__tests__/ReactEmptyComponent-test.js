@@ -72,7 +72,7 @@ describe('ReactEmptyComponent', () => {
       render() {}
     }
 
-    expect(function() {
+    expect(function () {
       ReactTestUtils.renderIntoDocument(<Component />);
     }).toThrowError(
       'Component(...): Nothing was returned from render. This usually means a return statement is missing. ' +
@@ -143,10 +143,10 @@ describe('ReactEmptyComponent', () => {
       <TogglingComponent firstComponent={'script'} secondComponent={null} />
     );
 
-    expect(function() {
+    expect(function () {
       ReactTestUtils.renderIntoDocument(instance1);
     }).not.toThrow();
-    expect(function() {
+    expect(function () {
       ReactTestUtils.renderIntoDocument(instance2);
     }).not.toThrow();
 
@@ -186,10 +186,10 @@ describe('ReactEmptyComponent', () => {
         <TogglingComponent firstComponent={Child} secondComponent={'div'} />
       );
 
-      expect(function() {
+      expect(function () {
         ReactTestUtils.renderIntoDocument(instance1);
       }).not.toThrow();
-      expect(function() {
+      expect(function () {
         ReactTestUtils.renderIntoDocument(instance2);
       }).not.toThrow();
 
@@ -293,7 +293,7 @@ describe('ReactEmptyComponent', () => {
       }
     }
 
-    expect(function() {
+    expect(function () {
       ReactTestUtils.renderIntoDocument(<Parent />);
     }).not.toThrow();
   });

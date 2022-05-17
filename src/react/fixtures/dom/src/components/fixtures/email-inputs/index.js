@@ -15,7 +15,8 @@ function EmailInputs() {
           Some browsers are trying to remove spaces from email inputs and after
           doing this place cursor to the beginning.
         `}
-        affectedBrowsers="Chrome">
+        affectedBrowsers="Chrome"
+      >
         <TestCase.Steps>
           <li>Type space and character</li>
           <li>Type character, space, character, delete last character</li>
@@ -30,7 +31,8 @@ function EmailInputs() {
         title="Attributes enabled"
         description={`
           Test enabled pattern, maxlength, multiple attributes.
-        `}>
+        `}
+      >
         <TestCase.Steps>
           <li>Type after existing text ',b@tt.com'</li>
           <li>Try to type spaces after typed text</li>
@@ -48,7 +50,8 @@ function EmailInputs() {
         title="Attributes disabled"
         description={`
           Test disabled maxlength, multiple attributes.
-        `}>
+        `}
+      >
         <TestCase.Steps>
           <li>Type after existing text ',b@tt.com'</li>
           <li>Try to type spaces after typed text</li>

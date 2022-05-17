@@ -54,7 +54,7 @@ class ErrorBoundary extends React.Component {
 class Example extends React.Component {
   state = {key: 0};
   restart = () => {
-    this.setState(state => ({key: state.key + 1}));
+    this.setState((state) => ({key: state.key + 1}));
   };
   render() {
     return (
@@ -130,7 +130,7 @@ class SilenceErrors extends React.Component {
             type="checkbox"
             value={this.state.silenceErrors}
             onChange={() =>
-              this.setState(state => ({
+              this.setState((state) => ({
                 silenceErrors: !state.silenceErrors,
               }))
             }
@@ -247,7 +247,8 @@ export default class ErrorHandlingTestCases extends React.Component {
       <FixtureSet title="Error handling">
         <TestCase
           title="Break on uncaught exceptions"
-          description="In DEV, errors should be treated as uncaught, even though React catches them internally">
+          description="In DEV, errors should be treated as uncaught, even though React catches them internally"
+        >
           <TestCase.Steps>
             <li>Open the browser DevTools</li>
             <li>Make sure "Pause on exceptions" is enabled</li>
@@ -290,7 +291,8 @@ export default class ErrorHandlingTestCases extends React.Component {
         </TestCase>
         <TestCase
           title="Cross-origin errors (development mode only)"
-          description="">
+          description=""
+        >
           <TestCase.Steps>
             <li>Click the "Trigger cross-origin error" button</li>
             <li>Click the reset button</li>
@@ -312,7 +314,8 @@ export default class ErrorHandlingTestCases extends React.Component {
         </TestCase>
         <TestCase
           title="Errors are logged even if they're caught (development mode only)"
-          description="">
+          description=""
+        >
           <TestCase.Steps>
             <li>Click the "Trigger render error and catch" button</li>
           </TestCase.Steps>
@@ -325,7 +328,8 @@ export default class ErrorHandlingTestCases extends React.Component {
         </TestCase>
         <TestCase
           title="Recoverable errors can be silenced with preventDefault (development mode only)"
-          description="">
+          description=""
+        >
           <TestCase.Steps>
             <li>Check the "Silence errors" checkbox below</li>
             <li>Click the "Throw (render phase)" button</li>
@@ -344,7 +348,8 @@ export default class ErrorHandlingTestCases extends React.Component {
         </TestCase>
         <TestCase
           title="Fatal errors cannot be silenced with preventDefault (development mode only)"
-          description="">
+          description=""
+        >
           <TestCase.Steps>
             <li>Check the "Silence errors" checkbox below</li>
             <li>Click the "Throw fatal error" button</li>
@@ -360,7 +365,8 @@ export default class ErrorHandlingTestCases extends React.Component {
         {window.hasOwnProperty('event') ? (
           <TestCase
             title="Error handling does not interfere with window.event"
-            description="">
+            description=""
+          >
             <TestCase.Steps>
               <li>Click the "Trigger callback in event" button</li>
             </TestCase.Steps>

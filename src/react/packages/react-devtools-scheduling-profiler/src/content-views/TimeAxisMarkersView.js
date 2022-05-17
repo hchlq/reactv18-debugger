@@ -4,10 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                             
 
 import {
   durationToWidth,
@@ -37,10 +35,10 @@ const HEADER_HEIGHT_FIXED = MARKER_HEIGHT + BORDER_SIZE;
 const LABEL_FIXED_WIDTH = LABEL_SIZE + BORDER_SIZE;
 
 export class TimeAxisMarkersView extends View {
-  _totalDuration        ;
-  _intrinsicSize      ;
+  _totalDuration;
+  _intrinsicSize;
 
-  constructor(surface         , frame      , totalDuration        ) {
+  constructor(surface, frame, totalDuration) {
     super(surface, frame);
     this._totalDuration = totalDuration;
     this._intrinsicSize = {
@@ -57,7 +55,7 @@ export class TimeAxisMarkersView extends View {
   // In Chrome, these seem to range from 70-140 pixels wide.
   // Time wise, they represent intervals of e.g. 1s, 500ms, 200ms, 100ms, 50ms, 20ms.
   // Based on zoom, we should determine which amount to actually show.
-  _getTimeTickInterval(scaleFactor        )         {
+  _getTimeTickInterval(scaleFactor) {
     for (let i = 0; i < INTERVAL_TIMES.length; i++) {
       const currentInterval = INTERVAL_TIMES[i];
       const intervalWidth = durationToWidth(currentInterval, scaleFactor);
@@ -68,7 +66,7 @@ export class TimeAxisMarkersView extends View {
     return INTERVAL_TIMES[0];
   }
 
-  draw(context                          ) {
+  draw(context) {
     const {frame, _intrinsicSize, visibleArea} = this;
     const clippedFrame = {
       origin: frame.origin,
@@ -139,7 +137,7 @@ export class TimeAxisMarkersView extends View {
 
     // Render bottom border.
     // Propose border rect, check if intersects with `rect`, draw intersection.
-    const borderFrame       = {
+    const borderFrame = {
       origin: {
         x: clippedFrame.origin.x,
         y: clippedFrame.origin.y + clippedFrame.size.height - BORDER_SIZE,

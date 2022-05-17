@@ -38,7 +38,7 @@ const roots = [];
 function mountHelper(App) {
   const container = document.createElement('div');
 
-  ((document.body     )                 ).appendChild(container);
+  document.body.appendChild(container);
 
   const root = createRoot(container);
   root.render(createElement(App));
@@ -62,7 +62,7 @@ function mountTestApp() {
 }
 
 function unmountTestApp() {
-  roots.forEach(root => root.unmount());
+  roots.forEach((root) => root.unmount());
 }
 
 mountTestApp();

@@ -129,13 +129,7 @@ describe('ReactIncrementalUpdates', () => {
       state = {};
       render() {
         instance = this;
-        return (
-          <span
-            prop={Object.keys(this.state)
-              .sort()
-              .join('')}
-          />
-        );
+        return <span prop={Object.keys(this.state).sort().join('')} />;
       }
     }
 
@@ -185,13 +179,7 @@ describe('ReactIncrementalUpdates', () => {
       state = {};
       render() {
         instance = this;
-        return (
-          <span
-            prop={Object.keys(this.state)
-              .sort()
-              .join('')}
-          />
-        );
+        return <span prop={Object.keys(this.state).sort().join('')} />;
       }
     }
 
@@ -254,7 +242,7 @@ describe('ReactIncrementalUpdates', () => {
     instance.setState({b: 'b'});
     // No longer a public API, but we can test that it works internally by
     // reaching into the updater.
-    instance.updater.enqueueReplaceState(instance, previousState => ({
+    instance.updater.enqueueReplaceState(instance, (previousState) => ({
       previousState,
     }));
     expect(Scheduler).toFlushWithoutYielding();
@@ -306,9 +294,7 @@ describe('ReactIncrementalUpdates', () => {
       }
     }
     ReactNoop.render(<Foo />);
-    expect(() =>
-      expect(Scheduler).toFlushAndYield(['render']),
-    ).toErrorDev(
+    expect(() => expect(Scheduler).toFlushAndYield(['render'])).toErrorDev(
       'Using UNSAFE_componentWillReceiveProps in strict mode is not recommended',
       {withoutStack: true},
     );
@@ -348,7 +334,7 @@ describe('ReactIncrementalUpdates', () => {
 
     expect(() =>
       expect(Scheduler).toFlushAndYield(
-        gate(flags =>
+        gate((flags) =>
           flags.deferRenderPhaseUpdateToNextBatch
             ? [
                 'setState updater',
@@ -381,7 +367,7 @@ describe('ReactIncrementalUpdates', () => {
       return {b: 'b'};
     });
     expect(Scheduler).toFlushAndYield(
-      gate(flags =>
+      gate((flags) =>
         flags.deferRenderPhaseUpdateToNextBatch
           ? // In the new reconciler, updates inside the render phase are
             // treated as if they came from an event, so the update gets shifted
@@ -452,7 +438,7 @@ describe('ReactIncrementalUpdates', () => {
       setCount = _setCount;
       Scheduler.unstable_yieldValue('Render: ' + count);
       useLayoutEffect(() => {
-        setCount(prevCount => prevCount + 1);
+        setCount((prevCount) => prevCount + 1);
         Scheduler.unstable_yieldValue('Commit: ' + count);
       }, []);
       return null;
@@ -513,8 +499,8 @@ describe('ReactIncrementalUpdates', () => {
     let pushToLog;
     function App() {
       const [log, setLog] = useState('');
-      pushToLog = msg => {
-        setLog(prevLog => prevLog + msg);
+      pushToLog = (msg) => {
+        setLog((prevLog) => prevLog + msg);
       };
 
       useLayoutEffect(() => {
@@ -530,7 +516,7 @@ describe('ReactIncrementalUpdates', () => {
               },
             ),
           );
-          setLog(prevLog => prevLog + 'D');
+          setLog((prevLog) => prevLog + 'D');
         }
       }, [log]);
 
@@ -579,8 +565,8 @@ describe('ReactIncrementalUpdates', () => {
     let pushToLog;
     class App extends React.Component {
       state = {log: ''};
-      pushToLog = msg => {
-        this.setState(prevState => ({log: prevState.log + msg}));
+      pushToLog = (msg) => {
+        this.setState((prevState) => ({log: prevState.log + msg}));
       };
       componentDidUpdate() {
         Scheduler.unstable_yieldValue('Committed: ' + this.state.log);
@@ -683,7 +669,7 @@ describe('ReactIncrementalUpdates', () => {
     // batch, change the prop back to its original value.
     await ReactNoop.act(async () => {
       root.render(<App prop="A" />);
-      app.setState(state => ({count: state.count + 1}));
+      app.setState((state) => ({count: state.count + 1}));
     });
     // There were two total prop changes, plus an increment.
     expect(root).toMatchRenderedOutput('201');

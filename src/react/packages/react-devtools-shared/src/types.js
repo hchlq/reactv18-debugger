@@ -4,14 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                     
-                                              
-                                     
-                                                                         
-   
 
 // WARNING
 // The values below are referenced by ComponentFilters (which are saved via localStorage).
@@ -36,7 +30,6 @@ export const ElementTypeSuspenseList = 13;
 // Different types of elements displayed in the Elements tree.
 // These types may be used to visually distinguish types,
 // or to enable/disable certain functionality.
-                                                                        
 
 // WARNING
 // The values below are referenced by ComponentFilters (which are saved via localStorage).
@@ -47,32 +40,8 @@ export const ComponentFilterDisplayName = 2;
 export const ComponentFilterLocation = 3;
 export const ComponentFilterHOC = 4;
 
-                                                
-
 // Hide all elements of types in this Set.
 // We hide host components only by default.
-                                           
-                     
-          
-                     
-   
 
 // Hide all elements with displayNames or paths matching one or more of the RegExps in this Set.
 // Path filters are only used when elements include debug source location.
-                                      
-                     
-                   
-              
-                
-   
-
-                                       
-                     
-                   
-          
-   
-
-                             
-                          
-                              
-                          

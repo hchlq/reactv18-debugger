@@ -4,82 +4,14 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                                 
-                                      
 
 import {useEffect} from 'react';
 import {normalizeWheel} from './utils/normalizeWheel';
 
-                                     
-                    
-             
-                      
-                    
-     
-   
-                                     
-                    
-             
-                      
-                    
-     
-   
-                                   
-                  
-             
-                      
-                    
-     
-   
-                                      
-                      
-             
-                      
-                    
-                                
-     
-   
-                                          
-                      
-             
-                      
-                    
-                                
-     
-   
-                                            
-                        
-             
-                      
-                    
-                                
-     
-   
-                                         
-                     
-             
-                      
-                    
-                                
-     
-   
-
-                         
-                        
-                        
-                      
-                         
-                             
-                               
-                             
-
 let canvasBoundingRectCache = null;
-function cacheFirstGetCanvasBoundingRect(
-  canvas                   ,
-)             {
+function cacheFirstGetCanvasBoundingRect(canvas) {
   if (
     canvasBoundingRectCache &&
     canvas.width === canvasBoundingRectCache.width &&
@@ -95,17 +27,14 @@ function cacheFirstGetCanvasBoundingRect(
   return canvasBoundingRectCache.rect;
 }
 
-export function useCanvasInteraction(
-  canvasRef                                       ,
-  interactor                                    ,
-) {
+export function useCanvasInteraction(canvasRef, interactor) {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) {
       return;
     }
 
-    function localToCanvasCoordinates(localCoordinates       )        {
+    function localToCanvasCoordinates(localCoordinates) {
       const canvasRect = cacheFirstGetCanvasBoundingRect(canvas);
       return {
         x: localCoordinates.x - canvasRect.left,
@@ -113,7 +42,7 @@ export function useCanvasInteraction(
       };
     }
 
-    const onCanvasMouseDown                    = event => {
+    const onCanvasMouseDown = (event) => {
       interactor({
         type: 'mousedown',
         payload: {
@@ -123,7 +52,7 @@ export function useCanvasInteraction(
       });
     };
 
-    const onDocumentMouseMove                    = event => {
+    const onDocumentMouseMove = (event) => {
       interactor({
         type: 'mousemove',
         payload: {
@@ -133,7 +62,7 @@ export function useCanvasInteraction(
       });
     };
 
-    const onDocumentMouseUp                    = event => {
+    const onDocumentMouseUp = (event) => {
       interactor({
         type: 'mouseup',
         payload: {
@@ -143,7 +72,7 @@ export function useCanvasInteraction(
       });
     };
 
-    const onCanvasWheel                    = event => {
+    const onCanvasWheel = (event) => {
       event.preventDefault();
       event.stopPropagation();
 

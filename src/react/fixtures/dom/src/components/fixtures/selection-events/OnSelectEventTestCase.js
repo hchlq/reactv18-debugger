@@ -5,11 +5,11 @@ const React = window.React;
 class OnSelectIframe extends React.Component {
   state = {count: 0, value: 'Select Me!'};
 
-  _onSelect = event => {
+  _onSelect = (event) => {
     this.setState(({count}) => ({count: count + 1}));
   };
 
-  _onChange = event => {
+  _onChange = (event) => {
     this.setState({value: event.target.value});
   };
 
@@ -34,7 +34,8 @@ export default class OnSelectEventTestCase extends React.Component {
     return (
       <TestCase
         title="onSelect events within iframes"
-        description="onSelect events should fire for elements rendered inside iframes">
+        description="onSelect events should fire for elements rendered inside iframes"
+      >
         <TestCase.Steps>
           <li>Highlight some of the text in the input below</li>
           <li>Move the cursor around using the arrow keys</li>

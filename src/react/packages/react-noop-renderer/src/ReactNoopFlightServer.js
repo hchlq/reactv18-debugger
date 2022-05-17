@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 /**
@@ -14,41 +14,37 @@
  * environment.
  */
 
-                                                                   
-
 import {saveModule} from 'react-noop-renderer/flight-modules';
 
 import ReactFlightServer from 'react-server/flight';
 
-                                 
-
 const ReactNoopFlightServer = ReactFlightServer({
-  scheduleWork(callback            ) {
+  scheduleWork(callback) {
     callback();
   },
-  beginWriting(destination             )       {},
-  writeChunk(destination             , buffer            )       {
-    destination.push(Buffer.from((buffer     )).toString('utf8'));
+  beginWriting(destination) {},
+  writeChunk(destination, buffer) {
+    destination.push(Buffer.from(buffer).toString('utf8'));
   },
-  completeWriting(destination             )       {},
-  close(destination             )       {},
-  flushBuffered(destination             )       {},
-  convertStringToBuffer(content        )             {
+  completeWriting(destination) {},
+  close(destination) {},
+  flushBuffered(destination) {},
+  convertStringToBuffer(content) {
     return Buffer.from(content, 'utf8');
   },
-  formatChunkAsString(type        , props        )         {
+  formatChunkAsString(type, props) {
     return JSON.stringify({type, props});
   },
-  formatChunk(type        , props        )             {
+  formatChunk(type, props) {
     return Buffer.from(JSON.stringify({type, props}), 'utf8');
   },
-  resolveModuleMetaData(config      , renderFn          ) {
+  resolveModuleMetaData(config, renderFn) {
     return saveModule(renderFn);
   },
 });
 
-function render(model            )              {
-  const destination              = [];
+function render(model) {
+  const destination = [];
   const bundlerConfig = undefined;
   const request = ReactNoopFlightServer.createRequest(
     model,

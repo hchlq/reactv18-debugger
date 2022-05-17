@@ -4,16 +4,13 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import {createContext} from 'react';
 
-                                                                              
-                                
-
-const idToShowFnMap = new Map                ();
-const idToHideFnMap = new Map                ();
+const idToShowFnMap = new Map();
+const idToHideFnMap = new Map();
 
 let currentHideFn = null;
 
@@ -23,17 +20,7 @@ function hideMenu() {
   }
 }
 
-function showMenu({
-  data,
-  id,
-  pageX,
-  pageY,
-}    
-               
-             
-                
-                
-  ) {
+function showMenu({data, id, pageX, pageY}) {
   const showFn = idToShowFnMap.get(id);
   if (typeof showFn === 'function') {
     currentHideFn = idToHideFnMap.get(id);
@@ -41,7 +28,7 @@ function showMenu({
   }
 }
 
-function registerMenu(id        , showFn        , hideFn        ) {
+function registerMenu(id, showFn, hideFn) {
   if (idToShowFnMap.has(id)) {
     throw Error(`Context menu with id "${id}" already registered.`);
   }
@@ -55,18 +42,7 @@ function registerMenu(id        , showFn        , hideFn        ) {
   };
 }
 
-                                    
-                       
-               
-                 
-               
-                  
-                  
-              
-                                                     
-   
-
-export const RegistryContext = createContext                     ({
+export const RegistryContext = createContext({
   hideMenu,
   showMenu,
   registerMenu,

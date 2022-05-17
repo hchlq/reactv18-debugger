@@ -4,12 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                           
-                                                                     
-                                                                  
 
 describe('ProfilingCache', () => {
   let PropTypes;
@@ -17,9 +13,9 @@ describe('ProfilingCache', () => {
   let ReactDOM;
   let Scheduler;
   let SchedulerTracing;
-  let TestRenderer                   ;
-  let bridge                ;
-  let store       ;
+  let TestRenderer;
+  let bridge;
+  let store;
   let utils;
 
   beforeEach(() => {
@@ -95,7 +91,7 @@ describe('ProfilingCache', () => {
     expect(dataForRoots).not.toBeNull();
 
     if (dataForRoots !== null) {
-      dataForRoots.forEach(dataForRoot => {
+      dataForRoots.forEach((dataForRoot) => {
         utils.act(() =>
           TestRenderer.create(
             <Validator
@@ -111,7 +107,7 @@ describe('ProfilingCache', () => {
 
     utils.exportImportHelper(bridge, store);
 
-    allProfilingDataForRoots.forEach(profilingDataForRoot => {
+    allProfilingDataForRoots.forEach((profilingDataForRoot) => {
       utils.act(() =>
         TestRenderer.create(
           <Validator
@@ -202,10 +198,7 @@ describe('ProfilingCache', () => {
 
     const ModernContext = React.createContext(0);
 
-    class LegacyContextProvider extends React.Component 
-          
-                        
-      {
+    class LegacyContextProvider extends React.Component {
       static childContextTypes = {
         count: PropTypes.number,
       };
@@ -231,14 +224,14 @@ describe('ProfilingCache', () => {
       return null;
     };
 
-    class ModernContextConsumer extends React.Component      {
+    class ModernContextConsumer extends React.Component {
       static contextType = ModernContext;
       render() {
         return <FunctionComponentWithHooks count={this.context} />;
       }
     }
 
-    class LegacyContextConsumer extends React.Component      {
+    class LegacyContextConsumer extends React.Component {
       static contextTypes = {
         count: PropTypes.number,
       };
@@ -252,7 +245,7 @@ describe('ProfilingCache', () => {
     utils.act(() => store.profilerStore.startProfiling());
     utils.act(() => ReactDOM.render(<LegacyContextProvider />, container));
     expect(instance).not.toBeNull();
-    utils.act(() => (instance     ).setState({count: 1}));
+    utils.act(() => instance.setState({count: 1}));
     utils.act(() =>
       ReactDOM.render(<LegacyContextProvider foo={123} />, container),
     );
@@ -478,13 +471,13 @@ describe('ProfilingCache', () => {
     expect(commitData).not.toBeNull();
   });
 
-  it('should calculate self duration correctly for suspended views', async done => {
+  it('should calculate self duration correctly for suspended views', async (done) => {
     let data;
     const getData = () => {
       if (data) {
         return data;
       } else {
-        throw new Promise(resolve => {
+        throw new Promise((resolve) => {
           data = 'abc';
           resolve(data);
         });
@@ -665,11 +658,10 @@ describe('ProfilingCache', () => {
     let interactions = null;
 
     function Validator({previousInteractions, rootID}) {
-      interactions = store.profilerStore.profilingCache.getInteractionsChartData(
-        {
+      interactions =
+        store.profilerStore.profilingCache.getInteractionsChartData({
           rootID,
-        },
-      ).interactions;
+        }).interactions;
       if (previousInteractions != null) {
         expect(interactions).toEqual(previousInteractions);
       } else {
@@ -760,9 +752,9 @@ describe('ProfilingCache', () => {
     function Switch({children}) {
       return (
         <RouterContext.Consumer>
-          {context => {
+          {(context) => {
             let element = null;
-            React.Children.forEach(children, child => {
+            React.Children.forEach(children, (child) => {
               if (context.path === child.props.path) {
                 element = child.props.children;
               }
@@ -784,7 +776,7 @@ describe('ProfilingCache', () => {
     function Link({children, path}) {
       return (
         <RouterContext.Consumer>
-          {context => {
+          {(context) => {
             return (
               <button ref={linkRef} onClick={() => context.setPath(path)}>
                 {children}

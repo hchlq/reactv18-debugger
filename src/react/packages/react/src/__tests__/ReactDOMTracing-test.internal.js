@@ -69,7 +69,8 @@ function LegacyHiddenDiv({children, mode}) {
   return (
     <div hidden={mode === 'hidden'}>
       <React.unstable_LegacyHidden
-        mode={mode === 'hidden' ? 'unstable-defer-without-hiding' : mode}>
+        mode={mode === 'hidden' ? 'unstable-defer-without-hiding' : mode}
+      >
         {children}
       </React.unstable_LegacyHidden>
     </div>
@@ -152,7 +153,7 @@ describe('ReactDOMTracing', () => {
           onInteractionScheduledWorkCompleted,
         ).toHaveBeenLastNotifiedOfInteraction(interaction);
 
-        if (gate(flags => flags.new)) {
+        if (gate((flags) => flags.new)) {
           expect(onRender).toHaveBeenCalledTimes(3);
         } else {
           // TODO: This is 4 instead of 3 because this update was scheduled at
@@ -310,7 +311,7 @@ describe('ReactDOMTracing', () => {
         expect(
           onInteractionScheduledWorkCompleted,
         ).toHaveBeenLastNotifiedOfInteraction(interaction);
-        if (gate(flags => flags.new)) {
+        if (gate((flags) => flags.new)) {
           expect(onRender).toHaveBeenCalledTimes(3);
         } else {
           // TODO: This is 4 instead of 3 because this update was scheduled at
@@ -351,7 +352,7 @@ describe('ReactDOMTracing', () => {
 
           const setCount = React.useState(0)[1];
           update = () => {
-            setCount(current => current + 1);
+            setCount((current) => current + 1);
           };
 
           return <div />;
@@ -457,7 +458,7 @@ describe('ReactDOMTracing', () => {
           });
 
           const setCount = React.useState(0)[1];
-          scheduleUpdate = () => setCount(current => current + 1);
+          scheduleUpdate = () => setCount((current) => current + 1);
 
           return <div />;
         };
@@ -686,7 +687,7 @@ describe('ReactDOMTracing', () => {
         let suspend = false;
         let resolve;
         const promise = new Promise(
-          resolvePromise => (resolve = resolvePromise),
+          (resolvePromise) => (resolve = resolvePromise),
         );
         const ref = React.createRef();
 

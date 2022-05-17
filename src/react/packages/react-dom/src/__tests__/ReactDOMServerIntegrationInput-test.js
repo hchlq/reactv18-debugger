@@ -43,32 +43,35 @@ desc('ReactDOMServerIntegrationInput', () => {
     resetModules();
   });
 
-  itRenders('an input with a value and an onChange', async render => {
+  itRenders('an input with a value and an onChange', async (render) => {
     const e = await render(<input value="foo" onChange={() => {}} />);
     expect(e.value).toBe('foo');
   });
 
-  itRenders('an input with a value and readOnly', async render => {
+  itRenders('an input with a value and readOnly', async (render) => {
     const e = await render(<input value="foo" readOnly={true} />);
     expect(e.value).toBe('foo');
   });
 
-  itRenders('an input with a value and no onChange/readOnly', async render => {
-    // this configuration should raise a dev warning that value without
-    // onChange or readOnly is a mistake.
-    const e = await render(<input value="foo" />, 1);
-    expect(e.value).toBe('foo');
-    expect(e.getAttribute('value')).toBe('foo');
-  });
+  itRenders(
+    'an input with a value and no onChange/readOnly',
+    async (render) => {
+      // this configuration should raise a dev warning that value without
+      // onChange or readOnly is a mistake.
+      const e = await render(<input value="foo" />, 1);
+      expect(e.value).toBe('foo');
+      expect(e.getAttribute('value')).toBe('foo');
+    },
+  );
 
-  itRenders('an input with a defaultValue', async render => {
+  itRenders('an input with a defaultValue', async (render) => {
     const e = await render(<input defaultValue="foo" />);
     expect(e.value).toBe('foo');
     expect(e.getAttribute('value')).toBe('foo');
     expect(e.getAttribute('defaultValue')).toBe(null);
   });
 
-  itRenders('an input value overriding defaultValue', async render => {
+  itRenders('an input value overriding defaultValue', async (render) => {
     const e = await render(
       <input value="foo" defaultValue="bar" readOnly={true} />,
       1,
@@ -80,7 +83,7 @@ desc('ReactDOMServerIntegrationInput', () => {
 
   itRenders(
     'an input value overriding defaultValue no matter the prop order',
-    async render => {
+    async (render) => {
       const e = await render(
         <input defaultValue="bar" value="foo" readOnly={true} />,
         1,

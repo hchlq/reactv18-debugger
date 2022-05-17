@@ -47,11 +47,11 @@ describe('ReactTestRenderer', () => {
     beforeEach(() => {
       PendingResources = {};
       TextResource = ReactCache.unstable_createResource(
-        text =>
-          new Promise(resolve => {
+        (text) =>
+          new Promise((resolve) => {
             PendingResources[text] = resolve;
           }),
-        text => text,
+        (text) => text,
       );
 
       AsyncText = ({text}) => {
@@ -60,7 +60,7 @@ describe('ReactTestRenderer', () => {
       };
     });
 
-    it('for root Suspense components', async done => {
+    it('for root Suspense components', async (done) => {
       const App = ({text}) => {
         return (
           <React.Suspense fallback="fallback">
@@ -86,7 +86,7 @@ describe('ReactTestRenderer', () => {
       done();
     });
 
-    it('for nested Suspense components', async done => {
+    it('for nested Suspense components', async (done) => {
       const App = ({text}) => {
         return (
           <div>

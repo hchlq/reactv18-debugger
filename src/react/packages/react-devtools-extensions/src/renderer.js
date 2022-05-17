@@ -5,22 +5,18 @@
  * The hook will look for the presence of a global __REACT_DEVTOOLS_ATTACH__ and attach an injected renderer early.
  * The normal case (not a reload-and-profile) will not make use of this entry point though.
  *
- *      
+ *
  */
 
 import {attach} from 'react-devtools-shared/src/backend/renderer';
 
-Object.defineProperty(
-  window,
-  '__REACT_DEVTOOLS_ATTACH__',
-  ({
-    enumerable: false,
-    // This property needs to be configurable to allow third-party integrations
-    // to attach their own renderer. Note that using third-party integrations
-    // is not officially supported. Use at your own risk.
-    configurable: true,
-    get() {
-      return attach;
-    },
-  }        ),
-);
+Object.defineProperty(window, '__REACT_DEVTOOLS_ATTACH__', {
+  enumerable: false,
+  // This property needs to be configurable to allow third-party integrations
+  // to attach their own renderer. Note that using third-party integrations
+  // is not officially supported. Use at your own risk.
+  configurable: true,
+  get() {
+    return attach;
+  },
+});

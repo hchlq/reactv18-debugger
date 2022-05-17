@@ -8,7 +8,7 @@ export default function Toggle() {
       <h2>Toggle</h2>
       <div>
         <>
-          <button onClick={() => setShow(s => !s)}>Show child</button>
+          <button onClick={() => setShow((s) => !s)}>Show child</button>
           {show && ' '}
           {show && <Greeting>Hello</Greeting>}
         </>

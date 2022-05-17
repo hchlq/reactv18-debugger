@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 /**
@@ -18,23 +18,21 @@ import {readModule} from 'react-noop-renderer/flight-modules';
 
 import ReactFlightClient from 'react-client/flight';
 
-                            
-
 const {createResponse, processStringChunk, close} = ReactFlightClient({
   supportsBinaryStreams: false,
-  resolveModuleReference(idx        ) {
+  resolveModuleReference(idx) {
     return idx;
   },
-  preloadModule(idx        ) {},
-  requireModule(idx        ) {
+  preloadModule(idx) {},
+  requireModule(idx) {
     return readModule(idx);
   },
-  parseModel(response          , json) {
+  parseModel(response, json) {
     return JSON.parse(json, response._fromJSON);
   },
 });
 
-function read   (source        )    {
+function read(source) {
   const response = createResponse(source);
   for (let i = 0; i < source.length; i++) {
     processStringChunk(response, source[i], 0);

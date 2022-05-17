@@ -30,7 +30,7 @@ class Hydration extends React.Component {
     window.removeEventListener('message', this.handleMessage);
   }
 
-  handleMessage = event => {
+  handleMessage = (event) => {
     var data = JSON.parse(event.data);
 
     switch (data.type) {
@@ -58,27 +58,27 @@ class Hydration extends React.Component {
     }
   };
 
-  send = message => {
+  send = (message) => {
     if (this.ready) {
       this.frame.contentWindow.postMessage(JSON.stringify(message), '*');
     }
   };
 
-  setFrame = frame => {
+  setFrame = (frame) => {
     this.frame = frame;
   };
 
-  setCode = code => {
+  setCode = (code) => {
     this.setState({code}, this.injectCode);
   };
 
-  setCheckbox = event => {
+  setCheckbox = (event) => {
     this.setState({
       [event.target.name]: event.target.checked,
     });
   };
 
-  setVersion = version => {
+  setVersion = (version) => {
     this.setState({version});
   };
 

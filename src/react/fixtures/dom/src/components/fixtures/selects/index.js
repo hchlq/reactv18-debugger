@@ -10,16 +10,16 @@ class SelectFixture extends React.Component {
   _singleFormDOMNode = null;
   _multipleFormDOMNode = null;
 
-  onChange = event => {
+  onChange = (event) => {
     this.setState({value: event.target.value});
   };
 
-  resetSingleOptionForm = event => {
+  resetSingleOptionForm = (event) => {
     event.preventDefault();
     this._singleFormDOMNode.reset();
   };
 
-  resetMultipleOptionForm = event => {
+  resetMultipleOptionForm = (event) => {
     event.preventDefault();
     this._multipleFormDOMNode.reset();
   };
@@ -69,7 +69,7 @@ class SelectFixture extends React.Component {
           </fieldset>
           <fieldset>
             <legend>Controlled in nested subtree</legend>
-            <div ref={node => (this._nestedDOMNode = node)} />
+            <div ref={(node) => (this._nestedDOMNode = node)} />
             <span className="hint">
               This should synchronize in both direction with the "Controlled".
             </span>
@@ -127,7 +127,7 @@ class SelectFixture extends React.Component {
           </TestCase.ExpectedResult>
 
           <div className="test-fixture">
-            <form ref={n => (this._singleFormDOMNode = n)}>
+            <form ref={(n) => (this._singleFormDOMNode = n)}>
               <select defaultValue="bar">
                 <option value="foo">foo</option>
                 <option value="bar">bar</option>
@@ -148,7 +148,7 @@ class SelectFixture extends React.Component {
           </TestCase.ExpectedResult>
 
           <div className="test-fixture">
-            <form ref={n => (this._multipleFormDOMNode = n)}>
+            <form ref={(n) => (this._multipleFormDOMNode = n)}>
               <select multiple defaultValue={['foo', 'baz']}>
                 <option value="foo">foo</option>
                 <option value="bar">bar</option>
@@ -180,7 +180,8 @@ class SelectFixture extends React.Component {
 
         <TestCase
           title="An option which contains conditional render fails"
-          relatedIssues="11911">
+          relatedIssues="11911"
+        >
           <TestCase.Steps>
             <li>Select any option</li>
           </TestCase.Steps>
@@ -206,7 +207,8 @@ class SelectFixture extends React.Component {
         <TestCase
           title="A select with the size attribute should not set first option as selected"
           relatedIssues="14239"
-          introducedIn="16.0.0">
+          introducedIn="16.0.0"
+        >
           <TestCase.ExpectedResult>
             No options should be selected.
           </TestCase.ExpectedResult>

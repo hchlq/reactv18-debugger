@@ -4,10 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                
 
 export const NoMode = 0b00000;
 export const StrictMode = 0b00001;

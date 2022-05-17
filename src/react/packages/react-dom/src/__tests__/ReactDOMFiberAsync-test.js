@@ -56,7 +56,7 @@ describe('ReactDOMFiberAsync', () => {
     class Component extends React.Component {
       state = {text: ''};
       push(val) {
-        this.setState(state => ({text: state.text + val}));
+        this.setState((state) => ({text: state.text + val}));
       }
       componentDidUpdate() {
         ops.push(this.state.text);
@@ -94,7 +94,7 @@ describe('ReactDOMFiberAsync', () => {
     class Component extends React.Component {
       state = {text: ''};
       push(val) {
-        this.setState(state => ({text: state.text + val}));
+        this.setState((state) => ({text: state.text + val}));
       }
       componentDidUpdate() {
         ops.push(this.state.text);
@@ -164,7 +164,7 @@ describe('ReactDOMFiberAsync', () => {
       class Counter extends React.Component {
         state = {asyncValue: '', syncValue: ''};
 
-        handleChange = e => {
+        handleChange = (e) => {
           const nextValue = e.target.value;
           requestIdleCallback(() => {
             this.setState({
@@ -256,7 +256,7 @@ describe('ReactDOMFiberAsync', () => {
       class Component extends React.Component {
         state = {text: ''};
         push(val) {
-          this.setState(state => ({text: state.text + val}));
+          this.setState((state) => ({text: state.text + val}));
         }
         componentDidUpdate() {
           ops.push(this.state.text);
@@ -303,7 +303,7 @@ describe('ReactDOMFiberAsync', () => {
       class Counter extends React.Component {
         state = {counter: 0};
         increment = () =>
-          this.setState(state => ({counter: state.counter + 1}));
+          this.setState((state) => ({counter: state.counter + 1}));
         render() {
           inst = this;
           return this.state.counter;
@@ -343,7 +343,7 @@ describe('ReactDOMFiberAsync', () => {
       class Counter extends React.Component {
         state = {counter: 0};
         increment = () =>
-          this.setState(state => ({counter: state.counter + 1}));
+          this.setState((state) => ({counter: state.counter + 1}));
         render() {
           inst = this;
           return this.state.counter;
@@ -375,7 +375,7 @@ describe('ReactDOMFiberAsync', () => {
       class Counter extends React.Component {
         state = {counter: 0};
         increment = () =>
-          this.setState(state => ({counter: state.counter + 1}));
+          this.setState((state) => ({counter: state.counter + 1}));
         render() {
           inst = this;
           return this.state.counter;
@@ -482,7 +482,8 @@ describe('ReactDOMFiberAsync', () => {
                 onClick={
                   this.state.active ? this.submitForm : this.disabledSubmitForm
                 }
-                ref={submitButtonRef}>
+                ref={submitButtonRef}
+              >
                 Submit
               </button>
             </div>
@@ -542,7 +543,8 @@ describe('ReactDOMFiberAsync', () => {
               </button>
               <button
                 onClick={this.state.active ? this.submitForm : null}
-                ref={submitButtonRef}>
+                ref={submitButtonRef}
+              >
                 Submit
               </button>{' '}
               : null}

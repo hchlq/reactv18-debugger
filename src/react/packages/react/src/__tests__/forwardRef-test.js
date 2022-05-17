@@ -126,9 +126,7 @@ describe('forwardRef', () => {
   });
 
   it('should warn if not provided a callback during creation', () => {
-    expect(() =>
-      React.forwardRef(undefined),
-    ).toErrorDev(
+    expect(() => React.forwardRef(undefined)).toErrorDev(
       'forwardRef requires a render function but was given undefined.',
       {withoutStack: true},
     );
@@ -138,18 +136,14 @@ describe('forwardRef', () => {
         withoutStack: true,
       },
     );
-    expect(() =>
-      React.forwardRef('foo'),
-    ).toErrorDev(
+    expect(() => React.forwardRef('foo')).toErrorDev(
       'forwardRef requires a render function but was given string.',
       {withoutStack: true},
     );
   });
 
   it('should warn if no render function is provided', () => {
-    expect(
-      React.forwardRef,
-    ).toErrorDev(
+    expect(React.forwardRef).toErrorDev(
       'forwardRef requires a render function but was given undefined.',
       {withoutStack: true},
     );
@@ -166,16 +160,12 @@ describe('forwardRef', () => {
     }
     renderWithDefaultProps.defaultProps = {};
 
-    expect(() =>
-      React.forwardRef(renderWithPropTypes),
-    ).toErrorDev(
+    expect(() => React.forwardRef(renderWithPropTypes)).toErrorDev(
       'forwardRef render functions do not support propTypes or defaultProps. ' +
         'Did you accidentally pass a React component?',
       {withoutStack: true},
     );
-    expect(() =>
-      React.forwardRef(renderWithDefaultProps),
-    ).toErrorDev(
+    expect(() => React.forwardRef(renderWithDefaultProps)).toErrorDev(
       'forwardRef render functions do not support propTypes or defaultProps. ' +
         'Did you accidentally pass a React component?',
       {withoutStack: true},
@@ -189,11 +179,9 @@ describe('forwardRef', () => {
   });
 
   it('should warn if the render function provided does not use the forwarded ref parameter', () => {
-    const arityOfOne = props => <div {...props} />;
+    const arityOfOne = (props) => <div {...props} />;
 
-    expect(() =>
-      React.forwardRef(arityOfOne),
-    ).toErrorDev(
+    expect(() => React.forwardRef(arityOfOne)).toErrorDev(
       'forwardRef render functions accept exactly two parameters: props and ref. ' +
         'Did you forget to use the ref parameter?',
       {withoutStack: true},
@@ -208,9 +196,7 @@ describe('forwardRef', () => {
   it('should warn if the render function provided expects to use more than two parameters', () => {
     const arityOfThree = (props, ref, x) => <div {...props} ref={ref} x={x} />;
 
-    expect(() =>
-      React.forwardRef(arityOfThree),
-    ).toErrorDev(
+    expect(() => React.forwardRef(arityOfThree)).toErrorDev(
       'forwardRef render functions accept exactly two parameters: props and ref. ' +
         'Any additional parameter will be undefined.',
       {withoutStack: true},
@@ -218,7 +204,7 @@ describe('forwardRef', () => {
   });
 
   it('should honor a displayName if set on the forwardRef wrapper in warnings', () => {
-    const Component = props => <div {...props} />;
+    const Component = (props) => <div {...props} />;
 
     const RefForwardingComponent = React.forwardRef((props, ref) => (
       <Component {...props} forwardedRef={ref} />
@@ -247,7 +233,7 @@ describe('forwardRef', () => {
   });
 
   it('should honor a displayName in stacks if set on the inner function', () => {
-    const Component = props => <div {...props} />;
+    const Component = (props) => <div {...props} />;
 
     const inner = (props, ref) => <Component {...props} forwardedRef={ref} />;
     inner.displayName = 'Foo';
@@ -274,7 +260,7 @@ describe('forwardRef', () => {
   });
 
   it('should not bailout if forwardRef is not wrapped in memo', () => {
-    const Component = props => <div {...props} />;
+    const Component = (props) => <div {...props} />;
 
     let renderCount = 0;
 
@@ -295,7 +281,7 @@ describe('forwardRef', () => {
   });
 
   it('should bailout if forwardRef is wrapped in memo', () => {
-    const Component = props => <div ref={props.forwardedRef} />;
+    const Component = (props) => <div ref={props.forwardedRef} />;
 
     let renderCount = 0;
 
@@ -335,7 +321,7 @@ describe('forwardRef', () => {
   });
 
   it('should custom memo comparisons to compose', () => {
-    const Component = props => <div ref={props.forwardedRef} />;
+    const Component = (props) => <div ref={props.forwardedRef} />;
 
     let renderCount = 0;
 

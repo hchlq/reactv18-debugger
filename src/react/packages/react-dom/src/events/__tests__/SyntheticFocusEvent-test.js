@@ -30,8 +30,8 @@ describe('SyntheticFocusEvent', () => {
     const log = [];
     ReactDOM.render(
       <button
-        onFocus={event => log.push(`onFocus: ${event.type}`)}
-        onFocusCapture={event => log.push(`onFocusCapture: ${event.type}`)}
+        onFocus={(event) => log.push(`onFocus: ${event.type}`)}
+        onFocusCapture={(event) => log.push(`onFocusCapture: ${event.type}`)}
       />,
       container,
     );
@@ -51,8 +51,8 @@ describe('SyntheticFocusEvent', () => {
     const log = [];
     ReactDOM.render(
       <button
-        onBlur={event => log.push(`onBlur: ${event.type}`)}
-        onBlurCapture={event => log.push(`onBlurCapture: ${event.type}`)}
+        onBlur={(event) => log.push(`onBlur: ${event.type}`)}
+        onBlurCapture={(event) => log.push(`onBlurCapture: ${event.type}`)}
       />,
       container,
     );

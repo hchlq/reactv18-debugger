@@ -4,33 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                                        
-
-                                 
-     
-     
-     
-     
-     
-     
-     
-     
-     
-     
-      
-      
-      
-      
-      
-      
-      
-       
-                                  
-                                 
-                                         
 
 import invariant from 'shared/invariant';
 
@@ -43,82 +18,82 @@ import {
   NoPriority as NoSchedulerPriority,
 } from './SchedulerWithReactIntegration.new';
 
-export const SyncLanePriority               = 15;
-export const SyncBatchedLanePriority               = 14;
+export const SyncLanePriority = 15;
+export const SyncBatchedLanePriority = 14;
 
-const InputDiscreteHydrationLanePriority               = 13;
-export const InputDiscreteLanePriority               = 12;
+const InputDiscreteHydrationLanePriority = 13;
+export const InputDiscreteLanePriority = 12;
 
-const InputContinuousHydrationLanePriority               = 11;
-export const InputContinuousLanePriority               = 10;
+const InputContinuousHydrationLanePriority = 11;
+export const InputContinuousLanePriority = 10;
 
-const DefaultHydrationLanePriority               = 9;
-export const DefaultLanePriority               = 8;
+const DefaultHydrationLanePriority = 9;
+export const DefaultLanePriority = 8;
 
-const TransitionHydrationPriority               = 7;
-export const TransitionPriority               = 6;
+const TransitionHydrationPriority = 7;
+export const TransitionPriority = 6;
 
-const RetryLanePriority               = 5;
+const RetryLanePriority = 5;
 
-const SelectiveHydrationLanePriority               = 4;
+const SelectiveHydrationLanePriority = 4;
 
-const IdleHydrationLanePriority               = 3;
-const IdleLanePriority               = 2;
+const IdleHydrationLanePriority = 3;
+const IdleLanePriority = 2;
 
-const OffscreenLanePriority               = 1;
+const OffscreenLanePriority = 1;
 
-export const NoLanePriority               = 0;
+export const NoLanePriority = 0;
 
 const TotalLanes = 31;
 
-export const NoLanes        = /*                        */ 0b0000000000000000000000000000000;
-export const NoLane       = /*                          */ 0b0000000000000000000000000000000;
+export const NoLanes = /*                        */ 0b0000000000000000000000000000000;
+export const NoLane = /*                          */ 0b0000000000000000000000000000000;
 
-export const SyncLane       = /*                        */ 0b0000000000000000000000000000001;
-export const SyncBatchedLane       = /*                 */ 0b0000000000000000000000000000010;
+export const SyncLane = /*                        */ 0b0000000000000000000000000000001;
+export const SyncBatchedLane = /*                 */ 0b0000000000000000000000000000010;
 
-export const InputDiscreteHydrationLane       = /*      */ 0b0000000000000000000000000000100;
-const InputDiscreteLanes        = /*                    */ 0b0000000000000000000000000011000;
+export const InputDiscreteHydrationLane = /*      */ 0b0000000000000000000000000000100;
+const InputDiscreteLanes = /*                    */ 0b0000000000000000000000000011000;
 
-const InputContinuousHydrationLane       = /*           */ 0b0000000000000000000000000100000;
-const InputContinuousLanes        = /*                  */ 0b0000000000000000000000011000000;
+const InputContinuousHydrationLane = /*           */ 0b0000000000000000000000000100000;
+const InputContinuousLanes = /*                  */ 0b0000000000000000000000011000000;
 
-export const DefaultHydrationLane       = /*            */ 0b0000000000000000000000100000000;
-export const DefaultLanes        = /*                   */ 0b0000000000000000000111000000000;
+export const DefaultHydrationLane = /*            */ 0b0000000000000000000000100000000;
+export const DefaultLanes = /*                   */ 0b0000000000000000000111000000000;
 
-const TransitionHydrationLane       = /*                */ 0b0000000000000000001000000000000;
-const TransitionLanes        = /*                       */ 0b0000000001111111110000000000000;
+const TransitionHydrationLane = /*                */ 0b0000000000000000001000000000000;
+const TransitionLanes = /*                       */ 0b0000000001111111110000000000000;
 
-const RetryLanes        = /*                            */ 0b0000011110000000000000000000000;
+const RetryLanes = /*                            */ 0b0000011110000000000000000000000;
 
-export const SomeRetryLane        = /*                  */ 0b0000010000000000000000000000000;
+export const SomeRetryLane = /*                  */ 0b0000010000000000000000000000000;
 
-export const SelectiveHydrationLane       = /*          */ 0b0000100000000000000000000000000;
+export const SelectiveHydrationLane = /*          */ 0b0000100000000000000000000000000;
 
 const NonIdleLanes = /*                                 */ 0b0000111111111111111111111111111;
 
-export const IdleHydrationLane       = /*               */ 0b0001000000000000000000000000000;
-const IdleLanes        = /*                             */ 0b0110000000000000000000000000000;
+export const IdleHydrationLane = /*               */ 0b0001000000000000000000000000000;
+const IdleLanes = /*                             */ 0b0110000000000000000000000000000;
 
-export const OffscreenLane       = /*                   */ 0b1000000000000000000000000000000;
+export const OffscreenLane = /*                   */ 0b1000000000000000000000000000000;
 
 export const NoTimestamp = -1;
 
-let currentUpdateLanePriority               = NoLanePriority;
+let currentUpdateLanePriority = NoLanePriority;
 
-export function getCurrentUpdateLanePriority()               {
+export function getCurrentUpdateLanePriority() {
   return currentUpdateLanePriority;
 }
 
-export function setCurrentUpdateLanePriority(newLanePriority              ) {
+export function setCurrentUpdateLanePriority(newLanePriority) {
   currentUpdateLanePriority = newLanePriority;
 }
 
 // "Registers" used to "return" multiple values
 // Used by getHighestPriorityLanes and getNextLanes:
-let return_highestLanePriority               = DefaultLanePriority;
+let return_highestLanePriority = DefaultLanePriority;
 
-function getHighestPriorityLanes(lanes              )        {
+function getHighestPriorityLanes(lanes) {
   if ((SyncLane & lanes) !== NoLanes) {
     return_highestLanePriority = SyncLanePriority;
     return SyncLane;
@@ -193,9 +168,7 @@ function getHighestPriorityLanes(lanes              )        {
   return lanes;
 }
 
-export function schedulerPriorityToLanePriority(
-  schedulerPriorityLevel                    ,
-)               {
+export function schedulerPriorityToLanePriority(schedulerPriorityLevel) {
   switch (schedulerPriorityLevel) {
     case ImmediateSchedulerPriority:
       return SyncLanePriority;
@@ -212,9 +185,7 @@ export function schedulerPriorityToLanePriority(
   }
 }
 
-export function lanePriorityToSchedulerPriority(
-  lanePriority              ,
-)                     {
+export function lanePriorityToSchedulerPriority(lanePriority) {
   switch (lanePriority) {
     case SyncLanePriority:
     case SyncBatchedLanePriority:
@@ -246,7 +217,7 @@ export function lanePriorityToSchedulerPriority(
   }
 }
 
-export function getNextLanes(root           , wipLanes       )        {
+export function getNextLanes(root, wipLanes) {
   // Early bailout if there's no pending work left.
   const pendingLanes = root.pendingLanes;
   if (pendingLanes === NoLanes) {
@@ -359,7 +330,7 @@ export function getNextLanes(root           , wipLanes       )        {
   return nextLanes;
 }
 
-export function getMostRecentEventTime(root           , lanes       )         {
+export function getMostRecentEventTime(root, lanes) {
   const eventTimes = root.eventTimes;
 
   let mostRecentEventTime = NoTimestamp;
@@ -378,7 +349,7 @@ export function getMostRecentEventTime(root           , lanes       )         {
   return mostRecentEventTime;
 }
 
-function computeExpirationTime(lane      , currentTime        ) {
+function computeExpirationTime(lane, currentTime) {
   // TODO: Expiration heuristic is constant per lane, so could use a map.
   getHighestPriorityLanes(lane);
   const priority = return_highestLanePriority;
@@ -407,10 +378,7 @@ function computeExpirationTime(lane      , currentTime        ) {
   }
 }
 
-export function markStarvedLanesAsExpired(
-  root           ,
-  currentTime        ,
-)       {
+export function markStarvedLanesAsExpired(root, currentTime) {
   // TODO: This gets called every time we yield. We can optimize by storing
   // the earliest expiration time on the root. Then use that to quickly bail out
   // of this function.
@@ -451,11 +419,11 @@ export function markStarvedLanesAsExpired(
 
 // This returns the highest priority pending lanes regardless of whether they
 // are suspended.
-export function getHighestPriorityPendingLanes(root           ) {
+export function getHighestPriorityPendingLanes(root) {
   return getHighestPriorityLanes(root.pendingLanes);
 }
 
-export function getLanesToRetrySynchronouslyOnError(root           )        {
+export function getLanesToRetrySynchronouslyOnError(root) {
   const everythingButOffscreen = root.pendingLanes & ~OffscreenLane;
   if (everythingButOffscreen !== NoLanes) {
     return everythingButOffscreen;
@@ -469,22 +437,19 @@ export function getLanesToRetrySynchronouslyOnError(root           )        {
 export function returnNextLanesPriority() {
   return return_highestLanePriority;
 }
-export function includesNonIdleWork(lanes       ) {
+export function includesNonIdleWork(lanes) {
   return (lanes & NonIdleLanes) !== NoLanes;
 }
-export function includesOnlyRetries(lanes       ) {
+export function includesOnlyRetries(lanes) {
   return (lanes & RetryLanes) === lanes;
 }
-export function includesOnlyTransitions(lanes       ) {
+export function includesOnlyTransitions(lanes) {
   return (lanes & TransitionLanes) === lanes;
 }
 
 // To ensure consistency across multiple updates in the same event, this should
 // be a pure function, so that it always returns the same lane for given inputs.
-export function findUpdateLane(
-  lanePriority              ,
-  wipLanes       ,
-)       {
+export function findUpdateLane(lanePriority, wipLanes) {
   switch (lanePriority) {
     case NoLanePriority:
       break;
@@ -545,7 +510,7 @@ export function findUpdateLane(
 
 // To ensure consistency across multiple updates in the same event, this should
 // be pure function, so that it always returns the same lane for given inputs.
-export function findTransitionLane(wipLanes       , pendingLanes       )       {
+export function findTransitionLane(wipLanes, pendingLanes) {
   // First look for lanes that are completely unclaimed, i.e. have no
   // pending work.
   let lane = pickArbitraryLane(TransitionLanes & ~pendingLanes);
@@ -564,7 +529,7 @@ export function findTransitionLane(wipLanes       , pendingLanes       )       {
 
 // To ensure consistency across multiple updates in the same event, this should
 // be pure function, so that it always returns the same lane for given inputs.
-export function findRetryLane(wipLanes       )       {
+export function findRetryLane(wipLanes) {
   // This is a fork of `findUpdateLane` designed specifically for Suspense
   // "retries" — a special update that attempts to flip a Suspense boundary
   // from its placeholder state to its primary/resolved state.
@@ -575,21 +540,21 @@ export function findRetryLane(wipLanes       )       {
   return lane;
 }
 
-function getHighestPriorityLane(lanes       ) {
+function getHighestPriorityLane(lanes) {
   return lanes & -lanes;
 }
 
-function getLowestPriorityLane(lanes       )       {
+function getLowestPriorityLane(lanes) {
   // This finds the most significant non-zero bit.
   const index = 31 - clz32(lanes);
   return index < 0 ? NoLanes : 1 << index;
 }
 
-function getEqualOrHigherPriorityLanes(lanes              )        {
+function getEqualOrHigherPriorityLanes(lanes) {
   return (getLowestPriorityLane(lanes) << 1) - 1;
 }
 
-export function pickArbitraryLane(lanes       )       {
+export function pickArbitraryLane(lanes) {
   // This wrapper function gets inlined. Only exists so to communicate that it
   // doesn't matter which bit is selected; you can pick any bit without
   // affecting the algorithms where its used. Here I'm using
@@ -597,49 +562,46 @@ export function pickArbitraryLane(lanes       )       {
   return getHighestPriorityLane(lanes);
 }
 
-function pickArbitraryLaneIndex(lanes       ) {
+function pickArbitraryLaneIndex(lanes) {
   return 31 - clz32(lanes);
 }
 
-function laneToIndex(lane      ) {
+function laneToIndex(lane) {
   return pickArbitraryLaneIndex(lane);
 }
 
-export function includesSomeLane(a              , b              ) {
+export function includesSomeLane(a, b) {
   return (a & b) !== NoLanes;
 }
 
-export function isSubsetOfLanes(set       , subset              ) {
+export function isSubsetOfLanes(set, subset) {
   return (set & subset) === subset;
 }
 
-export function mergeLanes(a              , b              )        {
+export function mergeLanes(a, b) {
   return a | b;
 }
 
-export function removeLanes(set       , subset              )        {
+export function removeLanes(set, subset) {
   return set & ~subset;
 }
 
 // Seems redundant, but it changes the type from a single lane (used for
 // updates) to a group of lanes (used for flushing work).
-export function laneToLanes(lane      )        {
+export function laneToLanes(lane) {
   return lane;
 }
 
-export function higherPriorityLane(a      , b      ) {
+export function higherPriorityLane(a, b) {
   // This works because the bit ranges decrease in priority as you go left.
   return a !== NoLane && a < b ? a : b;
 }
 
-export function higherLanePriority(
-  a              ,
-  b              ,
-)               {
+export function higherLanePriority(a, b) {
   return a !== NoLanePriority && a > b ? a : b;
 }
 
-export function createLaneMap   (initial   )             {
+export function createLaneMap(initial) {
   // Intentionally pushing one by one.
   // https://v8.dev/blog/elements-kinds#avoid-creating-holes
   const laneMap = [];
@@ -649,11 +611,7 @@ export function createLaneMap   (initial   )             {
   return laneMap;
 }
 
-export function markRootUpdated(
-  root           ,
-  updateLane      ,
-  eventTime        ,
-) {
+export function markRootUpdated(root, updateLane, eventTime) {
   root.pendingLanes |= updateLane;
 
   // TODO: Theoretically, any update to any lane can unblock any other lane. But
@@ -679,7 +637,7 @@ export function markRootUpdated(
   eventTimes[index] = eventTime;
 }
 
-export function markRootSuspended(root           , suspendedLanes       ) {
+export function markRootSuspended(root, suspendedLanes) {
   root.suspendedLanes |= suspendedLanes;
   root.pingedLanes &= ~suspendedLanes;
 
@@ -696,31 +654,27 @@ export function markRootSuspended(root           , suspendedLanes       ) {
   }
 }
 
-export function markRootPinged(
-  root           ,
-  pingedLanes       ,
-  eventTime        ,
-) {
+export function markRootPinged(root, pingedLanes, eventTime) {
   root.pingedLanes |= root.suspendedLanes & pingedLanes;
 }
 
-export function markRootExpired(root           , expiredLanes       ) {
+export function markRootExpired(root, expiredLanes) {
   root.expiredLanes |= expiredLanes & root.pendingLanes;
 }
 
-export function markDiscreteUpdatesExpired(root           ) {
+export function markDiscreteUpdatesExpired(root) {
   root.expiredLanes |= InputDiscreteLanes & root.pendingLanes;
 }
 
-export function hasDiscreteLanes(lanes       ) {
+export function hasDiscreteLanes(lanes) {
   return (lanes & InputDiscreteLanes) !== NoLanes;
 }
 
-export function markRootMutableRead(root           , updateLane      ) {
+export function markRootMutableRead(root, updateLane) {
   root.mutableReadLanes |= updateLane & root.pendingLanes;
 }
 
-export function markRootFinished(root           , remainingLanes       ) {
+export function markRootFinished(root, remainingLanes) {
   const noLongerPendingLanes = root.pendingLanes & ~remainingLanes;
 
   root.pendingLanes = remainingLanes;
@@ -752,7 +706,7 @@ export function markRootFinished(root           , remainingLanes       ) {
   }
 }
 
-export function markRootEntangled(root           , entangledLanes       ) {
+export function markRootEntangled(root, entangledLanes) {
   root.entangledLanes |= entangledLanes;
 
   const entanglements = root.entanglements;
@@ -767,10 +721,7 @@ export function markRootEntangled(root           , entangledLanes       ) {
   }
 }
 
-export function getBumpedLaneForHydration(
-  root           ,
-  renderLanes       ,
-)       {
+export function getBumpedLaneForHydration(root, renderLanes) {
   getHighestPriorityLanes(renderLanes);
   const highestLanePriority = return_highestLanePriority;
 
@@ -834,7 +785,7 @@ const clz32 = Math.clz32 ? Math.clz32 : clz32Fallback;
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/clz32
 const log = Math.log;
 const LN2 = Math.LN2;
-function clz32Fallback(lanes              ) {
+function clz32Fallback(lanes) {
   if (lanes === 0) {
     return 32;
   }

@@ -4,19 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                      
-             
-                
-                                   
-                                 
-                           
-                
-                                     
-                            
-                                                      
 
 // Modules provided by RN:
 import {
@@ -31,16 +20,12 @@ import {
 } from './NativeMethodsMixinUtils';
 
 class ReactNativeFiberHostComponent {
-  _children                          ;
-  _nativeTag        ;
-  _internalFiberInstanceHandleDEV        ;
-  viewConfig                                      ;
+  _children;
+  _nativeTag;
+  _internalFiberInstanceHandleDEV;
+  viewConfig;
 
-  constructor(
-    tag        ,
-    viewConfig                                      ,
-    internalInstanceHandleDEV        ,
-  ) {
+  constructor(tag, viewConfig, internalInstanceHandleDEV) {
     this._nativeTag = tag;
     this._children = [];
     this.viewConfig = viewConfig;
@@ -57,14 +42,14 @@ class ReactNativeFiberHostComponent {
     TextInputState.focusTextInput(this);
   }
 
-  measure(callback                          ) {
+  measure(callback) {
     UIManager.measure(
       this._nativeTag,
       mountSafeCallback_NOT_REALLY_SAFE(this, callback),
     );
   }
 
-  measureInWindow(callback                                  ) {
+  measureInWindow(callback) {
     UIManager.measureInWindow(
       this._nativeTag,
       mountSafeCallback_NOT_REALLY_SAFE(this, callback),
@@ -72,17 +57,17 @@ class ReactNativeFiberHostComponent {
   }
 
   measureLayout(
-    relativeToNativeNode                                           ,
-    onSuccess                                ,
-    onFail              /* currently unused */,
+    relativeToNativeNode,
+    onSuccess,
+    onFail /* currently unused */,
   ) {
-    let relativeNode         ;
+    let relativeNode;
 
     if (typeof relativeToNativeNode === 'number') {
       // Already a node handle
       relativeNode = relativeToNativeNode;
     } else {
-      const nativeNode                                = (relativeToNativeNode     );
+      const nativeNode = relativeToNativeNode;
       if (nativeNode._nativeTag) {
         relativeNode = nativeNode._nativeTag;
       }
@@ -106,7 +91,7 @@ class ReactNativeFiberHostComponent {
     );
   }
 
-  setNativeProps(nativeProps        ) {
+  setNativeProps(nativeProps) {
     if (__DEV__) {
       warnForStyleProps(nativeProps, this.viewConfig.validAttributes);
     }
@@ -127,6 +112,6 @@ class ReactNativeFiberHostComponent {
 }
 
 // eslint-disable-next-line no-unused-expressions
-(ReactNativeFiberHostComponent.prototype               );
+ReactNativeFiberHostComponent.prototype;
 
 export default ReactNativeFiberHostComponent;

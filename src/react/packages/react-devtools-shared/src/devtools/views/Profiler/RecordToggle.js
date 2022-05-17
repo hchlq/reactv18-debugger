@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -15,14 +15,9 @@ import {ProfilerContext} from './ProfilerContext';
 
 import styles from './RecordToggle.css';
 
-                      
-                     
-   
-
-export default function RecordToggle({disabled}       ) {
-  const {isProfiling, startProfiling, stopProfiling} = useContext(
-    ProfilerContext,
-  );
+export default function RecordToggle({disabled}) {
+  const {isProfiling, startProfiling, stopProfiling} =
+    useContext(ProfilerContext);
 
   let className = styles.InactiveRecordToggle;
   if (disabled) {
@@ -36,7 +31,8 @@ export default function RecordToggle({disabled}       ) {
       className={className}
       disabled={disabled}
       onClick={isProfiling ? stopProfiling : startProfiling}
-      title={isProfiling ? 'Stop profiling' : 'Start profiling'}>
+      title={isProfiling ? 'Stop profiling' : 'Start profiling'}
+    >
       <ButtonIcon type="record" />
     </Button>
   );

@@ -46,14 +46,14 @@ describe('ReactSuspense', () => {
                       );
                       status = 'rejected';
                       value = new Error('Failed to load: ' + text);
-                      listeners.forEach(listener => listener.reject(value));
+                      listeners.forEach((listener) => listener.reject(value));
                     } else {
                       Scheduler.unstable_yieldValue(
                         `Promise resolved [${text}]`,
                       );
                       status = 'resolved';
                       value = text;
-                      listeners.forEach(listener => listener.resolve(value));
+                      listeners.forEach((listener) => listener.resolve(value));
                     }
                   }, ms);
                 } else {
@@ -213,7 +213,7 @@ describe('ReactSuspense', () => {
 
     function resolveThenable() {
       didResolve = true;
-      listeners.forEach(l => l());
+      listeners.forEach((l) => l());
     }
 
     function Async() {
@@ -1526,7 +1526,7 @@ describe('ReactSuspense', () => {
       }
 
       async function fetchComponent() {
-        return new Promise(r => {
+        return new Promise((r) => {
           // simulating a delayed import() call
           setTimeout(r, 1000, {default: Hello});
         });

@@ -10,7 +10,7 @@ import {
 import {initialize as initializeFrontend} from 'react-devtools-inline/frontend';
 import {initDevTools} from 'react-devtools-shared/src/devtools';
 
-const iframe = ((document.getElementById('target')     )                   );
+const iframe = document.getElementById('target');
 
 const {contentDocument, contentWindow} = iframe;
 
@@ -19,14 +19,12 @@ contentWindow.__REACT_DEVTOOLS_TARGET_WINDOW__ = window;
 
 initializeBackend(contentWindow);
 
-const container = ((document.getElementById('devtools')     )             );
+const container = document.getElementById('devtools');
 
 let isTestAppMounted = true;
 
-const mountButton = ((document.getElementById(
-  'mountButton',
-)     )                   );
-mountButton.addEventListener('click', function() {
+const mountButton = document.getElementById('mountButton');
+mountButton.addEventListener('click', function () {
   if (isTestAppMounted) {
     if (typeof window.unmountTestApp === 'function') {
       window.unmountTestApp();
@@ -74,5 +72,5 @@ function inject(sourcePath, callback) {
   script.onload = callback;
   script.src = sourcePath;
 
-  ((contentDocument.body     )                 ).appendChild(script);
+  contentDocument.body.appendChild(script);
 }

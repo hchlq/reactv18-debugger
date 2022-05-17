@@ -18,13 +18,13 @@ import {enableDiscreteEventFlushingChange} from 'shared/ReactFeatureFlags';
 // scheduled work and instead do synchronous work.
 
 // Defaults
-let batchedUpdatesImpl = function(fn, bookkeeping) {
+let batchedUpdatesImpl = function (fn, bookkeeping) {
   return fn(bookkeeping);
 };
-let discreteUpdatesImpl = function(fn, a, b, c, d) {
+let discreteUpdatesImpl = function (fn, a, b, c, d) {
   return fn(a, b, c, d);
 };
-let flushDiscreteUpdatesImpl = function() {};
+let flushDiscreteUpdatesImpl = function () {};
 let batchedEventUpdatesImpl = batchedUpdatesImpl;
 
 let isInsideEventHandler = false;

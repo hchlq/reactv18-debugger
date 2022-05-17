@@ -12,12 +12,14 @@ class InputChangeEvents extends React.Component {
     return (
       <FixtureSet
         title="Input change events"
-        description="Tests proper behavior of the onChange event for inputs">
+        description="Tests proper behavior of the onChange event for inputs"
+      >
         <TestCase
           title="Range keyboard changes"
           description={`
             Range inputs should fire onChange events for keyboard events
-          `}>
+          `}
+        >
           <TestCase.Steps>
             <li>Focus range input</li>
             <li>change value via the keyboard arrow keys</li>
@@ -37,7 +39,8 @@ class InputChangeEvents extends React.Component {
             Radio inputs should only fire change events when the checked
             state changes.
           `}
-          resolvedIn="16.0.0">
+          resolvedIn="16.0.0"
+        >
           <TestCase.Steps>
             <li>Click on the Radio input (or label text)</li>
           </TestCase.Steps>
@@ -54,7 +57,8 @@ class InputChangeEvents extends React.Component {
             Radio inputs should fire change events when the value moved to
             another named input
           `}
-          introducedIn="15.6.0">
+          introducedIn="15.6.0"
+        >
           <TestCase.Steps>
             <li>Click on the "Radio 2"</li>
             <li>Click back to "Radio 1"</li>
@@ -77,7 +81,8 @@ class InputChangeEvents extends React.Component {
           `}
           resolvedIn="15.0.0"
           resolvedBy="#5004"
-          affectedBrowsers="IE9+">
+          affectedBrowsers="IE9+"
+        >
           <TestCase.Steps>
             <li>Click on the Text input</li>
             <li>Click on the "Change placeholder" button</li>
@@ -96,7 +101,8 @@ class InputChangeEvents extends React.Component {
             the names changes
           `}
           resolvedBy="#11227"
-          affectedBrowsers="IE9+">
+          affectedBrowsers="IE9+"
+        >
           <TestCase.Steps>
             <li>Click the toggle button</li>
           </TestCase.Steps>

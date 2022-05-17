@@ -80,7 +80,7 @@ class VectorWidget extends React.Component {
   /**
    * Better SVG support for React coming soon.
    */
-  renderGraphic = rotation => {
+  renderGraphic = (rotation) => {
     return (
       <Group onMouseDown={this.handleMouseDown} onMouseUp={this.handleMouseUp}>
         <Group x={210} y={135}>

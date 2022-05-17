@@ -66,8 +66,9 @@ describe('ReactCompositeComponent', () => {
     React = require('react');
     ReactDOM = require('react-dom');
     ReactDOMServer = require('react-dom/server');
-    ReactCurrentOwner = require('react')
-      .__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.ReactCurrentOwner;
+    ReactCurrentOwner =
+      require('react').__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED
+        .ReactCurrentOwner;
     ReactTestUtils = require('react-dom/test-utils');
     PropTypes = require('prop-types');
 
@@ -192,9 +193,7 @@ describe('ReactCompositeComponent', () => {
     // Old API based on heuristic
     let container = document.createElement('div');
     container.innerHTML = markup;
-    expect(() =>
-      ReactDOM.render(<Parent />, container),
-    ).toWarnDev(
+    expect(() => ReactDOM.render(<Parent />, container)).toWarnDev(
       'render(): Calling ReactDOM.render() to hydrate server-rendered markup ' +
         'will stop working in React v18. Replace the ReactDOM.render() call ' +
         'with ReactDOM.hydrate() if you want React to attach to the server HTML.',
@@ -395,7 +394,7 @@ describe('ReactCompositeComponent', () => {
     ReactDOM.render(
       <div>
         <span>
-          <Component ref={c => (instance = c || instance)} />
+          <Component ref={(c) => (instance = c || instance)} />
         </span>
       </div>,
       container,
@@ -433,7 +432,7 @@ describe('ReactCompositeComponent', () => {
 
       componentWillUnmount() {
         expect(() => {
-          this.setState({value: 2}, function() {
+          this.setState({value: 2}, function () {
             cbCalled = true;
           });
         }).not.toThrow();
@@ -926,7 +925,7 @@ describe('ReactCompositeComponent', () => {
     expect(childInstance).toBeNull();
 
     expect(parentInstance.state.flag).toBe(false);
-    ReactDOM.unstable_batchedUpdates(function() {
+    ReactDOM.unstable_batchedUpdates(function () {
       parentInstance.setState({flag: true});
     });
     expect(parentInstance.state.flag).toBe(true);
@@ -1087,7 +1086,7 @@ describe('ReactCompositeComponent', () => {
 
     let parentInstance = null;
     ReactDOM.render(
-      <Parent ref={inst => (parentInstance = inst)}>
+      <Parent ref={(inst) => (parentInstance = inst)}>
         <ChildWithoutContext>
           A1
           <GrandChild>A2</GrandChild>
@@ -1320,17 +1319,18 @@ describe('ReactCompositeComponent', () => {
   });
 
   it('should support objects with prototypes as state', () => {
-    const NotActuallyImmutable = function(str) {
+    const NotActuallyImmutable = function (str) {
       this.str = str;
     };
-    NotActuallyImmutable.prototype.amIImmutable = function() {
+    NotActuallyImmutable.prototype.amIImmutable = function () {
       return true;
     };
     class Moo extends React.Component {
       state = new NotActuallyImmutable('first');
       // No longer a public API, but we can test that it works internally by
       // reaching into the updater.
-      _replaceState = update => this.updater.enqueueReplaceState(this, update);
+      _replaceState = (update) =>
+        this.updater.enqueueReplaceState(this, update);
       render() {
         return <div />;
       }
@@ -1353,7 +1353,7 @@ describe('ReactCompositeComponent', () => {
 
     // When more than one state update is enqueued, we have the same behavior
     const fifthState = new NotActuallyImmutable('fifth');
-    ReactDOM.unstable_batchedUpdates(function() {
+    ReactDOM.unstable_batchedUpdates(function () {
       moo.setState({str: 'fourth'});
       moo._replaceState(fifthState);
     });
@@ -1361,7 +1361,7 @@ describe('ReactCompositeComponent', () => {
 
     // When more than one state update is enqueued, we have the same behavior
     const sixthState = new NotActuallyImmutable('sixth');
-    ReactDOM.unstable_batchedUpdates(function() {
+    ReactDOM.unstable_batchedUpdates(function () {
       moo._replaceState(sixthState);
       moo.setState({str: 'seventh'});
     });
@@ -1450,7 +1450,7 @@ describe('ReactCompositeComponent', () => {
 
     const container = document.createElement('div');
 
-    const setRef = ref => {
+    const setRef = (ref) => {
       if (ref) {
         app = ref;
       }
@@ -1662,7 +1662,7 @@ describe('ReactCompositeComponent', () => {
     expect(stateSuccessfullyUpdated).toBe(true);
   });
 
-  it('should call the setState callback even if shouldComponentUpdate = false', done => {
+  it('should call the setState callback even if shouldComponentUpdate = false', (done) => {
     const mockFn = jest.fn().mockReturnValue(false);
     const div = document.createElement('div');
 

@@ -11,7 +11,8 @@ class TextInputFixtures extends React.Component {
     return (
       <FixtureSet
         title="Inputs"
-        description="Common behavior across controlled and uncontrolled inputs">
+        description="Common behavior across controlled and uncontrolled inputs"
+      >
         <TestCase title="Numbers in a controlled text field with no handler">
           <TestCase.Steps>
             <li>Move the cursor to after "2" in the text field</li>
@@ -46,7 +47,8 @@ class TextInputFixtures extends React.Component {
         <TestCase
           title="Required Inputs"
           affectedBrowsers="Firefox"
-          relatedIssues="8395">
+          relatedIssues="8395"
+        >
           <TestCase.Steps>
             <li>View this test in Firefox</li>
           </TestCase.Steps>
@@ -128,7 +130,8 @@ class TextInputFixtures extends React.Component {
 
         <TestCase
           title="Replacing email input with text disabled input"
-          relatedIssues="12062">
+          relatedIssues="12062"
+        >
           <TestCase.Steps>
             <li>Type "test@test.com"</li>
             <li>Press enter</li>

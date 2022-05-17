@@ -37,15 +37,15 @@ describe('ReactTransition', () => {
 
   function createAsyncText(text) {
     let resolved = false;
-    const Component = function() {
+    const Component = function () {
       if (!resolved) {
         Scheduler.unstable_yieldValue('Suspend! [' + text + ']');
         throw promise;
       }
       return <Text text={text} />;
     };
-    const promise = new Promise(resolve => {
-      Component.resolve = function() {
+    const promise = new Promise((resolve) => {
+      Component.resolve = function () {
         resolved = true;
         return resolve();
       };

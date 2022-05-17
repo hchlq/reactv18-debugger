@@ -4,17 +4,12 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import memoize from 'memoize-one';
 
-                                                                        
-
-function unmemoizedGetBatchRange(
-  batchUID          ,
-  data                   ,
-)                               {
+function unmemoizedGetBatchRange(batchUID, data) {
   const {measures} = data;
 
   let startTime = 0;

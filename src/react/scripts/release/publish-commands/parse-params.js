@@ -32,7 +32,7 @@ module.exports = () => {
   const params = commandLineArgs(paramDefinitions);
   splitCommaParams(params.skipPackages);
   splitCommaParams(params.tags);
-  params.tags.forEach(tag => {
+  params.tags.forEach((tag) => {
     switch (tag) {
       case 'latest':
       case 'next':

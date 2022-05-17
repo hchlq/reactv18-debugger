@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -16,18 +16,7 @@ import {StoreContext} from '../context';
 
 import styles from './HoveredFiberInfo.css';
 
-                                                        
-
-                                 
-             
-               
-   
-
-                     
-                       
-  
-
-export default function HoveredFiberInfo({fiberData}       ) {
+export default function HoveredFiberInfo({fiberData}) {
   const {profilerStore} = useContext(StoreContext);
   const {rootID, selectedCommitIndex} = useContext(ProfilerContext);
 
@@ -35,8 +24,8 @@ export default function HoveredFiberInfo({fiberData}       ) {
   const {profilingCache} = profilerStore;
 
   const commitIndices = profilingCache.getFiberCommits({
-    fiberID: ((id     )        ),
-    rootID: ((rootID     )        ),
+    fiberID: id,
+    rootID: rootID,
   });
 
   let renderDurationInfo = null;
@@ -44,10 +33,8 @@ export default function HoveredFiberInfo({fiberData}       ) {
   for (i = 0; i < commitIndices.length; i++) {
     const commitIndex = commitIndices[i];
     if (selectedCommitIndex === commitIndex) {
-      const {
-        fiberActualDurations,
-        fiberSelfDurations,
-      } = profilerStore.getCommitData(((rootID     )        ), commitIndex);
+      const {fiberActualDurations, fiberSelfDurations} =
+        profilerStore.getCommitData(rootID, commitIndex);
       const actualDuration = fiberActualDurations.get(id) || 0;
       const selfDuration = fiberSelfDurations.get(id) || 0;
 
@@ -68,7 +55,7 @@ export default function HoveredFiberInfo({fiberData}       ) {
       </div>
       <div className={styles.Content}>
         {renderDurationInfo || <div>Did not render.</div>}
-        <WhatChanged fiberID={((id     )        )} />
+        <WhatChanged fiberID={id} />
       </div>
     </Fragment>
   );

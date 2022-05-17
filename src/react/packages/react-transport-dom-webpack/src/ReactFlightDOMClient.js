@@ -4,10 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                                                         
 
 import {
   createResponse,
@@ -17,17 +15,14 @@ import {
   close,
 } from 'react-client/src/ReactFlightClientStream';
 
-function startReadingFromStream(
-  response                ,
-  stream                ,
-)       {
+function startReadingFromStream(response, stream) {
   const reader = stream.getReader();
   function progress({done, value}) {
     if (done) {
       close(response);
       return;
     }
-    const buffer             = (value     );
+    const buffer = value;
     processBinaryChunk(response, buffer);
     return reader.read().then(progress, error);
   }
@@ -37,40 +32,38 @@ function startReadingFromStream(
   reader.read().then(progress, error);
 }
 
-function createFromReadableStream(stream                )                 {
-  const response                 = createResponse();
+function createFromReadableStream(stream) {
+  const response = createResponse();
   startReadingFromStream(response, stream);
   return response;
 }
 
-function createFromFetch(
-  promiseForResponse                   ,
-)                 {
-  const response                 = createResponse();
+function createFromFetch(promiseForResponse) {
+  const response = createResponse();
   promiseForResponse.then(
-    function(r) {
-      startReadingFromStream(response, (r.body     ));
+    function (r) {
+      startReadingFromStream(response, r.body);
     },
-    function(e) {
+    function (e) {
       reportGlobalError(response, e);
     },
   );
   return response;
 }
 
-function createFromXHR(request                )                 {
-  const response                 = createResponse();
+function createFromXHR(request) {
+  const response = createResponse();
   let processedLength = 0;
-  function progress(e               )       {
+  function progress(e) {
     const chunk = request.responseText;
     processStringChunk(response, chunk, processedLength);
     processedLength = chunk.length;
   }
-  function load(e               )       {
+  function load(e) {
     progress(e);
     close(response);
   }
-  function error(e               )       {
+  function error(e) {
     reportGlobalError(response, new TypeError('Network error'));
   }
   request.addEventListener('progress', progress);

@@ -4,15 +4,13 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                                  
 
 describe('ProfilerStore', () => {
   let React;
   let ReactDOM;
-  let store       ;
+  let store;
   let utils;
 
   beforeEach(() => {
@@ -85,7 +83,7 @@ describe('ProfilerStore', () => {
     const inputRef = React.createRef();
     const ControlledInput = () => {
       const [name, setName] = React.useState('foo');
-      const handleChange = event => setName(event.target.value);
+      const handleChange = (event) => setName(event.target.value);
       return <input ref={inputRef} value={name} onChange={handleChange} />;
     };
 

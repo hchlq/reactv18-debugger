@@ -75,7 +75,7 @@ export default class Clock extends PureComponent {
     }
   }
 
-  handleClick = e => {
+  handleClick = (e) => {
     e.stopPropagation();
     this.hitCounter = 50;
   };

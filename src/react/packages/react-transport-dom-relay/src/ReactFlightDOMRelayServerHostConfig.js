@@ -4,17 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                                            
-
-             
-              
-                
-                  
-                 
-                                              
 
 import {resolveModelToJSON} from 'react-server/src/ReactFlightServer';
 
@@ -24,50 +15,11 @@ import {
   resolveModuleMetaData as resolveModuleMetaDataImpl,
 } from 'ReactFlightDOMRelayServerIntegration';
 
-             
-              
-                
-                  
-                 
-                                              
-
-export function resolveModuleMetaData   (
-  config               ,
-  resource                    ,
-)                 {
+export function resolveModuleMetaData(config, resource) {
   return resolveModuleMetaDataImpl(config, resource);
 }
 
-                
-          
-          
-           
-        
-                               
-                     
-
-                   
-     
-                   
-                 
-                      
-     
-     
-                    
-                 
-             
-                        
-                      
-           
-        
-      
-
-export function processErrorChunk(
-  request         ,
-  id        ,
-  message        ,
-  stack        ,
-)        {
+export function processErrorChunk(request, id, message, stack) {
   return {
     type: 'error',
     id: id,
@@ -78,22 +30,17 @@ export function processErrorChunk(
   };
 }
 
-function convertModelToJSON(
-  request         ,
-  parent                                                           ,
-  key        ,
-  model            ,
-)            {
+function convertModelToJSON(request, parent, key, model) {
   const json = resolveModelToJSON(request, parent, key, model);
   if (typeof json === 'object' && json !== null) {
     if (Array.isArray(json)) {
-      const jsonArray                   = [];
+      const jsonArray = [];
       for (let i = 0; i < json.length; i++) {
         jsonArray[i] = convertModelToJSON(request, json, '' + i, json[i]);
       }
       return jsonArray;
     } else {
-      const jsonObj                             = {};
+      const jsonObj = {};
       for (const nextKey in json) {
         jsonObj[nextKey] = convertModelToJSON(
           request,
@@ -108,11 +55,7 @@ function convertModelToJSON(
   return json;
 }
 
-export function processModelChunk(
-  request         ,
-  id        ,
-  model            ,
-)        {
+export function processModelChunk(request, id, model) {
   const json = convertModelToJSON(request, {}, '', model);
   return {
     type: 'json',
@@ -121,15 +64,15 @@ export function processModelChunk(
   };
 }
 
-export function scheduleWork(callback            ) {
+export function scheduleWork(callback) {
   callback();
 }
 
-export function flushBuffered(destination             ) {}
+export function flushBuffered(destination) {}
 
-export function beginWriting(destination             ) {}
+export function beginWriting(destination) {}
 
-export function writeChunk(destination             , chunk       )          {
+export function writeChunk(destination, chunk) {
   if (chunk.type === 'json') {
     emitModel(destination, chunk.id, chunk.json);
   } else {
@@ -138,6 +81,6 @@ export function writeChunk(destination             , chunk       )          {
   return true;
 }
 
-export function completeWriting(destination             ) {}
+export function completeWriting(destination) {}
 
 export {close} from 'ReactFlightDOMRelayServerIntegration';

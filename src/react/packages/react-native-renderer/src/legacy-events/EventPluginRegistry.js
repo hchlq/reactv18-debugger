@@ -4,40 +4,27 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
-                                                              
-             
-                 
-             
-                     
-                            
-
 import invariant from 'shared/invariant';
-
-                       
-                                                        
-      
-  
-                                                 
 
 /**
  * Injectable ordering of event plugins.
  */
-let eventPluginOrder                   = null;
+let eventPluginOrder = null;
 
 /**
  * Injectable mapping from names to event plugin modules.
  */
-const namesToPlugins                 = {};
+const namesToPlugins = {};
 
 /**
  * Recomputes the plugin list using the injected plugins and plugin ordering.
  *
  * @private
  */
-function recomputePluginOrdering()       {
+function recomputePluginOrdering() {
   if (!eventPluginOrder) {
     // Wait until an `eventPluginOrder` is injected.
     return;
@@ -85,11 +72,7 @@ function recomputePluginOrdering()       {
  * @return {boolean} True if the event was successfully published.
  * @private
  */
-function publishEventForPlugin(
-  dispatchConfig                ,
-  pluginModule                                    ,
-  eventName        ,
-)          {
+function publishEventForPlugin(dispatchConfig, pluginModule, eventName) {
   invariant(
     !eventNameDispatchConfigs.hasOwnProperty(eventName),
     'EventPluginRegistry: More than one plugin attempted to publish the same ' +
@@ -129,11 +112,7 @@ function publishEventForPlugin(
  * @param {object} PluginModule Plugin publishing the event.
  * @private
  */
-function publishRegistrationName(
-  registrationName        ,
-  pluginModule                                    ,
-  eventName        ,
-)       {
+function publishRegistrationName(registrationName, pluginModule, eventName) {
   invariant(
     !registrationNameModules[registrationName],
     'EventPluginRegistry: More than one plugin attempted to publish the same ' +
@@ -184,7 +163,7 @@ export const registrationNameDependencies = {};
  * only in __DEV__.
  * @type {Object}
  */
-export const possibleRegistrationNames = __DEV__ ? {} : (null     );
+export const possibleRegistrationNames = __DEV__ ? {} : null;
 // Trust the developer to only use possibleRegistrationNames in __DEV__
 
 /**
@@ -195,9 +174,7 @@ export const possibleRegistrationNames = __DEV__ ? {} : (null     );
  * @param {array} InjectedEventPluginOrder
  * @internal
  */
-export function injectEventPluginOrder(
-  injectedEventPluginOrder                  ,
-)       {
+export function injectEventPluginOrder(injectedEventPluginOrder) {
   invariant(
     !eventPluginOrder,
     'EventPluginRegistry: Cannot inject event plugin ordering more than ' +
@@ -217,9 +194,7 @@ export function injectEventPluginOrder(
  * @param {object} injectedNamesToPlugins Map from names to plugin modules.
  * @internal
  */
-export function injectEventPluginsByName(
-  injectedNamesToPlugins                ,
-)       {
+export function injectEventPluginsByName(injectedNamesToPlugins) {
   let isOrderingDirty = false;
   for (const pluginName in injectedNamesToPlugins) {
     if (!injectedNamesToPlugins.hasOwnProperty(pluginName)) {

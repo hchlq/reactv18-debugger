@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -16,15 +16,9 @@ import {getGradientColor} from './utils';
 
 import styles from './SidebarInteractions.css';
 
-                         
-
-export default function SidebarInteractions(_       ) {
-  const {
-    selectedInteractionID,
-    rootID,
-    selectCommitIndex,
-    selectTab,
-  } = useContext(ProfilerContext);
+export default function SidebarInteractions(_) {
+  const {selectedInteractionID, rootID, selectCommitIndex, selectTab} =
+    useContext(ProfilerContext);
 
   const {profilerStore} = useContext(StoreContext);
   const {profilingCache} = profilerStore;
@@ -33,9 +27,8 @@ export default function SidebarInteractions(_       ) {
     return <div className={styles.NothingSelected}>Nothing selected</div>;
   }
 
-  const {interactionCommits, interactions} = profilerStore.getDataForRoot(
-    ((rootID     )        ),
-  );
+  const {interactionCommits, interactions} =
+    profilerStore.getDataForRoot(rootID);
   const interaction = interactions.get(selectedInteractionID);
   if (interaction == null) {
     throw Error(
@@ -44,20 +37,20 @@ export default function SidebarInteractions(_       ) {
   }
 
   const {maxCommitDuration} = profilingCache.getInteractionsChartData({
-    rootID: ((rootID     )        ),
+    rootID: rootID,
   });
 
-  const viewCommit = (commitIndex        ) => {
+  const viewCommit = (commitIndex) => {
     selectTab('flame-chart');
     selectCommitIndex(commitIndex);
   };
 
-  const listItems                    = [];
+  const listItems = [];
   const commitIndices = interactionCommits.get(selectedInteractionID);
   if (commitIndices != null) {
-    commitIndices.forEach(commitIndex => {
+    commitIndices.forEach((commitIndex) => {
       const {duration, timestamp} = profilerStore.getCommitData(
-        ((rootID     )        ),
+        rootID,
         commitIndex,
       );
 
@@ -65,7 +58,8 @@ export default function SidebarInteractions(_       ) {
         <li
           key={commitIndex}
           className={styles.ListItem}
-          onClick={() => viewCommit(commitIndex)}>
+          onClick={() => viewCommit(commitIndex)}
+        >
           <div
             className={styles.CommitBox}
             style={{

@@ -90,7 +90,7 @@ describe('ReactTestRenderer.act()', () => {
 
       function App() {
         // This component will keep updating itself until step === 3
-        const [step, proceed] = useReducer(s => (s === 3 ? 3 : s + 1), 1);
+        const [step, proceed] = useReducer((s) => (s === 3 ? 3 : s + 1), 1);
         useEffect(() => {
           Scheduler.unstable_yieldValue('Effect');
           alreadyResolvedPromise.then(() => {

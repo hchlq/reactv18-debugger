@@ -15,13 +15,13 @@ const printResults = require('./stats');
 const serveBenchmark = require('./server');
 
 function getBenchmarkNames() {
-  return readdirSync(join(__dirname, 'benchmarks')).filter(file =>
+  return readdirSync(join(__dirname, 'benchmarks')).filter((file) =>
     statSync(join(__dirname, 'benchmarks', file)).isDirectory()
   );
 }
 
 function wait(val) {
-  return new Promise(resolve => setTimeout(resolve, val));
+  return new Promise((resolve) => setTimeout(resolve, val));
 }
 
 const runRemote = argv.remote;

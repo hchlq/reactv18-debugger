@@ -4,16 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-             
-              
-                       
-                       
-                     
-                                
-                                           
 
 import nullthrows from 'nullthrows';
 import {Surface} from './Surface';
@@ -23,21 +15,7 @@ import {layeredLayout, noopLayout} from './layouter';
 import {ColorView} from './ColorView';
 import {clamp} from './utils/clamp';
 
-                                                        
-
-                                 
-                                                      
-                                 
-                                                        
-                 
-    
-
-                               
-                                                                                
-                     
-    
-
-function getColorForBarState(state                )         {
+function getColorForBarState(state) {
   // Colors obtained from Firefox Profiler
   switch (state) {
     case 'normal':
@@ -51,14 +29,14 @@ function getColorForBarState(state                )         {
 }
 
 class ResizeBar extends View {
-  _intrinsicContentSize       = {
+  _intrinsicContentSize = {
     width: 0,
     height: 5,
   };
 
-  _interactionState                 = 'normal';
+  _interactionState = 'normal';
 
-  constructor(surface         , frame      ) {
+  constructor(surface, frame) {
     super(surface, frame, layeredLayout);
     this.addSubview(new ColorView(surface, frame, ''));
     this._updateColor();
@@ -68,15 +46,15 @@ class ResizeBar extends View {
     return this._intrinsicContentSize;
   }
 
-  _getColorView()            {
-    return (this.subviews[0]     );
+  _getColorView() {
+    return this.subviews[0];
   }
 
   _updateColor() {
     this._getColorView().setColor(getColorForBarState(this._interactionState));
   }
 
-  _setInteractionState(state                ) {
+  _setInteractionState(state) {
     if (this._interactionState === state) {
       return;
     }
@@ -84,7 +62,7 @@ class ResizeBar extends View {
     this._updateColor();
   }
 
-  _handleMouseDown(interaction                      ) {
+  _handleMouseDown(interaction) {
     const cursorInView = rectContainsPoint(
       interaction.payload.location,
       this.frame,
@@ -94,7 +72,7 @@ class ResizeBar extends View {
     }
   }
 
-  _handleMouseMove(interaction                      ) {
+  _handleMouseMove(interaction) {
     const cursorInView = rectContainsPoint(
       interaction.payload.location,
       this.frame,
@@ -105,7 +83,7 @@ class ResizeBar extends View {
     this._setInteractionState(cursorInView ? 'hovered' : 'normal');
   }
 
-  _handleMouseUp(interaction                    ) {
+  _handleMouseUp(interaction) {
     const cursorInView = rectContainsPoint(
       interaction.payload.location,
       this.frame,
@@ -115,7 +93,7 @@ class ResizeBar extends View {
     }
   }
 
-  handleInteraction(interaction             ) {
+  handleInteraction(interaction) {
     switch (interaction.type) {
       case 'mousedown':
         this._handleMouseDown(interaction);
@@ -131,15 +109,10 @@ class ResizeBar extends View {
 }
 
 export class ResizableSplitView extends View {
-  _resizingState                       = null;
-  _layoutState             ;
+  _resizingState = null;
+  _layoutState;
 
-  constructor(
-    surface         ,
-    frame      ,
-    topSubview      ,
-    bottomSubview      ,
-  ) {
+  constructor(surface, frame, topSubview, bottomSubview) {
     super(surface, frame, noopLayout);
 
     this.addSubview(topSubview);
@@ -152,19 +125,19 @@ export class ResizableSplitView extends View {
     };
   }
 
-  _getTopSubview()       {
+  _getTopSubview() {
     return this.subviews[0];
   }
 
-  _getResizeBar()       {
+  _getResizeBar() {
     return this.subviews[1];
   }
 
-  _getBottomSubview()       {
+  _getBottomSubview() {
     return this.subviews[2];
   }
 
-  _getResizeBarDesiredSize()       {
+  _getResizeBarDesiredSize() {
     return nullthrows(
       this._getResizeBar().desiredSize(),
       'Resize bar must have desired size',
@@ -266,7 +239,7 @@ export class ResizableSplitView extends View {
     });
   }
 
-  _handleMouseDown(interaction                      ) {
+  _handleMouseDown(interaction) {
     const cursorLocation = interaction.payload.location;
     const resizeBarFrame = this._getResizeBar().frame;
     if (rectContainsPoint(cursorLocation, resizeBarFrame)) {
@@ -278,7 +251,7 @@ export class ResizableSplitView extends View {
     }
   }
 
-  _handleMouseMove(interaction                      ) {
+  _handleMouseMove(interaction) {
     const {_resizingState} = this;
     if (_resizingState) {
       this._resizingState = {
@@ -289,13 +262,13 @@ export class ResizableSplitView extends View {
     }
   }
 
-  _handleMouseUp(interaction                    ) {
+  _handleMouseUp(interaction) {
     if (this._resizingState) {
       this._resizingState = null;
     }
   }
 
-  handleInteraction(interaction             ) {
+  handleInteraction(interaction) {
     switch (interaction.type) {
       case 'mousedown':
         this._handleMouseDown(interaction);

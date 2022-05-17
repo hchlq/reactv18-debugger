@@ -4,7 +4,7 @@ const React = window.React;
 
 class PasswordTestCase extends React.Component {
   state = {value: ''};
-  onChange = event => {
+  onChange = (event) => {
     this.setState({value: event.target.value});
   };
   render() {

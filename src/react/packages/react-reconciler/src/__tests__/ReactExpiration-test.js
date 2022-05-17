@@ -25,7 +25,7 @@ describe('ReactExpiration', () => {
 
     const textCache = new Map();
 
-    readText = text => {
+    readText = (text) => {
       const record = textCache.get(text);
       if (record !== undefined) {
         switch (record.status) {
@@ -38,7 +38,7 @@ describe('ReactExpiration', () => {
         }
       } else {
         let ping;
-        const promise = new Promise(resolve => (ping = resolve));
+        const promise = new Promise((resolve) => (ping = resolve));
         const newRecord = {
           status: 'pending',
           ping: ping,
@@ -49,7 +49,7 @@ describe('ReactExpiration', () => {
       }
     };
 
-    resolveText = text => {
+    resolveText = (text) => {
       const record = textCache.get(text);
       if (record !== undefined) {
         if (record.status === 'pending') {
@@ -283,7 +283,7 @@ describe('ReactExpiration', () => {
     ]);
 
     // Partial update
-    subscribers.forEach(s => s.setState({text: '1'}));
+    subscribers.forEach((s) => s.setState({text: '1'}));
     expect(Scheduler).toFlushAndYieldThrough([
       '1 [A] [render]',
       '1 [B] [render]',
@@ -292,7 +292,7 @@ describe('ReactExpiration', () => {
     // Before the update can finish, update again. Even though no time has
     // advanced, this update should be given a different expiration time than
     // the currently rendering one. So, C and D should render with 1, not 2.
-    subscribers.forEach(s => s.setState({text: '2'}));
+    subscribers.forEach((s) => s.setState({text: '2'}));
     expect(Scheduler).toFlushAndYieldThrough([
       '1 [C] [render]',
       '1 [D] [render]',
@@ -412,9 +412,9 @@ describe('ReactExpiration', () => {
       updateHighPri = () =>
         Scheduler.unstable_runWithPriority(
           Scheduler.unstable_UserBlockingPriority,
-          () => setHighPri(n => n + 1),
+          () => setHighPri((n) => n + 1),
         );
-      updateNormalPri = () => setNormalPri(n => n + 1);
+      updateNormalPri = () => setNormalPri((n) => n + 1);
       return (
         <>
           <Text text={'High pri: ' + highPri} />
@@ -479,11 +479,11 @@ describe('ReactExpiration', () => {
     function App() {
       const [syncPri, setSyncPri] = useState(0);
       const [highPri, setHighPri] = useState(0);
-      updateSyncPri = () => ReactNoop.flushSync(() => setSyncPri(n => n + 1));
+      updateSyncPri = () => ReactNoop.flushSync(() => setSyncPri((n) => n + 1));
       updateHighPri = () =>
         Scheduler.unstable_runWithPriority(
           Scheduler.unstable_UserBlockingPriority,
-          () => setHighPri(n => n + 1),
+          () => setHighPri((n) => n + 1),
         );
       return (
         <>
@@ -549,11 +549,11 @@ describe('ReactExpiration', () => {
     function App() {
       const [syncPri, setSyncPri] = useState(0);
       const [highPri, setIdlePri] = useState(0);
-      updateSyncPri = () => ReactNoop.flushSync(() => setSyncPri(n => n + 1));
+      updateSyncPri = () => ReactNoop.flushSync(() => setSyncPri((n) => n + 1));
       updateIdlePri = () =>
         Scheduler.unstable_runWithPriority(
           Scheduler.unstable_IdlePriority,
-          () => setIdlePri(n => n + 1),
+          () => setIdlePri((n) => n + 1),
         );
       return (
         <>
@@ -621,9 +621,9 @@ describe('ReactExpiration', () => {
       updateHighPri = () =>
         Scheduler.unstable_runWithPriority(
           Scheduler.unstable_UserBlockingPriority,
-          () => setHighPri(n => n + 1),
+          () => setHighPri((n) => n + 1),
         );
-      updateNormalPri = () => setNormalPri(n => n + 1);
+      updateNormalPri = () => setNormalPri((n) => n + 1);
       return (
         <>
           <Text text={'High pri: ' + highPri} />
@@ -689,9 +689,9 @@ describe('ReactExpiration', () => {
       updateHighPri = () =>
         Scheduler.unstable_runWithPriority(
           Scheduler.unstable_UserBlockingPriority,
-          () => setHighPri(n => n + 1),
+          () => setHighPri((n) => n + 1),
         );
-      updateNormalPri = () => setNormalPri(n => n + 1);
+      updateNormalPri = () => setNormalPri((n) => n + 1);
       return (
         <>
           <Text text={'High pri: ' + highPri} />

@@ -11,14 +11,14 @@ class VersionPicker extends React.Component {
   }
 
   componentWillMount() {
-    getVersionTags().then(tags => {
-      let versions = tags.map(tag => tag.name.slice(1));
+    getVersionTags().then((tags) => {
+      let versions = tags.map((tag) => tag.name.slice(1));
       versions = [`local`, ...versions];
       this.setState({versions});
     });
   }
 
-  onChange = event => {
+  onChange = (event) => {
     this.props.onChange(event.target.value);
   };
 
@@ -28,7 +28,7 @@ class VersionPicker extends React.Component {
 
     return (
       <select id={id} name={name} value={version} onChange={this.onChange}>
-        {versions.map(version => (
+        {versions.map((version) => (
           <option key={version} value={version}>
             {version}
           </option>

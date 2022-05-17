@@ -4,29 +4,29 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 const ReactDebugCurrentFrame = {};
 
-let currentExtraStackFrame = (null               );
+let currentExtraStackFrame = null;
 
-export function setExtraStackFrame(stack               ) {
+export function setExtraStackFrame(stack) {
   if (__DEV__) {
     currentExtraStackFrame = stack;
   }
 }
 
 if (__DEV__) {
-  ReactDebugCurrentFrame.setExtraStackFrame = function(stack               ) {
+  ReactDebugCurrentFrame.setExtraStackFrame = function (stack) {
     if (__DEV__) {
       currentExtraStackFrame = stack;
     }
   };
   // Stack implementation injected by the current renderer.
-  ReactDebugCurrentFrame.getCurrentStack = (null                       );
+  ReactDebugCurrentFrame.getCurrentStack = null;
 
-  ReactDebugCurrentFrame.getStackAddendum = function()         {
+  ReactDebugCurrentFrame.getStackAddendum = function () {
     let stack = '';
 
     // Add an extra top frame while an element is being validated

@@ -45,7 +45,7 @@ function addBenchmarkResults(table, localResults, remoteMasterResults) {
     (localResults && localResults.benchmarks) ||
       (remoteMasterResults && remoteMasterResults.benchmarks)
   );
-  benchmarks.forEach(benchmark => {
+  benchmarks.forEach((benchmark) => {
     const rowHeader = [chalk.white.bold(benchmark)];
     if (remoteMasterResults) {
       rowHeader.push(chalk.white.bold('Time'));

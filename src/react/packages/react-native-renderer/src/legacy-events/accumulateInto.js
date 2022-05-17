@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import invariant from 'shared/invariant';
@@ -22,10 +22,7 @@ import invariant from 'shared/invariant';
  * @return {*|array<*>} An accumulation of items.
  */
 
-function accumulateInto   (
-  current                 ,
-  next              ,
-)               {
+function accumulateInto(current, next) {
   invariant(
     next != null,
     'accumulateInto(...): Accumulated items must not be null or undefined.',

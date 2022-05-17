@@ -4,18 +4,15 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                                     
-                                                                  
 
 describe('editing interface', () => {
   let PropTypes;
   let React;
   let ReactDOM;
-  let bridge                ;
-  let store       ;
+  let bridge;
+  let store;
   let utils;
 
   const flushPendingUpdates = () => {
@@ -81,8 +78,8 @@ describe('editing interface', () => {
         ),
       );
 
-      classID = ((store.getElementIDAtIndex(0)     )        );
-      functionID = ((store.getElementIDAtIndex(1)     )        );
+      classID = store.getElementIDAtIndex(0);
+      functionID = store.getElementIDAtIndex(1);
 
       expect(committedClassProps).toStrictEqual({
         array: [1, 2, 3],
@@ -414,7 +411,7 @@ describe('editing interface', () => {
         ),
       );
 
-      id = ((store.getElementIDAtIndex(0)     )        );
+      id = store.getElementIDAtIndex(0);
 
       expect(committedState).toStrictEqual({
         array: [1, 2, 3],
@@ -629,7 +626,7 @@ describe('editing interface', () => {
       );
 
       hookID = 0; // index
-      id = ((store.getElementIDAtIndex(0)     )        );
+      id = store.getElementIDAtIndex(0);
 
       expect(committedState).toStrictEqual({
         array: [1, 2, 3],
@@ -836,7 +833,7 @@ describe('editing interface', () => {
     let id;
 
     async function mountTestApp() {
-      class LegacyContextProvider extends React.Component      {
+      class LegacyContextProvider extends React.Component {
         static childContextTypes = {
           array: PropTypes.array,
           object: PropTypes.object,
@@ -856,7 +853,7 @@ describe('editing interface', () => {
         }
       }
 
-      class ClassComponent extends React.Component      {
+      class ClassComponent extends React.Component {
         static contextTypes = {
           array: PropTypes.array,
           object: PropTypes.object,
@@ -886,7 +883,7 @@ describe('editing interface', () => {
       // This test only covers Class components.
       // Function components using legacy context are not editable.
 
-      id = ((store.getElementIDAtIndex(1)     )        );
+      id = store.getElementIDAtIndex(1);
 
       expect(committedContext).toStrictEqual({
         array: [1, 2, 3],

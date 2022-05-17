@@ -4,47 +4,15 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import {formatDuration} from './utils';
 import ProfilerStore from 'react-devtools-shared/src/devtools/ProfilerStore';
 
-                                        
+const cachedChartData = new Map();
 
-                          
-                         
-                     
-             
-                
-               
-                 
-                       
-                           
-   
-
-                          
-                       
-                
-                                    
-                          
-                               
-                                
-   
-
-const cachedChartData                         = new Map();
-
-export function getChartData({
-  commitIndex,
-  commitTree,
-  profilerStore,
-  rootID,
-}    
-                      
-                         
-                               
-                 
-  )            {
+export function getChartData({commitIndex, commitTree, profilerStore, rootID}) {
   const commitDatum = profilerStore.getCommitData(rootID, commitIndex);
 
   const {fiberActualDurations, fiberSelfDurations} = commitDatum;
@@ -52,18 +20,18 @@ export function getChartData({
 
   const chartDataKey = `${rootID}-${commitIndex}`;
   if (cachedChartData.has(chartDataKey)) {
-    return ((cachedChartData.get(chartDataKey)     )           );
+    return cachedChartData.get(chartDataKey);
   }
 
-  const idToDepthMap                      = new Map();
-  const renderPathNodes              = new Set();
-  const rows                          = [];
+  const idToDepthMap = new Map();
+  const renderPathNodes = new Set();
+  const rows = [];
 
   let maxDepth = 0;
   let maxSelfDuration = 0;
 
   // Generate flame graph structure using tree base durations.
-  const walkTree = (id        , rightOffset        , currentDepth        ) => {
+  const walkTree = (id, rightOffset, currentDepth) => {
     idToDepthMap.set(id, currentDepth);
 
     const node = nodes.get(id);
@@ -71,13 +39,8 @@ export function getChartData({
       throw Error(`Could not find node with id "${id}" in commit tree`);
     }
 
-    const {
-      children,
-      displayName,
-      hocDisplayNames,
-      key,
-      treeBaseDuration,
-    } = node;
+    const {children, displayName, hocDisplayNames, key, treeBaseDuration} =
+      node;
 
     const actualDuration = fiberActualDurations.get(id) || 0;
     const selfDuration = fiberSelfDurations.get(id) || 0;
@@ -101,7 +64,7 @@ export function getChartData({
     maxDepth = Math.max(maxDepth, currentDepth);
     maxSelfDuration = Math.max(maxSelfDuration, selfDuration);
 
-    const chartNode            = {
+    const chartNode = {
       actualDuration,
       didRender,
       id,
@@ -184,6 +147,6 @@ export function getChartData({
   return chartData;
 }
 
-export function invalidateChartData()       {
+export function invalidateChartData() {
   cachedChartData.clear();
 }

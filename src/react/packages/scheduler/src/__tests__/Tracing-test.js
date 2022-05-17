@@ -31,7 +31,7 @@ describe('Tracing', () => {
     expect(wrapped()).toBe(123);
   });
 
-  it('should execute traced callbacks', done => {
+  it('should execute traced callbacks', (done) => {
     SchedulerTracing.unstable_trace('some event', 0, () => {
       done();
     });
@@ -41,7 +41,7 @@ describe('Tracing', () => {
     expect(SchedulerTracing.unstable_clear(() => 123)).toBe(123);
   });
 
-  it('should execute wrapped callbacks', done => {
+  it('should execute wrapped callbacks', (done) => {
     const wrappedCallback = SchedulerTracing.unstable_wrap(() => {
       done();
     });

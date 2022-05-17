@@ -58,13 +58,8 @@ const moduleTypes = {
   NON_FIBER_RENDERER: 'NON_FIBER_RENDERER',
 };
 
-const {
-  ISOMORPHIC,
-  RENDERER,
-  RENDERER_UTILS,
-  RECONCILER,
-  NON_FIBER_RENDERER,
-} = moduleTypes;
+const {ISOMORPHIC, RENDERER, RENDERER_UTILS, RECONCILER, NON_FIBER_RENDERER} =
+  moduleTypes;
 
 const bundles = [
   /******* Isomorphic *******/
@@ -212,7 +207,7 @@ const bundles = [
     entry: 'react-dom/server.browser',
     global: 'ReactDOMServer',
     externals: ['react'],
-    babel: opts =>
+    babel: (opts) =>
       Object.assign({}, opts, {
         plugins: opts.plugins.concat([
           [require.resolve('@babel/plugin-transform-classes'), {loose: true}],
@@ -224,7 +219,7 @@ const bundles = [
     moduleType: NON_FIBER_RENDERER,
     entry: 'react-dom/server.node',
     externals: ['react', 'stream'],
-    babel: opts =>
+    babel: (opts) =>
       Object.assign({}, opts, {
         plugins: opts.plugins.concat([
           [require.resolve('@babel/plugin-transform-classes'), {loose: true}],
@@ -334,7 +329,7 @@ const bundles = [
     entry: 'react-art',
     global: 'ReactART',
     externals: ['react'],
-    babel: opts =>
+    babel: (opts) =>
       Object.assign({}, opts, {
         // Include JSX
         presets: opts.presets.concat([
@@ -356,7 +351,7 @@ const bundles = [
     entry: 'react-native-renderer',
     global: 'ReactNativeRenderer',
     externals: ['react-native'],
-    babel: opts =>
+    babel: (opts) =>
       Object.assign({}, opts, {
         plugins: opts.plugins.concat([
           [require.resolve('@babel/plugin-transform-classes'), {loose: true}],
@@ -369,7 +364,7 @@ const bundles = [
     entry: 'react-native-renderer',
     global: 'ReactNativeRenderer',
     externals: ['react-native'],
-    babel: opts =>
+    babel: (opts) =>
       Object.assign({}, opts, {
         plugins: opts.plugins.concat([
           [require.resolve('@babel/plugin-transform-classes'), {loose: true}],
@@ -386,7 +381,7 @@ const bundles = [
     entry: 'react-native-renderer/fabric',
     global: 'ReactFabric',
     externals: ['react-native'],
-    babel: opts =>
+    babel: (opts) =>
       Object.assign({}, opts, {
         plugins: opts.plugins.concat([
           [require.resolve('@babel/plugin-transform-classes'), {loose: true}],
@@ -399,7 +394,7 @@ const bundles = [
     entry: 'react-native-renderer/fabric',
     global: 'ReactFabric',
     externals: ['react-native'],
-    babel: opts =>
+    babel: (opts) =>
       Object.assign({}, opts, {
         plugins: opts.plugins.concat([
           [require.resolve('@babel/plugin-transform-classes'), {loose: true}],
@@ -423,7 +418,7 @@ const bundles = [
     entry: 'react-test-renderer',
     global: 'ReactTestRenderer',
     externals: ['react', 'scheduler', 'scheduler/unstable_mock'],
-    babel: opts =>
+    babel: (opts) =>
       Object.assign({}, opts, {
         plugins: opts.plugins.concat([
           [require.resolve('@babel/plugin-transform-classes'), {loose: true}],
@@ -581,7 +576,7 @@ const bundles = [
     entry: 'create-subscription',
     global: 'createSubscription',
     externals: ['react'],
-    babel: opts =>
+    babel: (opts) =>
       Object.assign({}, opts, {
         plugins: opts.plugins.concat([
           [require.resolve('@babel/plugin-transform-classes'), {loose: true}],
@@ -709,7 +704,7 @@ const bundles = [
 // Based on deep-freeze by substack (public domain)
 function deepFreeze(o) {
   Object.freeze(o);
-  Object.getOwnPropertyNames(o).forEach(function(prop) {
+  Object.getOwnPropertyNames(o).forEach(function (prop) {
     if (
       o[prop] !== null &&
       (typeof o[prop] === 'object' || typeof o[prop] === 'function') &&

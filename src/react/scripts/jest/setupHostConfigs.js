@@ -14,7 +14,7 @@ jest.mock('react-reconciler/src/ReactFiberReconciler', () => {
 // turn the export into a function, and use the argument as host config.
 const shimHostConfigPath = 'react-reconciler/src/ReactFiberHostConfig';
 jest.mock('react-reconciler', () => {
-  return config => {
+  return (config) => {
     jest.mock(shimHostConfigPath, () => config);
     return require.requireActual('react-reconciler');
   };
@@ -23,14 +23,14 @@ const shimServerStreamConfigPath = 'react-server/src/ReactServerStreamConfig';
 const shimServerFormatConfigPath = 'react-server/src/ReactServerFormatConfig';
 const shimFlightServerConfigPath = 'react-server/src/ReactFlightServerConfig';
 jest.mock('react-server', () => {
-  return config => {
+  return (config) => {
     jest.mock(shimServerStreamConfigPath, () => config);
     jest.mock(shimServerFormatConfigPath, () => config);
     return require.requireActual('react-server');
   };
 });
 jest.mock('react-server/flight', () => {
-  return config => {
+  return (config) => {
     jest.mock(shimServerStreamConfigPath, () => config);
     jest.mock(shimServerFormatConfigPath, () => config);
     jest.mock('react-server/src/ReactFlightServerBundlerConfigCustom', () => ({
@@ -47,7 +47,7 @@ jest.mock('react-server/flight', () => {
 const shimFlightClientHostConfigPath =
   'react-client/src/ReactFlightClientHostConfig';
 jest.mock('react-client/flight', () => {
-  return config => {
+  return (config) => {
     jest.mock(shimFlightClientHostConfigPath, () => config);
     return require.requireActual('react-client/flight');
   };
@@ -62,7 +62,7 @@ const configPaths = [
 ];
 
 function mockAllConfigs(rendererInfo) {
-  configPaths.forEach(path => {
+  configPaths.forEach((path) => {
     // We want the reconciler to pick up the host config for this renderer.
     jest.mock(path, () => {
       let idx = path.lastIndexOf('/');
@@ -74,13 +74,13 @@ function mockAllConfigs(rendererInfo) {
 
 // But for inlined host configs (such as React DOM, Native, etc), we
 // mock their named entry points to establish a host config mapping.
-inlinedHostConfigs.forEach(rendererInfo => {
+inlinedHostConfigs.forEach((rendererInfo) => {
   if (rendererInfo.shortName === 'custom') {
     // There is no inline entry point for the custom renderers.
     // Instead, it's handled by the generic `react-reconciler` entry point above.
     return;
   }
-  rendererInfo.entryPoints.forEach(entryPoint => {
+  rendererInfo.entryPoints.forEach((entryPoint) => {
     jest.mock(entryPoint, () => {
       mockAllConfigs(rendererInfo);
       return require.requireActual(entryPoint);

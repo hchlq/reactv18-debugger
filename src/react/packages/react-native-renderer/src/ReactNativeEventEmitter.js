@@ -4,14 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                                     
-                                                                   
-                                                                         
-                                                                                 
-                                                                     
 
 import {registrationNameModules} from './legacy-events/EventPluginRegistry';
 import {batchedUpdates} from './legacy-events/ReactGenericBatching';
@@ -30,7 +24,7 @@ export {getListener, registrationNameModules as registrationNames};
  */
 
 // Shared default empty native event - conserve memory.
-const EMPTY_NATIVE_EVENT = (({}     )                );
+const EMPTY_NATIVE_EVENT = {};
 
 /**
  * Selects a subsequence of `Touch`es, without destroying `touches`.
@@ -39,7 +33,7 @@ const EMPTY_NATIVE_EVENT = (({}     )                );
  * @param {Array<number>} indices Indices by which to pull subsequence.
  * @return {Array<Touch>} Subsequence of touch objects.
  */
-const touchSubsequence = function(touches, indices) {
+const touchSubsequence = function (touches, indices) {
   const ret = [];
   for (let i = 0; i < indices.length; i++) {
     ret.push(touches[indices[i]]);
@@ -58,14 +52,11 @@ const touchSubsequence = function(touches, indices) {
  * @param {Array<number>} indices Indices to remove from `touches`.
  * @return {Array<Touch>} Subsequence of removed touch objects.
  */
-const removeTouchesAtIndices = function(
-  touches               ,
-  indices               ,
-)                {
+const removeTouchesAtIndices = function (touches, indices) {
   const rippedOut = [];
   // use an unsafe downcast to alias to nullable elements,
   // so we can delete and then compact.
-  const temp                 = (touches            );
+  const temp = touches;
   for (let i = 0; i < indices.length; i++) {
     const index = indices[i];
     rippedOut.push(touches[index]);
@@ -92,11 +83,7 @@ const removeTouchesAtIndices = function(
  * @param {TopLevelType} topLevelType Top level type of event.
  * @param {?object} nativeEventParam Object passed from native.
  */
-function _receiveRootNodeIDEvent(
-  rootNodeID        ,
-  topLevelType              ,
-  nativeEventParam                 ,
-) {
+function _receiveRootNodeIDEvent(rootNodeID, topLevelType, nativeEventParam) {
   const nativeEvent = nativeEventParam || EMPTY_NATIVE_EVENT;
   const inst = getInstanceFromNode(rootNodeID);
 
@@ -105,7 +92,7 @@ function _receiveRootNodeIDEvent(
     target = inst.stateNode;
   }
 
-  batchedUpdates(function() {
+  batchedUpdates(function () {
     runExtractedPluginEventsInBatch(topLevelType, inst, nativeEvent, target);
   });
   // React Native doesn't use ReactControlledComponent but if it did, here's
@@ -120,16 +107,16 @@ function _receiveRootNodeIDEvent(
  * @internal
  */
 function extractPluginEvents(
-  topLevelType              ,
-  targetInst              ,
-  nativeEvent                ,
-  nativeEventTarget                    ,
-)                                                          {
+  topLevelType,
+  targetInst,
+  nativeEvent,
+  nativeEventTarget,
+) {
   let events = null;
-  const legacyPlugins = ((plugins     )                                  );
+  const legacyPlugins = plugins;
   for (let i = 0; i < legacyPlugins.length; i++) {
     // Not every plugin in the ordering may be loaded at runtime.
-    const possiblePlugin                                     = legacyPlugins[i];
+    const possiblePlugin = legacyPlugins[i];
     if (possiblePlugin) {
       const extractedEvents = possiblePlugin.extractEvents(
         topLevelType,
@@ -146,10 +133,10 @@ function extractPluginEvents(
 }
 
 function runExtractedPluginEventsInBatch(
-  topLevelType              ,
-  targetInst              ,
-  nativeEvent                ,
-  nativeEventTarget                    ,
+  topLevelType,
+  targetInst,
+  nativeEvent,
+  nativeEventTarget,
 ) {
   const events = extractPluginEvents(
     topLevelType,
@@ -167,11 +154,7 @@ function runExtractedPluginEventsInBatch(
  * @param {TopLevelType} topLevelType Top level type of event.
  * @param {object} nativeEventParam Object passed from native.
  */
-export function receiveEvent(
-  rootNodeID        ,
-  topLevelType              ,
-  nativeEventParam                ,
-) {
+export function receiveEvent(rootNodeID, topLevelType, nativeEventParam) {
   _receiveRootNodeIDEvent(rootNodeID, topLevelType, nativeEventParam);
 }
 
@@ -199,11 +182,7 @@ export function receiveEvent(
  * Web desktop polyfills only need to construct a fake touch event with
  * identifier 0, also abandoning traditional click handlers.
  */
-export function receiveTouches(
-  eventTopLevelType              ,
-  touches               ,
-  changedIndices               ,
-) {
+export function receiveTouches(eventTopLevelType, touches, changedIndices) {
   const changedTouches =
     eventTopLevelType === 'topTouchEnd' ||
     eventTopLevelType === 'topTouchCancel'

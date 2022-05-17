@@ -4,13 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                
-                                                                   
-                                                                       
-                                                                  
 
 import * as Scheduler from 'scheduler/unstable_mock';
 import {
@@ -54,36 +49,13 @@ import {ConcurrentRoot, LegacyRoot} from 'react-reconciler/src/ReactRootTags';
 
 const {IsSomeRendererActing} = ReactSharedInternals;
 
-                            
-                                                       
-                                 
-     
-  
-
-                               
-               
-                                        
-                                                
-                                                                         
-   
-                                                            
-
-                           
-                                                                           
-                                                                   
-                
-     
-   
-
-                                                              
-
 const defaultTestOptions = {
-  createNodeMock: function() {
+  createNodeMock: function () {
     return null;
   },
 };
 
-function toJSON(inst                         )                               {
+function toJSON(inst) {
   if (inst.isHidden) {
     // Omit timed out children from output entirely. This seems like the least
     // surprising behavior. We could perhaps add a separate API that includes
@@ -112,7 +84,7 @@ function toJSON(inst                         )                               {
           }
         }
       }
-      const json                        = {
+      const json = {
         type: inst.type,
         props: props,
         children: renderedChildren,
@@ -169,7 +141,7 @@ function flatten(arr) {
   return result;
 }
 
-function toTree(node        ) {
+function toTree(node) {
   if (node == null) {
     return null;
   }
@@ -245,10 +217,10 @@ const validWrapperTypes = new Set([
   HostRoot,
 ]);
 
-function getChildren(parent       ) {
+function getChildren(parent) {
   const children = [];
   const startingNode = parent;
-  let node        = startingNode;
+  let node = startingNode;
   if (node.child === null) {
     return children;
   }
@@ -272,18 +244,18 @@ function getChildren(parent       ) {
       if (node.return === startingNode) {
         break outer;
       }
-      node = (node.return     );
+      node = node.return;
     }
-    (node.sibling     ).return = node.return;
-    node = (node.sibling     );
+    node.sibling.return = node.return;
+    node = node.sibling;
   }
   return children;
 }
 
 class ReactTestInstance {
-  _fiber       ;
+  _fiber;
 
-  _currentFiber()        {
+  _currentFiber() {
     // Throws if this component has been unmounted.
     const fiber = findCurrentFiberUsingSlowPath(this._fiber);
     invariant(
@@ -294,7 +266,7 @@ class ReactTestInstance {
     return fiber;
   }
 
-  constructor(fiber       ) {
+  constructor(fiber) {
     invariant(
       validWrapperTypes.has(fiber.tag),
       'Unexpected object passed to ReactTestInstance constructor (tag: %s). ' +
@@ -316,11 +288,11 @@ class ReactTestInstance {
     return this._fiber.type;
   }
 
-  get props()         {
+  get props() {
     return this._currentFiber().memoizedProps;
   }
 
-  get parent()                     {
+  get parent() {
     let parent = this._fiber.return;
     while (parent !== null) {
       if (validWrapperTypes.has(parent.tag)) {
@@ -338,63 +310,50 @@ class ReactTestInstance {
     return null;
   }
 
-  get children()                                    {
+  get children() {
     return getChildren(this._currentFiber());
   }
 
   // Custom search functions
-  find(predicate           )                    {
+  find(predicate) {
     return expectOne(
       this.findAll(predicate, {deep: false}),
       `matching custom predicate: ${predicate.toString()}`,
     );
   }
 
-  findByType(type     )                    {
+  findByType(type) {
     return expectOne(
       this.findAllByType(type, {deep: false}),
       `with node type: "${getComponentName(type) || 'Unknown'}"`,
     );
   }
 
-  findByProps(props        )                    {
+  findByProps(props) {
     return expectOne(
       this.findAllByProps(props, {deep: false}),
       `with props: ${JSON.stringify(props)}`,
     );
   }
 
-  findAll(
-    predicate           ,
-    options               = null,
-  )                           {
+  findAll(predicate, options = null) {
     return findAll(this, predicate, options);
   }
 
-  findAllByType(
-    type     ,
-    options               = null,
-  )                           {
-    return findAll(this, node => node.type === type, options);
+  findAllByType(type, options = null) {
+    return findAll(this, (node) => node.type === type, options);
   }
 
-  findAllByProps(
-    props        ,
-    options               = null,
-  )                           {
+  findAllByProps(props, options = null) {
     return findAll(
       this,
-      node => node.props && propsMatch(node.props, props),
+      (node) => node.props && propsMatch(node.props, props),
       options,
     );
   }
 }
 
-function findAll(
-  root                   ,
-  predicate           ,
-  options              ,
-)                           {
+function findAll(root, predicate, options) {
   const deep = options ? options.deep : true;
   const results = [];
 
@@ -405,7 +364,7 @@ function findAll(
     }
   }
 
-  root.children.forEach(child => {
+  root.children.forEach((child) => {
     if (typeof child === 'string') {
       return;
     }
@@ -415,10 +374,7 @@ function findAll(
   return results;
 }
 
-function expectOne(
-  all                          ,
-  message        ,
-)                    {
+function expectOne(all, message) {
   if (all.length === 1) {
     return all[0];
   }
@@ -431,7 +387,7 @@ function expectOne(
   throw new Error(prefix + message);
 }
 
-function propsMatch(props        , filter        )          {
+function propsMatch(props, filter) {
   for (const key in filter) {
     if (props[key] !== filter[key]) {
       return false;
@@ -440,7 +396,7 @@ function propsMatch(props        , filter        )          {
   return true;
 }
 
-function create(element                    , options                     ) {
+function create(element, options) {
   let createNodeMock = defaultTestOptions.createNodeMock;
   let isConcurrent = false;
   if (typeof options === 'object' && options !== null) {
@@ -456,7 +412,7 @@ function create(element                    , options                     ) {
     createNodeMock,
     tag: 'CONTAINER',
   };
-  let root                   = createContainer(
+  let root = createContainer(
     container,
     isConcurrent ? ConcurrentRoot : LegacyRoot,
     false,
@@ -470,7 +426,7 @@ function create(element                    , options                     ) {
 
     root: undefined, // makes flow happy
     // we define a 'getter' for 'root' below using 'Object.defineProperty'
-    toJSON()                                                              {
+    toJSON() {
       if (root == null || root.current == null || container == null) {
         return null;
       }
@@ -510,7 +466,7 @@ function create(element                    , options                     ) {
       }
       return toTree(root.current);
     },
-    update(newElement                    ) {
+    update(newElement) {
       if (root == null || root.current == null) {
         return;
       }
@@ -531,41 +487,37 @@ function create(element                    , options                     ) {
       return getPublicRootInstance(root);
     },
 
-    unstable_flushSync   (fn         )    {
+    unstable_flushSync(fn) {
       return flushSync(fn);
     },
   };
 
-  Object.defineProperty(
-    entry,
-    'root',
-    ({
-      configurable: true,
-      enumerable: true,
-      get: function() {
-        if (root === null) {
-          throw new Error("Can't access .root on unmounted test renderer");
-        }
-        const children = getChildren(root.current);
-        if (children.length === 0) {
-          throw new Error("Can't access .root on unmounted test renderer");
-        } else if (children.length === 1) {
-          // Normally, we skip the root and just give you the child.
-          return children[0];
-        } else {
-          // However, we give you the root if there's more than one root child.
-          // We could make this the behavior for all cases but it would be a breaking change.
-          return wrapFiber(root.current);
-        }
-      },
-    }        ),
-  );
+  Object.defineProperty(entry, 'root', {
+    configurable: true,
+    enumerable: true,
+    get: function () {
+      if (root === null) {
+        throw new Error("Can't access .root on unmounted test renderer");
+      }
+      const children = getChildren(root.current);
+      if (children.length === 0) {
+        throw new Error("Can't access .root on unmounted test renderer");
+      } else if (children.length === 1) {
+        // Normally, we skip the root and just give you the child.
+        return children[0];
+      } else {
+        // However, we give you the root if there's more than one root child.
+        // We could make this the behavior for all cases but it would be a breaking change.
+        return wrapFiber(root.current);
+      }
+    },
+  });
 
   return entry;
 }
 
 const fiberToWrapper = new WeakMap();
-function wrapFiber(fiber       )                    {
+function wrapFiber(fiber) {
   let wrapper = fiberToWrapper.get(fiber);
   if (wrapper === undefined && fiber.alternate !== null) {
     wrapper = fiberToWrapper.get(fiber.alternate);
@@ -579,9 +531,9 @@ function wrapFiber(fiber       )                    {
 
 // Enable ReactTestRenderer to be used to test DevTools integration.
 injectIntoDevTools({
-  findFiberByHostInstance: (() => {
+  findFiberByHostInstance: () => {
     throw new Error('TestRenderer does not support findFiberByHostInstance()');
-  }     ),
+  },
   bundleType: __DEV__ ? 1 : 0,
   version: ReactVersion,
   rendererPackageName: 'react-test-renderer',
@@ -597,7 +549,7 @@ let actingUpdatesScopeDepth = 0;
 // building an app with React.
 // TODO: Migrate our tests to use ReactNoop. Although we would need to figure
 // out a solution for Relay, which has some Concurrent Mode tests.
-function unstable_concurrentAct(scope                              ) {
+function unstable_concurrentAct(scope) {
   if (Scheduler.unstable_flushAllWithoutAsserting === undefined) {
     throw Error(
       'This version of `act` requires a special mock build of Scheduler.',
@@ -644,7 +596,7 @@ function unstable_concurrentAct(scope                              ) {
       typeof thenable.then === 'function'
     ) {
       return {
-        then(resolve            , reject                        ) {
+        then(resolve, reject) {
           thenable.then(
             () => {
               flushActWork(
@@ -652,13 +604,13 @@ function unstable_concurrentAct(scope                              ) {
                   unwind();
                   resolve();
                 },
-                error => {
+                (error) => {
                   unwind();
                   reject(error);
                 },
               );
             },
-            error => {
+            (error) => {
               unwind();
               reject(error);
             },

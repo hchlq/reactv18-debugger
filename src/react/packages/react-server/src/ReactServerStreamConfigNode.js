@@ -4,25 +4,14 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
-                                     
-
-                         
-                     
-           
-                            
-     
-  
-
-                                                      
-
-export function scheduleWork(callback            ) {
+export function scheduleWork(callback) {
   setImmediate(callback);
 }
 
-export function flushBuffered(destination             ) {
+export function flushBuffered(destination) {
   // If we don't have any more data to send right now.
   // Flush whatever is in the buffer to the wire.
   if (typeof destination.flush === 'function') {
@@ -35,32 +24,29 @@ export function flushBuffered(destination             ) {
   }
 }
 
-export function beginWriting(destination             ) {
+export function beginWriting(destination) {
   // Older Node streams like http.createServer don't have this.
   if (typeof destination.cork === 'function') {
     destination.cork();
   }
 }
 
-export function writeChunk(
-  destination             ,
-  buffer            ,
-)          {
-  const nodeBuffer = ((buffer     )        ); // close enough
+export function writeChunk(destination, buffer) {
+  const nodeBuffer = buffer; // close enough
   return destination.write(nodeBuffer);
 }
 
-export function completeWriting(destination             ) {
+export function completeWriting(destination) {
   // Older Node streams like http.createServer don't have this.
   if (typeof destination.uncork === 'function') {
     destination.uncork();
   }
 }
 
-export function close(destination             ) {
+export function close(destination) {
   destination.end();
 }
 
-export function convertStringToBuffer(content        )             {
+export function convertStringToBuffer(content) {
   return Buffer.from(content, 'utf8');
 }

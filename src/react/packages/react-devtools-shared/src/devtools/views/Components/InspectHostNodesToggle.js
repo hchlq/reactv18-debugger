@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -18,7 +18,7 @@ export default function InspectHostNodesToggle() {
   const bridge = useContext(BridgeContext);
 
   const handleChange = useCallback(
-    (isChecked         ) => {
+    (isChecked) => {
       setIsInspecting(isChecked);
 
       if (isChecked) {
@@ -41,7 +41,8 @@ export default function InspectHostNodesToggle() {
     <Toggle
       onChange={handleChange}
       isChecked={isInspecting}
-      title="Select an element in the page to inspect it">
+      title="Select an element in the page to inspect it"
+    >
       <ButtonIcon type="search" />
     </Toggle>
   );

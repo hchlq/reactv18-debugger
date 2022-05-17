@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -24,65 +24,19 @@ import {hydrate, fillInPath} from 'react-devtools-shared/src/hydration';
 import {TreeStateContext} from './TreeContext';
 import {separateDisplayNameAndHOCs} from 'react-devtools-shared/src/utils';
 
-             
-                                              
-                          
-                                                 
-             
-                 
-          
-                                               
-                                                                   
-                                                    
-
-                                                                               
-
-                                        
-             
-                               
-          
-
-                                       
-             
-                               
-          
-
-                                   
-             
-                                     
-
-                                            
-                                                     
-                                                   
-                                           
-                               
-   
-
-const InspectedElementContext = createContext                             (
-  ((null     )                             ),
-);
+const InspectedElementContext = createContext(null);
 InspectedElementContext.displayName = 'InspectedElementContext';
 
-                                                                      
-                           
-                                              
-                       
-   
-
-const inProgressRequests                                      = new WeakMap();
-const resource           
-          
-          
-                           
-  = createResource(
-  (element         ) => {
+const inProgressRequests = new WeakMap();
+const resource = createResource(
+  (element) => {
     const request = inProgressRequests.get(element);
     if (request != null) {
       return request.promise;
     }
 
-    let resolveFn = ((null     )           );
-    const promise = new Promise(resolve => {
+    let resolveFn = null;
+    const promise = new Promise((resolve) => {
       resolveFn = resolve;
     });
 
@@ -90,23 +44,19 @@ const resource
 
     return promise;
   },
-  (element         ) => element,
+  (element) => element,
   {useWeakMap: true},
 );
 
-               
-                       
-   
-
-function InspectedElementContextController({children}       ) {
+function InspectedElementContextController({children}) {
   const bridge = useContext(BridgeContext);
   const store = useContext(StoreContext);
 
   const storeAsGlobalCount = useRef(1);
 
   // Ask the backend to store the value at the specified path as a global variable.
-  const storeAsGlobal = useCallback                         (
-    (id        , path                        ) => {
+  const storeAsGlobal = useCallback(
+    (id, path) => {
       const rendererID = store.getRendererIDForElement(id);
       if (rendererID !== null) {
         bridge.send('storeAsGlobal', {
@@ -121,8 +71,8 @@ function InspectedElementContextController({children}       ) {
   );
 
   // Ask the backend to copy the specified path to the clipboard.
-  const copyInspectedElementPath = useCallback                         (
-    (id        , path                        ) => {
+  const copyInspectedElementPath = useCallback(
+    (id, path) => {
       const rendererID = store.getRendererIDForElement(id);
       if (rendererID !== null) {
         bridge.send('copyElementPath', {id, path, rendererID});
@@ -132,8 +82,8 @@ function InspectedElementContextController({children}       ) {
   );
 
   // Ask the backend to fill in a "dehydrated" path; this will result in a "inspectedElement".
-  const getInspectedElementPath = useCallback                         (
-    (id        , path                        ) => {
+  const getInspectedElementPath = useCallback(
+    (id, path) => {
       const rendererID = store.getRendererIDForElement(id);
       if (rendererID !== null) {
         bridge.send('inspectElement', {id, path, rendererID});
@@ -142,8 +92,8 @@ function InspectedElementContextController({children}       ) {
     [bridge, store],
   );
 
-  const getInspectedElement = useCallback                     (
-    (id        ) => {
+  const getInspectedElement = useCallback(
+    (id) => {
       const element = store.getElementByID(id);
       if (element !== null) {
         return resource.read(element);
@@ -159,14 +109,12 @@ function InspectedElementContextController({children}       ) {
   // would itself be blocked by the same render that suspends (waiting for the data).
   const {selectedElementID} = useContext(TreeStateContext);
 
-  const [
-    currentlyInspectedElement,
-    setCurrentlyInspectedElement,
-  ] = useState                                 (null);
+  const [currentlyInspectedElement, setCurrentlyInspectedElement] =
+    useState(null);
 
   // This effect handler invalidates the suspense cache and schedules rendering updates with React.
   useEffect(() => {
-    const onInspectedElement = (data                         ) => {
+    const onInspectedElement = (data) => {
       const {id} = data;
 
       let element;
@@ -217,9 +165,9 @@ function InspectedElementContextController({children}       ) {
             rootType,
             state,
             key,
-          } = ((data.value     )                         );
+          } = data.value;
 
-          const inspectedElement                           = {
+          const inspectedElement = {
             canEditFunctionProps,
             canEditFunctionPropsDeletePaths,
             canEditFunctionPropsRenamePaths,
@@ -239,14 +187,9 @@ function InspectedElementContextController({children}       ) {
             owners:
               owners === null
                 ? null
-                : owners.map(owner => {
-                    const [
-                      displayName,
-                      hocDisplayNames,
-                    ] = separateDisplayNameAndHOCs(
-                      owner.displayName,
-                      owner.type,
-                    );
+                : owners.map((owner) => {
+                    const [displayName, hocDisplayNames] =
+                      separateDisplayNameAndHOCs(owner.displayName, owner.type);
                     return {
                       ...owner,
                       displayName,
@@ -295,7 +238,7 @@ function InspectedElementContextController({children}       ) {
 
     const rendererID = store.getRendererIDForElement(selectedElementID);
 
-    let timeoutID                   = null;
+    let timeoutID = null;
 
     const sendRequest = () => {
       timeoutID = null;
@@ -309,7 +252,7 @@ function InspectedElementContextController({children}       ) {
     // We'll poll for an update in the response handler below.
     sendRequest();
 
-    const onInspectedElement = (data                         ) => {
+    const onInspectedElement = (data) => {
       // If this is the element we requested, wait a little bit and then ask for another update.
       if (data.id === selectedElementID) {
         switch (data.type) {
@@ -362,10 +305,7 @@ function InspectedElementContextController({children}       ) {
   );
 }
 
-function hydrateHelper(
-  dehydratedData                       ,
-  path                         ,
-)                {
+function hydrateHelper(dehydratedData, path) {
   if (dehydratedData !== null) {
     const {cleaned, data, unserializable} = dehydratedData;
 
@@ -376,8 +316,8 @@ function hydrateHelper(
         // In that event it's important that we adjust the "cleaned" paths to match.
         return hydrate(
           data,
-          cleaned.map(cleanedPath => cleanedPath.slice(length)),
-          unserializable.map(unserializablePath =>
+          cleaned.map((cleanedPath) => cleanedPath.slice(length)),
+          unserializable.map((unserializablePath) =>
             unserializablePath.slice(length),
           ),
         );

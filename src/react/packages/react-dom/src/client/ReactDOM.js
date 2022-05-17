@@ -4,11 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                     
-                                                    
 
 import '../shared/checkReact';
 import {
@@ -107,11 +104,7 @@ setBatchingImplementation(
   batchedEventUpdates,
 );
 
-function createPortal(
-  children               ,
-  container           ,
-  key          = null,
-)               {
+function createPortal(children, container, key = null) {
   invariant(
     isValidContainer(container),
     'Target container is not a DOM element.',
@@ -121,17 +114,17 @@ function createPortal(
   return createPortalImpl(children, container, null, key);
 }
 
-function scheduleHydration(target      ) {
+function scheduleHydration(target) {
   if (target) {
     queueExplicitHydrationTarget(target);
   }
 }
 
 function renderSubtreeIntoContainer(
-  parentComponent                           ,
-  element                    ,
-  containerNode           ,
-  callback           ,
+  parentComponent,
+  element,
+  containerNode,
+  callback,
 ) {
   if (__DEV__) {
     if (
@@ -154,11 +147,7 @@ function renderSubtreeIntoContainer(
   );
 }
 
-function unstable_createPortal(
-  children               ,
-  container           ,
-  key          = null,
-) {
+function unstable_createPortal(children, container, key = null) {
   if (__DEV__) {
     if (!didWarnAboutUnstableCreatePortal) {
       didWarnAboutUnstableCreatePortal = true;

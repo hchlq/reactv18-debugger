@@ -51,7 +51,7 @@ describe('ErrorBoundaryReconciliation', () => {
       fail ? <InvalidType /> : <span prop="BrokenRender" />;
   });
 
-  [true, false].forEach(isConcurrent => {
+  [true, false].forEach((isConcurrent) => {
     function sharedTest(ErrorBoundary, fallbackTagName) {
       const renderer = ReactTestRenderer.create(
         <ErrorBoundary fallbackTagName={fallbackTagName}>

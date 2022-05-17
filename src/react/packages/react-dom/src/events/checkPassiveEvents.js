@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import {canUseDOM} from 'shared/ExecutionEnvironment';
@@ -18,7 +18,7 @@ if (canUseDOM) {
     const options = {};
     // $FlowFixMe: Ignore Flow complaining about needing a value
     Object.defineProperty(options, 'passive', {
-      get: function() {
+      get: function () {
         passiveBrowserEventsSupported = true;
       },
     });

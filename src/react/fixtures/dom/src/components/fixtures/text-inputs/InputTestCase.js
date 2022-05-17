@@ -16,7 +16,7 @@ class InputTestCase extends React.Component {
     };
   }
 
-  onChange = event => {
+  onChange = (event) => {
     const raw = event.target.value;
 
     switch (this.props.type) {

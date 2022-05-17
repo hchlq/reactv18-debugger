@@ -4,28 +4,12 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
 
 import styles from './ChartNode.css';
-
-               
-                
-                 
-                     
-                
-                                                    
-                                                           
-                                                         
-                                                         
-                                
-                     
-                
-            
-            
-   
 
 const minWidthToDisplay = 35;
 
@@ -42,7 +26,7 @@ export default function ChartNode({
   width,
   x,
   y,
-}       ) {
+}) {
   return (
     <g className={styles.Group} transform={`translate(${x},${y})`}>
       <rect
@@ -68,7 +52,8 @@ export default function ChartNode({
             opacity: isDimmed ? 0.75 : 1,
             display: width < minWidthToDisplay ? 'none' : 'block',
           }}
-          y={0}>
+          y={0}
+        >
           <div className={styles.Div} style={textStyle}>
             {label}
           </div>

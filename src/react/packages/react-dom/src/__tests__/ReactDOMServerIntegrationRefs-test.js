@@ -44,12 +44,12 @@ describe('ReactDOMServerIntegration', () => {
     resetModules();
   });
 
-  describe('refs', function() {
+  describe('refs', function () {
     it('should not run ref code on server', async () => {
       let refCount = 0;
       class RefsComponent extends React.Component {
         render() {
-          return <div ref={e => refCount++} />;
+          return <div ref={(e) => refCount++} />;
         }
       }
       await expectMarkupMatch(<RefsComponent />, <div />);
@@ -60,7 +60,7 @@ describe('ReactDOMServerIntegration', () => {
       let refCount = 0;
       class RefsComponent extends React.Component {
         render() {
-          return <div ref={e => refCount++} />;
+          return <div ref={(e) => refCount++} />;
         }
       }
       await expectMarkupMatch(<div />, <RefsComponent />);
@@ -71,7 +71,7 @@ describe('ReactDOMServerIntegration', () => {
       let refElement = null;
       class RefsComponent extends React.Component {
         render() {
-          return <div ref={e => (refElement = e)} />;
+          return <div ref={(e) => (refElement = e)} />;
         }
       }
       const e = await clientRenderOnServerString(<RefsComponent />);
@@ -92,7 +92,7 @@ describe('ReactDOMServerIntegration', () => {
       let component = null;
       resetModules();
       await asyncReactDOMRender(
-        <RefsComponent ref={e => (component = e)} />,
+        <RefsComponent ref={(e) => (component = e)} />,
         root,
         true,
       );

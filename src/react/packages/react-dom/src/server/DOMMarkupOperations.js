@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import {
@@ -30,11 +30,11 @@ import quoteAttributeValueForBrowser from './quoteAttributeValueForBrowser';
  * @param {string} id Unescaped ID.
  * @return {string} Markup string.
  */
-export function createMarkupForID(id        )         {
+export function createMarkupForID(id) {
   return ID_ATTRIBUTE_NAME + '=' + quoteAttributeValueForBrowser(id);
 }
 
-export function createMarkupForRoot()         {
+export function createMarkupForRoot() {
   return ROOT_ATTRIBUTE_NAME + '=""';
 }
 
@@ -45,7 +45,7 @@ export function createMarkupForRoot()         {
  * @param {*} value
  * @return {?string} Markup string, or null if the property was invalid.
  */
-export function createMarkupForProperty(name        , value       )         {
+export function createMarkupForProperty(name, value) {
   const propertyInfo = getPropertyInfo(name);
   if (name !== 'style' && shouldIgnoreAttribute(name, propertyInfo, false)) {
     return '';
@@ -60,7 +60,7 @@ export function createMarkupForProperty(name        , value       )         {
       return attributeName + '=""';
     } else {
       if (propertyInfo.sanitizeURL) {
-        value = '' + (value     );
+        value = '' + value;
         sanitizeURL(value);
       }
       return attributeName + '=' + quoteAttributeValueForBrowser(value);
@@ -78,10 +78,7 @@ export function createMarkupForProperty(name        , value       )         {
  * @param {*} value
  * @return {string} Markup string, or empty string if the property was invalid.
  */
-export function createMarkupForCustomAttribute(
-  name        ,
-  value       ,
-)         {
+export function createMarkupForCustomAttribute(name, value) {
   if (!isAttributeNameSafe(name) || value == null) {
     return '';
   }

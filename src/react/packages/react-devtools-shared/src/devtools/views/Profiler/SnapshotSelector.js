@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -18,9 +18,7 @@ import {StoreContext} from '../context';
 
 import styles from './SnapshotSelector.css';
 
-                         
-
-export default function SnapshotSelector(_       ) {
+export default function SnapshotSelector(_) {
   const {
     isCommitFilterEnabled,
     minCommitDuration,
@@ -30,11 +28,11 @@ export default function SnapshotSelector(_       ) {
   } = useContext(ProfilerContext);
 
   const {profilerStore} = useContext(StoreContext);
-  const {commitData} = profilerStore.getDataForRoot(((rootID     )        ));
+  const {commitData} = profilerStore.getDataForRoot(rootID);
 
-  const commitDurations                = [];
-  const commitTimes                = [];
-  commitData.forEach(commitDatum => {
+  const commitDurations = [];
+  const commitTimes = [];
+  commitData.forEach((commitDatum) => {
     commitDurations.push(commitDatum.duration);
     commitTimes.push(commitDatum.timestamp);
   });
@@ -92,14 +90,14 @@ export default function SnapshotSelector(_       ) {
   }
 
   const viewNextCommit = useCallback(() => {
-    let nextCommitIndex = ((selectedFilteredCommitIndex     )        ) + 1;
+    let nextCommitIndex = selectedFilteredCommitIndex + 1;
     if (nextCommitIndex === filteredCommitIndices.length) {
       nextCommitIndex = 0;
     }
     selectCommitIndex(filteredCommitIndices[nextCommitIndex]);
   }, [selectedFilteredCommitIndex, filteredCommitIndices, selectCommitIndex]);
   const viewPrevCommit = useCallback(() => {
-    let nextCommitIndex = ((selectedFilteredCommitIndex     )        ) - 1;
+    let nextCommitIndex = selectedFilteredCommitIndex - 1;
     if (nextCommitIndex < 0) {
       nextCommitIndex = filteredCommitIndices.length - 1;
     }
@@ -107,7 +105,7 @@ export default function SnapshotSelector(_       ) {
   }, [selectedFilteredCommitIndex, filteredCommitIndices, selectCommitIndex]);
 
   const handleKeyDown = useCallback(
-    event => {
+    (event) => {
       switch (event.key) {
         case 'ArrowLeft':
           viewPrevCommit();
@@ -135,7 +133,8 @@ export default function SnapshotSelector(_       ) {
         className={styles.Button}
         disabled={numFilteredCommits === 0}
         onClick={viewPrevCommit}
-        title="Select previous commit">
+        title="Select previous commit"
+      >
         <ButtonIcon type="previous" />
       </Button>
       <div
@@ -148,7 +147,8 @@ export default function SnapshotSelector(_       ) {
               ? numFilteredCommits * maxBarWidth
               : undefined,
         }}
-        tabIndex={0}>
+        tabIndex={0}
+      >
         {numFilteredCommits > 0 && (
           <SnapshotCommitList
             commitDurations={commitDurations}
@@ -167,7 +167,8 @@ export default function SnapshotSelector(_       ) {
         className={styles.Button}
         disabled={numFilteredCommits === 0}
         onClick={viewNextCommit}
-        title="Select next commit">
+        title="Select next commit"
+      >
         <ButtonIcon type="next" />
       </Button>
     </Fragment>

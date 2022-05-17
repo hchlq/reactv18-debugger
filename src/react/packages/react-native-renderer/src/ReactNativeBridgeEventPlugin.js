@@ -4,11 +4,9 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
-                                                                     
-                                                                     
 import SyntheticEvent from './legacy-events/SyntheticEvent';
 import invariant from 'shared/invariant';
 
@@ -19,15 +17,13 @@ import getListener from './ReactNativeGetListener';
 import forEachAccumulated from './legacy-events/forEachAccumulated';
 import {HostComponent} from 'react-reconciler/src/ReactWorkTags';
 
-const {
-  customBubblingEventTypes,
-  customDirectEventTypes,
-} = ReactNativeViewConfigRegistry;
+const {customBubblingEventTypes, customDirectEventTypes} =
+  ReactNativeViewConfigRegistry;
 
 // Start of inline: the below functions were inlined from
 // EventPropagator.js, as they deviated from ReactDOM's newer
 // implementations.
-function listenerAtPhase(inst, event, propagationPhase                   ) {
+function listenerAtPhase(inst, event, propagationPhase) {
   const registrationName =
     event.dispatchConfig.phasedRegistrationNames[propagationPhase];
   return getListener(inst, registrationName);
@@ -67,7 +63,7 @@ function getParent(inst) {
 /**
  * Simulates the traversal of a two-phase, capture/bubble event dispatch.
  */
-export function traverseTwoPhase(inst        , fn          , arg          ) {
+export function traverseTwoPhase(inst, fn, arg) {
   const path = [];
   while (inst) {
     path.push(inst);
@@ -97,11 +93,7 @@ function accumulateTwoPhaseDispatches(events) {
  * registration names. Same as `accumulateDirectDispatchesSingle` but without
  * requiring that the `dispatchMarker` be the same as the dispatched ID.
  */
-function accumulateDispatches(
-  inst        ,
-  ignoredDirection          ,
-  event        ,
-)       {
+function accumulateDispatches(inst, ignoredDirection, event) {
   if (inst && event && event.dispatchConfig.registrationName) {
     const registrationName = event.dispatchConfig.registrationName;
     const listener = getListener(inst, registrationName);
@@ -120,28 +112,27 @@ function accumulateDispatches(
  * `dispatchMarker`.
  * @param {SyntheticEvent} event
  */
-function accumulateDirectDispatchesSingle(event        ) {
+function accumulateDirectDispatchesSingle(event) {
   if (event && event.dispatchConfig.registrationName) {
     accumulateDispatches(event._targetInst, null, event);
   }
 }
 
-function accumulateDirectDispatches(events                           ) {
+function accumulateDirectDispatches(events) {
   forEachAccumulated(events, accumulateDirectDispatchesSingle);
 }
 
 // End of inline
-                                                
 
 const ReactNativeBridgeEventPlugin = {
   eventTypes: {},
 
-  extractEvents: function(
-    topLevelType              ,
-    targetInst               ,
-    nativeEvent                ,
-    nativeEventTarget               ,
-  )          {
+  extractEvents: function (
+    topLevelType,
+    targetInst,
+    nativeEvent,
+    nativeEventTarget,
+  ) {
     if (targetInst == null) {
       // Probably a node belonging to another renderer's tree.
       return null;

@@ -12,7 +12,7 @@ class DragBox extends React.Component {
   previousLeft = 0;
   previousTop = 0;
 
-  onDown = event => {
+  onDown = (event) => {
     this.isDragging = true;
     event.target.setPointerCapture(event.pointerId);
 
@@ -21,7 +21,7 @@ class DragBox extends React.Component {
     this.extractPositionDelta(event);
   };
 
-  onMove = event => {
+  onMove = (event) => {
     if (!this.isDragging) {
       return;
     }
@@ -33,11 +33,11 @@ class DragBox extends React.Component {
     }));
   };
 
-  onUp = event => (this.isDragging = false);
-  onGotCapture = event => this.setState({hasCapture: true});
-  onLostCapture = event => this.setState({hasCapture: false});
+  onUp = (event) => (this.isDragging = false);
+  onGotCapture = (event) => this.setState({hasCapture: true});
+  onLostCapture = (event) => this.setState({hasCapture: false});
 
-  extractPositionDelta = event => {
+  extractPositionDelta = (event) => {
     const left = event.pageX;
     const top = event.pageY;
     const delta = {

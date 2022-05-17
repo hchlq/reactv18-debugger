@@ -4,18 +4,15 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 /**
  * In the future, we should cleanup callbacks by cancelling them instead of
  * using this.
  */
-export function mountSafeCallback_NOT_REALLY_SAFE(
-  context     ,
-  callback           ,
-)      {
-  return function() {
+export function mountSafeCallback_NOT_REALLY_SAFE(context, callback) {
+  return function () {
     if (!callback) {
       return undefined;
     }
@@ -45,7 +42,7 @@ export function mountSafeCallback_NOT_REALLY_SAFE(
   };
 }
 
-export function throwOnStylesProp(component     , props     ) {
+export function throwOnStylesProp(component, props) {
   if (props.styles !== undefined) {
     const owner = component._owner || null;
     const name = component.constructor.displayName;
@@ -65,7 +62,7 @@ export function throwOnStylesProp(component     , props     ) {
   }
 }
 
-export function warnForStyleProps(props     , validAttributes     ) {
+export function warnForStyleProps(props, validAttributes) {
   if (__DEV__) {
     for (const key in validAttributes.style) {
       if (!(validAttributes[key] || props[key] === undefined)) {

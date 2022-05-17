@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import {isEnabled} from './src/events/ReactDOMEventListener';
@@ -12,7 +12,7 @@ import {isEnabled} from './src/events/ReactDOMEventListener';
 import {__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED} from './src/client/ReactDOM';
 
 // For classic WWW builds, include a few internals that are already in use.
-Object.assign((__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED     ), {
+Object.assign(__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED, {
   ReactBrowserEventEmitter: {
     isEnabled,
   },

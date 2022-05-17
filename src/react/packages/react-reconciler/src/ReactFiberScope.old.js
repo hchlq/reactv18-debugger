@@ -4,15 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                
-             
-                     
-               
-                  
-                           
 
 import {
   getPublicInstance,
@@ -24,17 +17,13 @@ import {isFiberSuspenseAndTimedOut} from './ReactFiberTreeReflection';
 import {HostComponent, ScopeComponent, ContextProvider} from './ReactWorkTags';
 import {enableScopeAPI} from 'shared/ReactFeatureFlags';
 
-function getSuspenseFallbackChild(fiber       )               {
-  return ((((fiber.child     )       ).sibling     )       ).child;
+function getSuspenseFallbackChild(fiber) {
+  return fiber.child.sibling.child;
 }
 
 const emptyObject = {};
 
-function collectScopedNodes(
-  node       ,
-  fn                 ,
-  scopedNodes            ,
-)       {
+function collectScopedNodes(node, fn, scopedNodes) {
   if (enableScopeAPI) {
     if (node.tag === HostComponent) {
       const {type, memoizedProps, stateNode} = node;
@@ -57,10 +46,7 @@ function collectScopedNodes(
   }
 }
 
-function collectFirstScopedNode(
-  node       ,
-  fn                 ,
-)                {
+function collectFirstScopedNode(node, fn) {
   if (enableScopeAPI) {
     if (node.tag === HostComponent) {
       const {type, memoizedProps, stateNode} = node;
@@ -81,11 +67,7 @@ function collectFirstScopedNode(
   return null;
 }
 
-function collectScopedNodesFromChildren(
-  startingChild       ,
-  fn                 ,
-  scopedNodes            ,
-)       {
+function collectScopedNodesFromChildren(startingChild, fn, scopedNodes) {
   let child = startingChild;
   while (child !== null) {
     collectScopedNodes(child, fn, scopedNodes);
@@ -93,10 +75,7 @@ function collectScopedNodesFromChildren(
   }
 }
 
-function collectFirstScopedNodeFromChildren(
-  startingChild       ,
-  fn                 ,
-)                {
+function collectFirstScopedNodeFromChildren(startingChild, fn) {
   let child = startingChild;
   while (child !== null) {
     const scopedNode = collectFirstScopedNode(child, fn);
@@ -108,11 +87,7 @@ function collectFirstScopedNodeFromChildren(
   return null;
 }
 
-function collectNearestContextValues   (
-  node       ,
-  context                 ,
-  childContextValues          ,
-)       {
+function collectNearestContextValues(node, context, childContextValues) {
   if (node.tag === ContextProvider && node.type._context === context) {
     const contextValue = node.memoizedProps.value;
     childContextValues.push(contextValue);
@@ -128,11 +103,11 @@ function collectNearestContextValues   (
   }
 }
 
-function collectNearestChildContextValues   (
-  startingChild              ,
-  context                 ,
-  childContextValues          ,
-)       {
+function collectNearestChildContextValues(
+  startingChild,
+  context,
+  childContextValues,
+) {
   let child = startingChild;
   while (child !== null) {
     collectNearestContextValues(child, context, childContextValues);
@@ -140,7 +115,7 @@ function collectNearestChildContextValues   (
   }
 }
 
-function DO_NOT_USE_queryAllNodes(fn                 )                       {
+function DO_NOT_USE_queryAllNodes(fn) {
   const currentFiber = getInstanceFromScope(this);
   if (currentFiber === null) {
     return null;
@@ -153,7 +128,7 @@ function DO_NOT_USE_queryAllNodes(fn                 )                       {
   return scopedNodes.length === 0 ? null : scopedNodes;
 }
 
-function DO_NOT_USE_queryFirstNode(fn                 )                {
+function DO_NOT_USE_queryFirstNode(fn) {
   const currentFiber = getInstanceFromScope(this);
   if (currentFiber === null) {
     return null;
@@ -165,7 +140,7 @@ function DO_NOT_USE_queryFirstNode(fn                 )                {
   return null;
 }
 
-function containsNode(node        )          {
+function containsNode(node) {
   let fiber = getInstanceFromNode(node);
   while (fiber !== null) {
     if (fiber.tag === ScopeComponent && fiber.stateNode === this) {
@@ -176,7 +151,7 @@ function containsNode(node        )          {
   return false;
 }
 
-function getChildContextValues   (context                 )           {
+function getChildContextValues(context) {
   const currentFiber = getInstanceFromScope(this);
   if (currentFiber === null) {
     return [];
@@ -189,7 +164,7 @@ function getChildContextValues   (context                 )           {
   return childContextValues;
 }
 
-export function createScopeInstance()                     {
+export function createScopeInstance() {
   return {
     DO_NOT_USE_queryAllNodes,
     DO_NOT_USE_queryFirstNode,

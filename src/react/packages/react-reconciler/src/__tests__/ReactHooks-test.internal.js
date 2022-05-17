@@ -500,8 +500,8 @@ describe('ReactHooks', () => {
     expect(Scheduler).toFlushAndYield(['Parent: 0', 'Child: 0']);
     expect(root).toMatchRenderedOutput('0');
 
-    const update = value => {
-      setCounter(previous => {
+    const update = (value) => {
+      setCounter((previous) => {
         Scheduler.unstable_yieldValue(
           `Compute state (${previous} -> ${value})`,
         );
@@ -560,8 +560,8 @@ describe('ReactHooks', () => {
     expect(Scheduler).toFlushAndYield(['Parent: 1', 'Child: 1']);
     expect(root).toMatchRenderedOutput('1');
 
-    const update = compute => {
-      setCounter(previous => {
+    const update = (compute) => {
+      setCounter((previous) => {
         const value = compute(previous);
         Scheduler.unstable_yieldValue(
           `Compute state (${previous} -> ${value})`,
@@ -571,14 +571,14 @@ describe('ReactHooks', () => {
     };
 
     // Update at normal priority
-    ReactTestRenderer.unstable_batchedUpdates(() => update(n => n * 100));
+    ReactTestRenderer.unstable_batchedUpdates(() => update((n) => n * 100));
 
     // The new state is eagerly computed.
     expect(Scheduler).toHaveYielded(['Compute state (1 -> 100)']);
 
     // but before it's flushed, a higher priority update interrupts it.
     root.unstable_flushSync(() => {
-      update(n => n + 5);
+      update((n) => n + 5);
     });
     expect(Scheduler).toHaveYielded([
       // The eagerly computed state was completely skipped
@@ -771,12 +771,12 @@ describe('ReactHooks', () => {
     function Counter() {
       const [counter, setCounter] = useState(0);
       if (counter === 0) {
-        setCounter(x => x + 1);
-        setCounter(x => x + 1);
+        setCounter((x) => x + 1);
+        setCounter((x) => x + 1);
       }
       useEffect(() => {
-        setCounter(x => x + 1);
-        setCounter(x => x + 1);
+        setCounter((x) => x + 1);
+        setCounter((x) => x + 1);
       }, []);
       return counter;
     }
@@ -791,7 +791,7 @@ describe('ReactHooks', () => {
   it('does not forget render phase useReducer updates inside an effect with hoisted reducer', () => {
     const {useReducer, useEffect} = React;
 
-    const reducer = x => x + 1;
+    const reducer = (x) => x + 1;
     function Counter() {
       const [counter, increment] = useReducer(reducer, 0);
       if (counter === 0) {
@@ -816,7 +816,7 @@ describe('ReactHooks', () => {
     const {useReducer, useEffect} = React;
 
     function Counter() {
-      const [counter, increment] = useReducer(x => x + 1, 0);
+      const [counter, increment] = useReducer((x) => x + 1, 0);
       if (counter === 0) {
         increment();
         increment();
@@ -1266,12 +1266,12 @@ describe('ReactHooks', () => {
       return <div />;
     });
 
-    const Memo = React.memo(props => {
+    const Memo = React.memo((props) => {
       renderCount++;
       return <div />;
     });
 
-    const MemoHasHooks = React.memo(props => {
+    const MemoHasHooks = React.memo((props) => {
       useState(0);
       renderCount++;
       return <div />;
@@ -1593,8 +1593,9 @@ describe('ReactHooks', () => {
         }
       });
 
-      it(`warns when more hooks (${(hookNameA,
-      hookNameB)}) are used during update than mount`, () => {
+      it(`warns when more hooks (${
+        (hookNameA, hookNameB)
+      }) are used during update than mount`, () => {
         function App(props) {
           /* eslint-disable no-unused-vars */
           if (props.update) {
@@ -1648,8 +1649,9 @@ describe('ReactHooks', () => {
         .replace('use', '')
         .replace('Helper', '');
 
-      it(`warns when fewer hooks (${(hookNameA,
-      hookNameB)}) are used during update than mount`, () => {
+      it(`warns when fewer hooks (${
+        (hookNameA, hookNameB)
+      }) are used during update than mount`, () => {
         function App(props) {
           /* eslint-disable no-unused-vars */
           if (props.update) {
@@ -1852,7 +1854,7 @@ describe('ReactHooks', () => {
     let wasSuspended = false;
     function trySuspend() {
       if (!wasSuspended) {
-        throw new Promise(resolve => {
+        throw new Promise((resolve) => {
           wasSuspended = true;
           resolve();
         });
@@ -1884,7 +1886,7 @@ describe('ReactHooks', () => {
     let wasSuspended = false;
     function trySuspend() {
       if (!wasSuspended) {
-        throw new Promise(resolve => {
+        throw new Promise((resolve) => {
           wasSuspended = true;
           resolve();
         });
@@ -1916,7 +1918,7 @@ describe('ReactHooks', () => {
     let wasSuspended = false;
     function trySuspend() {
       if (!wasSuspended) {
-        throw new Promise(resolve => {
+        throw new Promise((resolve) => {
           wasSuspended = true;
           resolve();
         });

@@ -45,6 +45,6 @@ const run = async ({branch, checksum, commit, reactVersion, tempDirectory}) => {
   }
 };
 
-module.exports = async params => {
+module.exports = async (params) => {
   return logPromise(run(params), 'Adding build metadata to packages');
 };

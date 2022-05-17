@@ -40,7 +40,7 @@ describe('ReactDOMServerIntegration', () => {
   });
 
   describe('React.Fragment', () => {
-    itRenders('a fragment with one child', async render => {
+    itRenders('a fragment with one child', async (render) => {
       const e = await render(
         <>
           <div>text1</div>
@@ -50,11 +50,11 @@ describe('ReactDOMServerIntegration', () => {
       expect(parent.childNodes[0].tagName).toBe('DIV');
     });
 
-    itRenders('a fragment with several children', async render => {
-      const Header = props => {
+    itRenders('a fragment with several children', async (render) => {
+      const Header = (props) => {
         return <p>header</p>;
       };
-      const Footer = props => {
+      const Footer = (props) => {
         return (
           <>
             <h2>footer</h2>
@@ -78,7 +78,7 @@ describe('ReactDOMServerIntegration', () => {
       expect(parent.childNodes[4].tagName).toBe('H3');
     });
 
-    itRenders('a nested fragment', async render => {
+    itRenders('a nested fragment', async (render) => {
       const e = await render(
         <>
           <>
@@ -102,7 +102,7 @@ describe('ReactDOMServerIntegration', () => {
       expect(parent.childNodes[2].tagName).toBe('P');
     });
 
-    itRenders('an empty fragment', async render => {
+    itRenders('an empty fragment', async (render) => {
       expect(await render(<React.Fragment />)).toBe(null);
     });
   });

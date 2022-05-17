@@ -37,7 +37,8 @@ export default class ButtonTestCases extends React.Component {
     return (
       <FixtureSet
         title="Custom Elements"
-        description="Support for Custom Element DOM standards.">
+        description="Support for Custom Element DOM standards."
+      >
         <TestCase title="Rendering into shadow root">
           <TestCase.ExpectedResult>
             You should see "Hello, World" printed below.{' '}

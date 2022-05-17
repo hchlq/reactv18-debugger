@@ -155,7 +155,7 @@ if (__DEV__) {
     dlItemTagAutoclosing: null,
   };
 
-  updatedAncestorInfo = function(oldInfo, tag) {
+  updatedAncestorInfo = function (oldInfo, tag) {
     const ancestorInfo = {...(oldInfo || emptyAncestorInfo)};
     const info = {tag};
 
@@ -210,7 +210,7 @@ if (__DEV__) {
   /**
    * Returns whether
    */
-  const isTagValidWithParent = function(tag, parentTag) {
+  const isTagValidWithParent = function (tag, parentTag) {
     // First, let's check if we're in an unusual parsing mode...
     switch (parentTag) {
       // https://html.spec.whatwg.org/multipage/syntax.html#parsing-main-inselect
@@ -335,7 +335,7 @@ if (__DEV__) {
   /**
    * Returns whether
    */
-  const findInvalidAncestorForTag = function(tag, ancestorInfo) {
+  const findInvalidAncestorForTag = function (tag, ancestorInfo) {
     switch (tag) {
       case 'address':
       case 'article':
@@ -401,7 +401,7 @@ if (__DEV__) {
 
   const didWarn = {};
 
-  validateDOMNesting = function(childTag, childText, ancestorInfo) {
+  validateDOMNesting = function (childTag, childText, ancestorInfo) {
     ancestorInfo = ancestorInfo || emptyAncestorInfo;
     const parentInfo = ancestorInfo.current;
     const parentTag = parentInfo && parentInfo.tag;

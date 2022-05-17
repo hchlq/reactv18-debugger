@@ -4,10 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                
 
 import {readCache} from 'react/unstable-cache';
 
@@ -15,28 +13,11 @@ const Pending = 0;
 const Resolved = 1;
 const Rejected = 2;
 
-                       
-            
-                  
-   
-
-                        
-            
-               
-   
-
-                        
-            
-               
-   
-
-                                                              
-
 // TODO: this is a browser-only version. Add a separate Node entry point.
 const nativeFetch = window.fetch;
 const fetchKey = {};
 
-function readResultMap()                      {
+function readResultMap() {
   const resources = readCache().resources;
   let map = resources.get(fetchKey);
   if (map === undefined) {
@@ -46,22 +27,22 @@ function readResultMap()                      {
   return map;
 }
 
-function toResult(thenable)         {
-  const result         = {
+function toResult(thenable) {
+  const result = {
     status: Pending,
     value: thenable,
   };
   thenable.then(
-    value => {
+    (value) => {
       if (result.status === Pending) {
-        const resolvedResult = ((result     )                );
+        const resolvedResult = result;
         resolvedResult.status = Resolved;
         resolvedResult.value = value;
       }
     },
-    err => {
+    (err) => {
       if (result.status === Pending) {
-        const rejectedResult = ((result     )                );
+        const rejectedResult = result;
         rejectedResult.status = Rejected;
         rejectedResult.value = err;
       }
@@ -70,7 +51,7 @@ function toResult(thenable)         {
   return result;
 }
 
-function readResult(result        ) {
+function readResult(result) {
   if (result.status === Resolved) {
     return result.value;
   } else {
@@ -119,7 +100,7 @@ Response.prototype = {
   },
 };
 
-function preloadResult(url        , options       )         {
+function preloadResult(url, options) {
   const map = readResultMap();
   let entry = map.get(url);
   if (!entry) {
@@ -137,14 +118,14 @@ function preloadResult(url        , options       )         {
   return entry;
 }
 
-export function preload(url        , options       )       {
+export function preload(url, options) {
   preloadResult(url, options);
   // Don't return anything.
 }
 
-export function fetch(url        , options       )         {
+export function fetch(url, options) {
   const result = preloadResult(url, options);
-  const nativeResponse = (readResult(result)     );
+  const nativeResponse = readResult(result);
   if (nativeResponse._reactResponse) {
     return nativeResponse._reactResponse;
   } else {

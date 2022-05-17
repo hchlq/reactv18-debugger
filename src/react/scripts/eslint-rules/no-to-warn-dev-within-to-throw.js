@@ -9,7 +9,7 @@
 
 'use strict';
 
-module.exports = function(context) {
+module.exports = function (context) {
   return {
     Identifier(node) {
       if (node.name === 'toWarnDev' || node.name === 'toErrorDev') {

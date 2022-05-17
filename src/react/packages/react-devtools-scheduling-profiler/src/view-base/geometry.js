@@ -4,50 +4,45 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                        
-                                                                
-                                                            
 
 /**
  * Alternative representation of `Rect`.
  * A tuple of (`top`, `right`, `bottom`, `left`) coordinates.
  */
-                                            
 
-export const zeroPoint        = Object.freeze({x: 0, y: 0});
-export const zeroSize       = Object.freeze({width: 0, height: 0});
-export const zeroRect       = Object.freeze({
+export const zeroPoint = Object.freeze({x: 0, y: 0});
+export const zeroSize = Object.freeze({width: 0, height: 0});
+export const zeroRect = Object.freeze({
   origin: zeroPoint,
   size: zeroSize,
 });
 
-export function pointEqualToPoint(point1       , point2       )          {
+export function pointEqualToPoint(point1, point2) {
   return point1.x === point2.x && point1.y === point2.y;
 }
 
-export function sizeEqualToSize(size1      , size2      )          {
+export function sizeEqualToSize(size1, size2) {
   return size1.width === size2.width && size1.height === size2.height;
 }
 
-export function rectEqualToRect(rect1      , rect2      )          {
+export function rectEqualToRect(rect1, rect2) {
   return (
     pointEqualToPoint(rect1.origin, rect2.origin) &&
     sizeEqualToSize(rect1.size, rect2.size)
   );
 }
 
-export function sizeIsValid({width, height}      )          {
+export function sizeIsValid({width, height}) {
   return width >= 0 && height >= 0;
 }
 
-export function sizeIsEmpty({width, height}      )          {
+export function sizeIsEmpty({width, height}) {
   return width <= 0 || height <= 0;
 }
 
-function rectToBox(rect      )      {
+function rectToBox(rect) {
   const top = rect.origin.y;
   const right = rect.origin.x + rect.size.width;
   const bottom = rect.origin.y + rect.size.height;
@@ -55,7 +50,7 @@ function rectToBox(rect      )      {
   return [top, right, bottom, left];
 }
 
-function boxToRect(box     )       {
+function boxToRect(box) {
   const [top, right, bottom, left] = box;
   return {
     origin: {
@@ -69,7 +64,7 @@ function boxToRect(box     )       {
   };
 }
 
-export function rectIntersectsRect(rect1      , rect2      )          {
+export function rectIntersectsRect(rect1, rect2) {
   const [top1, right1, bottom1, left1] = rectToBox(rect1);
   const [top2, right2, bottom2, left2] = rectToBox(rect2);
   return !(
@@ -85,7 +80,7 @@ export function rectIntersectsRect(rect1      , rect2      )          {
  *
  * Prerequisite: `rect1` must intersect with `rect2`.
  */
-export function intersectionOfRects(rect1      , rect2      )       {
+export function intersectionOfRects(rect1, rect2) {
   const [top1, right1, bottom1, left1] = rectToBox(rect1);
   const [top2, right2, bottom2, left2] = rectToBox(rect2);
   return boxToRect([
@@ -96,7 +91,7 @@ export function intersectionOfRects(rect1      , rect2      )       {
   ]);
 }
 
-export function rectContainsPoint({x, y}       , rect      )          {
+export function rectContainsPoint({x, y}, rect) {
   const [top, right, bottom, left] = rectToBox(rect);
   return left <= x && x <= right && top <= y && y <= bottom;
 }
@@ -106,7 +101,7 @@ export function rectContainsPoint({x, y}       , rect      )          {
  *
  * @returns Union of `rects`. If `rects` is empty, returns `zeroRect`.
  */
-export function unionOfRects(...rects        )       {
+export function unionOfRects(...rects) {
   if (rects.length === 0) {
     return zeroRect;
   }
@@ -114,7 +109,7 @@ export function unionOfRects(...rects        )       {
   const [firstRect, ...remainingRects] = rects;
   const boxUnion = remainingRects
     .map(rectToBox)
-    .reduce((intermediateUnion, nextBox)      => {
+    .reduce((intermediateUnion, nextBox) => {
       const [unionTop, unionRight, unionBottom, unionLeft] = intermediateUnion;
       const [nextTop, nextRight, nextBottom, nextLeft] = nextBox;
       return [

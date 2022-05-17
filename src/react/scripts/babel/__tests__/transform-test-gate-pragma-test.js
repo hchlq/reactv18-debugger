@@ -203,6 +203,6 @@ describe('transform test-gate-pragma: actual runtime', () => {
 describe('dynamic gate method', () => {
   // @gate experimental && __DEV__
   test('returns same conditions as pragma', () => {
-    expect(gate(ctx => ctx.experimental && ctx.__DEV__)).toBe(true);
+    expect(gate((ctx) => ctx.experimental && ctx.__DEV__)).toBe(true);
   });
 });

@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import {
@@ -19,11 +19,9 @@ import {
 } from 'react-devtools-shared/src/devtools/views/Settings/SettingsContext';
 import {enableDarkMode} from './SchedulingProfilerFeatureFlags';
 
-                                            
-
 const DARK_MODE_QUERY = '(prefers-color-scheme: dark)';
 
-const getSnapshot = window =>
+const getSnapshot = (window) =>
   window.matchMedia(DARK_MODE_QUERY).matches ? 'dark' : 'light';
 
 const darkModeMutableSource = createMutableSource(
@@ -39,11 +37,11 @@ const subscribe = (window, callback) => {
   };
 };
 
-export function useBrowserTheme()       {
+export function useBrowserTheme() {
   const theme = useMutableSource(darkModeMutableSource, getSnapshot, subscribe);
 
   useLayoutEffect(() => {
-    const documentElements = [((document.documentElement     )             )];
+    const documentElements = [document.documentElement];
     if (enableDarkMode) {
       switch (theme) {
         case 'light':
@@ -61,9 +59,9 @@ export function useBrowserTheme()       {
   }, [theme]);
 }
 
-export function useDisplayDensity()       {
+export function useDisplayDensity() {
   useLayoutEffect(() => {
-    const documentElements = [((document.documentElement     )             )];
+    const documentElements = [document.documentElement];
     updateDisplayDensity('comfortable', documentElements);
   }, []);
 }

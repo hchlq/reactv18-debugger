@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 // Allocates a new index for each request. Tries to stay as compact as possible so that these
@@ -12,8 +12,6 @@
 // The first allocated index is 1.
 
 import invariant from 'shared/invariant';
-
-                              
 
 let nextAvailableThreadIDs = new Uint16Array(16);
 for (let i = 0; i < 15; i++) {
@@ -43,7 +41,7 @@ function growThreadCountAndReturnNextAvailable() {
   return oldSize;
 }
 
-export function allocThreadID()           {
+export function allocThreadID() {
   const nextID = nextAvailableThreadIDs[0];
   if (nextID === 0) {
     return growThreadCountAndReturnNextAvailable();
@@ -52,7 +50,7 @@ export function allocThreadID()           {
   return nextID;
 }
 
-export function freeThreadID(id          ) {
+export function freeThreadID(id) {
   nextAvailableThreadIDs[id] = nextAvailableThreadIDs[0];
   nextAvailableThreadIDs[0] = id;
 }

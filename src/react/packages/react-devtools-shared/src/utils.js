@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import LRU from 'lru-cache';
@@ -44,18 +44,14 @@ import {
 } from 'react-devtools-shared/src/types';
 import {localStorageGetItem, localStorageSetItem} from './storage';
 import {meta} from './hydration';
-                                                          
 
-const cachedDisplayNames                            = new WeakMap();
+const cachedDisplayNames = new WeakMap();
 
 // On large trees, encoding takes significant time.
 // Try to reuse the already encoded strings.
 const encodedStringCache = new LRU({max: 1000});
 
-export function alphaSortKeys(
-  a                          ,
-  b                          ,
-)         {
+export function alphaSortKeys(a, b) {
   if (a.toString() > b.toString()) {
     return 1;
   } else if (b.toString() > a.toString()) {
@@ -65,9 +61,7 @@ export function alphaSortKeys(
   }
 }
 
-export function getAllEnumerableKeys(
-  obj        ,
-)                                  {
+export function getAllEnumerableKeys(obj) {
   const keys = [];
   let current = obj;
   while (current != null) {
@@ -76,7 +70,7 @@ export function getAllEnumerableKeys(
       ...Object.getOwnPropertySymbols(current),
     ];
     const descriptors = Object.getOwnPropertyDescriptors(current);
-    currentKeys.forEach(key => {
+    currentKeys.forEach((key) => {
       // $FlowFixMe: key can be a Symbol https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/getOwnPropertyDescriptor
       if (descriptors[key].enumerable) {
         keys.push(key);
@@ -87,10 +81,7 @@ export function getAllEnumerableKeys(
   return keys;
 }
 
-export function getDisplayName(
-  type          ,
-  fallbackName         = 'Anonymous',
-)         {
+export function getDisplayName(type, fallbackName = 'Anonymous') {
   const nameFromCache = cachedDisplayNames.get(type);
   if (nameFromCache != null) {
     return nameFromCache;
@@ -111,17 +102,17 @@ export function getDisplayName(
   return displayName;
 }
 
-let uidCounter         = 0;
+let uidCounter = 0;
 
-export function getUID()         {
+export function getUID() {
   return ++uidCounter;
 }
 
-export function utfDecodeString(array               )         {
+export function utfDecodeString(array) {
   return String.fromCodePoint(...array);
 }
 
-export function utfEncodeString(string        )                {
+export function utfEncodeString(string) {
   const cached = encodedStringCache.get(string);
   if (cached !== undefined) {
     return cached;
@@ -135,7 +126,7 @@ export function utfEncodeString(string        )                {
   return encoded;
 }
 
-export function printOperationsArray(operations               ) {
+export function printOperationsArray(operations) {
   // The first two values are always rendererID and rootID
   const rendererID = operations[0];
   const rootID = operations[1];
@@ -152,9 +143,7 @@ export function printOperationsArray(operations               ) {
   const stringTableEnd = i + stringTableSize;
   while (i < stringTableEnd) {
     const nextLength = operations[i++];
-    const nextString = utfDecodeString(
-      (operations.slice(i, i + nextLength)     ),
-    );
+    const nextString = utfDecodeString(operations.slice(i, i + nextLength));
     stringTable.push(nextString);
     i += nextLength;
   }
@@ -164,8 +153,8 @@ export function printOperationsArray(operations               ) {
 
     switch (operation) {
       case TREE_OPERATION_ADD: {
-        const id = ((operations[i + 1]     )        );
-        const type = ((operations[i + 2]     )             );
+        const id = operations[i + 1];
+        const type = operations[i + 2];
 
         i += 3;
 
@@ -175,7 +164,7 @@ export function printOperationsArray(operations               ) {
           i++; // supportsProfiling
           i++; // hasOwnerMetadata
         } else {
-          const parentID = ((operations[i]     )        );
+          const parentID = operations[i];
           i++;
 
           i++; // ownerID
@@ -193,11 +182,11 @@ export function printOperationsArray(operations               ) {
         break;
       }
       case TREE_OPERATION_REMOVE: {
-        const removeLength = ((operations[i + 1]     )        );
+        const removeLength = operations[i + 1];
         i += 2;
 
         for (let removeIndex = 0; removeIndex < removeLength; removeIndex++) {
-          const id = ((operations[i]     )        );
+          const id = operations[i];
           i += 1;
 
           logs.push(`Remove node ${id}`);
@@ -205,8 +194,8 @@ export function printOperationsArray(operations               ) {
         break;
       }
       case TREE_OPERATION_REORDER_CHILDREN: {
-        const id = ((operations[i + 1]     )        );
-        const numChildren = ((operations[i + 2]     )        );
+        const id = operations[i + 1];
+        const numChildren = operations[i + 2];
         i += 3;
         const children = operations.slice(i, i + numChildren);
         i += numChildren;
@@ -228,7 +217,7 @@ export function printOperationsArray(operations               ) {
   console.log(logs.join('\n  '));
 }
 
-export function getDefaultComponentFilters()                         {
+export function getDefaultComponentFilters() {
   return [
     {
       type: ComponentFilterElementType,
@@ -238,7 +227,7 @@ export function getDefaultComponentFilters()                         {
   ];
 }
 
-export function getSavedComponentFilters()                         {
+export function getSavedComponentFilters() {
   try {
     const raw = localStorageGetItem(LOCAL_STORAGE_FILTER_PREFERENCES_KEY);
     if (raw != null) {
@@ -248,16 +237,14 @@ export function getSavedComponentFilters()                         {
   return getDefaultComponentFilters();
 }
 
-export function saveComponentFilters(
-  componentFilters                        ,
-)       {
+export function saveComponentFilters(componentFilters) {
   localStorageSetItem(
     LOCAL_STORAGE_FILTER_PREFERENCES_KEY,
     JSON.stringify(componentFilters),
   );
 }
 
-export function getAppendComponentStack()          {
+export function getAppendComponentStack() {
   try {
     const raw = localStorageGetItem(LOCAL_STORAGE_SHOULD_PATCH_CONSOLE_KEY);
     if (raw != null) {
@@ -267,14 +254,14 @@ export function getAppendComponentStack()          {
   return true;
 }
 
-export function setAppendComponentStack(value         )       {
+export function setAppendComponentStack(value) {
   localStorageSetItem(
     LOCAL_STORAGE_SHOULD_PATCH_CONSOLE_KEY,
     JSON.stringify(value),
   );
 }
 
-export function getBreakOnConsoleErrors()          {
+export function getBreakOnConsoleErrors() {
   try {
     const raw = localStorageGetItem(
       LOCAL_STORAGE_SHOULD_BREAK_ON_CONSOLE_ERRORS,
@@ -286,17 +273,14 @@ export function getBreakOnConsoleErrors()          {
   return false;
 }
 
-export function setBreakOnConsoleErrors(value         )       {
+export function setBreakOnConsoleErrors(value) {
   localStorageSetItem(
     LOCAL_STORAGE_SHOULD_BREAK_ON_CONSOLE_ERRORS,
     JSON.stringify(value),
   );
 }
 
-export function separateDisplayNameAndHOCs(
-  displayName               ,
-  type             ,
-)                                        {
+export function separateDisplayNameAndHOCs(displayName, type) {
   if (displayName === null) {
     return [null, null];
   }
@@ -339,7 +323,7 @@ export function separateDisplayNameAndHOCs(
 
 // Pulled from react-compat
 // https://github.com/developit/preact-compat/blob/7c5de00e7c85e2ffd011bf3af02899b63f699d3a/src/index.js#L349
-export function shallowDiffers(prev        , next        )          {
+export function shallowDiffers(prev, next) {
   for (const attribute in prev) {
     if (!(attribute in next)) {
       return true;
@@ -353,8 +337,8 @@ export function shallowDiffers(prev        , next        )          {
   return false;
 }
 
-export function getInObject(object        , path                        )      {
-  return path.reduce((reduced        , attr     )      => {
+export function getInObject(object, path) {
+  return path.reduce((reduced, attr) => {
     if (reduced) {
       if (hasOwnProperty.call(reduced, attr)) {
         return reduced[attr];
@@ -374,17 +358,14 @@ export function getInObject(object        , path                        )      {
   }, object);
 }
 
-export function deletePathInObject(
-  object        ,
-  path                        ,
-) {
+export function deletePathInObject(object, path) {
   const length = path.length;
   const last = path[length - 1];
   if (object != null) {
     const parent = getInObject(object, path.slice(0, length - 1));
     if (parent) {
       if (Array.isArray(parent)) {
-        parent.splice(((last     )        ), 1);
+        parent.splice(last, 1);
       } else {
         delete parent[last];
       }
@@ -392,11 +373,7 @@ export function deletePathInObject(
   }
 }
 
-export function renamePathInObject(
-  object        ,
-  oldPath                        ,
-  newPath                        ,
-) {
+export function renamePathInObject(object, oldPath, newPath) {
   const length = oldPath.length;
   if (object != null) {
     const parent = getInObject(object, oldPath.slice(0, length - 1));
@@ -405,7 +382,7 @@ export function renamePathInObject(
       const lastNew = newPath[length - 1];
       parent[lastNew] = parent[lastOld];
       if (Array.isArray(parent)) {
-        parent.splice(((lastOld     )        ), 1);
+        parent.splice(lastOld, 1);
       } else {
         delete parent[lastOld];
       }
@@ -413,11 +390,7 @@ export function renamePathInObject(
   }
 }
 
-export function setInObject(
-  object        ,
-  path                        ,
-  value     ,
-) {
+export function setInObject(object, path, value) {
   const length = path.length;
   const last = path[length - 1];
   if (object != null) {
@@ -428,35 +401,10 @@ export function setInObject(
   }
 }
 
-                      
-           
-                  
-            
-             
-               
-          
-              
-                         
-                  
-              
-              
-                     
-         
-          
-            
-            
-                   
-            
-            
-            
-                 
-               
-              
-
 /**
  * Get a enhanced/artificial type string based on the object instance
  */
-export function getDataType(data        )           {
+export function getDataType(data) {
   if (data === null) {
     return 'null';
   } else if (data === undefined) {
@@ -531,9 +479,7 @@ export function getDataType(data        )           {
   }
 }
 
-export function getDisplayNameForReactElement(
-  element                    ,
-)                {
+export function getDisplayNameForReactElement(element) {
   const elementType = typeOf(element);
   switch (elementType) {
     case ContextConsumer:
@@ -574,10 +520,7 @@ export function getDisplayNameForReactElement(
 
 const MAX_PREVIEW_STRING_LENGTH = 50;
 
-function truncateForDisplay(
-  string        ,
-  length         = MAX_PREVIEW_STRING_LENGTH,
-) {
+function truncateForDisplay(string, length = MAX_PREVIEW_STRING_LENGTH) {
   if (string.length > length) {
     return string.substr(0, length) + '…';
   } else {
@@ -607,10 +550,7 @@ function truncateForDisplay(
 //
 // Would show a preview of...
 //   [123, "abc", Array(2), {…}]
-export function formatDataForPreview(
-  data     ,
-  showFormattedValue         ,
-)         {
+export function formatDataForPreview(data, showFormattedValue) {
   if (data != null && hasOwnProperty.call(data, meta.type)) {
     return showFormattedValue
       ? data[meta.preview_long]

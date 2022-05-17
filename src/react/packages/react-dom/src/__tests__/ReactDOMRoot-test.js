@@ -43,9 +43,7 @@ describe('ReactDOMRoot', () => {
   it('warns if a callback parameter is provided to render', () => {
     const callback = jest.fn();
     const root = ReactDOM.unstable_createRoot(container);
-    expect(() =>
-      root.render(<div>Hi</div>, callback),
-    ).toErrorDev(
+    expect(() => root.render(<div>Hi</div>, callback)).toErrorDev(
       'render(...): does not support the second callback argument. ' +
         'To execute a side effect after rendering, declare it in a component body with useEffect().',
       {withoutStack: true},
@@ -58,9 +56,7 @@ describe('ReactDOMRoot', () => {
     const callback = jest.fn();
     const root = ReactDOM.unstable_createRoot(container);
     root.render(<div>Hi</div>);
-    expect(() =>
-      root.unmount(callback),
-    ).toErrorDev(
+    expect(() => root.unmount(callback)).toErrorDev(
       'unmount(...): does not support a callback argument. ' +
         'To execute a side effect after rendering, declare it in a component body with useEffect().',
       {withoutStack: true},
@@ -80,7 +76,7 @@ describe('ReactDOMRoot', () => {
   });
 
   it('supports hydration', async () => {
-    const markup = await new Promise(resolve =>
+    const markup = await new Promise((resolve) =>
       resolve(
         ReactDOMServer.renderToString(
           <div>

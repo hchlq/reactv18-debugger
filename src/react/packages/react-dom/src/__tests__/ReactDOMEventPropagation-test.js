@@ -14,7 +14,7 @@ describe('ReactDOMEventListener', () => {
   let container;
 
   beforeEach(() => {
-    window.TextEvent = function() {};
+    window.TextEvent = function () {};
     jest.resetModules();
     React = require('react');
     jest.isolateModules(() => {
@@ -1255,34 +1255,34 @@ describe('ReactDOMEventListener', () => {
           type="div"
           targetRef={targetRef}
           targetProps={{
-            onMouseEnter: e => {
+            onMouseEnter: (e) => {
               log.push('---- inner enter');
             },
-            onMouseLeave: e => {
+            onMouseLeave: (e) => {
               log.push('---- inner leave');
             },
           }}
           parentProps={{
-            onMouseEnter: e => {
+            onMouseEnter: (e) => {
               log.push('--- inner parent enter');
             },
-            onMouseLeave: e => {
+            onMouseLeave: (e) => {
               log.push('--- inner parent leave');
             },
           }}
           outerProps={{
-            onMouseEnter: e => {
+            onMouseEnter: (e) => {
               log.push('-- outer enter');
             },
-            onMouseLeave: e => {
+            onMouseLeave: (e) => {
               log.push('-- outer leave');
             },
           }}
           outerParentProps={{
-            onMouseEnter: e => {
+            onMouseEnter: (e) => {
               log.push('- outer parent enter');
             },
-            onMouseLeave: e => {
+            onMouseLeave: (e) => {
               log.push('- outer parent leave');
             },
           }}
@@ -1328,34 +1328,34 @@ describe('ReactDOMEventListener', () => {
           type="div"
           targetRef={targetRef}
           targetProps={{
-            onPointerEnter: e => {
+            onPointerEnter: (e) => {
               log.push('---- inner enter');
             },
-            onPointerLeave: e => {
+            onPointerLeave: (e) => {
               log.push('---- inner leave');
             },
           }}
           parentProps={{
-            onPointerEnter: e => {
+            onPointerEnter: (e) => {
               log.push('--- inner parent enter');
             },
-            onPointerLeave: e => {
+            onPointerLeave: (e) => {
               log.push('--- inner parent leave');
             },
           }}
           outerProps={{
-            onPointerEnter: e => {
+            onPointerEnter: (e) => {
               log.push('-- outer enter');
             },
-            onPointerLeave: e => {
+            onPointerLeave: (e) => {
               log.push('-- outer leave');
             },
           }}
           outerParentProps={{
-            onPointerEnter: e => {
+            onPointerEnter: (e) => {
               log.push('- outer parent enter');
             },
-            onPointerLeave: e => {
+            onPointerLeave: (e) => {
               log.push('- outer parent leave');
             },
           }}
@@ -1412,34 +1412,34 @@ describe('ReactDOMEventListener', () => {
           type="input"
           targetRef={targetRef}
           targetProps={{
-            onBeforeInput: e => {
+            onBeforeInput: (e) => {
               log.push('---- inner');
             },
-            onBeforeInputCapture: e => {
+            onBeforeInputCapture: (e) => {
               log.push('---- inner capture');
             },
           }}
           parentProps={{
-            onBeforeInput: e => {
+            onBeforeInput: (e) => {
               log.push('--- inner parent');
             },
-            onBeforeInputCapture: e => {
+            onBeforeInputCapture: (e) => {
               log.push('--- inner parent capture');
             },
           }}
           outerProps={{
-            onBeforeInput: e => {
+            onBeforeInput: (e) => {
               log.push('-- outer');
             },
-            onBeforeInputCapture: e => {
+            onBeforeInputCapture: (e) => {
               log.push('-- outer capture');
             },
           }}
           outerParentProps={{
-            onBeforeInput: e => {
+            onBeforeInput: (e) => {
               log.push('- outer parent');
             },
-            onBeforeInputCapture: e => {
+            onBeforeInputCapture: (e) => {
               expect(e.type).toBe('beforeinput');
               log.push('- outer parent capture');
             },
@@ -1475,34 +1475,34 @@ describe('ReactDOMEventListener', () => {
           type="input"
           targetRef={targetRef}
           targetProps={{
-            onChange: e => {
+            onChange: (e) => {
               log.push('---- inner');
             },
-            onChangeCapture: e => {
+            onChangeCapture: (e) => {
               log.push('---- inner capture');
             },
           }}
           parentProps={{
-            onChange: e => {
+            onChange: (e) => {
               log.push('--- inner parent');
             },
-            onChangeCapture: e => {
+            onChangeCapture: (e) => {
               log.push('--- inner parent capture');
             },
           }}
           outerProps={{
-            onChange: e => {
+            onChange: (e) => {
               log.push('-- outer');
             },
-            onChangeCapture: e => {
+            onChangeCapture: (e) => {
               log.push('-- outer capture');
             },
           }}
           outerParentProps={{
-            onChange: e => {
+            onChange: (e) => {
               log.push('- outer parent');
             },
-            onChangeCapture: e => {
+            onChangeCapture: (e) => {
               expect(e.type).toBe('change');
               log.push('- outer parent capture');
             },
@@ -1534,34 +1534,34 @@ describe('ReactDOMEventListener', () => {
           type="input"
           targetRef={targetRef}
           targetProps={{
-            onCompositionStart: e => {
+            onCompositionStart: (e) => {
               log.push('---- inner');
             },
-            onCompositionStartCapture: e => {
+            onCompositionStartCapture: (e) => {
               log.push('---- inner capture');
             },
           }}
           parentProps={{
-            onCompositionStart: e => {
+            onCompositionStart: (e) => {
               log.push('--- inner parent');
             },
-            onCompositionStartCapture: e => {
+            onCompositionStartCapture: (e) => {
               log.push('--- inner parent capture');
             },
           }}
           outerProps={{
-            onCompositionStart: e => {
+            onCompositionStart: (e) => {
               log.push('-- outer');
             },
-            onCompositionStartCapture: e => {
+            onCompositionStartCapture: (e) => {
               log.push('-- outer capture');
             },
           }}
           outerParentProps={{
-            onCompositionStart: e => {
+            onCompositionStart: (e) => {
               log.push('- outer parent');
             },
-            onCompositionStartCapture: e => {
+            onCompositionStartCapture: (e) => {
               expect(e.type).toBe('compositionstart');
               log.push('- outer parent capture');
             },
@@ -1596,34 +1596,34 @@ describe('ReactDOMEventListener', () => {
           type="input"
           targetRef={targetRef}
           targetProps={{
-            onCompositionEnd: e => {
+            onCompositionEnd: (e) => {
               log.push('---- inner');
             },
-            onCompositionEndCapture: e => {
+            onCompositionEndCapture: (e) => {
               log.push('---- inner capture');
             },
           }}
           parentProps={{
-            onCompositionEnd: e => {
+            onCompositionEnd: (e) => {
               log.push('--- inner parent');
             },
-            onCompositionEndCapture: e => {
+            onCompositionEndCapture: (e) => {
               log.push('--- inner parent capture');
             },
           }}
           outerProps={{
-            onCompositionEnd: e => {
+            onCompositionEnd: (e) => {
               log.push('-- outer');
             },
-            onCompositionEndCapture: e => {
+            onCompositionEndCapture: (e) => {
               log.push('-- outer capture');
             },
           }}
           outerParentProps={{
-            onCompositionEnd: e => {
+            onCompositionEnd: (e) => {
               log.push('- outer parent');
             },
-            onCompositionEndCapture: e => {
+            onCompositionEndCapture: (e) => {
               expect(e.type).toBe('compositionend');
               log.push('- outer parent capture');
             },
@@ -1658,34 +1658,34 @@ describe('ReactDOMEventListener', () => {
           type="input"
           targetRef={targetRef}
           targetProps={{
-            onCompositionUpdate: e => {
+            onCompositionUpdate: (e) => {
               log.push('---- inner');
             },
-            onCompositionUpdateCapture: e => {
+            onCompositionUpdateCapture: (e) => {
               log.push('---- inner capture');
             },
           }}
           parentProps={{
-            onCompositionUpdate: e => {
+            onCompositionUpdate: (e) => {
               log.push('--- inner parent');
             },
-            onCompositionUpdateCapture: e => {
+            onCompositionUpdateCapture: (e) => {
               log.push('--- inner parent capture');
             },
           }}
           outerProps={{
-            onCompositionUpdate: e => {
+            onCompositionUpdate: (e) => {
               log.push('-- outer');
             },
-            onCompositionUpdateCapture: e => {
+            onCompositionUpdateCapture: (e) => {
               log.push('-- outer capture');
             },
           }}
           outerParentProps={{
-            onCompositionUpdate: e => {
+            onCompositionUpdate: (e) => {
               log.push('- outer parent');
             },
-            onCompositionUpdateCapture: e => {
+            onCompositionUpdateCapture: (e) => {
               expect(e.type).toBe('compositionupdate');
               log.push('- outer parent capture');
             },
@@ -1720,34 +1720,34 @@ describe('ReactDOMEventListener', () => {
           type="input"
           targetRef={targetRef}
           targetProps={{
-            onSelect: e => {
+            onSelect: (e) => {
               log.push('---- inner');
             },
-            onSelectCapture: e => {
+            onSelectCapture: (e) => {
               log.push('---- inner capture');
             },
           }}
           parentProps={{
-            onSelect: e => {
+            onSelect: (e) => {
               log.push('--- inner parent');
             },
-            onSelectCapture: e => {
+            onSelectCapture: (e) => {
               log.push('--- inner parent capture');
             },
           }}
           outerProps={{
-            onSelect: e => {
+            onSelect: (e) => {
               log.push('-- outer');
             },
-            onSelectCapture: e => {
+            onSelectCapture: (e) => {
               log.push('-- outer capture');
             },
           }}
           outerParentProps={{
-            onSelect: e => {
+            onSelect: (e) => {
               log.push('- outer parent');
             },
-            onSelectCapture: e => {
+            onSelectCapture: (e) => {
               expect(e.type).toBe('select');
               log.push('- outer parent capture');
             },
@@ -1819,34 +1819,34 @@ describe('ReactDOMEventListener', () => {
         type={eventConfig.type}
         targetRef={targetRef}
         targetProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('---- inner');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             log.push('---- inner capture');
           },
         }}
         parentProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('--- inner parent');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             log.push('--- inner parent capture');
           },
         }}
         outerProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('-- outer');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             log.push('-- outer capture');
           },
         }}
         outerParentProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('- outer parent');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             expect(e.type).toBe(eventConfig.reactEventType);
             log.push('- outer parent capture');
           },
@@ -1876,34 +1876,34 @@ describe('ReactDOMEventListener', () => {
         type={eventConfig.type}
         targetRef={targetRef}
         targetProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('---- inner');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             log.push('---- inner capture');
           },
         }}
         parentProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('--- inner parent');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             log.push('--- inner parent capture');
           },
         }}
         outerProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('-- outer');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             log.push('-- outer capture');
           },
         }}
         outerParentProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('- outer parent');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             expect(e.type).toBe(eventConfig.reactEventType);
             log.push('- outer parent capture');
           },
@@ -1935,34 +1935,34 @@ describe('ReactDOMEventListener', () => {
         type={eventConfig.type}
         targetRef={targetRef}
         targetProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('---- inner');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             log.push('---- inner capture');
           },
         }}
         parentProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('--- inner parent');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             log.push('--- inner parent capture');
           },
         }}
         outerProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('-- outer');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             log.push('-- outer capture');
           },
         }}
         outerParentProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('- outer parent');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             expect(e.type).toBe(eventConfig.reactEventType);
             log.push('- outer parent capture');
           },
@@ -1996,26 +1996,26 @@ describe('ReactDOMEventListener', () => {
           }
         }
         parentProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('--- inner parent');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             log.push('--- inner parent capture');
           },
         }}
         outerProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('-- outer');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             log.push('-- outer capture');
           },
         }}
         outerParentProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('- outer parent');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             expect(e.type).toBe(eventConfig.reactEventType);
             log.push('- outer parent capture');
           },
@@ -2048,26 +2048,26 @@ describe('ReactDOMEventListener', () => {
           }
         }
         parentProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('--- inner parent');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             log.push('--- inner parent capture');
           },
         }}
         outerProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('-- outer');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             log.push('-- outer capture');
           },
         }}
         outerParentProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('- outer parent');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             expect(e.type).toBe(eventConfig.reactEventType);
             log.push('- outer parent capture');
           },
@@ -2102,26 +2102,26 @@ describe('ReactDOMEventListener', () => {
           }
         }
         parentProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('--- inner parent');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             log.push('--- inner parent capture');
           },
         }}
         outerProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('-- outer');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             log.push('-- outer capture');
           },
         }}
         outerParentProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('- outer parent');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             expect(e.type).toBe(eventConfig.reactEventType);
             log.push('- outer parent capture');
           },
@@ -2146,11 +2146,11 @@ describe('ReactDOMEventListener', () => {
     render(
       <Fixture
         type={eventConfig.type}
-        targetRef={node => {
+        targetRef={(node) => {
           targetRef.current = node;
           if (node) {
             // No cleanup, assume we render once.
-            node.addEventListener(eventConfig.nativeEvent, e => {
+            node.addEventListener(eventConfig.nativeEvent, (e) => {
               // We *don't* expect this to appear in the log
               // at all because the event is stopped earlier.
               log.push('---- inner (native)');
@@ -2158,35 +2158,35 @@ describe('ReactDOMEventListener', () => {
           }
         }}
         targetProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('---- inner');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             log.push('---- inner capture');
           },
         }}
         parentProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('--- inner parent');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             log.push('--- inner parent capture');
           },
         }}
         outerProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('-- outer');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             e.stopPropagation(); // <---------
             log.push('-- outer capture');
           },
         }}
         outerParentProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('- outer parent');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             expect(e.type).toBe(eventConfig.reactEventType);
             log.push('- outer parent capture');
           },
@@ -2209,11 +2209,11 @@ describe('ReactDOMEventListener', () => {
     render(
       <Fixture
         type={eventConfig.type}
-        targetRef={node => {
+        targetRef={(node) => {
           targetRef.current = node;
           if (node) {
             // No cleanup, assume we render once.
-            node.addEventListener(eventConfig.nativeEvent, e => {
+            node.addEventListener(eventConfig.nativeEvent, (e) => {
               // We *don't* expect this to appear in the log
               // at all because the event is stopped earlier.
               log.push('---- inner (native)');
@@ -2221,35 +2221,35 @@ describe('ReactDOMEventListener', () => {
           }
         }}
         targetProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('---- inner');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             log.push('---- inner capture');
           },
         }}
         parentProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('--- inner parent');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             e.stopPropagation(); // <---------
             log.push('--- inner parent capture');
           },
         }}
         outerProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('-- outer');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             log.push('-- outer capture');
           },
         }}
         outerParentProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('- outer parent');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             expect(e.type).toBe(eventConfig.reactEventType);
             log.push('- outer parent capture');
           },
@@ -2275,26 +2275,26 @@ describe('ReactDOMEventListener', () => {
         type={eventConfig.type}
         targetRef={targetRef}
         targetProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             e.stopPropagation(); // <---------
             log.push('---- inner');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             log.push('---- inner capture');
           },
         }}
         parentProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('--- inner parent');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             log.push('--- inner parent capture');
           },
         }}
-        outerRef={node => {
+        outerRef={(node) => {
           if (node) {
             // No cleanup, assume we render once.
-            node.addEventListener(eventConfig.nativeEvent, e => {
+            node.addEventListener(eventConfig.nativeEvent, (e) => {
               // We *don't* expect this to appear in the log
               // at all because the event is stopped earlier.
               log.push('-- outer (native)');
@@ -2302,18 +2302,18 @@ describe('ReactDOMEventListener', () => {
           }
         }}
         outerProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('-- outer');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             log.push('-- outer capture');
           },
         }}
         outerParentProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('- outer parent');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             expect(e.type).toBe(eventConfig.reactEventType);
             log.push('- outer parent capture');
           },
@@ -2340,35 +2340,35 @@ describe('ReactDOMEventListener', () => {
         type={eventConfig.type}
         targetRef={targetRef}
         targetProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('---- inner');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             log.push('---- inner capture');
           },
         }}
         parentProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('--- inner parent');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             log.push('--- inner parent capture');
           },
         }}
         outerProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             e.stopPropagation(); // <---------
             log.push('-- outer');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             log.push('-- outer capture');
           },
         }}
         outerParentProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('- outer parent');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             expect(e.type).toBe(eventConfig.reactEventType);
             log.push('- outer parent capture');
           },
@@ -2397,35 +2397,35 @@ describe('ReactDOMEventListener', () => {
         type={eventConfig.type}
         targetRef={targetRef}
         targetProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('---- inner');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             log.push('---- inner capture');
           },
         }}
         parentProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('--- inner parent');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             log.push('--- inner parent capture');
           },
         }}
         outerProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('-- outer');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             log.push('-- outer capture');
           },
         }}
-        outerParentRef={node => {
+        outerParentRef={(node) => {
           if (node) {
             // No cleanup, assume we render once.
             node.addEventListener(
               eventConfig.nativeEvent,
-              e => {
+              (e) => {
                 log.push('- outer parent capture (native)');
                 e.stopPropagation(); // <---------
               },
@@ -2434,10 +2434,10 @@ describe('ReactDOMEventListener', () => {
           }
         }}
         outerParentProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('- outer parent');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             expect(e.type).toBe(eventConfig.reactEventType);
             log.push('- outer parent capture');
           },
@@ -2465,19 +2465,19 @@ describe('ReactDOMEventListener', () => {
         type={eventConfig.type}
         targetRef={targetRef}
         targetProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('---- inner');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             log.push('---- inner capture');
           },
         }}
-        parentRef={node => {
+        parentRef={(node) => {
           if (node) {
             // No cleanup, assume we render once.
             node.addEventListener(
               eventConfig.nativeEvent,
-              e => {
+              (e) => {
                 log.push('--- inner parent capture (native)');
                 e.stopPropagation(); // <---------
               },
@@ -2486,26 +2486,26 @@ describe('ReactDOMEventListener', () => {
           }
         }}
         parentProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('--- inner parent');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             log.push('--- inner parent capture');
           },
         }}
         outerProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('-- outer');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             log.push('-- outer capture');
           },
         }}
         outerParentProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('- outer parent');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             expect(e.type).toBe(eventConfig.reactEventType);
             log.push('- outer parent capture');
           },
@@ -2533,45 +2533,45 @@ describe('ReactDOMEventListener', () => {
     render(
       <Fixture
         type={eventConfig.type}
-        targetRef={node => {
+        targetRef={(node) => {
           targetRef.current = node;
           if (node) {
             // No cleanup, assume we render once.
-            node.addEventListener(eventConfig.nativeEvent, e => {
+            node.addEventListener(eventConfig.nativeEvent, (e) => {
               log.push('---- inner (native)');
               e.stopPropagation(); // <---------
             });
           }
         }}
         targetProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('---- inner');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             log.push('---- inner capture');
           },
         }}
         parentProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('--- inner parent');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             log.push('--- inner parent capture');
           },
         }}
         outerProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('-- outer');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             log.push('-- outer capture');
           },
         }}
         outerParentProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('- outer parent');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             expect(e.type).toBe(eventConfig.reactEventType);
             log.push('- outer parent capture');
           },
@@ -2599,45 +2599,45 @@ describe('ReactDOMEventListener', () => {
     render(
       <Fixture
         type={eventConfig.type}
-        targetRef={node => {
+        targetRef={(node) => {
           targetRef.current = node;
           if (node) {
             // No cleanup, assume we render once.
-            node.addEventListener(eventConfig.nativeEvent, e => {
+            node.addEventListener(eventConfig.nativeEvent, (e) => {
               log.push('---- inner (native)');
               e.stopPropagation(); // <---------
             });
           }
         }}
         targetProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('---- inner');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             log.push('---- inner capture');
           },
         }}
         parentProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('--- inner parent');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             log.push('--- inner parent capture');
           },
         }}
         outerProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('-- outer');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             log.push('-- outer capture');
           },
         }}
         outerParentProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('- outer parent');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             expect(e.type).toBe(eventConfig.reactEventType);
             log.push('- outer parent capture');
           },
@@ -2670,43 +2670,43 @@ describe('ReactDOMEventListener', () => {
         type={eventConfig.type}
         targetRef={targetRef}
         targetProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('---- inner');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             log.push('---- inner capture');
           },
         }}
         parentProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('--- inner parent');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             log.push('--- inner parent capture');
           },
         }}
-        outerRef={node => {
+        outerRef={(node) => {
           if (node) {
             // No cleanup, assume we render once.
-            node.addEventListener(eventConfig.nativeEvent, e => {
+            node.addEventListener(eventConfig.nativeEvent, (e) => {
               log.push('-- outer (native)');
               e.stopPropagation(); // <---------
             });
           }
         }}
         outerProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('-- outer');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             log.push('-- outer capture');
           },
         }}
         outerParentProps={{
-          [eventConfig.reactEvent]: e => {
+          [eventConfig.reactEvent]: (e) => {
             log.push('- outer parent');
           },
-          [eventConfig.reactEvent + 'Capture']: e => {
+          [eventConfig.reactEvent + 'Capture']: (e) => {
             expect(e.type).toBe(eventConfig.reactEventType);
             log.push('- outer parent capture');
           },
@@ -2758,7 +2758,8 @@ describe('ReactDOMEventListener', () => {
         outerRef={outerRef}
         outerProps={outerProps}
         outerParentRef={outerParentRef}
-        outerParentProps={outerParentProps}>
+        outerParentProps={outerParentProps}
+      >
         <NestedReact>{inner}</NestedReact>
       </Outer>
     );
@@ -2807,7 +2808,7 @@ describe('ReactDOMEventListener', () => {
   function unindent(str) {
     return str[0]
       .split('\n')
-      .map(s => s.trim())
-      .filter(s => s !== '');
+      .map((s) => s.trim())
+      .filter((s) => s !== '');
   }
 });

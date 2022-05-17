@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -26,9 +26,7 @@ import ProfilerSettings from './ProfilerSettings';
 
 import styles from './SettingsModal.css';
 
-                                                   
-
-export default function SettingsModal(_      ) {
+export default function SettingsModal(_) {
   const {isModalShowing, setIsModalShowing} = useContext(SettingsModalContext);
   const store = useContext(StoreContext);
   const {profilerStore} = store;
@@ -38,14 +36,14 @@ export default function SettingsModal(_      ) {
   const isProfilingSubscription = useMemo(
     () => ({
       getCurrentValue: () => profilerStore.isProfiling,
-      subscribe: (callback          ) => {
+      subscribe: (callback) => {
         profilerStore.addListener('isProfiling', callback);
         return () => profilerStore.removeListener('isProfiling', callback);
       },
     }),
     [profilerStore],
   );
-  const isProfiling = useSubscription         (isProfilingSubscription);
+  const isProfiling = useSubscription(isProfilingSubscription);
   if (isProfiling && isModalShowing) {
     setIsModalShowing(false);
   }
@@ -57,18 +55,19 @@ export default function SettingsModal(_      ) {
   return <SettingsModalImpl />;
 }
 
-function SettingsModalImpl(_      ) {
+function SettingsModalImpl(_) {
   const {setIsModalShowing} = useContext(SettingsModalContext);
-  const dismissModal = useCallback(() => setIsModalShowing(false), [
-    setIsModalShowing,
-  ]);
+  const dismissModal = useCallback(
+    () => setIsModalShowing(false),
+    [setIsModalShowing],
+  );
 
-  const [selectedTabID, selectTab] = useLocalStorage       (
+  const [selectedTabID, selectTab] = useLocalStorage(
     'React::DevTools::selectedSettingsTabID',
     'general',
   );
 
-  const modalRef = useRef                       (null);
+  const modalRef = useRef(null);
   useModalDismissSignal(modalRef, dismissModal);
 
   useEffect(() => {

@@ -10,8 +10,8 @@
 'use strict';
 
 // TODO: can we express this test with only public API?
-const getNodeForCharacterOffset = require('../getNodeForCharacterOffset')
-  .default;
+const getNodeForCharacterOffset =
+  require('../getNodeForCharacterOffset').default;
 
 // Create node from HTML string
 function createNode(html) {

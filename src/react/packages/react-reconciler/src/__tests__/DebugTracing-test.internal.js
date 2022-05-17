@@ -27,10 +27,10 @@ describe('DebugTracing', () => {
 
     const groups = [];
 
-    spyOnDevAndProd(console, 'log').and.callFake(message => {
+    spyOnDevAndProd(console, 'log').and.callFake((message) => {
       logs.push(`log: ${message.replace(/%c/g, '')}`);
     });
-    spyOnDevAndProd(console, 'group').and.callFake(message => {
+    spyOnDevAndProd(console, 'group').and.callFake((message) => {
       logs.push(`group: ${message.replace(/%c/g, '')}`);
       groups.push(message);
     });
@@ -276,7 +276,7 @@ describe('DebugTracing', () => {
       expect(Scheduler).toFlushUntilNextPaint([]);
     }).toErrorDev('Cannot update during an existing state transition');
 
-    gate(flags => {
+    gate((flags) => {
       if (flags.new) {
         expect(logs).toEqual([
           'group: ⚛️ render (0b0000000000000000000001000000000)',
@@ -371,7 +371,7 @@ describe('DebugTracing', () => {
       );
     });
 
-    gate(flags => {
+    gate((flags) => {
       if (flags.new) {
         expect(logs).toEqual([
           'group: ⚛️ render (0b0000000000000000000001000000000)',

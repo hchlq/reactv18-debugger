@@ -4,14 +4,15 @@ const React = window.React;
 
 class RangeInputs extends React.Component {
   state = {value: 0.5};
-  onChange = event => {
+  onChange = (event) => {
     this.setState({value: event.target.value});
   };
   render() {
     return (
       <FixtureSet
         title="Range Inputs"
-        description="Note: Range inputs are not supported in IE9.">
+        description="Note: Range inputs are not supported in IE9."
+      >
         <form>
           <fieldset>
             <legend>Controlled</legend>

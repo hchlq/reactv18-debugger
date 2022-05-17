@@ -152,7 +152,7 @@ describe('ReactShallowRenderer with hooks', () => {
     }
 
     function SomeComponent(props) {
-      const [state] = React.useReducer(reducer, props, p => ({
+      const [state] = React.useReducer(reducer, props, (p) => ({
         count: p.initialCount,
       }));
 
@@ -198,7 +198,7 @@ describe('ReactShallowRenderer with hooks', () => {
     }
 
     function SomeComponent(props) {
-      const [state, dispatch] = React.useReducer(reducer, props, p => ({
+      const [state, dispatch] = React.useReducer(reducer, props, (p) => ({
         count: p.initialCount,
       }));
 
@@ -462,7 +462,7 @@ describe('ReactShallowRenderer with hooks', () => {
       const [count, updateCount] = React.useState(0);
       _updateCount = updateCount;
       if (count < 5) {
-        updateCount(x => x + 1);
+        updateCount((x) => x + 1);
       }
       return count;
     }
@@ -476,11 +476,11 @@ describe('ReactShallowRenderer with hooks', () => {
     result = shallowRenderer.render(element);
     expect(result).toEqual(10);
 
-    _updateCount(x => x + 1);
+    _updateCount((x) => x + 1);
     result = shallowRenderer.render(element);
     expect(result).toEqual(11);
 
-    _updateCount(x => x - 10);
+    _updateCount((x) => x - 10);
     result = shallowRenderer.render(element);
     expect(result).toEqual(5);
   });

@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 // TODO: direct imports like some-package/src/* are bad. Fix me.
@@ -18,10 +18,6 @@ let didWarnValueDefaultValue;
 if (__DEV__) {
   didWarnValueDefaultValue = false;
 }
-
-                                                    
-                                          
-   
 
 function getDeclarationErrorAddendum() {
   const ownerName = getCurrentFiberOwnerNameInDevOrNull();
@@ -65,20 +61,11 @@ function checkSelectPropTypes(props) {
   }
 }
 
-function updateOptions(
-  node                   ,
-  multiple         ,
-  propValue     ,
-  setDefaultSelected         ,
-) {
-                                                                 
-                                     
-        
-    
-  const options                                 = node.options;
+function updateOptions(node, multiple, propValue, setDefaultSelected) {
+  const options = node.options;
 
   if (multiple) {
-    const selectedValues = (propValue               );
+    const selectedValues = propValue;
     const selectedValue = {};
     for (let i = 0; i < selectedValues.length; i++) {
       // Prefix to avoid chaos with special keys.
@@ -96,7 +83,7 @@ function updateOptions(
   } else {
     // Do not set `select.value` as exact behavior isn't consistent across all
     // browsers for all cases.
-    const selectedValue = toString(getToStringValue((propValue     )));
+    const selectedValue = toString(getToStringValue(propValue));
     let defaultSelected = null;
     for (let i = 0; i < options.length; i++) {
       if (options[i].value === selectedValue) {
@@ -132,14 +119,14 @@ function updateOptions(
  * selected.
  */
 
-export function getHostProps(element         , props        ) {
+export function getHostProps(element, props) {
   return Object.assign({}, props, {
     value: undefined,
   });
 }
 
-export function initWrapperState(element         , props        ) {
-  const node = ((element     )                        );
+export function initWrapperState(element, props) {
+  const node = element;
   if (__DEV__) {
     checkSelectPropTypes(props);
   }
@@ -166,8 +153,8 @@ export function initWrapperState(element         , props        ) {
   }
 }
 
-export function postMountWrapper(element         , props        ) {
-  const node = ((element     )                        );
+export function postMountWrapper(element, props) {
+  const node = element;
   node.multiple = !!props.multiple;
   const value = props.value;
   if (value != null) {
@@ -177,8 +164,8 @@ export function postMountWrapper(element         , props        ) {
   }
 }
 
-export function postUpdateWrapper(element         , props        ) {
-  const node = ((element     )                        );
+export function postUpdateWrapper(element, props) {
+  const node = element;
   const wasMultiple = node._wrapperState.wasMultiple;
   node._wrapperState.wasMultiple = !!props.multiple;
 
@@ -196,8 +183,8 @@ export function postUpdateWrapper(element         , props        ) {
   }
 }
 
-export function restoreControlledState(element         , props        ) {
-  const node = ((element     )                        );
+export function restoreControlledState(element, props) {
+  const node = element;
   const value = props.value;
 
   if (value != null) {

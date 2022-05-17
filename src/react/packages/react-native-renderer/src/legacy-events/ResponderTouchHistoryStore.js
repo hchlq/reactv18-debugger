@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import invariant from 'shared/invariant';
@@ -16,21 +16,9 @@ import {isStartish, isMoveish, isEndish} from './ResponderTopLevelEventTypes';
  * should typically only see IDs in the range of 1-20 because IDs get recycled
  * when touches end and start again.
  */
-                     
-                       
-                     
-                     
-                         
-                       
-                       
-                           
-                        
-                        
-                            
-   
 
 const MAX_TOUCH_BANK = 20;
-const touchBank                     = [];
+const touchBank = [];
 const touchHistory = {
   touchBank,
   numberActiveTouches: 0,
@@ -41,31 +29,18 @@ const touchHistory = {
   mostRecentTimeStamp: 0,
 };
 
-              
-                      
-                
-                
-                    
-     
-  
-                   
-                               
-                        
-     
-  
-
-function timestampForTouch(touch       )         {
+function timestampForTouch(touch) {
   // The legacy internal implementation provides "timeStamp", which has been
   // renamed to "timestamp". Let both work for now while we iron it out
   // TODO (evv): rename timeStamp to timestamp in internal code
-  return (touch     ).timeStamp || touch.timestamp;
+  return touch.timeStamp || touch.timestamp;
 }
 
 /**
  * TODO: Instead of making gestures recompute filtered velocity, we could
  * include a built in velocity computation that can be reused globally.
  */
-function createTouchRecord(touch       )              {
+function createTouchRecord(touch) {
   return {
     touchActive: true,
     startPageX: touch.pageX,
@@ -80,7 +55,7 @@ function createTouchRecord(touch       )              {
   };
 }
 
-function resetTouchRecord(touchRecord             , touch       )       {
+function resetTouchRecord(touchRecord, touch) {
   touchRecord.touchActive = true;
   touchRecord.startPageX = touch.pageX;
   touchRecord.startPageY = touch.pageY;
@@ -93,7 +68,7 @@ function resetTouchRecord(touchRecord             , touch       )       {
   touchRecord.previousTimeStamp = timestampForTouch(touch);
 }
 
-function getTouchIdentifier({identifier}       )         {
+function getTouchIdentifier({identifier}) {
   invariant(identifier != null, 'Touch object is missing identifier.');
   if (__DEV__) {
     if (identifier > MAX_TOUCH_BANK) {
@@ -108,7 +83,7 @@ function getTouchIdentifier({identifier}       )         {
   return identifier;
 }
 
-function recordTouchStart(touch       )       {
+function recordTouchStart(touch) {
   const identifier = getTouchIdentifier(touch);
   const touchRecord = touchBank[identifier];
   if (touchRecord) {
@@ -119,7 +94,7 @@ function recordTouchStart(touch       )       {
   touchHistory.mostRecentTimeStamp = timestampForTouch(touch);
 }
 
-function recordTouchMove(touch       )       {
+function recordTouchMove(touch) {
   const touchRecord = touchBank[getTouchIdentifier(touch)];
   if (touchRecord) {
     touchRecord.touchActive = true;
@@ -143,7 +118,7 @@ function recordTouchMove(touch       )       {
   }
 }
 
-function recordTouchEnd(touch       )       {
+function recordTouchEnd(touch) {
   const touchRecord = touchBank[getTouchIdentifier(touch)];
   if (touchRecord) {
     touchRecord.touchActive = false;
@@ -167,7 +142,7 @@ function recordTouchEnd(touch       )       {
   }
 }
 
-function printTouch(touch       )         {
+function printTouch(touch) {
   return JSON.stringify({
     identifier: touch.identifier,
     pageX: touch.pageX,
@@ -176,7 +151,7 @@ function printTouch(touch       )         {
   });
 }
 
-function printTouchBank()         {
+function printTouchBank() {
   let printed = JSON.stringify(touchBank.slice(0, MAX_TOUCH_BANK));
   if (touchBank.length > MAX_TOUCH_BANK) {
     printed += ' (original size: ' + touchBank.length + ')';
@@ -185,7 +160,7 @@ function printTouchBank()         {
 }
 
 const ResponderTouchHistoryStore = {
-  recordTouchTrack(topLevelType        , nativeEvent            )       {
+  recordTouchTrack(topLevelType, nativeEvent) {
     if (isMoveish(topLevelType)) {
       nativeEvent.changedTouches.forEach(recordTouchMove);
     } else if (isStartish(topLevelType)) {

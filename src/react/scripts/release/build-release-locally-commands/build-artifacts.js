@@ -20,6 +20,6 @@ const run = async ({cwd, dry, tempDirectory}) => {
   await exec(`cp -r ${tempNodeModulesPath} ${buildPath}`);
 };
 
-module.exports = async params => {
+module.exports = async (params) => {
   return logPromise(run(params), 'Building artifacts', 600000);
 };

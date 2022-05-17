@@ -64,7 +64,7 @@ describe('findDOMNode', () => {
   });
 
   it('findDOMNode should reject random objects', () => {
-    expect(function() {
+    expect(function () {
       ReactDOM.findDOMNode({foo: 'bar'});
     }).toThrowError('Argument appears to not be a ReactComponent. Keys: foo');
   });
@@ -106,14 +106,14 @@ describe('findDOMNode', () => {
       render() {
         return (
           <StrictMode>
-            <div ref={n => (child = n)} />
+            <div ref={(n) => (child = n)} />
           </StrictMode>
         );
       }
     }
 
     ReactTestUtils.renderIntoDocument(
-      <ContainsStrictModeChild ref={n => (parent = n)} />,
+      <ContainsStrictModeChild ref={(n) => (parent = n)} />,
     );
 
     let match;
@@ -135,13 +135,13 @@ describe('findDOMNode', () => {
 
     class IsInStrictMode extends React.Component {
       render() {
-        return <div ref={n => (child = n)} />;
+        return <div ref={(n) => (child = n)} />;
       }
     }
 
     ReactTestUtils.renderIntoDocument(
       <StrictMode>
-        <IsInStrictMode ref={n => (parent = n)} />
+        <IsInStrictMode ref={(n) => (parent = n)} />
       </StrictMode>,
     );
 

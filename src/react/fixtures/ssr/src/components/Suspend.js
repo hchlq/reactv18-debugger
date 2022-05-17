@@ -7,7 +7,7 @@ export default function Suspend({children}) {
   if (typeof window === 'object') {
     if (!isResolved) {
       if (promise === null) {
-        promise = new Promise(resolve => {
+        promise = new Promise((resolve) => {
           setTimeout(() => {
             isResolved = true;
             resolve();

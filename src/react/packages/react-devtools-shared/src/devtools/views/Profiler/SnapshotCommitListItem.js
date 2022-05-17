@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -14,16 +14,7 @@ import {getGradientColor, formatDuration, formatTime} from './utils';
 
 import styles from './SnapshotCommitListItem.css';
 
-                                                   
-
-              
-                 
-                
-                
-     
-  
-
-function SnapshotCommitListItem({data: itemData, index, style}       ) {
+function SnapshotCommitListItem({data: itemData, index, style}) {
   const {
     commitDurations,
     commitTimes,
@@ -47,7 +38,7 @@ function SnapshotCommitListItem({data: itemData, index, style}       ) {
   // Leave a 1px gap between snapshots
   const width = parseFloat(style.width) - 1;
 
-  const handleMouseDown = ({buttons, target}     ) => {
+  const handleMouseDown = ({buttons, target}) => {
     if (buttons === 1) {
       selectCommitIndex(index);
       startCommitDrag({
@@ -71,7 +62,8 @@ function SnapshotCommitListItem({data: itemData, index, style}       ) {
       }}
       title={`Duration ${formatDuration(commitDuration)}ms at ${formatTime(
         commitTime,
-      )}s`}>
+      )}s`}
+    >
       <div
         className={styles.Inner}
         style={{
@@ -84,4 +76,4 @@ function SnapshotCommitListItem({data: itemData, index, style}       ) {
   );
 }
 
-export default memo       (SnapshotCommitListItem, areEqual);
+export default memo(SnapshotCommitListItem, areEqual);

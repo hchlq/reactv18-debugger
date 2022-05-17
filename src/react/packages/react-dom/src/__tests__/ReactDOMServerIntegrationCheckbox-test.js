@@ -43,14 +43,14 @@ desc('ReactDOMServerIntegrationCheckbox', () => {
     resetModules();
   });
 
-  itRenders('a checkbox that is checked with an onChange', async render => {
+  itRenders('a checkbox that is checked with an onChange', async (render) => {
     const e = await render(
       <input type="checkbox" checked={true} onChange={() => {}} />,
     );
     expect(e.checked).toBe(true);
   });
 
-  itRenders('a checkbox that is checked with readOnly', async render => {
+  itRenders('a checkbox that is checked with readOnly', async (render) => {
     const e = await render(
       <input type="checkbox" checked={true} readOnly={true} />,
     );
@@ -59,7 +59,7 @@ desc('ReactDOMServerIntegrationCheckbox', () => {
 
   itRenders(
     'a checkbox that is checked and no onChange/readOnly',
-    async render => {
+    async (render) => {
       // this configuration should raise a dev warning that checked without
       // onChange or readOnly is a mistake.
       const e = await render(<input type="checkbox" checked={true} />, 1);
@@ -67,13 +67,13 @@ desc('ReactDOMServerIntegrationCheckbox', () => {
     },
   );
 
-  itRenders('a checkbox with defaultChecked', async render => {
+  itRenders('a checkbox with defaultChecked', async (render) => {
     const e = await render(<input type="checkbox" defaultChecked={true} />);
     expect(e.checked).toBe(true);
     expect(e.getAttribute('defaultChecked')).toBe(null);
   });
 
-  itRenders('a checkbox checked overriding defaultChecked', async render => {
+  itRenders('a checkbox checked overriding defaultChecked', async (render) => {
     const e = await render(
       <input
         type="checkbox"
@@ -89,7 +89,7 @@ desc('ReactDOMServerIntegrationCheckbox', () => {
 
   itRenders(
     'a checkbox checked overriding defaultChecked no matter the prop order',
-    async render => {
+    async (render) => {
       const e = await render(
         <input
           type="checkbox"

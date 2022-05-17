@@ -5,22 +5,15 @@
  * LICENSE file in the root directory of this source tree.
  *
  * @format
- *      
+ *
  */
 
 'use strict';
 
-                                                      
-
 /*
  * @returns {bool} true if different, false if equal
  */
-const deepDiffer = function(
-  one     ,
-  two     ,
-  maxDepthOrOptions                   = -1,
-  maybeOptions          ,
-)          {
+const deepDiffer = function (one, two, maxDepthOrOptions = -1, maybeOptions) {
   const options =
     typeof maxDepthOrOptions === 'number' ? maybeOptions : maxDepthOrOptions;
   const maxDepth =

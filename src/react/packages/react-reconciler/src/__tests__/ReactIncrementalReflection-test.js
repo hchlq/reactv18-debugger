@@ -24,7 +24,7 @@ describe('ReactIncrementalReflection', () => {
   });
 
   function div(...children) {
-    children = children.map(c =>
+    children = children.map((c) =>
       typeof c === 'string' ? {text: c, hidden: false} : c,
     );
     return {type: 'div', children, prop: undefined, hidden: false};
@@ -112,9 +112,7 @@ describe('ReactIncrementalReflection', () => {
     }
 
     ReactNoop.render(<Foo mount={true} />);
-    expect(() =>
-      expect(Scheduler).toFlushAndYield(['Component']),
-    ).toErrorDev(
+    expect(() => expect(Scheduler).toFlushAndYield(['Component'])).toErrorDev(
       'Using UNSAFE_componentWillMount in strict mode is not recommended',
       {withoutStack: true},
     );
@@ -185,11 +183,11 @@ describe('ReactIncrementalReflection', () => {
       render() {
         Scheduler.unstable_yieldValue('render');
         return this.props.step < 2 ? (
-          <span ref={ref => (this.span = ref)} />
+          <span ref={(ref) => (this.span = ref)} />
         ) : this.props.step === 2 ? (
-          <div ref={ref => (this.div = ref)} />
+          <div ref={(ref) => (this.div = ref)} />
         ) : this.props.step === 3 ? null : this.props.step === 4 ? (
-          <div ref={ref => (this.span = ref)} />
+          <div ref={(ref) => (this.span = ref)} />
         ) : null;
       }
     }

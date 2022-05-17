@@ -4,17 +4,12 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import {enableProfilerTimer} from 'shared/ReactFeatureFlags';
 
-                                                                               
-                                                     
-
 import {DidCapture} from './ReactFiberFlags';
-
-                                                          
 
 let rendererID = null;
 let injectedHook = null;
@@ -23,7 +18,7 @@ let hasLoggedError = false;
 export const isDevToolsPresent =
   typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ !== 'undefined';
 
-export function injectInternals(internals        )          {
+export function injectInternals(internals) {
   if (typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ === 'undefined') {
     // No DevTools
     return false;
@@ -60,7 +55,7 @@ export function injectInternals(internals        )          {
   return true;
 }
 
-export function onScheduleRoot(root           , children               ) {
+export function onScheduleRoot(root, children) {
   if (__DEV__) {
     if (
       injectedHook &&
@@ -78,10 +73,7 @@ export function onScheduleRoot(root           , children               ) {
   }
 }
 
-export function onCommitRoot(
-  root           ,
-  priorityLevel                    ,
-) {
+export function onCommitRoot(root, priorityLevel) {
   if (injectedHook && typeof injectedHook.onCommitFiberRoot === 'function') {
     try {
       const didError = (root.current.flags & DidCapture) === DidCapture;
@@ -106,7 +98,7 @@ export function onCommitRoot(
   }
 }
 
-export function onCommitUnmount(fiber       ) {
+export function onCommitUnmount(fiber) {
   if (injectedHook && typeof injectedHook.onCommitFiberUnmount === 'function') {
     try {
       injectedHook.onCommitFiberUnmount(rendererID, fiber);

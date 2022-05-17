@@ -4,11 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                           
-                                                     
 
 import {
   scheduleWork,
@@ -21,23 +18,12 @@ import {
 import {formatChunk} from './ReactServerFormatConfig';
 import {REACT_ELEMENT_TYPE} from 'shared/ReactSymbols';
 
-                      
-                           
-                          
-                                     
-                   
-     
-  
-
-export function createRequest(
-  children               ,
-  destination             ,
-)                {
+export function createRequest(children, destination) {
   return {destination, children, completedChunks: [], flowing: false};
 }
 
-function performWork(request               )       {
-  const element = (request.children     );
+function performWork(request) {
+  const element = request.children;
   request.children = null;
   if (element && element.$$typeof !== REACT_ELEMENT_TYPE) {
     return;
@@ -55,7 +41,7 @@ function performWork(request               )       {
   flushBuffered(request.destination);
 }
 
-function flushCompletedChunks(request               ) {
+function flushCompletedChunks(request) {
   const destination = request.destination;
   const chunks = request.completedChunks;
   request.completedChunks = [];
@@ -72,12 +58,12 @@ function flushCompletedChunks(request               ) {
   close(destination);
 }
 
-export function startWork(request               )       {
+export function startWork(request) {
   request.flowing = true;
   scheduleWork(() => performWork(request));
 }
 
-export function startFlowing(request               )       {
+export function startFlowing(request) {
   request.flowing = false;
   flushCompletedChunks(request);
 }

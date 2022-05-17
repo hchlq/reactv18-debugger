@@ -56,7 +56,7 @@ function getTransforms() {
   } else if (_new !== undefined) {
     throw Error('Cannot provide --new without also providing --old');
   }
-  return argv._.map(filename => {
+  return argv._.map((filename) => {
     const oldPath = resolvePath(filename + '.old.js');
     const newPath = resolvePath(filename + '.new.js');
 

@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import {TEXT_NODE} from '../shared/HTMLNodeType';
@@ -18,7 +18,7 @@ import {TEXT_NODE} from '../shared/HTMLNodeType';
  * @param {string} text
  * @internal
  */
-const setTextContent = function(node         , text        )       {
+const setTextContent = function (node, text) {
   if (text) {
     const firstChild = node.firstChild;
 

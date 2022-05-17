@@ -4,14 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                                     
-                                                                   
-                                                                         
-                                                                                 
-                                                                     
 
 import {registrationNameModules} from './legacy-events/EventPluginRegistry';
 import {batchedUpdates} from './legacy-events/ReactGenericBatching';
@@ -31,16 +25,16 @@ export {getListener, registrationNameModules as registrationNames};
  * @internal
  */
 function extractPluginEvents(
-  topLevelType              ,
-  targetInst              ,
-  nativeEvent                ,
-  nativeEventTarget                    ,
-)                                                          {
+  topLevelType,
+  targetInst,
+  nativeEvent,
+  nativeEventTarget,
+) {
   let events = null;
-  const legacyPlugins = ((plugins     )                                  );
+  const legacyPlugins = plugins;
   for (let i = 0; i < legacyPlugins.length; i++) {
     // Not every plugin in the ordering may be loaded at runtime.
-    const possiblePlugin                                     = legacyPlugins[i];
+    const possiblePlugin = legacyPlugins[i];
     if (possiblePlugin) {
       const extractedEvents = possiblePlugin.extractEvents(
         topLevelType,
@@ -57,10 +51,10 @@ function extractPluginEvents(
 }
 
 function runExtractedPluginEventsInBatch(
-  topLevelType              ,
-  targetInst              ,
-  nativeEvent                ,
-  nativeEventTarget                    ,
+  topLevelType,
+  targetInst,
+  nativeEvent,
+  nativeEventTarget,
 ) {
   const events = extractPluginEvents(
     topLevelType,
@@ -71,12 +65,8 @@ function runExtractedPluginEventsInBatch(
   runEventsInBatch(events);
 }
 
-export function dispatchEvent(
-  target               ,
-  topLevelType              ,
-  nativeEvent                ,
-) {
-  const targetFiber = (target              );
+export function dispatchEvent(target, topLevelType, nativeEvent) {
+  const targetFiber = target;
 
   let eventTarget = null;
   if (targetFiber != null) {
@@ -87,7 +77,7 @@ export function dispatchEvent(
     }
   }
 
-  batchedUpdates(function() {
+  batchedUpdates(function () {
     // Heritage plugin event system
     runExtractedPluginEventsInBatch(
       topLevelType,

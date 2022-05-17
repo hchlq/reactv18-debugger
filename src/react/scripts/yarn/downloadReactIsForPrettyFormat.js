@@ -24,7 +24,7 @@ pacote
     `react-is@${reactIsDependencyVersion}`,
     prettyFormatNodeModulesReactIsDir
   )
-  .catch(error => {
+  .catch((error) => {
     console.error(error);
     process.exitCode = 1;
   });

@@ -43,7 +43,7 @@ describe('EnterLeaveEventPlugin', () => {
     const leaveEvents = [];
     const node = ReactDOM.render(
       <div
-        onMouseLeave={e => {
+        onMouseLeave={(e) => {
           e.persist();
           leaveEvents.push(e);
         }}
@@ -76,7 +76,7 @@ describe('EnterLeaveEventPlugin', () => {
     const enterEvents = [];
     const node = ReactDOM.render(
       <div
-        onMouseEnter={e => {
+        onMouseEnter={(e) => {
           e.persist();
           enterEvents.push(e);
         }}
@@ -108,7 +108,8 @@ describe('EnterLeaveEventPlugin', () => {
         return (
           <div
             onMouseEnter={() => parentEnterCalls++}
-            ref={node => (parent = node)}>
+            ref={(node) => (parent = node)}
+          >
             {this.props.showChild && (
               <div onMouseEnter={() => childEnterCalls++} />
             )}
@@ -136,7 +137,7 @@ describe('EnterLeaveEventPlugin', () => {
   });
 
   // Test for https://github.com/facebook/react/issues/16763.
-  it('should call mouseEnter once from sibling rendered inside a rendered component', done => {
+  it('should call mouseEnter once from sibling rendered inside a rendered component', (done) => {
     const mockFn = jest.fn();
 
     class Parent extends React.Component {
@@ -186,7 +187,7 @@ describe('EnterLeaveEventPlugin', () => {
     ReactDOM.render(<Parent />, container);
   });
 
-  it('should call mouseEnter when pressing a non tracked React node', done => {
+  it('should call mouseEnter when pressing a non tracked React node', (done) => {
     const mockFn = jest.fn();
 
     class Parent extends React.Component {

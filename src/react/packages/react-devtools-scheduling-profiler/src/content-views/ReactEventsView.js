@@ -4,11 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                            
-                                                                                
 
 import {
   positioningScaleFactor,
@@ -33,7 +30,7 @@ import {
 const EVENT_ROW_HEIGHT_FIXED =
   EVENT_ROW_PADDING + EVENT_DIAMETER + EVENT_ROW_PADDING;
 
-function isSuspenseEvent(event            )                  {
+function isSuspenseEvent(event) {
   return (
     event.type === 'suspense-suspend' ||
     event.type === 'suspense-resolved' ||
@@ -42,13 +39,13 @@ function isSuspenseEvent(event            )                  {
 }
 
 export class ReactEventsView extends View {
-  _profilerData                   ;
-  _intrinsicSize      ;
+  _profilerData;
+  _intrinsicSize;
 
-  _hoveredEvent                    = null;
-  onHover                                              = null;
+  _hoveredEvent = null;
+  onHover = null;
 
-  constructor(surface         , frame      , profilerData                   ) {
+  constructor(surface, frame, profilerData) {
     super(surface, frame);
     this._profilerData = profilerData;
 
@@ -62,7 +59,7 @@ export class ReactEventsView extends View {
     return this._intrinsicSize;
   }
 
-  setHoveredEvent(hoveredEvent                   ) {
+  setHoveredEvent(hoveredEvent) {
     if (this._hoveredEvent === hoveredEvent) {
       return;
     }
@@ -74,19 +71,19 @@ export class ReactEventsView extends View {
    * Draw a single `ReactEvent` as a circle in the canvas.
    */
   _drawSingleReactEvent(
-    context                          ,
-    rect      ,
-    event            ,
-    baseY        ,
-    scaleFactor        ,
-    showHoverHighlight         ,
+    context,
+    rect,
+    event,
+    baseY,
+    scaleFactor,
+    showHoverHighlight,
   ) {
     const {frame} = this;
     const {timestamp, type} = event;
 
     const x = timestampToPosition(timestamp, scaleFactor, frame);
     const radius = EVENT_DIAMETER / 2;
-    const eventRect       = {
+    const eventRect = {
       origin: {
         x: x - radius,
         y: baseY,
@@ -137,7 +134,7 @@ export class ReactEventsView extends View {
     }
   }
 
-  draw(context                          ) {
+  draw(context) {
     const {
       frame,
       _profilerData: {events},
@@ -160,9 +157,9 @@ export class ReactEventsView extends View {
       frame,
     );
 
-    const highlightedEvents               = [];
+    const highlightedEvents = [];
 
-    events.forEach(event => {
+    events.forEach((event) => {
       if (
         event === _hoveredEvent ||
         (_hoveredEvent &&
@@ -185,7 +182,7 @@ export class ReactEventsView extends View {
 
     // Draw the highlighted items on top so they stand out.
     // This is helpful if there are multiple (overlapping) items close to each other.
-    highlightedEvents.forEach(event => {
+    highlightedEvents.forEach((event) => {
       this._drawSingleReactEvent(
         context,
         visibleArea,
@@ -198,7 +195,7 @@ export class ReactEventsView extends View {
 
     // Render bottom border.
     // Propose border rect, check if intersects with `rect`, draw intersection.
-    const borderFrame       = {
+    const borderFrame = {
       origin: {
         x: frame.origin.x,
         y: frame.origin.y + EVENT_ROW_HEIGHT_FIXED - BORDER_SIZE,
@@ -223,7 +220,7 @@ export class ReactEventsView extends View {
   /**
    * @private
    */
-  _handleMouseMove(interaction                      ) {
+  _handleMouseMove(interaction) {
     const {frame, onHover, visibleArea} = this;
     if (!onHover) {
       return;
@@ -266,7 +263,7 @@ export class ReactEventsView extends View {
     onHover(null);
   }
 
-  handleInteraction(interaction             ) {
+  handleInteraction(interaction) {
     switch (interaction.type) {
       case 'mousemove':
         this._handleMouseMove(interaction);

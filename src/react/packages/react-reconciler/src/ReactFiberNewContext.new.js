@@ -4,13 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                    
-                                                                   
-                                                       
-                                            
 
 import {isPrimaryRenderer} from './ReactFiberHostConfig';
 import {createCursor, push, pop} from './ReactFiberStack.new';
@@ -35,7 +30,7 @@ import {createUpdate, enqueueUpdate, ForceUpdate} from './ReactUpdateQueue.new';
 import {markWorkInProgressReceivedUpdate} from './ReactFiberBeginWork.new';
 import {enableSuspenseServerRenderer} from 'shared/ReactFeatureFlags';
 
-const valueCursor                     = createCursor(null);
+const valueCursor = createCursor(null);
 
 let rendererSigil;
 if (__DEV__) {
@@ -43,13 +38,13 @@ if (__DEV__) {
   rendererSigil = {};
 }
 
-let currentlyRenderingFiber               = null;
-let lastContextDependency                                  = null;
-let lastContextWithAllBitsObserved                           = null;
+let currentlyRenderingFiber = null;
+let lastContextDependency = null;
+let lastContextWithAllBitsObserved = null;
 
-let isDisallowedContextReadInDEV          = false;
+let isDisallowedContextReadInDEV = false;
 
-export function resetContextDependencies()       {
+export function resetContextDependencies() {
   // This is called right before React yields execution, to ensure `readContext`
   // cannot be called outside the render phase.
   currentlyRenderingFiber = null;
@@ -60,20 +55,20 @@ export function resetContextDependencies()       {
   }
 }
 
-export function enterDisallowedContextReadInDEV()       {
+export function enterDisallowedContextReadInDEV() {
   if (__DEV__) {
     isDisallowedContextReadInDEV = true;
   }
 }
 
-export function exitDisallowedContextReadInDEV()       {
+export function exitDisallowedContextReadInDEV() {
   if (__DEV__) {
     isDisallowedContextReadInDEV = false;
   }
 }
 
-export function pushProvider   (providerFiber       , nextValue   )       {
-  const context                  = providerFiber.type._context;
+export function pushProvider(providerFiber, nextValue) {
+  const context = providerFiber.type._context;
 
   if (isPrimaryRenderer) {
     push(valueCursor, context._currentValue, providerFiber);
@@ -112,12 +107,12 @@ export function pushProvider   (providerFiber       , nextValue   )       {
   }
 }
 
-export function popProvider(providerFiber       )       {
+export function popProvider(providerFiber) {
   const currentValue = valueCursor.current;
 
   pop(valueCursor, providerFiber);
 
-  const context                    = providerFiber.type._context;
+  const context = providerFiber.type._context;
   if (isPrimaryRenderer) {
     context._currentValue = currentValue;
   } else {
@@ -125,11 +120,7 @@ export function popProvider(providerFiber       )       {
   }
 }
 
-export function calculateChangedBits   (
-  context                 ,
-  newValue   ,
-  oldValue   ,
-) {
+export function calculateChangedBits(context, newValue, oldValue) {
   if (is(oldValue, newValue)) {
     // No change
     return 0;
@@ -152,10 +143,7 @@ export function calculateChangedBits   (
   }
 }
 
-export function scheduleWorkOnParentPath(
-  parent              ,
-  renderLanes       ,
-) {
+export function scheduleWorkOnParentPath(parent, renderLanes) {
   // Update the child lanes of all the ancestors, including the alternates.
   let node = parent;
   while (node !== null) {
@@ -180,11 +168,11 @@ export function scheduleWorkOnParentPath(
 }
 
 export function propagateContextChange(
-  workInProgress       ,
-  context                     ,
-  changedBits        ,
-  renderLanes       ,
-)       {
+  workInProgress,
+  context,
+  changedBits,
+  renderLanes,
+) {
   let fiber = workInProgress.child;
   if (fiber !== null) {
     // Set the return pointer of the child to the work-in-progress fiber.
@@ -294,10 +282,7 @@ export function propagateContextChange(
   }
 }
 
-export function prepareToReadContext(
-  workInProgress       ,
-  renderLanes       ,
-)       {
+export function prepareToReadContext(workInProgress, renderLanes) {
   currentlyRenderingFiber = workInProgress;
   lastContextDependency = null;
   lastContextWithAllBitsObserved = null;
@@ -316,10 +301,7 @@ export function prepareToReadContext(
   }
 }
 
-export function readContext   (
-  context                 ,
-  observedBits                         ,
-)    {
+export function readContext(context, observedBits) {
   if (__DEV__) {
     // This warning would fire if you read context inside a Hook like useMemo.
     // Unlike the class check below, it's not enforced in production for perf.
@@ -344,14 +326,14 @@ export function readContext   (
       observedBits === MAX_SIGNED_31_BIT_INT
     ) {
       // Observe all updates.
-      lastContextWithAllBitsObserved = ((context     )                     );
+      lastContextWithAllBitsObserved = context;
       resolvedObservedBits = MAX_SIGNED_31_BIT_INT;
     } else {
       resolvedObservedBits = observedBits;
     }
 
     const contextItem = {
-      context: ((context     )                     ),
+      context: context,
       observedBits: resolvedObservedBits,
       next: null,
     };

@@ -24,15 +24,15 @@ describe('ReactSuspenseList', () => {
 
   function createAsyncText(text) {
     let resolved = false;
-    const Component = function() {
+    const Component = function () {
       if (!resolved) {
         Scheduler.unstable_yieldValue('Suspend! [' + text + ']');
         throw promise;
       }
       return <Text text={text} />;
     };
-    const promise = new Promise(resolve => {
-      Component.resolve = function() {
+    const promise = new Promise((resolve) => {
+      Component.resolve = function () {
         resolved = true;
         return resolve();
       };
@@ -160,7 +160,7 @@ describe('ReactSuspenseList', () => {
     function Foo({items}) {
       return (
         <SuspenseList revealOrder="forwards">
-          {items.map(name => (
+          {items.map((name) => (
             <Suspense key={name} fallback="Loading">
               {name}
             </Suspense>
@@ -692,19 +692,22 @@ describe('ReactSuspenseList', () => {
           <SuspenseList revealOrder="together">
             <Suspense
               unstable_avoidThisFallback={true}
-              fallback={<Text text="Loading A" />}>
+              fallback={<Text text="Loading A" />}
+            >
               <A />
             </Suspense>
             {showMore ? (
               <>
                 <Suspense
                   unstable_avoidThisFallback={true}
-                  fallback={<Text text="Loading B" />}>
+                  fallback={<Text text="Loading B" />}
+                >
                   <B />
                 </Suspense>
                 <Suspense
                   unstable_avoidThisFallback={true}
-                  fallback={<Text text="Loading C" />}>
+                  fallback={<Text text="Loading C" />}
+                >
                   <C />
                 </Suspense>
               </>
@@ -1074,7 +1077,7 @@ describe('ReactSuspenseList', () => {
     const F = createAsyncText('F');
 
     function createSyncText(text) {
-      return function() {
+      return function () {
         return <Text text={text} />;
       };
     }

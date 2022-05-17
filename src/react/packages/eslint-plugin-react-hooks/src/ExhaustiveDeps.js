@@ -75,7 +75,7 @@ export default {
     const stableKnownValueCache = new WeakMap();
     const functionWithoutCapturedValueCache = new WeakMap();
     function memoizeWithWeakMap(fn, map) {
-      return function(arg) {
+      return function (arg) {
         if (map.has(arg)) {
           // to verify cache hits:
           // console.log(arg.name)
@@ -515,7 +515,7 @@ export default {
         if (isStable) {
           stableDependencies.add(key);
         }
-        references.forEach(reference => {
+        references.forEach((reference) => {
           if (reference.writeExpr) {
             reportStaleAssignment(reference.writeExpr, key);
           }
@@ -535,7 +535,7 @@ export default {
           if (setStateInsideEffectWithoutDeps) {
             return;
           }
-          references.forEach(reference => {
+          references.forEach((reference) => {
             if (setStateInsideEffectWithoutDeps) {
               return;
             }
@@ -606,7 +606,7 @@ export default {
             'dependencies.',
         });
       } else {
-        declaredDependenciesNode.elements.forEach(declaredDependencyNode => {
+        declaredDependenciesNode.elements.forEach((declaredDependencyNode) => {
           // Skip elided elements.
           if (declaredDependencyNode === null) {
             return;
@@ -675,7 +675,7 @@ export default {
             maybeID = maybeID.object || maybeID.expression.object;
           }
           const isDeclaredInComponent = !componentScope.through.some(
-            ref => ref.identifier === maybeID,
+            (ref) => ref.identifier === maybeID,
           );
 
           // Add the dependency to our declared dependency map.
@@ -809,7 +809,7 @@ export default {
         if (declaredDependencies.length === 0) {
           return true;
         }
-        const declaredDepKeys = declaredDependencies.map(dep => dep.key);
+        const declaredDepKeys = declaredDependencies.map((dep) => dep.key);
         const sortedDeclaredDepKeys = declaredDepKeys.slice().sort();
         return declaredDepKeys.join(',') === sortedDeclaredDepKeys.join(',');
       }
@@ -848,7 +848,7 @@ export default {
           joinEnglish(
             Array.from(deps)
               .sort()
-              .map(name => "'" + formatDependency(name) + "'"),
+              .map((name) => "'" + formatDependency(name) + "'"),
           ) +
           `. Either ${fixVerb} ${
             deps.size > 1 ? 'them' : 'it'
@@ -859,7 +859,7 @@ export default {
       let extraWarning = '';
       if (unnecessaryDependencies.size > 0) {
         let badRef = null;
-        Array.from(unnecessaryDependencies.keys()).forEach(key => {
+        Array.from(unnecessaryDependencies.keys()).forEach((key) => {
           if (badRef !== null) {
             return;
           }
@@ -932,7 +932,7 @@ export default {
         // See if the user is trying to avoid specifying a callable prop.
         // This usually means they're unaware of useCallback.
         let missingCallbackDep = null;
-        missingDependencies.forEach(missingDep => {
+        missingDependencies.forEach((missingDep) => {
           if (missingCallbackDep) {
             return;
           }
@@ -981,7 +981,7 @@ export default {
 
       if (!extraWarning && missingDependencies.size > 0) {
         let setStateRecommendation = null;
-        missingDependencies.forEach(missingDep => {
+        missingDependencies.forEach((missingDep) => {
           if (setStateRecommendation !== null) {
             return;
           }
@@ -1161,7 +1161,8 @@ export default {
           if (
             declaredDependenciesNode.elements &&
             declaredDependenciesNode.elements.some(
-              el => el && el.type === 'Identifier' && el.name === callback.name,
+              (el) =>
+                el && el.type === 'Identifier' && el.name === callback.name,
             )
           ) {
             // If it's already in the list of deps, we don't care because
@@ -1288,7 +1289,7 @@ function collectRecommendations({
   dependencies.forEach((_, key) => {
     const node = getOrCreateNodeByPath(depTree, key);
     node.isUsed = true;
-    markAllParentsByPath(depTree, key, parent => {
+    markAllParentsByPath(depTree, key, (parent) => {
       parent.isSubtreeUsed = true;
     });
   });
@@ -1299,7 +1300,7 @@ function collectRecommendations({
     const node = getOrCreateNodeByPath(depTree, key);
     node.isSatisfiedRecursively = true;
   });
-  stableDependencies.forEach(key => {
+  stableDependencies.forEach((key) => {
     const node = getOrCreateNodeByPath(depTree, key);
     node.isSatisfiedRecursively = true;
   });
@@ -1338,7 +1339,7 @@ function collectRecommendations({
     depTree,
     missingDependencies,
     satisfyingDependencies,
-    key => key,
+    (key) => key,
   );
   function scanTreeRecursively(node, missingPaths, satisfyingPaths, keyToPath) {
     node.children.forEach((child, key) => {
@@ -1364,7 +1365,7 @@ function collectRecommendations({
         child,
         missingPaths,
         satisfyingPaths,
-        childKey => path + '.' + childKey,
+        (childKey) => path + '.' + childKey,
       );
     });
   }
@@ -1404,7 +1405,7 @@ function collectRecommendations({
   });
 
   // Then add the missing ones at the end.
-  missingDependencies.forEach(key => {
+  missingDependencies.forEach((key) => {
     suggestedDependencies.push(key);
   });
 
@@ -1479,7 +1480,7 @@ function scanForConstructions({
 }) {
   const constructions = declaredDependencies
     .map(({key}) => {
-      const ref = componentScope.variables.find(v => v.name === key);
+      const ref = componentScope.variables.find((v) => v.name === key);
       if (ref == null) {
         return null;
       }
@@ -1740,7 +1741,7 @@ function fastFindReferenceWithParent(start, target) {
         value.parent = item;
         queue.push(value);
       } else if (Array.isArray(value)) {
-        value.forEach(val => {
+        value.forEach((val) => {
           if (isNodeLike(val)) {
             val.parent = item;
             queue.push(val);

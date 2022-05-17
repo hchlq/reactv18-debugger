@@ -4,12 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-                                                        
-                                                   
-                                                           
-                                                          
 
 import {registerTwoPhaseEvent} from '../EventRegistry';
 import {SyntheticEvent} from '../SyntheticEvent';
@@ -50,7 +46,7 @@ function createAndAccumulateChangeEvent(
   target,
 ) {
   // Flag this event loop as needing state restore.
-  enqueueStateRestore(((target     )      ));
+  enqueueStateRestore(target);
   const listeners = accumulateTwoPhaseListeners(inst, 'onChange');
   if (listeners.length > 0) {
     const event = new SyntheticEvent(
@@ -75,8 +71,7 @@ let activeElementInst = null;
 function shouldUseChangeEvent(elem) {
   const nodeName = elem.nodeName && elem.nodeName.toLowerCase();
   return (
-    nodeName === 'select' ||
-    (nodeName === 'input' && (elem     ).type === 'file')
+    nodeName === 'select' || (nodeName === 'input' && elem.type === 'file')
   );
 }
 
@@ -107,14 +102,14 @@ function runEventInBatch(dispatchQueue) {
   processDispatchQueue(dispatchQueue, 0);
 }
 
-function getInstIfValueChanged(targetInst        ) {
+function getInstIfValueChanged(targetInst) {
   const targetNode = getNodeFromInstance(targetInst);
-  if (updateValueIfChanged(((targetNode     )                  ))) {
+  if (updateValueIfChanged(targetNode)) {
     return targetInst;
   }
 }
 
-function getTargetInstForChangeEvent(domEventName              , targetInst) {
+function getTargetInstForChangeEvent(domEventName, targetInst) {
   if (domEventName === 'change') {
     return targetInst;
   }
@@ -140,7 +135,7 @@ if (canUseDOM) {
 function startWatchingForValueChange(target, targetInst) {
   activeElement = target;
   activeElementInst = targetInst;
-  (activeElement     ).attachEvent('onpropertychange', handlePropertyChange);
+  activeElement.attachEvent('onpropertychange', handlePropertyChange);
 }
 
 /**
@@ -151,7 +146,7 @@ function stopWatchingForValueChange() {
   if (!activeElement) {
     return;
   }
-  (activeElement     ).detachEvent('onpropertychange', handlePropertyChange);
+  activeElement.detachEvent('onpropertychange', handlePropertyChange);
   activeElement = null;
   activeElementInst = null;
 }
@@ -169,11 +164,7 @@ function handlePropertyChange(nativeEvent) {
   }
 }
 
-function handleEventsForInputEventPolyfill(
-  domEventName              ,
-  target,
-  targetInst,
-) {
+function handleEventsForInputEventPolyfill(domEventName, target, targetInst) {
   if (domEventName === 'focusin') {
     // In IE9, propertychange fires for most input events but is buggy and
     // doesn't fire when text is deleted, but conveniently, selectionchange
@@ -193,10 +184,7 @@ function handleEventsForInputEventPolyfill(
 }
 
 // For IE8 and IE9.
-function getTargetInstForInputEventPolyfill(
-  domEventName              ,
-  targetInst,
-) {
+function getTargetInstForInputEventPolyfill(domEventName, targetInst) {
   if (
     domEventName === 'selectionchange' ||
     domEventName === 'keyup' ||
@@ -231,23 +219,20 @@ function shouldUseClickEvent(elem) {
   );
 }
 
-function getTargetInstForClickEvent(domEventName              , targetInst) {
+function getTargetInstForClickEvent(domEventName, targetInst) {
   if (domEventName === 'click') {
     return getInstIfValueChanged(targetInst);
   }
 }
 
-function getTargetInstForInputOrChangeEvent(
-  domEventName              ,
-  targetInst,
-) {
+function getTargetInstForInputOrChangeEvent(domEventName, targetInst) {
   if (domEventName === 'input' || domEventName === 'change') {
     return getInstIfValueChanged(targetInst);
   }
 }
 
-function handleControlledInputBlur(node                  ) {
-  const state = (node     )._wrapperState;
+function handleControlledInputBlur(node) {
+  const state = node._wrapperState;
 
   if (!state || !state.controlled || node.type !== 'number') {
     return;
@@ -255,7 +240,7 @@ function handleControlledInputBlur(node                  ) {
 
   if (!disableInputAttributeSyncing) {
     // If controlled, assign the value attribute to the current value on blur
-    setDefaultValue((node     ), 'number', (node     ).value);
+    setDefaultValue(node, 'number', node.value);
   }
 }
 
@@ -270,20 +255,20 @@ function handleControlledInputBlur(node                  ) {
  * - select
  */
 function extractEvents(
-  dispatchQueue               ,
-  domEventName              ,
-  targetInst              ,
-  nativeEvent                ,
-  nativeEventTarget                    ,
-  eventSystemFlags                  ,
-  targetContainer                    ,
+  dispatchQueue,
+  domEventName,
+  targetInst,
+  nativeEvent,
+  nativeEventTarget,
+  eventSystemFlags,
+  targetContainer,
 ) {
   const targetNode = targetInst ? getNodeFromInstance(targetInst) : window;
 
   let getTargetInstFunc, handleEventFunc;
   if (shouldUseChangeEvent(targetNode)) {
     getTargetInstFunc = getTargetInstForChangeEvent;
-  } else if (isTextInputElement(((targetNode     )             ))) {
+  } else if (isTextInputElement(targetNode)) {
     if (isInputEventSupported) {
       getTargetInstFunc = getTargetInstForInputOrChangeEvent;
     } else {
@@ -313,7 +298,7 @@ function extractEvents(
 
   // When blurring, set the value attribute for number inputs
   if (domEventName === 'focusout') {
-    handleControlledInputBlur(((targetNode     )                  ));
+    handleControlledInputBlur(targetNode);
   }
 }
 

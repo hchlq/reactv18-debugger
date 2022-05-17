@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import {
@@ -15,8 +15,6 @@ import {
   formatDataForPreview,
   setInObject,
 } from './utils';
-
-                                                                                              
 
 export const meta = {
   inspectable: Symbol('inspectable'),
@@ -30,30 +28,10 @@ export const meta = {
   unserializable: Symbol('unserializable'),
 };
 
-                           
-                       
-                      
-                              
-                               
-                     
-                
-               
-   
-
 // Typed arrays and other complex iteratable objects (e.g. Map, Set, ImmutableJS) need special handling.
 // These objects can't be serialized without losing type information,
 // so a "Unserializable" type wrapper is used (with meta-data keys) to send nested values-
 // while preserving the original type and name.
-                              
-                      
-                              
-                               
-                     
-                
-               
-                          
-     
-  
 
 // This threshold determines the depth at which the bridge "dehydrates" nested data.
 // Dehydration means that we don't serialize the data for e.g. postMessage or stringify,
@@ -66,16 +44,10 @@ const LEVEL_THRESHOLD = 2;
 /**
  * Generate the dehydrated metadata for complex object instances
  */
-function createDehydrated(
-  type        ,
-  inspectable         ,
-  data        ,
-  cleaned                               ,
-  path                        ,
-)             {
+function createDehydrated(type, inspectable, data, cleaned, path) {
   cleaned.push(path);
 
-  const dehydrated             = {
+  const dehydrated = {
     inspectable,
     type,
     preview_long: formatDataForPreview(data, true),
@@ -118,19 +90,13 @@ function createDehydrated(
  * and cleaned = [["some", "attr"], ["other"]]
  */
 export function dehydrate(
-  data        ,
-  cleaned                               ,
-  unserializable                               ,
-  path                        ,
-  isPathAllowed                                           ,
-  level          = 0,
-) 
-          
-              
-                  
-                     
-                         
-                                                               {
+  data,
+  cleaned,
+  unserializable,
+  path,
+  isPathAllowed,
+  level = 0,
+) {
   const type = getDataType(data);
 
   let isPathAllowedCheck;
@@ -230,7 +196,7 @@ export function dehydrate(
       if (level >= LEVEL_THRESHOLD && !isPathAllowedCheck) {
         return createDehydrated(type, true, data, cleaned, path);
       } else {
-        const unserializableValue                 = {
+        const unserializableValue = {
           unserializable: true,
           type: type,
           readonly: true,
@@ -302,7 +268,7 @@ export function dehydrate(
         return createDehydrated(type, true, data, cleaned, path);
       } else {
         const object = {};
-        getAllEnumerableKeys(data).forEach(key => {
+        getAllEnumerableKeys(data).forEach((key) => {
           const name = key.toString();
           object[name] = dehydrate(
             data[key],
@@ -331,12 +297,7 @@ export function dehydrate(
   }
 }
 
-export function fillInPath(
-  object        ,
-  data                ,
-  path                        ,
-  value     ,
-) {
+export function fillInPath(object, data, path, value) {
   const target = getInObject(object, path);
   if (target != null) {
     if (!target[meta.unserializable]) {
@@ -368,12 +329,8 @@ export function fillInPath(
   setInObject(object, path, value);
 }
 
-export function hydrate(
-  object     ,
-  cleaned                               ,
-  unserializable                               ,
-)         {
-  cleaned.forEach((path                        ) => {
+export function hydrate(object, cleaned, unserializable) {
+  cleaned.forEach((path) => {
     const length = path.length;
     const last = path[length - 1];
     const parent = getInObject(object, path.slice(0, length - 1));
@@ -391,7 +348,7 @@ export function hydrate(
       parent[last] = undefined;
     } else {
       // Replace the string keys with Symbols so they're non-enumerable.
-      const replaced                                         = {};
+      const replaced = {};
       replaced[meta.inspectable] = !!value.inspectable;
       replaced[meta.inspected] = false;
       replaced[meta.name] = value.name;
@@ -404,7 +361,7 @@ export function hydrate(
       parent[last] = replaced;
     }
   });
-  unserializable.forEach((path                        ) => {
+  unserializable.forEach((path) => {
     const length = path.length;
     const last = path[length - 1];
     const parent = getInObject(object, path.slice(0, length - 1));
@@ -425,7 +382,7 @@ export function hydrate(
   return object;
 }
 
-function upgradeUnserializable(destination        , source        ) {
+function upgradeUnserializable(destination, source) {
   Object.defineProperties(destination, {
     [meta.inspected]: {
       configurable: true,

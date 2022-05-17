@@ -58,10 +58,8 @@ describe('ReactHooksInspectionIntegration', () => {
       },
     ]);
 
-    const {
-      onMouseDown: setStateA,
-      onMouseUp: setStateB,
-    } = renderer.root.findByType('div').props;
+    const {onMouseDown: setStateA, onMouseUp: setStateB} =
+      renderer.root.findByType('div').props;
 
     act(() => setStateA('Hi'));
 
@@ -293,8 +291,8 @@ describe('ReactHooksInspectionIntegration', () => {
   });
 
   it('should inspect forwardRef', () => {
-    const obj = function() {};
-    const Foo = React.forwardRef(function(props, ref) {
+    const obj = function () {};
+    const Foo = React.forwardRef(function (props, ref) {
       React.useImperativeHandle(ref, () => obj);
       return <div />;
     });
@@ -686,7 +684,7 @@ describe('ReactHooksInspectionIntegration', () => {
 
     it('should support an optional formatter function param', () => {
       function useCustom() {
-        React.useDebugValue({bar: 123}, object => `bar:${object.bar}`);
+        React.useDebugValue({bar: 123}, (object) => `bar:${object.bar}`);
         React.useState(0);
       }
       function Example() {

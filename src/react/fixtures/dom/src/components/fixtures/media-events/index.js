@@ -34,7 +34,7 @@ export default class MediaEvents extends React.Component {
     this.video.playbackRate = 2;
   };
 
-  setVideo = el => {
+  setVideo = (el) => {
     this.video = el;
   };
 
@@ -47,7 +47,7 @@ export default class MediaEvents extends React.Component {
   getProgress() {
     const events = Object.keys(this.state.events);
     const total = events.length;
-    const fired = events.filter(type => this.state.events[type]).length;
+    const fired = events.filter((type) => this.state.events[type]).length;
 
     return fired / total;
   }
@@ -63,7 +63,8 @@ export default class MediaEvents extends React.Component {
       <FixtureSet title="Media Events">
         <TestCase
           title="Event bubbling"
-          description="Media events should synthetically bubble">
+          description="Media events should synthetically bubble"
+        >
           <TestCase.Steps>
             <li>Play the loaded video</li>
             <li>Pause the loaded video</li>

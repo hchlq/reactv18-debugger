@@ -12,8 +12,6 @@
 
 import {ReactNativeViewConfigRegistry} from 'react-native/Libraries/ReactPrivate/ReactNativePrivateInterface';
 
-                                                         
-
 const {register} = ReactNativeViewConfigRegistry;
 
 /**
@@ -24,10 +22,7 @@ const {register} = ReactNativeViewConfigRegistry;
  * @param {string} config iOS View configuration.
  * @private
  */
-const createReactNativeComponentClass = function(
-  name        ,
-  callback                  ,
-)         {
+const createReactNativeComponentClass = function (name, callback) {
   return register(name, callback);
 };
 

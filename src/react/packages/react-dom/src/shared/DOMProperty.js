@@ -4,12 +4,10 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import {enableFilterEmptyStringAttributesDOM} from 'shared/ReactFeatureFlags';
-
-                                              
 
 // A reserved attribute.
 // It is handled by React separately and shouldn't be written to the DOM.
@@ -44,17 +42,6 @@ export const NUMERIC = 5;
 // When falsy, it should be removed.
 export const POSITIVE_NUMERIC = 6;
 
-                             
-                            
-                         
-                                     
-                            
-                        
-                      
-                        
-                              
-   
-
 /* eslint-disable max-len */
 export const ATTRIBUTE_NAME_START_CHAR =
   ':A-Z_a-z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u02FF\\u0370-\\u037D\\u037F-\\u1FFF\\u200C-\\u200D\\u2070-\\u218F\\u2C00-\\u2FEF\\u3001-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFFD';
@@ -72,7 +59,7 @@ const hasOwnProperty = Object.prototype.hasOwnProperty;
 const illegalAttributeNameCache = {};
 const validatedAttributeNameCache = {};
 
-export function isAttributeNameSafe(attributeName        )          {
+export function isAttributeNameSafe(attributeName) {
   if (hasOwnProperty.call(validatedAttributeNameCache, attributeName)) {
     return true;
   }
@@ -91,10 +78,10 @@ export function isAttributeNameSafe(attributeName        )          {
 }
 
 export function shouldIgnoreAttribute(
-  name        ,
-  propertyInfo                     ,
-  isCustomComponentTag         ,
-)          {
+  name,
+  propertyInfo,
+  isCustomComponentTag,
+) {
   if (propertyInfo !== null) {
     return propertyInfo.type === RESERVED;
   }
@@ -112,11 +99,11 @@ export function shouldIgnoreAttribute(
 }
 
 export function shouldRemoveAttributeWithWarning(
-  name        ,
-  value       ,
-  propertyInfo                     ,
-  isCustomComponentTag         ,
-)          {
+  name,
+  value,
+  propertyInfo,
+  isCustomComponentTag,
+) {
   if (propertyInfo !== null && propertyInfo.type === RESERVED) {
     return false;
   }
@@ -142,11 +129,11 @@ export function shouldRemoveAttributeWithWarning(
 }
 
 export function shouldRemoveAttribute(
-  name        ,
-  value       ,
-  propertyInfo                     ,
-  isCustomComponentTag         ,
-)          {
+  name,
+  value,
+  propertyInfo,
+  isCustomComponentTag,
+) {
   if (value === null || typeof value === 'undefined') {
     return true;
   }
@@ -198,24 +185,24 @@ export function shouldRemoveAttribute(
       case NUMERIC:
         return isNaN(value);
       case POSITIVE_NUMERIC:
-        return isNaN(value) || (value     ) < 1;
+        return isNaN(value) || value < 1;
     }
   }
   return false;
 }
 
-export function getPropertyInfo(name        )                      {
+export function getPropertyInfo(name) {
   return properties.hasOwnProperty(name) ? properties[name] : null;
 }
 
 function PropertyInfoRecord(
-  name        ,
-  type              ,
-  mustUseProperty         ,
-  attributeName        ,
-  attributeNamespace               ,
-  sanitizeURL         ,
-  removeEmptyString         ,
+  name,
+  type,
+  mustUseProperty,
+  attributeName,
+  attributeNamespace,
+  sanitizeURL,
+  removeEmptyString,
 ) {
   this.acceptsBooleans =
     type === BOOLEANISH_STRING ||
@@ -250,7 +237,7 @@ const reservedProps = [
   'style',
 ];
 
-reservedProps.forEach(name => {
+reservedProps.forEach((name) => {
   properties[name] = new PropertyInfoRecord(
     name,
     RESERVED,
@@ -284,7 +271,7 @@ reservedProps.forEach(name => {
 // These are "enumerated" HTML attributes that accept "true" and "false".
 // In React, we let users pass `true` and `false` even though technically
 // these aren't boolean attributes (they are coerced to strings).
-['contentEditable', 'draggable', 'spellCheck', 'value'].forEach(name => {
+['contentEditable', 'draggable', 'spellCheck', 'value'].forEach((name) => {
   properties[name] = new PropertyInfoRecord(
     name,
     BOOLEANISH_STRING,
@@ -305,7 +292,7 @@ reservedProps.forEach(name => {
   'externalResourcesRequired',
   'focusable',
   'preserveAlpha',
-].forEach(name => {
+].forEach((name) => {
   properties[name] = new PropertyInfoRecord(
     name,
     BOOLEANISH_STRING,
@@ -345,7 +332,7 @@ reservedProps.forEach(name => {
   'seamless',
   // Microdata
   'itemScope',
-].forEach(name => {
+].forEach((name) => {
   properties[name] = new PropertyInfoRecord(
     name,
     BOOLEAN,
@@ -370,7 +357,7 @@ reservedProps.forEach(name => {
   // NOTE: if you add a camelCased prop to this list,
   // you'll need to set attributeName to name.toLowerCase()
   // instead in the assignment below.
-].forEach(name => {
+].forEach((name) => {
   properties[name] = new PropertyInfoRecord(
     name,
     BOOLEAN,
@@ -391,7 +378,7 @@ reservedProps.forEach(name => {
   // NOTE: if you add a camelCased prop to this list,
   // you'll need to set attributeName to name.toLowerCase()
   // instead in the assignment below.
-].forEach(name => {
+].forEach((name) => {
   properties[name] = new PropertyInfoRecord(
     name,
     OVERLOADED_BOOLEAN,
@@ -413,7 +400,7 @@ reservedProps.forEach(name => {
   // NOTE: if you add a camelCased prop to this list,
   // you'll need to set attributeName to name.toLowerCase()
   // instead in the assignment below.
-].forEach(name => {
+].forEach((name) => {
   properties[name] = new PropertyInfoRecord(
     name,
     POSITIVE_NUMERIC,
@@ -426,7 +413,7 @@ reservedProps.forEach(name => {
 });
 
 // These are HTML attributes that must be numbers.
-['rowSpan', 'start'].forEach(name => {
+['rowSpan', 'start'].forEach((name) => {
   properties[name] = new PropertyInfoRecord(
     name,
     NUMERIC,
@@ -439,7 +426,7 @@ reservedProps.forEach(name => {
 });
 
 const CAMELIZE = /[\-\:]([a-z])/g;
-const capitalize = token => token[1].toUpperCase();
+const capitalize = (token) => token[1].toUpperCase();
 
 // This is a list of all SVG attributes that need special casing, namespacing,
 // or boolean value assignment. Regular attributes that just accept strings
@@ -524,7 +511,7 @@ const capitalize = token => token[1].toUpperCase();
   // NOTE: if you add a camelCased prop to this list,
   // you'll need to set attributeName to name.toLowerCase()
   // instead in the assignment below.
-].forEach(attributeName => {
+].forEach((attributeName) => {
   const name = attributeName.replace(CAMELIZE, capitalize);
   properties[name] = new PropertyInfoRecord(
     name,
@@ -549,7 +536,7 @@ const capitalize = token => token[1].toUpperCase();
   // NOTE: if you add a camelCased prop to this list,
   // you'll need to set attributeName to name.toLowerCase()
   // instead in the assignment below.
-].forEach(attributeName => {
+].forEach((attributeName) => {
   const name = attributeName.replace(CAMELIZE, capitalize);
   properties[name] = new PropertyInfoRecord(
     name,
@@ -571,7 +558,7 @@ const capitalize = token => token[1].toUpperCase();
   // NOTE: if you add a camelCased prop to this list,
   // you'll need to set attributeName to name.toLowerCase()
   // instead in the assignment below.
-].forEach(attributeName => {
+].forEach((attributeName) => {
   const name = attributeName.replace(CAMELIZE, capitalize);
   properties[name] = new PropertyInfoRecord(
     name,
@@ -587,7 +574,7 @@ const capitalize = token => token[1].toUpperCase();
 // These attribute exists both in HTML and SVG.
 // The attribute name is case-sensitive in SVG so we can't just use
 // the React name like we do for attributes that exist only in HTML.
-['tabIndex', 'crossOrigin'].forEach(attributeName => {
+['tabIndex', 'crossOrigin'].forEach((attributeName) => {
   properties[attributeName] = new PropertyInfoRecord(
     attributeName,
     STRING,
@@ -612,7 +599,7 @@ properties[xlinkHref] = new PropertyInfoRecord(
   false, // removeEmptyString
 );
 
-['src', 'href', 'action', 'formAction'].forEach(attributeName => {
+['src', 'href', 'action', 'formAction'].forEach((attributeName) => {
   properties[attributeName] = new PropertyInfoRecord(
     attributeName,
     STRING,

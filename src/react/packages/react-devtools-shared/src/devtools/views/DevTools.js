@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 // Reach styles need to come before any component styles.
@@ -33,57 +33,14 @@ import styles from './DevTools.css';
 
 import './root.css';
 
-                                                                                                
-                                                                     
-
-                                            
-                                              
-                                 
-             
-                                     
-          
-                                   
-             
-                               
-          
-                                    
-                                     
-             
-
-                      
-                         
-                              
-                                                       
-                     
-                                               
-                       
-               
-                                        
-                                             
-                                                     
-                                                 
-
-                                                            
-                                                                                          
-                                               
-                                                                                            
-                      
-
-                                                                                             
-                                                                           
-                                                                                                               
-                                      
-                                    
-   
-
 const componentsTab = {
-  id: ('components'       ),
+  id: 'components',
   icon: 'components',
   label: 'Components',
   title: 'React Components',
 };
 const profilerTab = {
-  id: ('profiler'       ),
+  id: 'profiler',
   icon: 'profiler',
   label: 'Profiler',
   title: 'React Profiler',
@@ -106,8 +63,8 @@ export default function DevTools({
   warnIfUnsupportedVersionDetected = false,
   viewAttributeSourceFunction,
   viewElementSourceFunction,
-}       ) {
-  const [currentTab, setTab] = useLocalStorage       (
+}) {
+  const [currentTab, setTab] = useLocalStorage(
     'React::DevTools::defaultTab',
     defaultTab,
   );
@@ -134,7 +91,7 @@ export default function DevTools({
     [enabledInspectedElementContextMenu, viewAttributeSourceFunction],
   );
 
-  const devToolsRef = useRef                    (null);
+  const devToolsRef = useRef(null);
 
   useEffect(() => {
     if (!showTabBar) {
@@ -147,7 +104,7 @@ export default function DevTools({
     }
 
     const ownerWindow = div.ownerDocument.defaultView;
-    const handleKeyDown = (event               ) => {
+    const handleKeyDown = (event) => {
       if (event.ctrlKey || event.metaKey) {
         switch (event.key) {
           case '1':
@@ -188,7 +145,8 @@ export default function DevTools({
             <SettingsContextController
               browserTheme={browserTheme}
               componentsPortalContainer={componentsPortalContainer}
-              profilerPortalContainer={profilerPortalContainer}>
+              profilerPortalContainer={profilerPortalContainer}
+            >
               <ViewElementSourceContext.Provider value={viewElementSource}>
                 <TreeContextController>
                   <ProfilerContextController>
@@ -211,14 +169,16 @@ export default function DevTools({
                       )}
                       <div
                         className={styles.TabContent}
-                        hidden={tab !== 'components'}>
+                        hidden={tab !== 'components'}
+                      >
                         <Components
                           portalContainer={componentsPortalContainer}
                         />
                       </div>
                       <div
                         className={styles.TabContent}
-                        hidden={tab !== 'profiler'}>
+                        hidden={tab !== 'profiler'}
+                      >
                         <Profiler portalContainer={profilerPortalContainer} />
                       </div>
                     </div>

@@ -26,13 +26,13 @@ let didError = false;
 
 const files = glob
   .sync('**/*.js', {ignore: '**/node_modules/**'})
-  .filter(f => !onlyChanged || changedFiles.has(f));
+  .filter((f) => !onlyChanged || changedFiles.has(f));
 
 if (!files.length) {
   return;
 }
 
-files.forEach(file => {
+files.forEach((file) => {
   const options = prettier.resolveConfig.sync(file, {
     config: prettierConfigPath,
   });

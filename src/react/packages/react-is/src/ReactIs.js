@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 'use strict';
@@ -25,7 +25,7 @@ import {
 } from 'shared/ReactSymbols';
 import isValidElementType from 'shared/isValidElementType';
 
-export function typeOf(object     ) {
+export function typeOf(object) {
   if (typeof object === 'object' && object !== null) {
     const $$typeof = object.$$typeof;
     switch ($$typeof) {
@@ -79,7 +79,7 @@ let hasWarnedAboutDeprecatedIsAsyncMode = false;
 let hasWarnedAboutDeprecatedIsConcurrentMode = false;
 
 // AsyncMode should be deprecated
-export function isAsyncMode(object     ) {
+export function isAsyncMode(object) {
   if (__DEV__) {
     if (!hasWarnedAboutDeprecatedIsAsyncMode) {
       hasWarnedAboutDeprecatedIsAsyncMode = true;
@@ -92,7 +92,7 @@ export function isAsyncMode(object     ) {
   }
   return false;
 }
-export function isConcurrentMode(object     ) {
+export function isConcurrentMode(object) {
   if (__DEV__) {
     if (!hasWarnedAboutDeprecatedIsConcurrentMode) {
       hasWarnedAboutDeprecatedIsConcurrentMode = true;
@@ -105,40 +105,40 @@ export function isConcurrentMode(object     ) {
   }
   return false;
 }
-export function isContextConsumer(object     ) {
+export function isContextConsumer(object) {
   return typeOf(object) === REACT_CONTEXT_TYPE;
 }
-export function isContextProvider(object     ) {
+export function isContextProvider(object) {
   return typeOf(object) === REACT_PROVIDER_TYPE;
 }
-export function isElement(object     ) {
+export function isElement(object) {
   return (
     typeof object === 'object' &&
     object !== null &&
     object.$$typeof === REACT_ELEMENT_TYPE
   );
 }
-export function isForwardRef(object     ) {
+export function isForwardRef(object) {
   return typeOf(object) === REACT_FORWARD_REF_TYPE;
 }
-export function isFragment(object     ) {
+export function isFragment(object) {
   return typeOf(object) === REACT_FRAGMENT_TYPE;
 }
-export function isLazy(object     ) {
+export function isLazy(object) {
   return typeOf(object) === REACT_LAZY_TYPE;
 }
-export function isMemo(object     ) {
+export function isMemo(object) {
   return typeOf(object) === REACT_MEMO_TYPE;
 }
-export function isPortal(object     ) {
+export function isPortal(object) {
   return typeOf(object) === REACT_PORTAL_TYPE;
 }
-export function isProfiler(object     ) {
+export function isProfiler(object) {
   return typeOf(object) === REACT_PROFILER_TYPE;
 }
-export function isStrictMode(object     ) {
+export function isStrictMode(object) {
   return typeOf(object) === REACT_STRICT_MODE_TYPE;
 }
-export function isSuspense(object     ) {
+export function isSuspense(object) {
   return typeOf(object) === REACT_SUSPENSE_TYPE;
 }

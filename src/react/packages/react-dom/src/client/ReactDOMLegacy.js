@@ -4,12 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                    
-                                             
-                                                     
 
 import {
   getInstanceFromNode,
@@ -43,7 +39,7 @@ let topLevelUpdateWarnings;
 let warnedAboutHydrateAPI = false;
 
 if (__DEV__) {
-  topLevelUpdateWarnings = (container           ) => {
+  topLevelUpdateWarnings = (container) => {
     if (container._reactRootContainer && container.nodeType !== COMMENT_NODE) {
       const hostInstance = findHostInstanceWithNoPortals(
         container._reactRootContainer._internalRoot.current,
@@ -75,8 +71,8 @@ if (__DEV__) {
 
     if (
       container.nodeType === ELEMENT_NODE &&
-      ((container     )         ).tagName &&
-      ((container     )         ).tagName.toUpperCase() === 'BODY'
+      container.tagName &&
+      container.tagName.toUpperCase() === 'BODY'
     ) {
       console.error(
         'render(): Rendering components directly into document.body is ' +
@@ -89,7 +85,7 @@ if (__DEV__) {
   };
 }
 
-function getReactRootElementInContainer(container     ) {
+function getReactRootElementInContainer(container) {
   if (!container) {
     return null;
   }
@@ -110,10 +106,7 @@ function shouldHydrateDueToLegacyHeuristic(container) {
   );
 }
 
-function legacyCreateRootFromDOMContainer(
-  container           ,
-  forceHydrate         ,
-)           {
+function legacyCreateRootFromDOMContainer(container, forceHydrate) {
   const shouldHydrate =
     forceHydrate || shouldHydrateDueToLegacyHeuristic(container);
   // First clear any existing content.
@@ -125,7 +118,7 @@ function legacyCreateRootFromDOMContainer(
         if (
           !warned &&
           rootSibling.nodeType === ELEMENT_NODE &&
-          (rootSibling     ).hasAttribute(ROOT_ATTRIBUTE_NAME)
+          rootSibling.hasAttribute(ROOT_ATTRIBUTE_NAME)
         ) {
           warned = true;
           console.error(
@@ -159,7 +152,7 @@ function legacyCreateRootFromDOMContainer(
   );
 }
 
-function warnOnInvalidCallback(callback       , callerName        )       {
+function warnOnInvalidCallback(callback, callerName) {
   if (__DEV__) {
     if (callback !== null && typeof callback !== 'function') {
       console.error(
@@ -173,11 +166,11 @@ function warnOnInvalidCallback(callback       , callerName        )       {
 }
 
 function legacyRenderSubtreeIntoContainer(
-  parentComponent                            ,
-  children               ,
-  container           ,
-  forceHydrate         ,
-  callback           ,
+  parentComponent,
+  children,
+  container,
+  forceHydrate,
+  callback,
 ) {
   if (__DEV__) {
     topLevelUpdateWarnings(container);
@@ -186,7 +179,7 @@ function legacyRenderSubtreeIntoContainer(
 
   // TODO: Without `any` type, Flow says "Property cannot be accessed on any
   // member of intersection type." Whyyyyyy.
-  let root           = (container._reactRootContainer     );
+  let root = container._reactRootContainer;
   let fiberRoot;
   if (!root) {
     // Initial mount
@@ -197,7 +190,7 @@ function legacyRenderSubtreeIntoContainer(
     fiberRoot = root._internalRoot;
     if (typeof callback === 'function') {
       const originalCallback = callback;
-      callback = function() {
+      callback = function () {
         const instance = getPublicRootInstance(fiberRoot);
         originalCallback.call(instance);
       };
@@ -210,7 +203,7 @@ function legacyRenderSubtreeIntoContainer(
     fiberRoot = root._internalRoot;
     if (typeof callback === 'function') {
       const originalCallback = callback;
-      callback = function() {
+      callback = function () {
         const instance = getPublicRootInstance(fiberRoot);
         originalCallback.call(instance);
       };
@@ -221,11 +214,9 @@ function legacyRenderSubtreeIntoContainer(
   return getPublicRootInstance(fiberRoot);
 }
 
-export function findDOMNode(
-  componentOrElement                                      ,
-)                        {
+export function findDOMNode(componentOrElement) {
   if (__DEV__) {
-    const owner = (ReactCurrentOwner.current     );
+    const owner = ReactCurrentOwner.current;
     if (owner !== null && owner.stateNode !== null) {
       const warnedAboutRefsInRender = owner.stateNode._warnedAboutRefsInRender;
       if (!warnedAboutRefsInRender) {
@@ -244,8 +235,8 @@ export function findDOMNode(
   if (componentOrElement == null) {
     return null;
   }
-  if ((componentOrElement     ).nodeType === ELEMENT_NODE) {
-    return (componentOrElement     );
+  if (componentOrElement.nodeType === ELEMENT_NODE) {
+    return componentOrElement;
   }
   if (__DEV__) {
     return findHostInstanceWithWarning(componentOrElement, 'findDOMNode');
@@ -253,11 +244,7 @@ export function findDOMNode(
   return findHostInstance(componentOrElement);
 }
 
-export function hydrate(
-  element            ,
-  container           ,
-  callback           ,
-) {
+export function hydrate(element, container, callback) {
   invariant(
     isValidContainer(container),
     'Target container is not a DOM element.',
@@ -284,11 +271,7 @@ export function hydrate(
   );
 }
 
-export function render(
-  element                    ,
-  container           ,
-  callback           ,
-) {
+export function render(element, container, callback) {
   invariant(
     isValidContainer(container),
     'Target container is not a DOM element.',
@@ -315,10 +298,10 @@ export function render(
 }
 
 export function unstable_renderSubtreeIntoContainer(
-  parentComponent                           ,
-  element                    ,
-  containerNode           ,
-  callback           ,
+  parentComponent,
+  element,
+  containerNode,
+  callback,
 ) {
   invariant(
     isValidContainer(containerNode),
@@ -337,7 +320,7 @@ export function unstable_renderSubtreeIntoContainer(
   );
 }
 
-export function unmountComponentAtNode(container           ) {
+export function unmountComponentAtNode(container) {
   invariant(
     isValidContainer(container),
     'unmountComponentAtNode(...): Target container is not a DOM element.',

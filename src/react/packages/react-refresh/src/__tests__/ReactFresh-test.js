@@ -81,7 +81,8 @@ describe('ReactFresh', () => {
     return (
       <div hidden={mode === 'hidden'}>
         <React.unstable_LegacyHidden
-          mode={mode === 'hidden' ? 'unstable-defer-without-hiding' : mode}>
+          mode={mode === 'hidden' ? 'unstable-defer-without-hiding' : mode}
+        >
           {children}
         </React.unstable_LegacyHidden>
       </div>
@@ -834,7 +835,7 @@ describe('ReactFresh', () => {
 
         const Outer = React.lazy(
           () =>
-            new Promise(resolve => {
+            new Promise((resolve) => {
               setTimeout(() => resolve({default: Hello}), 100);
             }),
         );
@@ -881,7 +882,7 @@ describe('ReactFresh', () => {
 
         const Outer = React.lazy(
           () =>
-            new Promise(resolve => {
+            new Promise((resolve) => {
               setTimeout(() => resolve({default: Hello}), 100);
             }),
         );
@@ -970,7 +971,7 @@ describe('ReactFresh', () => {
 
         const Outer = React.lazy(
           () =>
-            new Promise(resolve => {
+            new Promise((resolve) => {
               setTimeout(() => resolve({default: Hello}), 100);
             }),
         );
@@ -1053,7 +1054,7 @@ describe('ReactFresh', () => {
 
         const Outer = React.lazy(
           () =>
-            new Promise(resolve => {
+            new Promise((resolve) => {
               setTimeout(() => resolve({default: Hello}), 100);
             }),
         );
@@ -1138,7 +1139,7 @@ describe('ReactFresh', () => {
 
         const Outer = React.lazy(
           () =>
-            new Promise(resolve => {
+            new Promise((resolve) => {
               setTimeout(() => resolve({default: Hello}), 100);
             }),
         );
@@ -1223,7 +1224,7 @@ describe('ReactFresh', () => {
 
         const Outer = React.lazy(
           () =>
-            new Promise(resolve => {
+            new Promise((resolve) => {
               setTimeout(() => resolve({default: Hello}), 100);
             }),
         );
@@ -1307,7 +1308,7 @@ describe('ReactFresh', () => {
           $RefreshReg$(Hello, 'Hello');
 
           function Never() {
-            throw new Promise(resolve => {});
+            throw new Promise((resolve) => {});
           }
 
           function App({shouldSuspend}) {
@@ -1932,7 +1933,7 @@ describe('ReactFresh', () => {
     const elements = container.querySelectorAll('section');
     // Each tree above produces exactly three <section> elements:
     expect(elements.length).toBe(3);
-    elements.forEach(el => {
+    elements.forEach((el) => {
       expect(el.dataset.color).toBe('blue');
     });
 
@@ -2003,19 +2004,19 @@ describe('ReactFresh', () => {
 
   it('can remount on signature change within a <root> wrapper', () => {
     if (__DEV__) {
-      testRemountingWithWrapper(Hello => Hello);
+      testRemountingWithWrapper((Hello) => Hello);
     }
   });
 
   it('can remount on signature change within a simple memo wrapper', () => {
     if (__DEV__) {
-      testRemountingWithWrapper(Hello => React.memo(Hello));
+      testRemountingWithWrapper((Hello) => React.memo(Hello));
     }
   });
 
   it('can remount on signature change within a lazy simple memo wrapper', () => {
     if (__DEV__) {
-      testRemountingWithWrapper(Hello =>
+      testRemountingWithWrapper((Hello) =>
         React.lazy(() => ({
           then(cb) {
             cb({default: React.memo(Hello)});
@@ -2027,19 +2028,19 @@ describe('ReactFresh', () => {
 
   it('can remount on signature change within forwardRef', () => {
     if (__DEV__) {
-      testRemountingWithWrapper(Hello => React.forwardRef(Hello));
+      testRemountingWithWrapper((Hello) => React.forwardRef(Hello));
     }
   });
 
   it('can remount on signature change within forwardRef render function', () => {
     if (__DEV__) {
-      testRemountingWithWrapper(Hello => React.forwardRef(() => <Hello />));
+      testRemountingWithWrapper((Hello) => React.forwardRef(() => <Hello />));
     }
   });
 
   it('can remount on signature change within nested memo', () => {
     if (__DEV__) {
-      testRemountingWithWrapper(Hello =>
+      testRemountingWithWrapper((Hello) =>
         React.memo(React.memo(React.memo(Hello))),
       );
     }
@@ -2047,13 +2048,13 @@ describe('ReactFresh', () => {
 
   it('can remount on signature change within a memo wrapper and custom comparison', () => {
     if (__DEV__) {
-      testRemountingWithWrapper(Hello => React.memo(Hello, () => true));
+      testRemountingWithWrapper((Hello) => React.memo(Hello, () => true));
     }
   });
 
   it('can remount on signature change within a class', () => {
     if (__DEV__) {
-      testRemountingWithWrapper(Hello => {
+      testRemountingWithWrapper((Hello) => {
         const child = <Hello />;
         return class Wrapper extends React.PureComponent {
           render() {
@@ -2066,7 +2067,7 @@ describe('ReactFresh', () => {
 
   it('can remount on signature change within a context provider', () => {
     if (__DEV__) {
-      testRemountingWithWrapper(Hello => {
+      testRemountingWithWrapper((Hello) => {
         const Context = React.createContext();
         const child = (
           <Context.Provider value="constant">
@@ -2082,7 +2083,7 @@ describe('ReactFresh', () => {
 
   it('can remount on signature change within a context consumer', () => {
     if (__DEV__) {
-      testRemountingWithWrapper(Hello => {
+      testRemountingWithWrapper((Hello) => {
         const Context = React.createContext();
         const child = <Context.Consumer>{() => <Hello />}</Context.Consumer>;
         return function Wrapper() {
@@ -2094,7 +2095,7 @@ describe('ReactFresh', () => {
 
   it('can remount on signature change within a suspense node', () => {
     if (__DEV__) {
-      testRemountingWithWrapper(Hello => {
+      testRemountingWithWrapper((Hello) => {
         // TODO: we'll probably want to test fallback trees too.
         const child = (
           <React.Suspense>
@@ -2110,7 +2111,7 @@ describe('ReactFresh', () => {
 
   it('can remount on signature change within a mode node', () => {
     if (__DEV__) {
-      testRemountingWithWrapper(Hello => {
+      testRemountingWithWrapper((Hello) => {
         const child = (
           <React.StrictMode>
             <Hello />
@@ -2125,7 +2126,7 @@ describe('ReactFresh', () => {
 
   it('can remount on signature change within a fragment node', () => {
     if (__DEV__) {
-      testRemountingWithWrapper(Hello => {
+      testRemountingWithWrapper((Hello) => {
         const child = (
           <>
             <Hello />
@@ -2140,7 +2141,7 @@ describe('ReactFresh', () => {
 
   it('can remount on signature change within multiple siblings', () => {
     if (__DEV__) {
-      testRemountingWithWrapper(Hello => {
+      testRemountingWithWrapper((Hello) => {
         const child = (
           <>
             <>
@@ -2159,7 +2160,7 @@ describe('ReactFresh', () => {
 
   it('can remount on signature change within a profiler node', () => {
     if (__DEV__) {
-      testRemountingWithWrapper(Hello => {
+      testRemountingWithWrapper((Hello) => {
         const child = <Hello />;
         return function Wrapper() {
           return (
@@ -2300,7 +2301,7 @@ describe('ReactFresh', () => {
         function Hello() {
           const [val, setVal] = React.useState(0);
           const tranformed = React.useMemo(() => val * 2, [val]);
-          const handleClick = React.useCallback(() => setVal(v => v + 1), []);
+          const handleClick = React.useCallback(() => setVal((v) => v + 1), []);
 
           React.useEffect(() => {
             useEffectWithEmptyArrayCalls++;
@@ -2333,7 +2334,10 @@ describe('ReactFresh', () => {
           function Hello() {
             const [val, setVal] = React.useState(0);
             const tranformed = React.useMemo(() => val * 10, [val]);
-            const handleClick = React.useCallback(() => setVal(v => v - 1), []);
+            const handleClick = React.useCallback(
+              () => setVal((v) => v - 1),
+              [],
+            );
 
             React.useEffect(() => {
               useEffectWithEmptyArrayCalls++;
@@ -3065,7 +3069,7 @@ describe('ReactFresh', () => {
         class Hello extends React.Component {
           state = {count: 0};
           handleClick = () => {
-            this.setState(prev => ({
+            this.setState((prev) => ({
               count: prev.count + 1,
             }));
           };
@@ -3100,7 +3104,7 @@ describe('ReactFresh', () => {
         class Hello extends React.Component {
           state = {count: 0};
           handleClick = () => {
-            this.setState(prev => ({
+            this.setState((prev) => ({
               count: prev.count + 1,
             }));
           };
@@ -3137,7 +3141,7 @@ describe('ReactFresh', () => {
         class Hello extends React.Component {
           state = {count: 0};
           handleClick = () => {
-            this.setState(prev => ({
+            this.setState((prev) => ({
               count: prev.count + 1,
             }));
           };
@@ -3275,7 +3279,7 @@ describe('ReactFresh', () => {
         class Hello extends React.Component {
           state = {count: 0};
           handleClick = () => {
-            this.setState(prev => ({
+            this.setState((prev) => ({
               count: prev.count + 1,
             }));
           };
@@ -3601,7 +3605,7 @@ describe('ReactFresh', () => {
       // a proper reload because we will bottle up the update.
       // So we're being somewhat conservative.
       expect(ReactFreshRuntime.isLikelyComponentType(() => {})).toBe(false);
-      expect(ReactFreshRuntime.isLikelyComponentType(function() {})).toBe(
+      expect(ReactFreshRuntime.isLikelyComponentType(function () {})).toBe(
         false,
       );
       expect(

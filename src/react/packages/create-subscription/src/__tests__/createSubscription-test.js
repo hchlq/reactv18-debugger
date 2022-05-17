@@ -47,7 +47,7 @@ describe('createSubscription', () => {
 
   it('supports basic subscription pattern', () => {
     const Subscription = createSubscription({
-      getCurrentValue: source => source.getValue(),
+      getCurrentValue: (source) => source.getValue(),
       subscribe: (source, callback) => {
         const subscription = source.subscribe(callback);
         return () => subscription.unsubscribe;
@@ -79,10 +79,10 @@ describe('createSubscription', () => {
 
   it('should support observable types like RxJS ReplaySubject', () => {
     const Subscription = createSubscription({
-      getCurrentValue: source => {
+      getCurrentValue: (source) => {
         let currentValue;
         source
-          .subscribe(value => {
+          .subscribe((value) => {
             currentValue = value;
           })
           .unsubscribe();
@@ -114,11 +114,11 @@ describe('createSubscription', () => {
   describe('Promises', () => {
     it('should support Promises', async () => {
       const Subscription = createSubscription({
-        getCurrentValue: source => undefined,
+        getCurrentValue: (source) => undefined,
         subscribe: (source, callback) => {
           source.then(
-            value => callback(value),
-            value => callback(value),
+            (value) => callback(value),
+            (value) => callback(value),
           );
           // (Can't unsubscribe from a Promise)
           return () => {};
@@ -161,7 +161,7 @@ describe('createSubscription', () => {
 
     it('should still work if unsubscription is managed incorrectly', async () => {
       const Subscription = createSubscription({
-        getCurrentValue: source => undefined,
+        getCurrentValue: (source) => undefined,
         subscribe: (source, callback) => {
           source.then(callback);
           // (Can't unsubscribe from a Promise)
@@ -175,8 +175,8 @@ describe('createSubscription', () => {
       }
 
       let resolveA, resolveB;
-      const promiseA = new Promise(resolve => (resolveA = resolve));
-      const promiseB = new Promise(resolve => (resolveB = resolve));
+      const promiseA = new Promise((resolve) => (resolveA = resolve));
+      const promiseB = new Promise((resolve) => (resolveB = resolve));
 
       // Subscribe first to Promise A then Promise B
       ReactNoop.render(<Subscription source={promiseA}>{render}</Subscription>);
@@ -195,11 +195,11 @@ describe('createSubscription', () => {
 
     it('should not call setState for a Promise that resolves after unmount', async () => {
       const Subscription = createSubscription({
-        getCurrentValue: source => undefined,
+        getCurrentValue: (source) => undefined,
         subscribe: (source, callback) => {
           source.then(
-            value => callback(value),
-            value => callback(value),
+            (value) => callback(value),
+            (value) => callback(value),
           );
           // (Can't unsubscribe from a Promise)
           return () => {};
@@ -231,7 +231,7 @@ describe('createSubscription', () => {
 
   it('should unsubscribe from old subscribables and subscribe to new subscribables when props change', () => {
     const Subscription = createSubscription({
-      getCurrentValue: source => source.getValue(),
+      getCurrentValue: (source) => source.getValue(),
       subscribe: (source, callback) => {
         const subscription = source.subscribe(callback);
         return () => subscription.unsubscribe();
@@ -277,7 +277,7 @@ describe('createSubscription', () => {
     }
 
     const Subscription = createSubscription({
-      getCurrentValue: source => source.getValue(),
+      getCurrentValue: (source) => source.getValue(),
       subscribe: (source, callback) => {
         const subscription = source.subscribe(callback);
         return () => subscription.unsubscribe();
@@ -364,7 +364,7 @@ describe('createSubscription', () => {
     }
 
     const Subscription = createSubscription({
-      getCurrentValue: source => source.getValue(),
+      getCurrentValue: (source) => source.getValue(),
       subscribe: (source, callback) => {
         const subscription = source.subscribe(callback);
         return () => subscription.unsubscribe();
@@ -476,13 +476,13 @@ describe('createSubscription', () => {
 
     it('should warn if subscribe does not return an unsubscribe method', () => {
       const Subscription = createSubscription({
-        getCurrentValue: source => undefined,
+        getCurrentValue: (source) => undefined,
         subscribe: (source, callback) => {},
       });
 
       const observable = createBehaviorSubject();
       ReactNoop.render(
-        <Subscription source={observable}>{value => null}</Subscription>,
+        <Subscription source={observable}>{(value) => null}</Subscription>,
       );
 
       expect(Scheduler).toFlushAndThrow(

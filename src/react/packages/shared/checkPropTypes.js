@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 const loggedTypeFailures = {};
@@ -32,12 +32,12 @@ function setCurrentlyValidatingElement(element) {
 }
 
 export default function checkPropTypes(
-  typeSpecs        ,
-  values        ,
-  location        ,
-  componentName         ,
-  element      ,
-)       {
+  typeSpecs,
+  values,
+  location,
+  componentName,
+  element,
+) {
   if (__DEV__) {
     // $FlowFixMe This is okay but Flow doesn't know it.
     const has = Function.call.bind(Object.prototype.hasOwnProperty);

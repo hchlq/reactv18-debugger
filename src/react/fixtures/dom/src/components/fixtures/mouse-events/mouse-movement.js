@@ -7,7 +7,7 @@ class MouseMovement extends React.Component {
     movement: {x: 0, y: 0},
   };
 
-  onMove = event => {
+  onMove = (event) => {
     this.setState({x: event.movementX, y: event.movementY});
   };
 
@@ -24,7 +24,8 @@ class MouseMovement extends React.Component {
       <TestCase
         title="Mouse Movement"
         description="We polyfill the movementX and movementY fields."
-        affectedBrowsers="IE, Safari">
+        affectedBrowsers="IE, Safari"
+      >
         <TestCase.Steps>
           <li>Mouse over the box below</li>
         </TestCase.Steps>

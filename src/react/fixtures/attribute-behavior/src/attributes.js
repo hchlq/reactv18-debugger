@@ -1,9 +1,9 @@
 function getProperty(propertyName) {
-  return el => el[propertyName];
+  return (el) => el[propertyName];
 }
 
 function getAttribute(attributeName) {
-  return el => {
+  return (el) => {
     if (el.namespaceURI === '') {
       throw new Error('Not an HTML element.');
     }
@@ -12,11 +12,11 @@ function getAttribute(attributeName) {
 }
 
 function getSVGProperty(propertyName) {
-  return el => el[propertyName];
+  return (el) => el[propertyName];
 }
 
 function getSVGAttribute(attributeName) {
-  return el => {
+  return (el) => {
     if (el.namespaceURI !== 'http://www.w3.org/2000/svg') {
       throw new Error('Not an SVG element.');
     }
@@ -2338,7 +2338,7 @@ const attributes = [
   {name: 'zoomAndPan', read: getSVGProperty('zoomAndPan'), tagName: 'svg'},
 ];
 
-attributes.forEach(attr => {
+attributes.forEach((attr) => {
   attr.read = attr.read || getProperty(attr.name);
 });
 

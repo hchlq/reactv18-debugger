@@ -1,12 +1,12 @@
 const React = window.React;
-const noop = n => n;
+const noop = (n) => n;
 
 class RadioNameChangeFixture extends React.Component {
   state = {
     updated: false,
   };
   onClick = () => {
-    this.setState(state => {
+    this.setState((state) => {
       return {updated: !state.updated};
     });
   };

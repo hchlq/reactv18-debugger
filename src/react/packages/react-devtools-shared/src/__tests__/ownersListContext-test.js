@@ -4,20 +4,15 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                           
-                                                                                       
-                                                                     
-                                                                  
 
 describe('OwnersListContext', () => {
   let React;
   let ReactDOM;
-  let TestRenderer                   ;
-  let bridge                ;
-  let store       ;
+  let TestRenderer;
+  let bridge;
+  let store;
   let utils;
 
   let BridgeContext;
@@ -38,16 +33,16 @@ describe('OwnersListContext', () => {
     ReactDOM = require('react-dom');
     TestRenderer = utils.requireTestRenderer();
 
-    BridgeContext = require('react-devtools-shared/src/devtools/views/context')
-      .BridgeContext;
-    OwnersListContext = require('react-devtools-shared/src/devtools/views/Components/OwnersListContext')
-      .OwnersListContext;
-    OwnersListContextController = require('react-devtools-shared/src/devtools/views/Components/OwnersListContext')
-      .OwnersListContextController;
-    StoreContext = require('react-devtools-shared/src/devtools/views/context')
-      .StoreContext;
-    TreeContextController = require('react-devtools-shared/src/devtools/views/Components/TreeContext')
-      .TreeContextController;
+    BridgeContext =
+      require('react-devtools-shared/src/devtools/views/context').BridgeContext;
+    OwnersListContext =
+      require('react-devtools-shared/src/devtools/views/Components/OwnersListContext').OwnersListContext;
+    OwnersListContextController =
+      require('react-devtools-shared/src/devtools/views/Components/OwnersListContext').OwnersListContextController;
+    StoreContext =
+      require('react-devtools-shared/src/devtools/views/context').StoreContext;
+    TreeContextController =
+      require('react-devtools-shared/src/devtools/views/Components/TreeContext').TreeContextController;
   });
 
   const Contexts = ({children, defaultOwnerID = null}) => (
@@ -60,7 +55,7 @@ describe('OwnersListContext', () => {
     </BridgeContext.Provider>
   );
 
-  it('should fetch the owners list for the selected element', async done => {
+  it('should fetch the owners list for the selected element', async (done) => {
     const Grandparent = () => <Parent />;
     const Parent = () => {
       return (
@@ -78,8 +73,8 @@ describe('OwnersListContext', () => {
 
     expect(store).toMatchSnapshot('mount');
 
-    const parent = ((store.getElementAtIndex(1)     )         );
-    const firstChild = ((store.getElementAtIndex(2)     )         );
+    const parent = store.getElementAtIndex(1);
+    const firstChild = store.getElementAtIndex(2);
 
     let didFinish = false;
 
@@ -119,7 +114,7 @@ describe('OwnersListContext', () => {
     done();
   });
 
-  it('should fetch the owners list for the selected element that includes filtered components', async done => {
+  it('should fetch the owners list for the selected element that includes filtered components', async (done) => {
     store.componentFilters = [utils.createDisplayNameFilter('^Parent$')];
 
     const Grandparent = () => <Parent />;
@@ -139,7 +134,7 @@ describe('OwnersListContext', () => {
 
     expect(store).toMatchSnapshot('mount');
 
-    const firstChild = ((store.getElementAtIndex(1)     )         );
+    const firstChild = store.getElementAtIndex(1);
 
     let didFinish = false;
 
@@ -167,7 +162,7 @@ describe('OwnersListContext', () => {
     done();
   });
 
-  it('should include the current element even if there are no other owners', async done => {
+  it('should include the current element even if there are no other owners', async (done) => {
     store.componentFilters = [utils.createDisplayNameFilter('^Parent$')];
 
     const Grandparent = () => <Parent />;
@@ -179,7 +174,7 @@ describe('OwnersListContext', () => {
 
     expect(store).toMatchSnapshot('mount');
 
-    const grandparent = ((store.getElementAtIndex(0)     )         );
+    const grandparent = store.getElementAtIndex(0);
 
     let didFinish = false;
 
@@ -207,7 +202,7 @@ describe('OwnersListContext', () => {
     done();
   });
 
-  it('should include all owners for a component wrapped in react memo', async done => {
+  it('should include all owners for a component wrapped in react memo', async (done) => {
     const InnerComponent = (props, ref) => <div ref={ref} />;
     const ForwardRef = React.forwardRef(InnerComponent);
     const Memo = React.memo(ForwardRef);
@@ -232,7 +227,7 @@ describe('OwnersListContext', () => {
       return null;
     }
 
-    const wrapped = ((store.getElementAtIndex(2)     )         );
+    const wrapped = store.getElementAtIndex(2);
     await utils.actAsync(() =>
       TestRenderer.create(
         <Contexts defaultOwnerID={wrapped.id}>

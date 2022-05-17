@@ -8,7 +8,7 @@ class MouseMove extends React.Component {
     events: [],
   };
 
-  checkEvent = event => {
+  checkEvent = (event) => {
     let {events} = this.state;
 
     if (event.type === 'mousemove' && events.indexOf(event) === -1) {

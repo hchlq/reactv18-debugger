@@ -70,7 +70,7 @@ describe('DOMPropertyOperations', () => {
       // Browsers default to this behavior, but some test environments do not.
       // This ensures that we have consistent behavior.
       const obj = {
-        toString: function() {
+        toString: function () {
           return 'css-class';
         },
       };
@@ -138,7 +138,7 @@ describe('DOMPropertyOperations', () => {
       expect(container.firstChild.hasAttribute('hidden')).toBe(false);
     });
 
-    it('should always assign the value attribute for non-inputs', function() {
+    it('should always assign the value attribute for non-inputs', function () {
       const container = document.createElement('div');
       ReactDOM.render(<progress />, container);
       spyOnDevAndProd(container.firstChild, 'setAttribute');
@@ -169,7 +169,7 @@ describe('DOMPropertyOperations', () => {
     it('should not remove attributes for special properties', () => {
       const container = document.createElement('div');
       ReactDOM.render(
-        <input type="text" value="foo" onChange={function() {}} />,
+        <input type="text" value="foo" onChange={function () {}} />,
         container,
       );
       if (disableInputAttributeSyncing) {
@@ -180,7 +180,7 @@ describe('DOMPropertyOperations', () => {
       expect(container.firstChild.value).toBe('foo');
       expect(() =>
         ReactDOM.render(
-          <input type="text" onChange={function() {}} />,
+          <input type="text" onChange={function () {}} />,
           container,
         ),
       ).toErrorDev(

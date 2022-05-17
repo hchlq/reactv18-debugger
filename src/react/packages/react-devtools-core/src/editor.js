@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import {existsSync} from 'fs';
@@ -12,7 +12,7 @@ import {basename, join, isAbsolute} from 'path';
 import {execSync, spawn} from 'child_process';
 import {parse} from 'shell-quote';
 
-function isTerminalEditor(editor        )          {
+function isTerminalEditor(editor) {
   switch (editor) {
     case 'vim':
     case 'emacs':
@@ -37,11 +37,7 @@ const COMMON_EDITORS = {
   '/Applications/Visual Studio Code.app/Contents/MacOS/Electron': 'code',
 };
 
-function getArgumentsForLineNumber(
-  editor        ,
-  filePath        ,
-  lineNumber        ,
-)                {
+function getArgumentsForLineNumber(editor, filePath, lineNumber) {
   switch (basename(editor)) {
     case 'vim':
     case 'mvim':
@@ -74,7 +70,7 @@ function getArgumentsForLineNumber(
   }
 }
 
-function guessEditor()                {
+function guessEditor() {
   // Explicit config always wins
   if (process.env.REACT_EDITOR) {
     return parse(process.env.REACT_EDITOR);
@@ -109,10 +105,7 @@ function guessEditor()                {
 
 let childProcess = null;
 
-export function getValidFilePath(
-  maybeRelativePath        ,
-  absoluteProjectRoots               ,
-)                {
+export function getValidFilePath(maybeRelativePath, absoluteProjectRoots) {
   // We use relative paths at Facebook with deterministic builds.
   // This is why our internal tooling calls React DevTools with absoluteProjectRoots.
   // If the filename is absolute then we don't need to care about this.
@@ -133,17 +126,14 @@ export function getValidFilePath(
   return null;
 }
 
-export function doesFilePathExist(
-  maybeRelativePath        ,
-  absoluteProjectRoots               ,
-)          {
+export function doesFilePathExist(maybeRelativePath, absoluteProjectRoots) {
   return getValidFilePath(maybeRelativePath, absoluteProjectRoots) !== null;
 }
 
 export function launchEditor(
-  maybeRelativePath        ,
-  lineNumber        ,
-  absoluteProjectRoots               ,
+  maybeRelativePath,
+  lineNumber,
+  absoluteProjectRoots,
 ) {
   const filePath = getValidFilePath(maybeRelativePath, absoluteProjectRoots);
   if (filePath === null) {
@@ -185,8 +175,8 @@ export function launchEditor(
   } else {
     childProcess = spawn(editor, args, {stdio: 'inherit'});
   }
-  childProcess.on('error', function() {});
-  childProcess.on('exit', function(errorCode) {
+  childProcess.on('error', function () {});
+  childProcess.on('exit', function (errorCode) {
     childProcess = null;
   });
 }

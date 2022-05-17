@@ -4,10 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                
 
 import * as ReactDOM from 'react-dom';
 import ReactSharedInternals from 'shared/ReactSharedInternals';
@@ -43,7 +41,7 @@ const isSchedulerMocked =
   typeof Scheduler.unstable_flushAllWithoutAsserting === 'function';
 const flushWork =
   Scheduler.unstable_flushAllWithoutAsserting ||
-  function() {
+  function () {
     let didFlushWork = false;
     while (flushPassiveEffects()) {
       didFlushWork = true;
@@ -52,7 +50,7 @@ const flushWork =
     return didFlushWork;
   };
 
-function flushWorkAndMicroTasks(onDone                       ) {
+function flushWorkAndMicroTasks(onDone) {
   try {
     flushWork();
     enqueueTask(() => {
@@ -73,7 +71,7 @@ function flushWorkAndMicroTasks(onDone                       ) {
 let actingUpdatesScopeDepth = 0;
 let didWarnAboutUsingActInProd = false;
 
-export function act(callback                       )                 {
+export function act(callback) {
   if (!__DEV__) {
     if (didWarnAboutUsingActInProd === false) {
       didWarnAboutUsingActInProd = true;
@@ -159,7 +157,7 @@ export function act(callback                       )                 {
             }
             // we're about to exit the act() scope,
             // now's the time to flush tasks/effects
-            flushWorkAndMicroTasks((err        ) => {
+            flushWorkAndMicroTasks((err) => {
               onDone();
               if (err) {
                 reject(err);
@@ -168,7 +166,7 @@ export function act(callback                       )                 {
               }
             });
           },
-          err => {
+          (err) => {
             onDone();
             reject(err);
           },

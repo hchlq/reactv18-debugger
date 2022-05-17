@@ -18,12 +18,13 @@ describe('ReactFetchNode', () => {
   let serverEndpoint;
   let serverImpl;
 
-  beforeEach(done => {
+  beforeEach((done) => {
     jest.resetModules();
     if (__EXPERIMENTAL__) {
       ReactCache = require('react/unstable-cache');
       // TODO: A way to pass load context.
-      ReactCache.CacheProvider._context._currentValue = ReactCache.createCache();
+      ReactCache.CacheProvider._context._currentValue =
+        ReactCache.createCache();
       ReactFetchNode = require('react-fetch');
       fetch = ReactFetchNode.fetch;
     }
@@ -36,7 +37,7 @@ describe('ReactFetchNode', () => {
     serverEndpoint = `http://localhost:${server.address().port}/`;
   });
 
-  afterEach(done => {
+  afterEach((done) => {
     server.close(done);
     server = null;
   });

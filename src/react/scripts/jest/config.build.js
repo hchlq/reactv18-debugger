@@ -6,7 +6,7 @@ const baseConfig = require('./config.base');
 
 // Find all folders in packages/* with package.json
 const packagesRoot = join(__dirname, '..', '..', 'packages');
-const packages = readdirSync(packagesRoot).filter(dir => {
+const packages = readdirSync(packagesRoot).filter((dir) => {
   if (dir.charAt(0) === '.') {
     return false;
   }
@@ -31,7 +31,7 @@ moduleNameMapper[
 ] = `<rootDir>/packages/shared/forks/ReactFeatureFlags.readonly`;
 
 // Map packages to bundles
-packages.forEach(name => {
+packages.forEach((name) => {
   // Root entry point
   moduleNameMapper[`^${name}$`] = `<rootDir>/build/node_modules/${name}`;
   // Named entry points

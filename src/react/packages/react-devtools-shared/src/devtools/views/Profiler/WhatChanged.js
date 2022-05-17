@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -14,11 +14,7 @@ import {StoreContext} from '../context';
 
 import styles from './WhatChanged.css';
 
-               
-                  
-   
-
-export default function WhatChanged({fiberID}       ) {
+export default function WhatChanged({fiberID}) {
   const {profilerStore} = useContext(StoreContext);
   const {rootID, selectedCommitIndex} = useContext(ProfilerContext);
 
@@ -31,7 +27,7 @@ export default function WhatChanged({fiberID}       ) {
   }
 
   const {changeDescriptions} = profilerStore.getCommitData(
-    ((rootID     )        ),
+    rootID,
     selectedCommitIndex,
   );
 
@@ -71,7 +67,7 @@ export default function WhatChanged({fiberID}       ) {
     changes.push(
       <div key="context" className={styles.Item}>
         • Context changed:
-        {changeDescription.context.map(key => (
+        {changeDescription.context.map((key) => (
           <span key={key} className={styles.Key}>
             {key}
           </span>
@@ -95,7 +91,7 @@ export default function WhatChanged({fiberID}       ) {
     changes.push(
       <div key="props" className={styles.Item}>
         • Props changed:
-        {changeDescription.props.map(key => (
+        {changeDescription.props.map((key) => (
           <span key={key} className={styles.Key}>
             {key}
           </span>
@@ -111,7 +107,7 @@ export default function WhatChanged({fiberID}       ) {
     changes.push(
       <div key="state" className={styles.Item}>
         • State changed:
-        {changeDescription.state.map(key => (
+        {changeDescription.state.map((key) => (
           <span key={key} className={styles.Key}>
             {key}
           </span>

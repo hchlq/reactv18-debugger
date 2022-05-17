@@ -4,19 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                       
-             
-                       
-             
-                        
-               
-                    
-         
-                 
-                 
 
 import * as React from 'react';
 import {Fragment, useRef} from 'react';
@@ -26,12 +15,6 @@ import {getBatchRange} from './utils/getBatchRange';
 import useSmartTooltip from './utils/useSmartTooltip';
 import styles from './EventTooltip.css';
 
-               
-                          
-                                             
-                
-   
-
 function formatTimestamp(ms) {
   return ms.toLocaleString(undefined, {minimumFractionDigits: 2}) + 'ms';
 }
@@ -40,14 +23,14 @@ function formatDuration(ms) {
   return prettyMilliseconds(ms, {millisecondsDecimalDigits: 3});
 }
 
-function trimmedString(string        , length        )         {
+function trimmedString(string, length) {
   if (string.length > length) {
     return `${string.substr(0, length - 1)}…`;
   }
   return string;
 }
 
-function getReactEventLabel(type)                {
+function getReactEventLabel(type) {
   switch (type) {
     case 'schedule-render':
       return 'render scheduled';
@@ -66,7 +49,7 @@ function getReactEventLabel(type)                {
   }
 }
 
-function getReactEventColor(event            )                {
+function getReactEventColor(event) {
   switch (event.type) {
     case 'schedule-render':
       return COLORS.REACT_SCHEDULE_HOVER;
@@ -84,7 +67,7 @@ function getReactEventColor(event            )                {
   }
 }
 
-function getReactMeasureLabel(type)                {
+function getReactMeasureLabel(type) {
   switch (type) {
     case 'commit':
       return 'commit';
@@ -101,7 +84,7 @@ function getReactMeasureLabel(type)                {
   }
 }
 
-export default function EventTooltip({data, hoveredEvent, origin}       ) {
+export default function EventTooltip({data, hoveredEvent, origin}) {
   const tooltipRef = useSmartTooltip({
     mouseX: origin.x,
     mouseY: origin.y,
@@ -138,8 +121,8 @@ export default function EventTooltip({data, hoveredEvent, origin}       ) {
   return null;
 }
 
-function formatComponentStack(componentStack        )         {
-  const lines = componentStack.split('\n').map(line => line.trim());
+function formatComponentStack(componentStack) {
+  const lines = componentStack.split('\n').map((line) => line.trim());
   lines.shift();
 
   if (lines.length > 5) {
@@ -148,21 +131,9 @@ function formatComponentStack(componentStack        )         {
   return lines.join('\n');
 }
 
-const TooltipFlamechartNode = ({
-  stackFrame,
-  tooltipRef,
-}   
-                                   
-                                    
- ) => {
-  const {
-    name,
-    timestamp,
-    duration,
-    scriptUrl,
-    locationLine,
-    locationColumn,
-  } = stackFrame;
+const TooltipFlamechartNode = ({stackFrame, tooltipRef}) => {
+  const {name, timestamp, duration, scriptUrl, locationLine, locationColumn} =
+    stackFrame;
   return (
     <div className={styles.Tooltip} ref={tooltipRef}>
       {formatDuration(duration)}
@@ -189,13 +160,7 @@ const TooltipFlamechartNode = ({
   );
 };
 
-const TooltipReactEvent = ({
-  event,
-  tooltipRef,
-}   
-                    
-                                    
- ) => {
+const TooltipReactEvent = ({event, tooltipRef}) => {
   const label = getReactEventLabel(event.type);
   const color = getReactEventColor(event);
   if (!label || !color) {
@@ -232,15 +197,7 @@ const TooltipReactEvent = ({
   );
 };
 
-const TooltipReactMeasure = ({
-  data,
-  measure,
-  tooltipRef,
-}   
-                          
-                        
-                                    
- ) => {
+const TooltipReactMeasure = ({data, measure, tooltipRef}) => {
   const label = getReactMeasureLabel(measure.type);
   if (!label) {
     if (__DEV__) {
@@ -271,13 +228,7 @@ const TooltipReactMeasure = ({
   );
 };
 
-const TooltipUserTimingMark = ({
-  mark,
-  tooltipRef,
-}   
-                       
-                                    
- ) => {
+const TooltipUserTimingMark = ({mark, tooltipRef}) => {
   const {name, timestamp} = mark;
   return (
     <div className={styles.Tooltip} ref={tooltipRef}>

@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import EventEmitter from '../events';
@@ -12,41 +12,28 @@ import {prepareProfilingDataFrontendFromBackendAndStore} from './views/Profiler/
 import ProfilingCache from './ProfilingCache';
 import Store from './store';
 
-                                                                     
-                                                                                  
-             
-                     
-                               
-                        
-               
-                                
-
-export default class ProfilerStore extends EventEmitter   
-                       
-                  
-                    
-    {
-  _bridge                ;
+export default class ProfilerStore extends EventEmitter {
+  _bridge;
 
   // Suspense cache for lazily calculating derived profiling data.
-  _cache                ;
+  _cache;
 
   // Temporary store of profiling data from the backend renderer(s).
   // This data will be converted to the ProfilingDataFrontend format after being collected from all renderers.
-  _dataBackends                              = [];
+  _dataBackends = [];
 
   // Data from the most recently completed profiling session,
   // or data that has been imported from a previously exported session.
   // This object contains all necessary data to drive the Profiler UI interface,
   // even though some of it is lazily parsed/derived via the ProfilingCache.
-  _dataFrontend                               = null;
+  _dataFrontend = null;
 
   // Snapshot of all attached renderer IDs.
   // Once profiling is finished, this snapshot will be used to query renderers for profiling data.
   //
   // This map is initialized when profiling starts and updated when a new root is added while profiling;
   // Upon completion, it is converted into the exportable ProfilingDataFrontend format.
-  _initialRendererIDs              = new Set();
+  _initialRendererIDs = new Set();
 
   // Snapshot of the state of the main Store (including all roots) when profiling started.
   // Once profiling is finished, this snapshot can be used along with "operations" messages emitted during profiling,
@@ -55,7 +42,7 @@ export default class ProfilerStore extends EventEmitter
   //
   // This map is initialized when profiling starts and updated when a new root is added while profiling;
   // Upon completion, it is converted into the exportable ProfilingDataFrontend format.
-  _initialSnapshotsByRootID                                         = new Map();
+  _initialSnapshotsByRootID = new Map();
 
   // Map of root (id) to a list of tree mutation that occur during profiling.
   // Once profiling is finished, these mutations can be used, along with the initial tree snapshots,
@@ -63,26 +50,22 @@ export default class ProfilerStore extends EventEmitter
   //
   // This map is only updated while profiling is in progress;
   // Upon completion, it is converted into the exportable ProfilingDataFrontend format.
-  _inProgressOperationsByRootID                                    = new Map();
+  _inProgressOperationsByRootID = new Map();
 
   // The backend is currently profiling.
   // When profiling is in progress, operations are stored so that we can later reconstruct past commit trees.
-  _isProfiling          = false;
+  _isProfiling = false;
 
   // Tracks whether a specific renderer logged any profiling data during the most recent session.
-  _rendererIDsThatReportedProfilingData              = new Set();
+  _rendererIDsThatReportedProfilingData = new Set();
 
   // After profiling, data is requested from each attached renderer using this queue.
   // So long as this queue is not empty, the store is retrieving and processing profiling data from the backend.
-  _rendererQueue              = new Set();
+  _rendererQueue = new Set();
 
-  _store       ;
+  _store;
 
-  constructor(
-    bridge                ,
-    store       ,
-    defaultIsProfiling         ,
-  ) {
+  constructor(bridge, store, defaultIsProfiling) {
     super();
 
     this._bridge = bridge;
@@ -101,7 +84,7 @@ export default class ProfilerStore extends EventEmitter
     this._cache = new ProfilingCache(this);
   }
 
-  getCommitData(rootID        , commitIndex        )                     {
+  getCommitData(rootID, commitIndex) {
     if (this._dataFrontend !== null) {
       const dataForRoot = this._dataFrontend.dataForRoots.get(rootID);
       if (dataForRoot != null) {
@@ -117,7 +100,7 @@ export default class ProfilerStore extends EventEmitter
     );
   }
 
-  getDataForRoot(rootID        )                               {
+  getDataForRoot(rootID) {
     if (this._dataFrontend !== null) {
       const dataForRoot = this._dataFrontend.dataForRoots.get(rootID);
       if (dataForRoot != null) {
@@ -129,28 +112,28 @@ export default class ProfilerStore extends EventEmitter
   }
 
   // Profiling data has been recorded for at least one root.
-  get didRecordCommits()          {
+  get didRecordCommits() {
     return (
       this._dataFrontend !== null && this._dataFrontend.dataForRoots.size > 0
     );
   }
 
-  get isProcessingData()          {
+  get isProcessingData() {
     return this._rendererQueue.size > 0 || this._dataBackends.length > 0;
   }
 
-  get isProfiling()          {
+  get isProfiling() {
     return this._isProfiling;
   }
 
-  get profilingCache()                 {
+  get profilingCache() {
     return this._cache;
   }
 
-  get profilingData()                               {
+  get profilingData() {
     return this._dataFrontend;
   }
-  set profilingData(value                              )       {
+  set profilingData(value) {
     if (this._isProfiling) {
       console.warn(
         'Profiling data cannot be updated while profiling is in progress.',
@@ -168,7 +151,7 @@ export default class ProfilerStore extends EventEmitter
     this.emit('profilingData');
   }
 
-  clear()       {
+  clear() {
     this._dataBackends.splice(0);
     this._dataFrontend = null;
     this._initialRendererIDs.clear();
@@ -183,7 +166,7 @@ export default class ProfilerStore extends EventEmitter
     this.emit('profilingData');
   }
 
-  startProfiling()       {
+  startProfiling() {
     this._bridge.send('startProfiling', this._store.recordChangeDescriptions);
 
     // Don't actually update the local profiling boolean yet!
@@ -192,7 +175,7 @@ export default class ProfilerStore extends EventEmitter
     // We do this to avoid mismatches on e.g. CommitTreeBuilder that would cause errors.
   }
 
-  stopProfiling()       {
+  stopProfiling() {
     this._bridge.send('stopProfiling');
 
     // Don't actually update the local profiling boolean yet!
@@ -201,13 +184,10 @@ export default class ProfilerStore extends EventEmitter
     // We do this to avoid mismatches on e.g. CommitTreeBuilder that would cause errors.
   }
 
-  _takeProfilingSnapshotRecursive = (
-    elementID        ,
-    profilingSnapshots                           ,
-  ) => {
+  _takeProfilingSnapshotRecursive = (elementID, profilingSnapshots) => {
     const element = this._store.getElementByID(elementID);
     if (element !== null) {
-      const snapshotNode               = {
+      const snapshotNode = {
         id: elementID,
         children: element.children.slice(0),
         displayName: element.displayName,
@@ -217,13 +197,13 @@ export default class ProfilerStore extends EventEmitter
       };
       profilingSnapshots.set(elementID, snapshotNode);
 
-      element.children.forEach(childID =>
+      element.children.forEach((childID) =>
         this._takeProfilingSnapshotRecursive(childID, profilingSnapshots),
       );
     }
   };
 
-  onBridgeOperations = (operations               ) => {
+  onBridgeOperations = (operations) => {
     // The first two values are always rendererID and rootID
     const rendererID = operations[0];
     const rootID = operations[1];
@@ -249,7 +229,7 @@ export default class ProfilerStore extends EventEmitter
     }
   };
 
-  onBridgeProfilingData = (dataBackend                      ) => {
+  onBridgeProfilingData = (dataBackend) => {
     if (this._isProfiling) {
       // This should never happen, but if it does- ignore previous profiling data.
       return;
@@ -286,7 +266,7 @@ export default class ProfilerStore extends EventEmitter
     this._bridge.removeListener('shutdown', this.onBridgeShutdown);
   };
 
-  onProfilingStatus = (isProfiling         ) => {
+  onProfilingStatus = (isProfiling) => {
     if (isProfiling) {
       this._dataBackends.splice(0);
       this._dataFrontend = null;
@@ -306,7 +286,7 @@ export default class ProfilerStore extends EventEmitter
 
       // Record snapshot of tree at the time profiling is started.
       // This info is required to handle cases of e.g. nodes being removed during profiling.
-      this._store.roots.forEach(rootID => {
+      this._store.roots.forEach((rootID) => {
         const profilingSnapshots = new Map();
         this._initialSnapshotsByRootID.set(rootID, profilingSnapshots);
         this._takeProfilingSnapshotRecursive(rootID, profilingSnapshots);
@@ -333,7 +313,7 @@ export default class ProfilerStore extends EventEmitter
         // Only request data from renderers that actually logged it.
         // This avoids unnecessary bridge requests and also avoids edge case mixed renderer bugs.
         // (e.g. when v15 and v16 are both present)
-        this._rendererIDsThatReportedProfilingData.forEach(rendererID => {
+        this._rendererIDsThatReportedProfilingData.forEach((rendererID) => {
           if (!this._rendererQueue.has(rendererID)) {
             this._rendererQueue.add(rendererID);
 

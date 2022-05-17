@@ -28,7 +28,7 @@ describe('ReactIncrementalErrorHandling', () => {
   });
 
   function div(...children) {
-    children = children.map(c => (typeof c === 'string' ? {text: c} : c));
+    children = children.map((c) => (typeof c === 'string' ? {text: c} : c));
     return {type: 'div', children, prop: undefined, hidden: false};
   }
 
@@ -39,7 +39,7 @@ describe('ReactIncrementalErrorHandling', () => {
   function normalizeCodeLocInfo(str) {
     return (
       str &&
-      str.replace(/\n +(?:at|in) ([\S]+)[^\n]*/g, function(m, name) {
+      str.replace(/\n +(?:at|in) ([\S]+)[^\n]*/g, function (m, name) {
         return '\n    in ' + name + ' (at **)';
       })
     );
@@ -51,7 +51,8 @@ describe('ReactIncrementalErrorHandling', () => {
     return (
       <div hidden={mode === 'hidden'}>
         <React.unstable_LegacyHidden
-          mode={mode === 'hidden' ? 'unstable-defer-without-hiding' : mode}>
+          mode={mode === 'hidden' ? 'unstable-defer-without-hiding' : mode}
+        >
           {children}
         </React.unstable_LegacyHidden>
       </div>
@@ -467,7 +468,7 @@ describe('ReactIncrementalErrorHandling', () => {
       state = {errorCount: 0};
       componentDidCatch(error) {
         Scheduler.unstable_yieldValue(`componentDidCatch: ${error.message}`);
-        this.setState(state => ({errorCount: state.errorCount + 1}));
+        this.setState((state) => ({errorCount: state.errorCount + 1}));
       }
       render() {
         if (this.state.errorCount > 0) {
@@ -1328,9 +1329,7 @@ describe('ReactIncrementalErrorHandling', () => {
 
   it('recovers from uncaught reconciler errors', () => {
     const InvalidType = undefined;
-    expect(() =>
-      ReactNoop.render(<InvalidType />),
-    ).toErrorDev(
+    expect(() => ReactNoop.render(<InvalidType />)).toErrorDev(
       'Warning: React.createElement: type is invalid -- expected a string',
       {withoutStack: true},
     );
@@ -1695,7 +1694,7 @@ describe('ReactIncrementalErrorHandling', () => {
   });
 
   it('provides component stack even if overriding prepareStackTrace', () => {
-    Error.prepareStackTrace = function(error, callsites) {
+    Error.prepareStackTrace = function (error, callsites) {
       const stack = ['An error occurred:', error.message];
       for (let i = 0; i < callsites.length; i++) {
         const callsite = callsites[i];

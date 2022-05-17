@@ -4,15 +4,15 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import Overlay from './Overlay';
 
 const SHOW_DURATION = 2000;
 
-let timeoutID                   = null;
-let overlay                 = null;
+let timeoutID = null;
+let overlay = null;
 
 export function hideOverlay() {
   timeoutID = null;
@@ -23,11 +23,7 @@ export function hideOverlay() {
   }
 }
 
-export function showOverlay(
-  elements                           ,
-  componentName               ,
-  hideAfterTimeout         ,
-) {
+export function showOverlay(elements, componentName, hideAfterTimeout) {
   // TODO (npm-packages) Detect RN and support it somehow
   if (window.document == null) {
     return;

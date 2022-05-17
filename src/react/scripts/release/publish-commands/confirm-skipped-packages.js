@@ -17,7 +17,7 @@ const run = async ({cwd, packages, skipPackages, tags}) => {
     theme`{spinnerSuccess ✓} The following packages will not be published as part of this release`
   );
 
-  skipPackages.forEach(packageName => {
+  skipPackages.forEach((packageName) => {
     console.log(theme`• {package ${packageName}}`);
   });
 

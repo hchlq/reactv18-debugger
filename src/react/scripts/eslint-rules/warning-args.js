@@ -15,7 +15,7 @@ const existingErrorMap = JSON.parse(
   fs.readFileSync(path.resolve(__dirname, '../error-codes/codes.json'))
 );
 const messages = new Set();
-Object.keys(existingErrorMap).forEach(key =>
+Object.keys(existingErrorMap).forEach((key) =>
   messages.add(existingErrorMap[key])
 );
 
@@ -24,7 +24,7 @@ Object.keys(existingErrorMap).forEach(key =>
  * argument.
  */
 
-module.exports = function(context) {
+module.exports = function (context) {
   // we also allow literal strings and concatenated literal strings
   function getLiteralString(node) {
     if (node.type === 'Literal' && typeof node.value === 'string') {
@@ -40,7 +40,7 @@ module.exports = function(context) {
   }
 
   return {
-    CallExpression: function(node) {
+    CallExpression: function (node) {
       // This could be a little smarter by checking context.getScope() to see
       // how warning/invariant was defined.
       const isWarning =

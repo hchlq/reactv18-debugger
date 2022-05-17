@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -64,7 +64,7 @@ function useDeepHookF() {
   useDebugValue('useDeepHookF');
 }
 
-function FunctionWithHooks(props     , ref                ) {
+function FunctionWithHooks(props, ref) {
   const [count, updateCount] = useState(0);
 
   // eslint-disable-next-line no-unused-vars

@@ -4,10 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                       
 
 import {
   REACT_CONTEXT_TYPE,
@@ -23,31 +21,26 @@ import {
   REACT_LAZY_TYPE,
   REACT_BLOCK_TYPE,
 } from 'shared/ReactSymbols';
-                                                                       
 
-function getWrappedName(
-  outerType       ,
-  innerType     ,
-  wrapperName        ,
-)         {
+function getWrappedName(outerType, innerType, wrapperName) {
   const functionName = innerType.displayName || innerType.name || '';
   return (
-    (outerType     ).displayName ||
+    outerType.displayName ||
     (functionName !== '' ? `${wrapperName}(${functionName})` : wrapperName)
   );
 }
 
-function getContextName(type                   ) {
+function getContextName(type) {
   return type.displayName || 'Context';
 }
 
-function getComponentName(type       )                {
+function getComponentName(type) {
   if (type == null) {
     // Host root, text node or just invalid type.
     return null;
   }
   if (__DEV__) {
-    if (typeof (type     ).tag === 'number') {
+    if (typeof type.tag === 'number') {
       console.error(
         'Received an unexpected object in getComponentName(). ' +
           'This is likely a bug in React. Please file an issue.',
@@ -55,7 +48,7 @@ function getComponentName(type       )                {
     }
   }
   if (typeof type === 'function') {
-    return (type     ).displayName || type.name || null;
+    return type.displayName || type.name || null;
   }
   if (typeof type === 'string') {
     return type;
@@ -77,10 +70,10 @@ function getComponentName(type       )                {
   if (typeof type === 'object') {
     switch (type.$$typeof) {
       case REACT_CONTEXT_TYPE:
-        const context                    = (type     );
+        const context = type;
         return getContextName(context) + '.Consumer';
       case REACT_PROVIDER_TYPE:
-        const provider                         = (type     );
+        const provider = type;
         return getContextName(provider._context) + '.Provider';
       case REACT_FORWARD_REF_TYPE:
         return getWrappedName(type, type.render, 'ForwardRef');
@@ -89,7 +82,7 @@ function getComponentName(type       )                {
       case REACT_BLOCK_TYPE:
         return getComponentName(type._render);
       case REACT_LAZY_TYPE: {
-        const lazyComponent                          = (type     );
+        const lazyComponent = type;
         const payload = lazyComponent._payload;
         const init = lazyComponent._init;
         try {

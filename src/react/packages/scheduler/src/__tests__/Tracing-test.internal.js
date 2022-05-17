@@ -22,7 +22,7 @@ describe('Tracing', () => {
     currentTime = 0;
     Date.now = jest.fn().mockImplementation(() => currentTime);
 
-    advanceTimeBy = amount => {
+    advanceTimeBy = (amount) => {
       currentTime += amount;
     };
 
@@ -53,7 +53,7 @@ describe('Tracing', () => {
       expect(wrapped()).toBe(123);
     });
 
-    it('should pass arguments through to a wrapped function', done => {
+    it('should pass arguments through to a wrapped function', (done) => {
       let wrapped;
       SchedulerTracing.unstable_trace('arbitrary', currentTime, () => {
         wrapped = SchedulerTracing.unstable_wrap((param1, param2) => {
@@ -69,7 +69,7 @@ describe('Tracing', () => {
       expect(SchedulerTracing.unstable_getCurrent()).toContainNoInteractions();
     });
 
-    it('should report the traced interaction from within the trace callback', done => {
+    it('should report the traced interaction from within the trace callback', (done) => {
       advanceTimeBy(100);
 
       SchedulerTracing.unstable_trace('some event', currentTime, () => {
@@ -82,7 +82,7 @@ describe('Tracing', () => {
       });
     });
 
-    it('should report the traced interaction from within wrapped callbacks', done => {
+    it('should report the traced interaction from within wrapped callbacks', (done) => {
       let wrappedIndirection;
 
       function indirection() {
@@ -172,7 +172,7 @@ describe('Tracing', () => {
       expect(innerTestReached).toBe(true);
     });
 
-    it('should support nested traced events', done => {
+    it('should support nested traced events', (done) => {
       advanceTimeBy(100);
 
       let innerIndirectionTraced = false;
@@ -206,9 +206,8 @@ describe('Tracing', () => {
 
         advanceTimeBy(50);
 
-        const wrapperOuterIndirection = SchedulerTracing.unstable_wrap(
-          outerIndirection,
-        );
+        const wrapperOuterIndirection =
+          SchedulerTracing.unstable_wrap(outerIndirection);
 
         let wrapperInnerIndirection;
         let innerEventTraced = false;
@@ -225,9 +224,8 @@ describe('Tracing', () => {
           wrapperOuterIndirection();
           expect(outerIndirectionTraced).toBe(true);
 
-          wrapperInnerIndirection = SchedulerTracing.unstable_wrap(
-            innerIndirection,
-          );
+          wrapperInnerIndirection =
+            SchedulerTracing.unstable_wrap(innerIndirection);
 
           innerEventTraced = true;
         });
@@ -249,7 +247,7 @@ describe('Tracing', () => {
     });
 
     describe('error handling', () => {
-      it('should reset state appropriately when an error occurs in a trace callback', done => {
+      it('should reset state appropriately when an error occurs in a trace callback', (done) => {
         advanceTimeBy(100);
 
         SchedulerTracing.unstable_trace('outer event', currentTime, () => {
@@ -267,7 +265,7 @@ describe('Tracing', () => {
         });
       });
 
-      it('should reset state appropriately when an error occurs in a wrapped callback', done => {
+      it('should reset state appropriately when an error occurs in a wrapped callback', (done) => {
         advanceTimeBy(100);
 
         SchedulerTracing.unstable_trace('outer event', currentTime, () => {
@@ -344,7 +342,7 @@ describe('Tracing', () => {
       expect(SchedulerTracing.unstable_getCurrent()).toBe(null);
     });
 
-    it('should execute traced callbacks', done => {
+    it('should execute traced callbacks', (done) => {
       SchedulerTracing.unstable_trace('some event', currentTime, () => {
         expect(SchedulerTracing.unstable_getCurrent()).toBe(null);
 
@@ -356,7 +354,7 @@ describe('Tracing', () => {
       expect(SchedulerTracing.unstable_clear(() => 123)).toBe(123);
     });
 
-    it('should execute wrapped callbacks', done => {
+    it('should execute wrapped callbacks', (done) => {
       const wrappedCallback = SchedulerTracing.unstable_wrap(() => {
         expect(SchedulerTracing.unstable_getCurrent()).toBe(null);
 

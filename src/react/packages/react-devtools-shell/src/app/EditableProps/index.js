@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -32,14 +32,13 @@ function reducer(state, action) {
   }
 }
 
-                                              
-
-function StatefulFunction({name}                       ) {
+function StatefulFunction({name}) {
   const [count, updateCount] = useState(0);
   const debouncedCount = useDebounce(count, 1000);
-  const handleUpdateCountClick = useCallback(() => updateCount(count + 1), [
-    count,
-  ]);
+  const handleUpdateCountClick = useCallback(
+    () => updateCount(count + 1),
+    [count],
+  );
 
   const [data, dispatch] = useReducer(reducer, initialData);
   const handleUpdateReducerClick = useCallback(
@@ -68,13 +67,10 @@ function StatefulFunction({name}                       ) {
 const BoolContext = createContext(true);
 BoolContext.displayName = 'BoolContext';
 
-                                               
-                                                      
-
-class StatefulClass extends Component               {
+class StatefulClass extends Component {
   static contextType = BoolContext;
 
-  state        = {
+  state = {
     cities: ['San Francisco', 'San Jose'],
     state: 'California',
   };
@@ -102,25 +98,24 @@ class StatefulClass extends Component               {
 const MemoizedStatefulClass = memo(StatefulClass);
 const MemoizedStatefulFunction = memo(StatefulFunction);
 
-const ForwardRef = forwardRef                                    (
-  ({name}, ref) => {
-    const [count, updateCount] = useState(0);
-    const debouncedCount = useDebounce(count, 1000);
-    const handleUpdateCountClick = useCallback(() => updateCount(count + 1), [
-      count,
-    ]);
-    return (
-      <ul ref={ref}>
-        <li>Name: {name}</li>
-        <li>
-          <button onClick={handleUpdateCountClick}>
-            Debounced count: {debouncedCount}
-          </button>
-        </li>
-      </ul>
-    );
-  },
-);
+const ForwardRef = forwardRef(({name}, ref) => {
+  const [count, updateCount] = useState(0);
+  const debouncedCount = useDebounce(count, 1000);
+  const handleUpdateCountClick = useCallback(
+    () => updateCount(count + 1),
+    [count],
+  );
+  return (
+    <ul ref={ref}>
+      <li>Name: {name}</li>
+      <li>
+        <button onClick={handleUpdateCountClick}>
+          Debounced count: {debouncedCount}
+        </button>
+      </li>
+    </ul>
+  );
+});
 
 export default function EditableProps() {
   return (

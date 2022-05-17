@@ -34,18 +34,15 @@ function initModules() {
   };
 }
 
-const {
-  resetModules,
-  itRenders,
-  itThrowsWhenRendering,
-} = ReactDOMServerIntegrationUtils(initModules);
+const {resetModules, itRenders, itThrowsWhenRendering} =
+  ReactDOMServerIntegrationUtils(initModules);
 
 describe('ReactDOMServerIntegration', () => {
   beforeEach(() => {
     resetModules();
   });
 
-  describe('legacy context', function() {
+  describe('legacy context', function () {
     let PurpleContext, RedContext;
     beforeEach(() => {
       class Parent extends React.Component {
@@ -58,11 +55,13 @@ describe('ReactDOMServerIntegration', () => {
       }
       Parent.childContextTypes = {text: PropTypes.string};
 
-      PurpleContext = props => <Parent text="purple">{props.children}</Parent>;
-      RedContext = props => <Parent text="red">{props.children}</Parent>;
+      PurpleContext = (props) => (
+        <Parent text="purple">{props.children}</Parent>
+      );
+      RedContext = (props) => <Parent text="red">{props.children}</Parent>;
     });
 
-    itRenders('class child with context', async render => {
+    itRenders('class child with context', async (render) => {
       class ClassChildWithContext extends React.Component {
         render() {
           return <div>{this.context.text}</div>;
@@ -78,7 +77,7 @@ describe('ReactDOMServerIntegration', () => {
       expect(e.textContent).toBe('purple');
     });
 
-    itRenders('stateless child with context', async render => {
+    itRenders('stateless child with context', async (render) => {
       function FunctionChildWithContext(props, context) {
         return <div>{context.text}</div>;
       }
@@ -92,7 +91,7 @@ describe('ReactDOMServerIntegration', () => {
       expect(e.textContent).toBe('purple');
     });
 
-    itRenders('class child without context', async render => {
+    itRenders('class child without context', async (render) => {
       class ClassChildWithoutContext extends React.Component {
         render() {
           // this should render blank; context isn't passed to this component.
@@ -108,7 +107,7 @@ describe('ReactDOMServerIntegration', () => {
       expect(e.textContent).toBe('');
     });
 
-    itRenders('stateless child without context', async render => {
+    itRenders('stateless child without context', async (render) => {
       function FunctionChildWithoutContext(props, context) {
         // this should render blank; context isn't passed to this component.
         return <div>{context.text}</div>;
@@ -122,7 +121,7 @@ describe('ReactDOMServerIntegration', () => {
       expect(e.textContent).toBe('');
     });
 
-    itRenders('class child with wrong context', async render => {
+    itRenders('class child with wrong context', async (render) => {
       class ClassChildWithWrongContext extends React.Component {
         render() {
           // this should render blank; context.text isn't passed to this component.
@@ -139,7 +138,7 @@ describe('ReactDOMServerIntegration', () => {
       expect(e.textContent).toBe('');
     });
 
-    itRenders('stateless child with wrong context', async render => {
+    itRenders('stateless child with wrong context', async (render) => {
       function FunctionChildWithWrongContext(props, context) {
         // this should render blank; context.text isn't passed to this component.
         return <div id="statelessWrongChild">{context.text}</div>;
@@ -156,13 +155,13 @@ describe('ReactDOMServerIntegration', () => {
       expect(e.textContent).toBe('');
     });
 
-    itRenders('with context passed through to a grandchild', async render => {
+    itRenders('with context passed through to a grandchild', async (render) => {
       function Grandchild(props, context) {
         return <div>{context.text}</div>;
       }
       Grandchild.contextTypes = {text: PropTypes.string};
 
-      const Child = props => <Grandchild />;
+      const Child = (props) => <Grandchild />;
 
       const e = await render(
         <PurpleContext>
@@ -172,7 +171,7 @@ describe('ReactDOMServerIntegration', () => {
       expect(e.textContent).toBe('purple');
     });
 
-    itRenders('a child context overriding a parent context', async render => {
+    itRenders('a child context overriding a parent context', async (render) => {
       const Grandchild = (props, context) => {
         return <div>{context.text}</div>;
       };
@@ -188,48 +187,51 @@ describe('ReactDOMServerIntegration', () => {
       expect(e.textContent).toBe('red');
     });
 
-    itRenders('a child context merged with a parent context', async render => {
-      class Parent extends React.Component {
-        getChildContext() {
-          return {text1: 'purple'};
+    itRenders(
+      'a child context merged with a parent context',
+      async (render) => {
+        class Parent extends React.Component {
+          getChildContext() {
+            return {text1: 'purple'};
+          }
+          render() {
+            return <Child />;
+          }
         }
-        render() {
-          return <Child />;
-        }
-      }
-      Parent.childContextTypes = {text1: PropTypes.string};
+        Parent.childContextTypes = {text1: PropTypes.string};
 
-      class Child extends React.Component {
-        getChildContext() {
-          return {text2: 'red'};
+        class Child extends React.Component {
+          getChildContext() {
+            return {text2: 'red'};
+          }
+          render() {
+            return <Grandchild />;
+          }
         }
-        render() {
-          return <Grandchild />;
-        }
-      }
-      Child.childContextTypes = {text2: PropTypes.string};
+        Child.childContextTypes = {text2: PropTypes.string};
 
-      const Grandchild = (props, context) => {
-        return (
-          <div>
-            <div id="first">{context.text1}</div>
-            <div id="second">{context.text2}</div>
-          </div>
-        );
-      };
-      Grandchild.contextTypes = {
-        text1: PropTypes.string,
-        text2: PropTypes.string,
-      };
+        const Grandchild = (props, context) => {
+          return (
+            <div>
+              <div id="first">{context.text1}</div>
+              <div id="second">{context.text2}</div>
+            </div>
+          );
+        };
+        Grandchild.contextTypes = {
+          text1: PropTypes.string,
+          text2: PropTypes.string,
+        };
 
-      const e = await render(<Parent />);
-      expect(e.querySelector('#first').textContent).toBe('purple');
-      expect(e.querySelector('#second').textContent).toBe('red');
-    });
+        const e = await render(<Parent />);
+        expect(e.querySelector('#first').textContent).toBe('purple');
+        expect(e.querySelector('#second').textContent).toBe('red');
+      },
+    );
 
     itRenders(
       'with a call to componentWillMount before getChildContext',
-      async render => {
+      async (render) => {
         class WillMountContext extends React.Component {
           getChildContext() {
             return {text: this.state.text};
@@ -255,7 +257,7 @@ describe('ReactDOMServerIntegration', () => {
 
     itRenders(
       'if getChildContext exists but childContextTypes is missing with a warning',
-      async render => {
+      async (render) => {
         function HopefulChild(props, context) {
           return context.foo || 'nope';
         }
@@ -277,7 +279,7 @@ describe('ReactDOMServerIntegration', () => {
 
     itThrowsWhenRendering(
       'if getChildContext returns a value not in childContextTypes',
-      render => {
+      (render) => {
         class MyComponent extends React.Component {
           render() {
             return <div />;

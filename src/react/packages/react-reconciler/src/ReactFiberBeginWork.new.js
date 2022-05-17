@@ -4,26 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                                       
-                                                         
-                                                                            
-                                                
-                                                    
-                                                  
-                                                     
-             
-                
-                          
-                       
-                                           
-                                                                     
-             
-                 
-                 
-                                        
 
 import checkPropTypes from 'shared/checkPropTypes';
 
@@ -131,7 +113,7 @@ import {
   registerSuspenseInstanceRetry,
   supportsHydration,
 } from './ReactFiberHostConfig';
-                                                             
+
 import {shouldSuspend} from './ReactFiberReconciler';
 import {pushHostContext, pushHostContainer} from './ReactFiberHostContext.new';
 import {
@@ -207,7 +189,7 @@ import {disableLogs, reenableLogs} from 'shared/ConsolePatchingDev';
 
 const ReactCurrentOwner = ReactSharedInternals.ReactCurrentOwner;
 
-let didReceiveUpdate          = false;
+let didReceiveUpdate = false;
 
 let didWarnAboutBadClass;
 let didWarnAboutModulePatternComponent;
@@ -232,10 +214,10 @@ if (__DEV__) {
 }
 
 export function reconcileChildren(
-  current              ,
-  workInProgress       ,
-  nextChildren     ,
-  renderLanes       ,
+  current,
+  workInProgress,
+  nextChildren,
+  renderLanes,
 ) {
   if (current === null) {
     // If this is a fresh new component that hasn't been rendered yet, we
@@ -265,10 +247,10 @@ export function reconcileChildren(
 }
 
 function forceUnmountCurrentAndReconcile(
-  current       ,
-  workInProgress       ,
-  nextChildren     ,
-  renderLanes       ,
+  current,
+  workInProgress,
+  nextChildren,
+  renderLanes,
 ) {
   // This function is fork of reconcileChildren. It's used in cases where we
   // want to reconcile without matching against the existing set. This has the
@@ -297,11 +279,11 @@ function forceUnmountCurrentAndReconcile(
 }
 
 function updateForwardRef(
-  current              ,
-  workInProgress       ,
-  Component     ,
-  nextProps     ,
-  renderLanes       ,
+  current,
+  workInProgress,
+  Component,
+  nextProps,
+  renderLanes,
 ) {
   // TODO: current can be non-null here even if the component
   // hasn't yet mounted. This happens after the first render suspends.
@@ -382,13 +364,13 @@ function updateForwardRef(
 }
 
 function updateMemoComponent(
-  current              ,
-  workInProgress       ,
-  Component     ,
-  nextProps     ,
-  updateLanes       ,
-  renderLanes       ,
-)               {
+  current,
+  workInProgress,
+  Component,
+  nextProps,
+  updateLanes,
+  renderLanes,
+) {
   if (current === null) {
     const type = Component.type;
     if (
@@ -458,7 +440,7 @@ function updateMemoComponent(
       );
     }
   }
-  const currentChild = ((current.child     )       ); // This is always exactly one child
+  const currentChild = current.child; // This is always exactly one child
   if (!includesSomeLane(updateLanes, renderLanes)) {
     // This will be the props with resolved defaultProps,
     // unlike current.memoizedProps which will be the unresolved ones.
@@ -480,13 +462,13 @@ function updateMemoComponent(
 }
 
 function updateSimpleMemoComponent(
-  current              ,
-  workInProgress       ,
-  Component     ,
-  nextProps     ,
-  updateLanes       ,
-  renderLanes       ,
-)               {
+  current,
+  workInProgress,
+  Component,
+  nextProps,
+  updateLanes,
+  renderLanes,
+) {
   // TODO: current can be non-null here even if the component
   // hasn't yet mounted. This happens when the inner render suspends.
   // We'll need to figure out if this is fine or can cause issues.
@@ -500,7 +482,7 @@ function updateSimpleMemoComponent(
         // We warn when you define propTypes on lazy()
         // so let's just skip over it to find memo() outer wrapper.
         // Inner props for memo are validated later.
-        const lazyComponent                              = outerMemoType;
+        const lazyComponent = outerMemoType;
         const payload = lazyComponent._payload;
         const init = lazyComponent._init;
         try {
@@ -509,7 +491,7 @@ function updateSimpleMemoComponent(
           outerMemoType = null;
         }
         // Inner propTypes will be validated in the function component path.
-        const outerPropTypes = outerMemoType && (outerMemoType     ).propTypes;
+        const outerPropTypes = outerMemoType && outerMemoType.propTypes;
         if (outerPropTypes) {
           checkPropTypes(
             outerPropTypes,
@@ -566,16 +548,11 @@ function updateSimpleMemoComponent(
   );
 }
 
-function updateOffscreenComponent(
-  current              ,
-  workInProgress       ,
-  renderLanes       ,
-) {
-  const nextProps                 = workInProgress.pendingProps;
+function updateOffscreenComponent(current, workInProgress, renderLanes) {
+  const nextProps = workInProgress.pendingProps;
   const nextChildren = nextProps.children;
 
-  const prevState                        =
-    current !== null ? current.memoizedState : null;
+  const prevState = current !== null ? current.memoizedState : null;
 
   if (
     nextProps.mode === 'hidden' ||
@@ -584,12 +561,12 @@ function updateOffscreenComponent(
     if ((workInProgress.mode & ConcurrentMode) === NoMode) {
       // In legacy sync mode, don't defer the subtree. Render it now.
       // TODO: Figure out what we should do in Blocking mode.
-      const nextState                 = {
+      const nextState = {
         baseLanes: NoLanes,
       };
       workInProgress.memoizedState = nextState;
       pushRenderLanes(workInProgress, renderLanes);
-    } else if (!includesSomeLane(renderLanes, (OffscreenLane      ))) {
+    } else if (!includesSomeLane(renderLanes, OffscreenLane)) {
       let nextBaseLanes;
       if (prevState !== null) {
         const prevBaseLanes = prevState.baseLanes;
@@ -600,12 +577,11 @@ function updateOffscreenComponent(
 
       // Schedule this fiber to re-render at offscreen priority. Then bailout.
       if (enableSchedulerTracing) {
-        markSpawnedWork((OffscreenLane      ));
+        markSpawnedWork(OffscreenLane);
       }
-      workInProgress.lanes = workInProgress.childLanes = laneToLanes(
-        OffscreenLane,
-      );
-      const nextState                 = {
+      workInProgress.lanes = workInProgress.childLanes =
+        laneToLanes(OffscreenLane);
+      const nextState = {
         baseLanes: nextBaseLanes,
       };
       workInProgress.memoizedState = nextState;
@@ -615,7 +591,7 @@ function updateOffscreenComponent(
       return null;
     } else {
       // Rendering at offscreen, so we can clear the base lanes.
-      const nextState                 = {
+      const nextState = {
         baseLanes: NoLanes,
       };
       workInProgress.memoizedState = nextState;
@@ -648,31 +624,19 @@ function updateOffscreenComponent(
 // fork the function.
 const updateLegacyHiddenComponent = updateOffscreenComponent;
 
-function updateFragment(
-  current              ,
-  workInProgress       ,
-  renderLanes       ,
-) {
+function updateFragment(current, workInProgress, renderLanes) {
   const nextChildren = workInProgress.pendingProps;
   reconcileChildren(current, workInProgress, nextChildren, renderLanes);
   return workInProgress.child;
 }
 
-function updateMode(
-  current              ,
-  workInProgress       ,
-  renderLanes       ,
-) {
+function updateMode(current, workInProgress, renderLanes) {
   const nextChildren = workInProgress.pendingProps.children;
   reconcileChildren(current, workInProgress, nextChildren, renderLanes);
   return workInProgress.child;
 }
 
-function updateProfiler(
-  current              ,
-  workInProgress       ,
-  renderLanes       ,
-) {
+function updateProfiler(current, workInProgress, renderLanes) {
   if (enableProfilerTimer) {
     // Reset effect durations for the next eventual effect phase.
     // These are reset during render to allow the DevTools commit hook a chance to read them,
@@ -686,7 +650,7 @@ function updateProfiler(
   return workInProgress.child;
 }
 
-function markRef(current              , workInProgress       ) {
+function markRef(current, workInProgress) {
   const ref = workInProgress.ref;
   if (
     (current === null && ref !== null) ||
@@ -701,7 +665,7 @@ function updateFunctionComponent(
   current,
   workInProgress,
   Component,
-  nextProps     ,
+  nextProps,
   renderLanes,
 ) {
   if (__DEV__) {
@@ -780,13 +744,7 @@ function updateFunctionComponent(
   return workInProgress.child;
 }
 
-function updateBlock             (
-  current              ,
-  workInProgress       ,
-  block                             ,
-  nextProps     ,
-  renderLanes       ,
-) {
+function updateBlock(current, workInProgress, block, nextProps, renderLanes) {
   // TODO: current can be non-null here even if the component
   // hasn't yet mounted. This happens after the first render suspends.
   // We'll need to figure out if this is fine or can cause issues.
@@ -850,11 +808,11 @@ function updateBlock             (
 }
 
 function updateClassComponent(
-  current              ,
-  workInProgress       ,
-  Component     ,
-  nextProps     ,
-  renderLanes       ,
+  current,
+  workInProgress,
+  Component,
+  nextProps,
+  renderLanes,
 ) {
   if (__DEV__) {
     if (workInProgress.type !== workInProgress.elementType) {
@@ -943,12 +901,12 @@ function updateClassComponent(
 }
 
 function finishClassComponent(
-  current              ,
-  workInProgress       ,
-  Component     ,
-  shouldUpdate         ,
-  hasContext         ,
-  renderLanes       ,
+  current,
+  workInProgress,
+  Component,
+  shouldUpdate,
+  hasContext,
+  renderLanes,
 ) {
   // Refs should update even if shouldComponentUpdate returns false
   markRef(current, workInProgress);
@@ -1034,7 +992,7 @@ function finishClassComponent(
 }
 
 function pushHostRootContext(workInProgress) {
-  const root = (workInProgress.stateNode           );
+  const root = workInProgress.stateNode;
   if (root.pendingContext) {
     pushTopLevelContextObject(
       workInProgress,
@@ -1070,7 +1028,7 @@ function updateHostRoot(current, workInProgress, renderLanes) {
     resetHydrationState();
     return bailoutOnAlreadyFinishedWork(current, workInProgress, renderLanes);
   }
-  const root            = workInProgress.stateNode;
+  const root = workInProgress.stateNode;
   if (root.hydrate && enterHydrationState(workInProgress)) {
     // If we don't have any current children this might be the first pass.
     // We always try to hydrate. If this isn't a hydration pass there won't
@@ -1082,9 +1040,7 @@ function updateHostRoot(current, workInProgress, renderLanes) {
         root.mutableSourceEagerHydrationData;
       if (mutableSourceEagerHydrationData != null) {
         for (let i = 0; i < mutableSourceEagerHydrationData.length; i += 2) {
-          const mutableSource = ((mutableSourceEagerHydrationData[
-            i
-          ]     )                    );
+          const mutableSource = mutableSourceEagerHydrationData[i];
           const version = mutableSourceEagerHydrationData[i + 1];
           setWorkInProgressVersion(mutableSource, version);
         }
@@ -1119,11 +1075,7 @@ function updateHostRoot(current, workInProgress, renderLanes) {
   return workInProgress.child;
 }
 
-function updateHostComponent(
-  current              ,
-  workInProgress       ,
-  renderLanes       ,
-) {
+function updateHostComponent(current, workInProgress, renderLanes) {
   pushHostContext(workInProgress);
 
   if (current === null) {
@@ -1185,7 +1137,7 @@ function mountLazyComponent(
   }
 
   const props = workInProgress.pendingProps;
-  const lazyComponent                              = elementType;
+  const lazyComponent = elementType;
   const payload = lazyComponent._payload;
   const init = lazyComponent._init;
   let Component = init(payload);
@@ -1198,9 +1150,8 @@ function mountLazyComponent(
     case FunctionComponent: {
       if (__DEV__) {
         validateFunctionComponentInDev(workInProgress, Component);
-        workInProgress.type = Component = resolveFunctionForHotReloading(
-          Component,
-        );
+        workInProgress.type = Component =
+          resolveFunctionForHotReloading(Component);
       }
       child = updateFunctionComponent(
         null,
@@ -1213,9 +1164,8 @@ function mountLazyComponent(
     }
     case ClassComponent: {
       if (__DEV__) {
-        workInProgress.type = Component = resolveClassForHotReloading(
-          Component,
-        );
+        workInProgress.type = Component =
+          resolveClassForHotReloading(Component);
       }
       child = updateClassComponent(
         null,
@@ -1228,9 +1178,8 @@ function mountLazyComponent(
     }
     case ForwardRef: {
       if (__DEV__) {
-        workInProgress.type = Component = resolveForwardRefForHotReloading(
-          Component,
-        );
+        workInProgress.type = Component =
+          resolveForwardRefForHotReloading(Component);
       }
       child = updateForwardRef(
         null,
@@ -1561,7 +1510,7 @@ function mountIndeterminateComponent(
   }
 }
 
-function validateFunctionComponentInDev(workInProgress       , Component     ) {
+function validateFunctionComponentInDev(workInProgress, Component) {
   if (__DEV__) {
     if (Component) {
       if (Component.childContextTypes) {
@@ -1639,21 +1588,18 @@ function validateFunctionComponentInDev(workInProgress       , Component     ) {
   }
 }
 
-const SUSPENDED_MARKER                = {
+const SUSPENDED_MARKER = {
   dehydrated: null,
   retryLane: NoLane,
 };
 
-function mountSuspenseOffscreenState(renderLanes       )                 {
+function mountSuspenseOffscreenState(renderLanes) {
   return {
     baseLanes: renderLanes,
   };
 }
 
-function updateSuspenseOffscreenState(
-  prevOffscreenState                ,
-  renderLanes       ,
-)                 {
+function updateSuspenseOffscreenState(prevOffscreenState, renderLanes) {
   return {
     baseLanes: mergeLanes(prevOffscreenState.baseLanes, renderLanes),
   };
@@ -1661,16 +1607,16 @@ function updateSuspenseOffscreenState(
 
 // TODO: Probably should inline this back
 function shouldRemainOnFallback(
-  suspenseContext                 ,
-  current              ,
-  workInProgress       ,
-  renderLanes       ,
+  suspenseContext,
+  current,
+  workInProgress,
+  renderLanes,
 ) {
   // If we're already showing a fallback, there are cases where we need to
   // remain on that fallback regardless of whether the content has resolved.
   // For example, SuspenseList coordinates when nested content appears.
   if (current !== null) {
-    const suspenseState                = current.memoizedState;
+    const suspenseState = current.memoizedState;
     if (suspenseState === null) {
       // Currently showing content. Don't hide it, even if ForceSuspenseFallack
       // is true. More precise name might be "ForceRemainSuspenseFallback".
@@ -1681,13 +1627,10 @@ function shouldRemainOnFallback(
   }
 
   // Not currently showing content. Consult the Suspense context.
-  return hasSuspenseContext(
-    suspenseContext,
-    (ForceSuspenseFallback                 ),
-  );
+  return hasSuspenseContext(suspenseContext, ForceSuspenseFallback);
 }
 
-function getRemainingWorkInPrimaryTree(current       , renderLanes) {
+function getRemainingWorkInPrimaryTree(current, renderLanes) {
   // TODO: Should not remove render lanes that were pinged during this render
   return removeLanes(current.childLanes, renderLanes);
 }
@@ -1702,7 +1645,7 @@ function updateSuspenseComponent(current, workInProgress, renderLanes) {
     }
   }
 
-  let suspenseContext                  = suspenseStackCursor.current;
+  let suspenseContext = suspenseStackCursor.current;
 
   let showFallback = false;
   const didSuspend = (workInProgress.flags & DidCapture) !== NoFlags;
@@ -1722,10 +1665,7 @@ function updateSuspenseComponent(current, workInProgress, renderLanes) {
     workInProgress.flags &= ~DidCapture;
   } else {
     // Attempting the main content
-    if (
-      current === null ||
-      (current.memoizedState                      ) !== null
-    ) {
+    if (current === null || current.memoizedState !== null) {
       // This is a new mount or this boundary is already showing a fallback state.
       // Mark this subtree context as having at least one invisible parent that could
       // handle the fallback state.
@@ -1777,8 +1717,7 @@ function updateSuspenseComponent(current, workInProgress, renderLanes) {
       tryToClaimNextHydratableInstance(workInProgress);
       // This could've been a dehydrated suspense component.
       if (enableSuspenseServerRenderer) {
-        const suspenseState                       =
-          workInProgress.memoizedState;
+        const suspenseState = workInProgress.memoizedState;
         if (suspenseState !== null) {
           const dehydrated = suspenseState.dehydrated;
           if (dehydrated !== null) {
@@ -1801,10 +1740,9 @@ function updateSuspenseComponent(current, workInProgress, renderLanes) {
         nextFallbackChildren,
         renderLanes,
       );
-      const primaryChildFragment        = (workInProgress.child     );
-      primaryChildFragment.memoizedState = mountSuspenseOffscreenState(
-        renderLanes,
-      );
+      const primaryChildFragment = workInProgress.child;
+      primaryChildFragment.memoizedState =
+        mountSuspenseOffscreenState(renderLanes);
       workInProgress.memoizedState = SUSPENDED_MARKER;
       return fallbackFragment;
     } else if (typeof nextProps.unstable_expectedLoadTime === 'number') {
@@ -1817,10 +1755,9 @@ function updateSuspenseComponent(current, workInProgress, renderLanes) {
         nextFallbackChildren,
         renderLanes,
       );
-      const primaryChildFragment        = (workInProgress.child     );
-      primaryChildFragment.memoizedState = mountSuspenseOffscreenState(
-        renderLanes,
-      );
+      const primaryChildFragment = workInProgress.child;
+      primaryChildFragment.memoizedState =
+        mountSuspenseOffscreenState(renderLanes);
       workInProgress.memoizedState = SUSPENDED_MARKER;
 
       // Since nothing actually suspended, there will nothing to ping this to
@@ -1848,7 +1785,7 @@ function updateSuspenseComponent(current, workInProgress, renderLanes) {
 
     // If the current fiber has a SuspenseState, that means it's already showing
     // a fallback.
-    const prevState                       = current.memoizedState;
+    const prevState = current.memoizedState;
     if (prevState !== null) {
       // The current tree is already showing a fallback
 
@@ -1864,9 +1801,7 @@ function updateSuspenseComponent(current, workInProgress, renderLanes) {
               prevState,
               renderLanes,
             );
-          } else if (
-            (workInProgress.memoizedState                      ) !== null
-          ) {
+          } else if (workInProgress.memoizedState !== null) {
             // Something suspended and we should still be in dehydrated mode.
             // Leave the existing child in place.
             workInProgress.child = current.child;
@@ -1879,17 +1814,17 @@ function updateSuspenseComponent(current, workInProgress, renderLanes) {
             // Therefore we now have to render the fallback.
             const nextPrimaryChildren = nextProps.children;
             const nextFallbackChildren = nextProps.fallback;
-            const fallbackChildFragment = mountSuspenseFallbackAfterRetryWithoutHydrating(
-              current,
-              workInProgress,
-              nextPrimaryChildren,
-              nextFallbackChildren,
-              renderLanes,
-            );
-            const primaryChildFragment        = (workInProgress.child     );
-            primaryChildFragment.memoizedState = mountSuspenseOffscreenState(
-              renderLanes,
-            );
+            const fallbackChildFragment =
+              mountSuspenseFallbackAfterRetryWithoutHydrating(
+                current,
+                workInProgress,
+                nextPrimaryChildren,
+                nextFallbackChildren,
+                renderLanes,
+              );
+            const primaryChildFragment = workInProgress.child;
+            primaryChildFragment.memoizedState =
+              mountSuspenseOffscreenState(renderLanes);
             workInProgress.memoizedState = SUSPENDED_MARKER;
             return fallbackChildFragment;
           }
@@ -1906,9 +1841,8 @@ function updateSuspenseComponent(current, workInProgress, renderLanes) {
           nextFallbackChildren,
           renderLanes,
         );
-        const primaryChildFragment        = (workInProgress.child     );
-        const prevOffscreenState                        = (current.child     )
-          .memoizedState;
+        const primaryChildFragment = workInProgress.child;
+        const prevOffscreenState = current.child.memoizedState;
         primaryChildFragment.memoizedState =
           prevOffscreenState === null
             ? mountSuspenseOffscreenState(renderLanes)
@@ -1943,9 +1877,8 @@ function updateSuspenseComponent(current, workInProgress, renderLanes) {
           nextFallbackChildren,
           renderLanes,
         );
-        const primaryChildFragment        = (workInProgress.child     );
-        const prevOffscreenState                        = (current.child     )
-          .memoizedState;
+        const primaryChildFragment = workInProgress.child;
+        const prevOffscreenState = current.child.memoizedState;
         primaryChildFragment.memoizedState =
           prevOffscreenState === null
             ? mountSuspenseOffscreenState(renderLanes)
@@ -1981,7 +1914,7 @@ function mountSuspensePrimaryChildren(
   renderLanes,
 ) {
   const mode = workInProgress.mode;
-  const primaryChildProps                 = {
+  const primaryChildProps = {
     mode: 'visible',
     children: primaryChildren,
   };
@@ -2003,9 +1936,9 @@ function mountSuspenseFallbackChildren(
   renderLanes,
 ) {
   const mode = workInProgress.mode;
-  const progressedPrimaryFragment               = workInProgress.child;
+  const progressedPrimaryFragment = workInProgress.child;
 
-  const primaryChildProps                 = {
+  const primaryChildProps = {
     mode: 'hidden',
     children: primaryChildren,
   };
@@ -2058,10 +1991,7 @@ function mountSuspenseFallbackChildren(
   return fallbackChildFragment;
 }
 
-function createWorkInProgressOffscreenFiber(
-  current       ,
-  offscreenProps                ,
-) {
+function createWorkInProgressOffscreenFiber(current, offscreenProps) {
   // The props argument to `createWorkInProgress` is `any` typed, so we use this
   // wrapper function to constrain it.
   return createWorkInProgress(current, offscreenProps);
@@ -2073,9 +2003,8 @@ function updateSuspensePrimaryChildren(
   primaryChildren,
   renderLanes,
 ) {
-  const currentPrimaryChildFragment        = (current.child     );
-  const currentFallbackChildFragment               =
-    currentPrimaryChildFragment.sibling;
+  const currentPrimaryChildFragment = current.child;
+  const currentFallbackChildFragment = currentPrimaryChildFragment.sibling;
 
   const primaryChildFragment = createWorkInProgressOffscreenFiber(
     currentPrimaryChildFragment,
@@ -2113,11 +2042,10 @@ function updateSuspenseFallbackChildren(
   renderLanes,
 ) {
   const mode = workInProgress.mode;
-  const currentPrimaryChildFragment        = (current.child     );
-  const currentFallbackChildFragment               =
-    currentPrimaryChildFragment.sibling;
+  const currentPrimaryChildFragment = current.child;
+  const currentFallbackChildFragment = currentPrimaryChildFragment.sibling;
 
-  const primaryChildProps                 = {
+  const primaryChildProps = {
     mode: 'hidden',
     children: primaryChildren,
   };
@@ -2135,7 +2063,7 @@ function updateSuspenseFallbackChildren(
     // only codepath.)
     workInProgress.child !== currentPrimaryChildFragment
   ) {
-    const progressedPrimaryFragment        = (workInProgress.child     );
+    const progressedPrimaryFragment = workInProgress.child;
     primaryChildFragment = progressedPrimaryFragment;
     primaryChildFragment.childLanes = NoLanes;
     primaryChildFragment.pendingProps = primaryChildProps;
@@ -2196,9 +2124,9 @@ function updateSuspenseFallbackChildren(
 }
 
 function retrySuspenseComponentWithoutHydrating(
-  current       ,
-  workInProgress       ,
-  renderLanes       ,
+  current,
+  workInProgress,
+  renderLanes,
 ) {
   // This will add the old fiber to the deletion list
   reconcileChildFibers(workInProgress, current.child, null, renderLanes);
@@ -2258,10 +2186,10 @@ function mountSuspenseFallbackAfterRetryWithoutHydrating(
 }
 
 function mountDehydratedSuspenseComponent(
-  workInProgress       ,
-  suspenseInstance                  ,
-  renderLanes       ,
-)               {
+  workInProgress,
+  suspenseInstance,
+  renderLanes,
+) {
   // During the first pass, we'll bail out and not drill into the children.
   // Instead, we'll leave the content in place and try to hydrate it later.
   if ((workInProgress.mode & BlockingMode) === NoMode) {
@@ -2304,12 +2232,12 @@ function mountDehydratedSuspenseComponent(
 }
 
 function updateDehydratedSuspenseComponent(
-  current       ,
-  workInProgress       ,
-  suspenseInstance                  ,
-  suspenseState               ,
-  renderLanes       ,
-)               {
+  current,
+  workInProgress,
+  suspenseInstance,
+  suspenseState,
+  renderLanes,
+) {
   // We should never be hydrating at this point because it is the first pass,
   // but after we've already committed once.
   warnIfHydrating();
@@ -2428,7 +2356,7 @@ function updateDehydratedSuspenseComponent(
   }
 }
 
-function scheduleWorkOnFiber(fiber       , renderLanes       ) {
+function scheduleWorkOnFiber(fiber, renderLanes) {
   fiber.lanes = mergeLanes(fiber.lanes, renderLanes);
   const alternate = fiber.alternate;
   if (alternate !== null) {
@@ -2438,17 +2366,17 @@ function scheduleWorkOnFiber(fiber       , renderLanes       ) {
 }
 
 function propagateSuspenseContextChange(
-  workInProgress       ,
-  firstChild              ,
-  renderLanes       ,
-)       {
+  workInProgress,
+  firstChild,
+  renderLanes,
+) {
   // Mark any Suspense boundaries with fallbacks as having work to do.
   // If they were previously forced into fallbacks, they may now be able
   // to unblock.
   let node = firstChild;
   while (node !== null) {
     if (node.tag === SuspenseComponent) {
-      const state                       = node.memoizedState;
+      const state = node.memoizedState;
       if (state !== null) {
         scheduleWorkOnFiber(node, renderLanes);
       }
@@ -2478,7 +2406,7 @@ function propagateSuspenseContextChange(
   }
 }
 
-function findLastContentRow(firstChild              )               {
+function findLastContentRow(firstChild) {
   // This is going to find the last row among these children that is already
   // showing content on the screen, as opposed to being in fallback state or
   // new. If a row has multiple Suspense boundaries, any of them being in the
@@ -2487,7 +2415,7 @@ function findLastContentRow(firstChild              )               {
   // will still be current since we haven't rendered them yet. The mounted
   // order may not be the same as the new order. We use the new order.
   let row = firstChild;
-  let lastContentRow               = null;
+  let lastContentRow = null;
   while (row !== null) {
     const currentRow = row.alternate;
     // New rows can't be content rows.
@@ -2499,9 +2427,7 @@ function findLastContentRow(firstChild              )               {
   return lastContentRow;
 }
 
-                                                                            
-
-function validateRevealOrder(revealOrder                         ) {
+function validateRevealOrder(revealOrder) {
   if (__DEV__) {
     if (
       revealOrder !== undefined &&
@@ -2553,10 +2479,7 @@ function validateRevealOrder(revealOrder                         ) {
   }
 }
 
-function validateTailOptions(
-  tailMode                      ,
-  revealOrder                         ,
-) {
+function validateTailOptions(tailMode, revealOrder) {
   if (__DEV__) {
     if (tailMode !== undefined && !didWarnAboutTailOptions[tailMode]) {
       if (tailMode !== 'collapsed' && tailMode !== 'hidden') {
@@ -2579,7 +2502,7 @@ function validateTailOptions(
   }
 }
 
-function validateSuspenseListNestedChild(childSlot       , index        ) {
+function validateSuspenseListNestedChild(childSlot, index) {
   if (__DEV__) {
     const isArray = Array.isArray(childSlot);
     const isIterable =
@@ -2602,10 +2525,7 @@ function validateSuspenseListNestedChild(childSlot       , index        ) {
   return true;
 }
 
-function validateSuspenseListChildren(
-  children       ,
-  revealOrder                         ,
-) {
+function validateSuspenseListChildren(children, revealOrder) {
   if (__DEV__) {
     if (
       (revealOrder === 'forwards' || revealOrder === 'backwards') &&
@@ -2647,23 +2567,22 @@ function validateSuspenseListChildren(
 }
 
 function initSuspenseListRenderState(
-  workInProgress       ,
-  isBackwards         ,
-  tail              ,
-  lastContentRow              ,
-  tailMode                      ,
-)       {
-  const renderState                                 =
-    workInProgress.memoizedState;
+  workInProgress,
+  isBackwards,
+  tail,
+  lastContentRow,
+  tailMode,
+) {
+  const renderState = workInProgress.memoizedState;
   if (renderState === null) {
-    workInProgress.memoizedState = ({
+    workInProgress.memoizedState = {
       isBackwards: isBackwards,
       rendering: null,
       renderingStartTime: 0,
       last: lastContentRow,
       tail: tail,
       tailMode: tailMode,
-    }                         );
+    };
   } else {
     // We can reuse the existing object from previous renders.
     renderState.isBackwards = isBackwards;
@@ -2682,14 +2601,10 @@ function initSuspenseListRenderState(
 // the force suspend context. If the first render didn't have anything in
 // in fallback state. Then we render each row in the tail one-by-one.
 // That happens in the completeWork phase without going back to beginWork.
-function updateSuspenseListComponent(
-  current              ,
-  workInProgress       ,
-  renderLanes       ,
-) {
+function updateSuspenseListComponent(current, workInProgress, renderLanes) {
   const nextProps = workInProgress.pendingProps;
-  const revealOrder                          = nextProps.revealOrder;
-  const tailMode                       = nextProps.tail;
+  const revealOrder = nextProps.revealOrder;
+  const tailMode = nextProps.tail;
   const newChildren = nextProps.children;
 
   validateRevealOrder(revealOrder);
@@ -2698,11 +2613,11 @@ function updateSuspenseListComponent(
 
   reconcileChildren(current, workInProgress, newChildren, renderLanes);
 
-  let suspenseContext                  = suspenseStackCursor.current;
+  let suspenseContext = suspenseStackCursor.current;
 
   const shouldForceFallback = hasSuspenseContext(
     suspenseContext,
-    (ForceSuspenseFallback                 ),
+    ForceSuspenseFallback,
   );
   if (shouldForceFallback) {
     suspenseContext = setShallowSuspenseContext(
@@ -2807,11 +2722,7 @@ function updateSuspenseListComponent(
   return workInProgress.child;
 }
 
-function updatePortalComponent(
-  current              ,
-  workInProgress       ,
-  renderLanes       ,
-) {
+function updatePortalComponent(current, workInProgress, renderLanes) {
   pushHostContainer(workInProgress, workInProgress.stateNode.containerInfo);
   const nextChildren = workInProgress.pendingProps;
   if (current === null) {
@@ -2834,13 +2745,9 @@ function updatePortalComponent(
 
 let hasWarnedAboutUsingNoValuePropOnContextProvider = false;
 
-function updateContextProvider(
-  current              ,
-  workInProgress       ,
-  renderLanes       ,
-) {
-  const providerType                         = workInProgress.type;
-  const context                    = providerType._context;
+function updateContextProvider(current, workInProgress, renderLanes) {
+  const providerType = workInProgress.type;
+  const context = providerType._context;
 
   const newProps = workInProgress.pendingProps;
   const oldProps = workInProgress.memoizedProps;
@@ -2894,12 +2801,8 @@ function updateContextProvider(
 
 let hasWarnedAboutUsingContextAsConsumer = false;
 
-function updateContextConsumer(
-  current              ,
-  workInProgress       ,
-  renderLanes       ,
-) {
-  let context                    = workInProgress.type;
+function updateContextConsumer(current, workInProgress, renderLanes) {
+  let context = workInProgress.type;
   // The logic below for Context differs depending on PROD or DEV mode. In
   // DEV mode, we create a separate object for Context.Consumer that acts
   // like a proxy to Context. This proxy object adds unnecessary code in PROD
@@ -2908,7 +2811,7 @@ function updateContextConsumer(
   // a property called "_context", which also gives us the ability to check
   // in DEV mode if this property exists or not and warn if it does not.
   if (__DEV__) {
-    if ((context     )._context === undefined) {
+    if (context._context === undefined) {
       // This may be because it's a Context (rather than a Consumer).
       // Or it may be because it's older React where they're the same thing.
       // We only want to warn if we're sure it's a new React.
@@ -2922,7 +2825,7 @@ function updateContextConsumer(
         }
       }
     } else {
-      context = (context     )._context;
+      context = context._context;
     }
   }
   const newProps = workInProgress.pendingProps;
@@ -2981,11 +2884,7 @@ export function markWorkInProgressReceivedUpdate() {
   didReceiveUpdate = true;
 }
 
-function bailoutOnAlreadyFinishedWork(
-  current              ,
-  workInProgress       ,
-  renderLanes       ,
-)               {
+function bailoutOnAlreadyFinishedWork(current, workInProgress, renderLanes) {
   if (current !== null) {
     // Reuse previous dependencies
     workInProgress.dependencies = current.dependencies;
@@ -3012,11 +2911,7 @@ function bailoutOnAlreadyFinishedWork(
   }
 }
 
-function remountFiber(
-  current       ,
-  oldWorkInProgress       ,
-  newWorkInProgress       ,
-)               {
+function remountFiber(current, oldWorkInProgress, newWorkInProgress) {
   if (__DEV__) {
     const returnFiber = oldWorkInProgress.return;
     if (returnFiber === null) {
@@ -3074,11 +2969,7 @@ function remountFiber(
   }
 }
 
-function beginWork(
-  current              ,
-  workInProgress       ,
-  renderLanes       ,
-)               {
+function beginWork(current, workInProgress, renderLanes) {
   const updateLanes = workInProgress.lanes;
 
   if (__DEV__) {
@@ -3153,7 +3044,7 @@ function beginWork(
           }
           break;
         case SuspenseComponent: {
-          const state                       = workInProgress.memoizedState;
+          const state = workInProgress.memoizedState;
           if (state !== null) {
             if (enableSuspenseServerRenderer) {
               if (state.dehydrated !== null) {
@@ -3175,7 +3066,7 @@ function beginWork(
             // whether to retry the primary children, or to skip over it and
             // go straight to the fallback. Check the priority of the primary
             // child fragment.
-            const primaryChildFragment        = (workInProgress.child     );
+            const primaryChildFragment = workInProgress.child;
             const primaryChildLanes = primaryChildFragment.childLanes;
             if (includesSomeLane(renderLanes, primaryChildLanes)) {
               // The primary children have pending work. Use the normal path

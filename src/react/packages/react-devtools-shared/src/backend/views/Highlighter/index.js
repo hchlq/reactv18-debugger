@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import memoize from 'memoize-one';
@@ -12,19 +12,14 @@ import throttle from 'lodash.throttle';
 import Agent from 'react-devtools-shared/src/backend/agent';
 import {hideOverlay, showOverlay} from './Highlighter';
 
-                                                                    
-
 // This plug-in provides in-page highlighting of the selected element.
 // It is used by the browser extension nad the standalone DevTools shell (when connected to a browser).
 // It is not currently the mechanism used to highlight React Native views.
 // That is done by the React Native Inspector component.
 
-let iframesListeningTo                         = new Set();
+let iframesListeningTo = new Set();
 
-export default function setupHighlighter(
-  bridge               ,
-  agent       ,
-)       {
+export default function setupHighlighter(bridge, agent) {
   bridge.addListener(
     'clearNativeElementHighlight',
     clearNativeElementHighlight,
@@ -54,7 +49,7 @@ export default function setupHighlighter(
   function stopInspectingNative() {
     hideOverlay();
     removeListenersOnWindow(window);
-    iframesListeningTo.forEach(function(frame) {
+    iframesListeningTo.forEach(function (frame) {
       try {
         removeListenersOnWindow(frame.contentWindow);
       } catch (error) {
@@ -88,25 +83,15 @@ export default function setupHighlighter(
     openNativeElementsPanel,
     rendererID,
     scrollIntoView,
-  }   
-                               
-                              
-               
-                                     
-                       
-                            
-       
-   ) {
+  }) {
     const renderer = agent.rendererInterfaces[rendererID];
     if (renderer == null) {
       console.warn(`Invalid renderer id "${rendererID}" for element "${id}"`);
     }
 
-    let nodes                      = null;
+    let nodes = null;
     if (renderer !== null) {
-      nodes = ((renderer.findNativeNodesForFiberID(
-        id,
-      )     )                     );
+      nodes = renderer.findNativeNodesForFiberID(id);
     }
 
     if (nodes != null && nodes[0] != null) {
@@ -129,7 +114,7 @@ export default function setupHighlighter(
     }
   }
 
-  function onClick(event            ) {
+  function onClick(event) {
     event.preventDefault();
     event.stopPropagation();
 
@@ -138,26 +123,26 @@ export default function setupHighlighter(
     bridge.send('stopInspectingNative', true);
   }
 
-  function onMouseEvent(event            ) {
+  function onMouseEvent(event) {
     event.preventDefault();
     event.stopPropagation();
   }
 
-  function onPointerDown(event            ) {
+  function onPointerDown(event) {
     event.preventDefault();
     event.stopPropagation();
 
-    selectFiberForNode(((event.target     )             ));
+    selectFiberForNode(event.target);
   }
 
-  function onPointerOver(event            ) {
+  function onPointerOver(event) {
     event.preventDefault();
     event.stopPropagation();
 
-    const target = ((event.target     )             );
+    const target = event.target;
 
     if (target.tagName === 'IFRAME') {
-      const iframe                    = (target     );
+      const iframe = target;
       try {
         if (!iframesListeningTo.has(iframe)) {
           const window = iframe.contentWindow;
@@ -176,13 +161,13 @@ export default function setupHighlighter(
     selectFiberForNode(target);
   }
 
-  function onPointerUp(event            ) {
+  function onPointerUp(event) {
     event.preventDefault();
     event.stopPropagation();
   }
 
   const selectFiberForNode = throttle(
-    memoize((node             ) => {
+    memoize((node) => {
       const id = agent.getIDForNode(node);
       if (id !== null) {
         bridge.send('selectFiber', id);

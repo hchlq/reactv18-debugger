@@ -30,11 +30,11 @@ describe('ReactBlocks', () => {
     Suspense = React.Suspense;
     const cache = new Map();
     let unresolved = [];
-    readString = function(text) {
+    readString = function (text) {
       let entry = cache.get(text);
       if (!entry) {
         entry = {
-          promise: new Promise(resolve => {
+          promise: new Promise((resolve) => {
             unresolved.push(() => {
               entry.resolved = true;
               resolve();
@@ -53,7 +53,7 @@ describe('ReactBlocks', () => {
     resolvePromises = () => {
       const res = unresolved;
       unresolved = [];
-      res.forEach(r => r());
+      res.forEach((r) => r());
     };
   });
 
@@ -188,8 +188,8 @@ describe('ReactBlocks', () => {
     let resolveLazy;
     const LazyUser = React.lazy(
       () =>
-        new Promise(resolve => {
-          resolveLazy = function() {
+        new Promise((resolve) => {
+          resolveLazy = function () {
             resolve({
               default: loadUser(123),
             });

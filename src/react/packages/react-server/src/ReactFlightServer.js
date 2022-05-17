@@ -4,17 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                                                          
-             
-              
-        
-                
-                 
-                  
-                                   
 
 import {
   scheduleWork,
@@ -50,50 +41,9 @@ import * as React from 'react';
 import ReactSharedInternals from 'shared/ReactSharedInternals';
 import invariant from 'shared/invariant';
 
-                     
-          
-           
-          
-        
-                                  
-                     
-
-                        
-                      
-          
-           
-          
-        
-                        
-                     
-
-                                                     
-
-                
-             
-                          
-                   
-  
-
-                       
-                           
-                               
-                      
-                        
-                                 
-                                    
-                                     
-                   
-                                                             
-  
-
 const ReactCurrentDispatcher = ReactSharedInternals.ReactCurrentDispatcher;
 
-export function createRequest(
-  model            ,
-  destination             ,
-  bundlerConfig               ,
-)          {
+export function createRequest(model, destination, bundlerConfig) {
   const pingedSegments = [];
   const request = {
     destination,
@@ -104,7 +54,7 @@ export function createRequest(
     completedJSONChunks: [],
     completedErrorChunks: [],
     flowing: false,
-    toJSON: function(key        , value            )                 {
+    toJSON: function (key, value) {
       return resolveModelToJSON(request, this, key, value);
     },
   };
@@ -114,7 +64,7 @@ export function createRequest(
   return request;
 }
 
-function attemptResolveElement(element                    )             {
+function attemptResolveElement(element) {
   const type = element.type;
   const props = element.props;
   if (typeof type === 'function') {
@@ -154,7 +104,7 @@ function attemptResolveElement(element                    )             {
   invariant(false, 'Unsupported type.');
 }
 
-function pingSegment(request         , segment         )       {
+function pingSegment(request, segment) {
   const pingedSegments = request.pingedSegments;
   pingedSegments.push(segment);
   if (pingedSegments.length === 1) {
@@ -162,7 +112,7 @@ function pingSegment(request         , segment         )       {
   }
 }
 
-function createSegment(request         , query                  )          {
+function createSegment(request, query) {
   const id = request.nextChunkId++;
   const segment = {
     id,
@@ -172,11 +122,11 @@ function createSegment(request         , query                  )          {
   return segment;
 }
 
-function serializeIDRef(id        )         {
+function serializeIDRef(id) {
   return '$' + id.toString(16);
 }
 
-function escapeStringValue(value        )         {
+function escapeStringValue(value) {
   if (value[0] === '$' || value[0] === '@') {
     // We need to escape $ or @ prefixed strings since we use those to encode
     // references to IDs and as special symbol values.
@@ -186,12 +136,7 @@ function escapeStringValue(value        )         {
   }
 }
 
-export function resolveModelToJSON(
-  request         ,
-  parent                                                                    ,
-  key        ,
-  value            ,
-)                 {
+export function resolveModelToJSON(request, parent, key, value) {
   // Special Symbols
   switch (value) {
     case REACT_ELEMENT_TYPE:
@@ -213,13 +158,13 @@ export function resolveModelToJSON(
     switch (key) {
       case '1': {
         // Module reference
-        const moduleReference                       = (value     );
+        const moduleReference = value;
         try {
-          const moduleMetaData                 = resolveModuleMetaData(
+          const moduleMetaData = resolveModuleMetaData(
             request.bundlerConfig,
             moduleReference,
           );
-          return (moduleMetaData                );
+          return moduleMetaData;
         } catch (x) {
           request.pendingChunks++;
           const errorId = request.nextChunkId++;
@@ -229,7 +174,7 @@ export function resolveModelToJSON(
       }
       case '2': {
         // Load function
-        const load                   = (value     );
+        const load = value;
         try {
           // Attempt to resolve the data.
           return load();
@@ -274,7 +219,7 @@ export function resolveModelToJSON(
     value.$$typeof === REACT_ELEMENT_TYPE
   ) {
     // TODO: Concatenate keys of parents onto children.
-    const element                     = (value     );
+    const element = value;
     try {
       // Attempt to render the server component.
       value = attemptResolveElement(element);
@@ -296,7 +241,7 @@ export function resolveModelToJSON(
   return value;
 }
 
-function emitErrorChunk(request         , id        , error       )       {
+function emitErrorChunk(request, id, error) {
   // TODO: We should not leak error messages to the client in prod.
   // Give this an error code instead and log on the server.
   // We can serialize the error in DEV as a convenience.
@@ -307,7 +252,7 @@ function emitErrorChunk(request         , id        , error       )       {
       message = '' + error.message;
       stack = '' + error.stack;
     } else {
-      message = 'Error: ' + (error     );
+      message = 'Error: ' + error;
     }
   } catch (x) {
     message = 'An error occurred but serializing the error message failed.';
@@ -317,7 +262,7 @@ function emitErrorChunk(request         , id        , error       )       {
   request.completedErrorChunks.push(processedChunk);
 }
 
-function retrySegment(request         , segment         )       {
+function retrySegment(request, segment) {
   const query = segment.query;
   let value;
   try {
@@ -328,7 +273,7 @@ function retrySegment(request         , segment         )       {
       value.$$typeof === REACT_ELEMENT_TYPE
     ) {
       // TODO: Concatenate keys of parents onto children.
-      const element                     = (value     );
+      const element = value;
       // Attempt to render the server component.
       // Doing this here lets us reuse this same segment if the next component
       // also suspends.
@@ -350,7 +295,7 @@ function retrySegment(request         , segment         )       {
   }
 }
 
-function performWork(request         )       {
+function performWork(request) {
   const prevDispatcher = ReactCurrentDispatcher.current;
   ReactCurrentDispatcher.current = Dispatcher;
 
@@ -368,7 +313,7 @@ function performWork(request         )       {
 }
 
 let reentrant = false;
-function flushCompletedChunks(request         )       {
+function flushCompletedChunks(request) {
   if (reentrant) {
     return;
   }
@@ -411,42 +356,42 @@ function flushCompletedChunks(request         )       {
   }
 }
 
-export function startWork(request         )       {
+export function startWork(request) {
   request.flowing = true;
   scheduleWork(() => performWork(request));
 }
 
-export function startFlowing(request         )       {
+export function startFlowing(request) {
   request.flowing = true;
   flushCompletedChunks(request);
 }
 
-function unsupportedHook()       {
+function unsupportedHook() {
   invariant(false, 'This Hook is not supported in Server Components.');
 }
 
-const Dispatcher                 = {
-  useMemo   (nextCreate         )    {
+const Dispatcher = {
+  useMemo(nextCreate) {
     return nextCreate();
   },
-  useCallback   (callback   )    {
+  useCallback(callback) {
     return callback;
   },
-  useDebugValue()       {},
-  useDeferredValue   (value   )    {
+  useDebugValue() {},
+  useDeferredValue(value) {
     return value;
   },
-  useTransition()                                            {
+  useTransition() {
     return [() => {}, false];
   },
-  readContext: (unsupportedHook     ),
-  useContext: (unsupportedHook     ),
-  useReducer: (unsupportedHook     ),
-  useRef: (unsupportedHook     ),
-  useState: (unsupportedHook     ),
-  useLayoutEffect: (unsupportedHook     ),
-  useImperativeHandle: (unsupportedHook     ),
-  useEffect: (unsupportedHook     ),
-  useOpaqueIdentifier: (unsupportedHook     ),
-  useMutableSource: (unsupportedHook     ),
+  readContext: unsupportedHook,
+  useContext: unsupportedHook,
+  useReducer: unsupportedHook,
+  useRef: unsupportedHook,
+  useState: unsupportedHook,
+  useLayoutEffect: unsupportedHook,
+  useImperativeHandle: unsupportedHook,
+  useEffect: unsupportedHook,
+  useOpaqueIdentifier: unsupportedHook,
+  useMutableSource: unsupportedHook,
 };

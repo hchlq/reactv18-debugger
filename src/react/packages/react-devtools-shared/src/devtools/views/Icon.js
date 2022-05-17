@@ -4,32 +4,13 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
 import styles from './Icon.css';
 
-                      
-           
-         
-          
-                
-          
-                 
-                  
-              
-                  
-            
-              
-                               
-
-               
-                     
-                 
-   
-
-export default function Icon({className = '', type}       ) {
+export default function Icon({className = '', type}) {
   let pathData = null;
   switch (type) {
     case 'arrow':
@@ -79,7 +60,8 @@ export default function Icon({className = '', type}       ) {
       className={`${styles.Icon} ${className}`}
       width="24"
       height="24"
-      viewBox="0 0 24 24">
+      viewBox="0 0 24 24"
+    >
       <path d="M0 0h24v24H0z" fill="none" />
       <path fill="currentColor" d={pathData} />
     </svg>

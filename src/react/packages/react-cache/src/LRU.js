@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as Scheduler from 'scheduler';
@@ -16,21 +16,14 @@ const {
   unstable_IdlePriority: IdlePriority,
 } = Scheduler;
 
-                  
-           
-                        
-                     
-                 
-   
-
-export function createLRU   (limit        ) {
+export function createLRU(limit) {
   let LIMIT = limit;
 
   // Circular, doubly-linked list
-  let first                  = null;
-  let size         = 0;
+  let first = null;
+  let size = 0;
 
-  let cleanUpIsScheduled          = false;
+  let cleanUpIsScheduled = false;
 
   function scheduleCleanUp() {
     if (cleanUpIsScheduled === false && size > LIMIT) {
@@ -46,24 +39,24 @@ export function createLRU   (limit        ) {
     deleteLeastRecentlyUsedEntries(LIMIT);
   }
 
-  function deleteLeastRecentlyUsedEntries(targetSize        ) {
+  function deleteLeastRecentlyUsedEntries(targetSize) {
     // Delete entries from the cache, starting from the end of the list.
     if (first !== null) {
-      const resolvedFirst           = (first     );
+      const resolvedFirst = first;
       let last = resolvedFirst.previous;
       while (size > targetSize && last !== null) {
         const onDelete = last.onDelete;
         const previous = last.previous;
-        last.onDelete = (null     );
+        last.onDelete = null;
 
         // Remove from the list
-        last.previous = last.next = (null     );
+        last.previous = last.next = null;
         if (last === first) {
           // Reached the head of the list.
           first = last = null;
         } else {
-          (first     ).previous = previous;
-          previous.next = (first     );
+          first.previous = previous;
+          previous.next = first;
           last = previous;
         }
 
@@ -77,12 +70,12 @@ export function createLRU   (limit        ) {
     }
   }
 
-  function add(value        , onDelete             )                {
+  function add(value, onDelete) {
     const entry = {
       value,
       onDelete,
-      next: (null     ),
-      previous: (null     ),
+      next: null,
+      previous: null,
     };
     if (first === null) {
       entry.previous = entry.next = entry;
@@ -102,15 +95,15 @@ export function createLRU   (limit        ) {
     return entry;
   }
 
-  function update(entry          , newValue   )       {
+  function update(entry, newValue) {
     entry.value = newValue;
   }
 
-  function access(entry          )    {
+  function access(entry) {
     const next = entry.next;
     if (next !== null) {
       // Entry already cached
-      const resolvedFirst           = (first     );
+      const resolvedFirst = first;
       if (first !== entry) {
         // Remove from current position
         const previous = entry.previous;
@@ -135,7 +128,7 @@ export function createLRU   (limit        ) {
     return entry.value;
   }
 
-  function setLimit(newLimit        ) {
+  function setLimit(newLimit) {
     LIMIT = newLimit;
     scheduleCleanUp();
   }

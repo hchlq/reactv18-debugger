@@ -3,16 +3,13 @@
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
- *      
+ *
  */
-
-                                                                   
-                                                        
 
 import invariant from 'shared/invariant';
 import {getFiberCurrentPropsFromNode} from '../client/ReactDOMComponentTree';
 
-function isInteractive(tag        )          {
+function isInteractive(tag) {
   return (
     tag === 'button' ||
     tag === 'input' ||
@@ -21,11 +18,7 @@ function isInteractive(tag        )          {
   );
 }
 
-function shouldPreventMouseEvent(
-  name        ,
-  type        ,
-  props       ,
-)          {
+function shouldPreventMouseEvent(name, type, props) {
   switch (name) {
     case 'onClick':
     case 'onClickCapture':
@@ -49,10 +42,7 @@ function shouldPreventMouseEvent(
  * @param {string} registrationName Name of listener (e.g. `onClick`).
  * @return {?function} The stored callback.
  */
-export default function getListener(
-  inst       ,
-  registrationName        ,
-)                  {
+export default function getListener(inst, registrationName) {
   const stateNode = inst.stateNode;
   if (stateNode === null) {
     // Work in progress (ex: onload events in incremental mode).

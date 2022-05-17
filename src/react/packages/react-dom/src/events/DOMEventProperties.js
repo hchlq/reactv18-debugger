@@ -4,11 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                     
-                                                  
 
 import {registerTwoPhaseEvent} from './EventRegistry';
 import {
@@ -25,10 +22,7 @@ import {
 
 import {enableCreateEventHandleAPI} from 'shared/ReactFeatureFlags';
 
-export const topLevelEventsToReactNames      
-               
-                
-  = new Map();
+export const topLevelEventsToReactNames = new Map();
 
 const eventPriorities = new Map();
 
@@ -79,7 +73,7 @@ const discreteEventPairsForSimpleEventPlugin = [
   ('volumechange'              ), 'volumeChange',
 ];
 
-const otherDiscreteEvents                      = [
+const otherDiscreteEvents = [
   'change',
   'selectionchange',
   'textInput',
@@ -156,10 +150,7 @@ const continuousPairsForSimpleEventPlugin                               = [
  *
  * and registers them.
  */
-function registerSimplePluginEventsAndSetTheirPriorities(
-  eventTypes                              ,
-  priority               ,
-)       {
+function registerSimplePluginEventsAndSetTheirPriorities(eventTypes, priority) {
   // As the event types are in pairs of two, we need to iterate
   // through in twos. The events are in pairs of two to save code
   // and improve init perf of processing this array, as it will
@@ -167,8 +158,8 @@ function registerSimplePluginEventsAndSetTheirPriorities(
   // if we only use three arrays to process all the categories of
   // instead of tuples.
   for (let i = 0; i < eventTypes.length; i += 2) {
-    const topEvent = ((eventTypes[i]     )              );
-    const event = ((eventTypes[i + 1]     )        );
+    const topEvent = eventTypes[i];
+    const event = eventTypes[i + 1];
     const capitalizedEvent = event[0].toUpperCase() + event.slice(1);
     const reactName = 'on' + capitalizedEvent;
     eventPriorities.set(topEvent, priority);
@@ -177,18 +168,13 @@ function registerSimplePluginEventsAndSetTheirPriorities(
   }
 }
 
-function setEventPriorities(
-  eventTypes                     ,
-  priority               ,
-)       {
+function setEventPriorities(eventTypes, priority) {
   for (let i = 0; i < eventTypes.length; i++) {
     eventPriorities.set(eventTypes[i], priority);
   }
 }
 
-export function getEventPriorityForPluginSystem(
-  domEventName              ,
-)                {
+export function getEventPriorityForPluginSystem(domEventName) {
   const priority = eventPriorities.get(domEventName);
   // Default to a ContinuousEvent. Note: we might
   // want to warn if we can't detect the priority
@@ -196,9 +182,7 @@ export function getEventPriorityForPluginSystem(
   return priority === undefined ? ContinuousEvent : priority;
 }
 
-export function getEventPriorityForListenerSystem(
-  type              ,
-)                {
+export function getEventPriorityForListenerSystem(type) {
   const priority = eventPriorities.get(type);
   if (priority !== undefined) {
     return priority;

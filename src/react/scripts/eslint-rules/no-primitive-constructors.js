@@ -9,7 +9,7 @@
 
 'use strict';
 
-module.exports = function(context) {
+module.exports = function (context) {
   function report(node, name, msg) {
     context.report(node, `Do not use the ${name} constructor. ${msg}`);
   }

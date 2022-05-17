@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 // This file is an intermediate layer to translate between Flight
@@ -64,36 +64,21 @@ ByteSize
 
 // TODO: Implement HTMLData, BlobData and URLData.
 
-                                                                            
-
 import {convertStringToBuffer} from './ReactServerStreamConfig';
-
-                                                           
-
-                               
 
 const stringify = JSON.stringify;
 
-function serializeRowHeader(tag        , id        ) {
+function serializeRowHeader(tag, id) {
   return tag + id.toString(16) + ':';
 }
 
-export function processErrorChunk(
-  request         ,
-  id        ,
-  message        ,
-  stack        ,
-)        {
+export function processErrorChunk(request, id, message, stack) {
   const errorInfo = {message, stack};
   const row = serializeRowHeader('E', id) + stringify(errorInfo) + '\n';
   return convertStringToBuffer(row);
 }
 
-export function processModelChunk(
-  request         ,
-  id        ,
-  model            ,
-)        {
+export function processModelChunk(request, id, model) {
   const json = stringify(model, request.toJSON);
   let row;
   if (id === 0) {

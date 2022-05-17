@@ -48,7 +48,8 @@ describe('ReactNewContext', () => {
     return (
       <div hidden={mode === 'hidden'}>
         <React.unstable_LegacyHidden
-          mode={mode === 'hidden' ? 'unstable-defer-without-hiding' : mode}>
+          mode={mode === 'hidden' ? 'unstable-defer-without-hiding' : mode}
+        >
           {children}
         </React.unstable_LegacyHidden>
       </div>
@@ -57,10 +58,10 @@ describe('ReactNewContext', () => {
 
   // We have several ways of reading from context. sharedContextTests runs
   // a suite of tests for a given context consumer implementation.
-  sharedContextTests('Context.Consumer', Context => Context.Consumer);
+  sharedContextTests('Context.Consumer', (Context) => Context.Consumer);
   sharedContextTests(
     'useContext inside function component',
-    Context =>
+    (Context) =>
       function Consumer(props) {
         const observedBits = props.unstable_observedBits;
         let contextValue;
@@ -76,7 +77,7 @@ describe('ReactNewContext', () => {
         return render(contextValue);
       },
   );
-  sharedContextTests('useContext inside forwardRef component', Context =>
+  sharedContextTests('useContext inside forwardRef component', (Context) =>
     React.forwardRef(function Consumer(props, ref) {
       const observedBits = props.unstable_observedBits;
       let contextValue;
@@ -92,25 +93,27 @@ describe('ReactNewContext', () => {
       return render(contextValue);
     }),
   );
-  sharedContextTests('useContext inside memoized function component', Context =>
-    React.memo(function Consumer(props) {
-      const observedBits = props.unstable_observedBits;
-      let contextValue;
-      expect(() => {
-        contextValue = useContext(Context, observedBits);
-      }).toErrorDev(
-        observedBits !== undefined
-          ? 'useContext() second argument is reserved for future use in React. ' +
-              `Passing it is not supported. You passed: ${observedBits}.`
-          : [],
-      );
-      const render = props.children;
-      return render(contextValue);
-    }),
+  sharedContextTests(
+    'useContext inside memoized function component',
+    (Context) =>
+      React.memo(function Consumer(props) {
+        const observedBits = props.unstable_observedBits;
+        let contextValue;
+        expect(() => {
+          contextValue = useContext(Context, observedBits);
+        }).toErrorDev(
+          observedBits !== undefined
+            ? 'useContext() second argument is reserved for future use in React. ' +
+                `Passing it is not supported. You passed: ${observedBits}.`
+            : [],
+        );
+        const render = props.children;
+        return render(contextValue);
+      }),
   );
   sharedContextTests(
     'readContext(Context) inside class component',
-    Context =>
+    (Context) =>
       class Consumer extends React.Component {
         render() {
           const observedBits = this.props.unstable_observedBits;
@@ -122,7 +125,7 @@ describe('ReactNewContext', () => {
   );
   sharedContextTests(
     'readContext(Context) inside pure class component',
-    Context =>
+    (Context) =>
       class Consumer extends React.PureComponent {
         render() {
           const observedBits = this.props.unstable_observedBits;
@@ -147,7 +150,7 @@ describe('ReactNewContext', () => {
               <Indirection>
                 <Indirection>
                   <Consumer>
-                    {value => <span prop={'Result: ' + value} />}
+                    {(value) => <span prop={'Result: ' + value} />}
                   </Consumer>
                 </Indirection>
               </Indirection>
@@ -182,7 +185,7 @@ describe('ReactNewContext', () => {
           Scheduler.unstable_yieldValue('Consumer');
           return (
             <ContextConsumer>
-              {value => {
+              {(value) => {
                 Scheduler.unstable_yieldValue('Consumer render prop');
                 return <span prop={'Result: ' + value} />;
               }}
@@ -251,7 +254,7 @@ describe('ReactNewContext', () => {
           Scheduler.unstable_yieldValue('Consumer');
           return (
             <ContextConsumer>
-              {value => {
+              {(value) => {
                 Scheduler.unstable_yieldValue('Consumer render prop');
                 return <span prop={'Result: ' + value} />;
               }}
@@ -310,7 +313,7 @@ describe('ReactNewContext', () => {
         function Provider(props) {
           return (
             <Consumer>
-              {contextValue => (
+              {(contextValue) => (
                 // Multiply previous context value by 2, unless prop overrides
                 <Context.Provider value={props.value || contextValue * 2}>
                   {props.children}
@@ -338,7 +341,7 @@ describe('ReactNewContext', () => {
                     <Provider>
                       <Indirection>
                         <Consumer>
-                          {value => <span prop={'Result: ' + value} />}
+                          {(value) => <span prop={'Result: ' + value} />}
                         </Consumer>
                       </Indirection>
                     </Provider>
@@ -404,7 +407,7 @@ describe('ReactNewContext', () => {
         function Provider(props) {
           return (
             <Context.Consumer>
-              {contextValue => (
+              {(contextValue) => (
                 // Multiply previous context value by 2, unless prop overrides
                 <Context.Provider value={props.value || contextValue * 2}>
                   {props.children}
@@ -430,13 +433,13 @@ describe('ReactNewContext', () => {
                 <Indirection>
                   <Provider>
                     <Consumer>
-                      {value => <span prop={'Result: ' + value} />}
+                      {(value) => <span prop={'Result: ' + value} />}
                     </Consumer>
                   </Provider>
                 </Indirection>
                 <Indirection>
                   <Consumer>
-                    {value => <span prop={'Result: ' + value} />}
+                    {(value) => <span prop={'Result: ' + value} />}
                   </Consumer>
                 </Indirection>
               </Indirection>
@@ -485,7 +488,7 @@ describe('ReactNewContext', () => {
           Scheduler.unstable_yieldValue('Consumer');
           return (
             <ContextConsumer>
-              {value => {
+              {(value) => {
                 Scheduler.unstable_yieldValue('Consumer render prop');
                 return <span prop={'Result: ' + value} />;
               }}
@@ -545,7 +548,7 @@ describe('ReactNewContext', () => {
         function Consumer(props) {
           return (
             <ContextConsumer>
-              {value => <span prop={'Result: ' + value} />}
+              {(value) => <span prop={'Result: ' + value} />}
             </ContextConsumer>
           );
         }
@@ -614,7 +617,7 @@ describe('ReactNewContext', () => {
         function Foo() {
           return (
             <Consumer unstable_observedBits={0b01}>
-              {value => {
+              {(value) => {
                 Scheduler.unstable_yieldValue('Foo');
                 return <span prop={'Foo: ' + value.foo} />;
               }}
@@ -625,7 +628,7 @@ describe('ReactNewContext', () => {
         function Bar() {
           return (
             <Consumer unstable_observedBits={0b10}>
-              {value => {
+              {(value) => {
                 Scheduler.unstable_yieldValue('Bar');
                 return <span prop={'Bar: ' + value.bar} />;
               }}
@@ -713,7 +716,7 @@ describe('ReactNewContext', () => {
         function Foo(props) {
           return (
             <Consumer unstable_observedBits={0b01}>
-              {value => {
+              {(value) => {
                 Scheduler.unstable_yieldValue('Foo');
                 return (
                   <>
@@ -729,7 +732,7 @@ describe('ReactNewContext', () => {
         function Bar(props) {
           return (
             <Consumer unstable_observedBits={0b10}>
-              {value => {
+              {(value) => {
                 Scheduler.unstable_yieldValue('Bar');
                 return (
                   <>
@@ -831,9 +834,11 @@ describe('ReactNewContext', () => {
           return (
             <Context.Provider value={props.value}>
               <Consumer>
-                {value => {
+                {(value) => {
                   Scheduler.unstable_yieldValue('Consumer render prop');
-                  return <Child ref={inst => (child = inst)} context={value} />;
+                  return (
+                    <Child ref={(inst) => (child = inst)} context={value} />
+                  );
                 }}
               </Consumer>
             </Context.Provider>
@@ -862,7 +867,7 @@ describe('ReactNewContext', () => {
         function ChildWithInlineRenderCallback() {
           Scheduler.unstable_yieldValue('ChildWithInlineRenderCallback');
           // Note: we are intentionally passing an inline arrow. Don't refactor.
-          return <Consumer>{value => renderChildValue(value)}</Consumer>;
+          return <Consumer>{(value) => renderChildValue(value)}</Consumer>;
         }
 
         function ChildWithCachedRenderCallback() {
@@ -925,7 +930,7 @@ describe('ReactNewContext', () => {
           return (
             <Context.Provider value={theme}>
               <LegacyHiddenDiv mode="hidden">
-                <Consumer>{value => <Text text={value} />}</Consumer>
+                <Consumer>{(value) => <Text text={value} />}</Consumer>
               </LegacyHiddenDiv>
             </Context.Provider>
           );
@@ -963,7 +968,7 @@ describe('ReactNewContext', () => {
             );
           }
           renderList() {
-            const list = [1, 2].map(id => this.renderItem(id));
+            const list = [1, 2].map((id) => this.renderItem(id));
             if (this.props.reverse) {
               list.reverse();
             }
@@ -1024,7 +1029,7 @@ describe('ReactNewContext', () => {
           render() {
             return (
               <ContextConsumer>
-                {value => {
+                {(value) => {
                   Scheduler.unstable_yieldValue('Consumer');
                   return <span prop={value} />;
                 }}
@@ -1035,7 +1040,7 @@ describe('ReactNewContext', () => {
 
         // Initial mount
         let inst;
-        ReactNoop.render(<App ref={ref => (inst = ref)} />);
+        ReactNoop.render(<App ref={(ref) => (inst = ref)} />);
         expect(Scheduler).toFlushAndYield(['App']);
         expect(ReactNoop.getChildren()).toEqual([
           span('static 1'),
@@ -1264,7 +1269,7 @@ describe('ReactNewContext', () => {
       function FooAndBar() {
         return (
           <FooContext.Consumer>
-            {foo => {
+            {(foo) => {
               const bar = readContext(BarContext);
               return <Text text={`Foo: ${foo}, Bar: ${bar}`} />;
             }}
@@ -1322,7 +1327,7 @@ describe('ReactNewContext', () => {
           text: 'hello',
         };
 
-        renderConsumer = context => {
+        renderConsumer = (context) => {
           Scheduler.unstable_yieldValue('App#renderConsumer');
           return <span prop={this.state.text} />;
         };
@@ -1339,7 +1344,7 @@ describe('ReactNewContext', () => {
 
       // Initial mount
       let inst;
-      ReactNoop.render(<App value={1} ref={ref => (inst = ref)} />);
+      ReactNoop.render(<App value={1} ref={(ref) => (inst = ref)} />);
       expect(Scheduler).toFlushAndYield(['App', 'App#renderConsumer']);
       expect(ReactNoop.getChildren()).toEqual([span('hello')]);
 
@@ -1369,7 +1374,8 @@ describe('ReactNewContext', () => {
       function Provider(props) {
         return (
           <Context.Provider
-            value={{foo: props.foo, bar: props.bar, baz: props.baz}}>
+            value={{foo: props.foo, bar: props.bar, baz: props.baz}}
+          >
             {props.children}
           </Context.Provider>
         );
@@ -1462,7 +1468,7 @@ describe('ReactNewContext', () => {
           text: 'hello',
         };
 
-        renderConsumer = context => {
+        renderConsumer = (context) => {
           Scheduler.unstable_yieldValue('App#renderConsumer');
           return <span prop={this.state.text} />;
         };
@@ -1479,7 +1485,7 @@ describe('ReactNewContext', () => {
 
       // Initial mount
       let inst;
-      ReactNoop.render(<App value={1} ref={ref => (inst = ref)} />);
+      ReactNoop.render(<App value={1} ref={(ref) => (inst = ref)} />);
       expect(Scheduler).toFlushAndYield(['App', 'App#renderConsumer']);
       expect(ReactNoop.getChildren()).toEqual([span('hello')]);
 
@@ -1591,7 +1597,7 @@ describe('ReactNewContext', () => {
           text: 'hello',
         };
 
-        renderConsumer = context => {
+        renderConsumer = (context) => {
           Scheduler.unstable_yieldValue('App#renderConsumer');
           return <span prop={this.state.text} />;
         };
@@ -1608,7 +1614,7 @@ describe('ReactNewContext', () => {
 
       // Initial mount
       let inst;
-      ReactNoop.render(<App value={1} ref={ref => (inst = ref)} />);
+      ReactNoop.render(<App value={1} ref={(ref) => (inst = ref)} />);
       expect(Scheduler).toFlushAndYield(['App', 'App#renderConsumer']);
       expect(ReactNoop.getChildren()).toEqual([span('hello')]);
 
@@ -1633,7 +1639,7 @@ describe('ReactNewContext', () => {
 
     ReactNoop.render(
       <Context.Provider value={10}>
-        <Context.Consumer>{value => <span prop={value} />}</Context.Consumer>
+        <Context.Consumer>{(value) => <span prop={value} />}</Context.Consumer>
       </Context.Provider>,
     );
     expect(Scheduler).toFlushWithoutYielding();
@@ -1707,7 +1713,7 @@ describe('ReactNewContext', () => {
 
     function ContextSimulator(maxDepth) {
       const contexts = new Map(
-        contextKeys.map(key => {
+        contextKeys.map((key) => {
           const Context = React.createContext(0);
           Context.displayName = 'Context' + key;
           return [key, Context];
@@ -1723,7 +1729,7 @@ describe('ReactNewContext', () => {
           if (this.props.depth >= this.props.maxDepth) {
             return null;
           }
-          const consumers = [0, 1, 2].map(i => {
+          const consumers = [0, 1, 2].map((i) => {
             const randomKey =
               contextKeys[
                 this.props.rand.intBetween(0, contextKeys.length - 1)
@@ -1731,7 +1737,7 @@ describe('ReactNewContext', () => {
             const Context = contexts.get(randomKey);
             return (
               <Context.Consumer key={i}>
-                {value => (
+                {(value) => (
                   <>
                     <span prop={`${randomKey}:${value}`} />
                     <ConsumerTree
@@ -1763,7 +1769,7 @@ describe('ReactNewContext', () => {
 
       function assertConsistentTree(expectedValues = {}) {
         const children = ReactNoop.getChildren();
-        children.forEach(child => {
+        children.forEach((child) => {
           const text = child.prop;
           const key = text[0];
           const value = parseInt(text[2], 10);
@@ -1794,7 +1800,7 @@ describe('ReactNewContext', () => {
         }
         updateRoot();
 
-        actions.forEach(action => {
+        actions.forEach((action) => {
           switch (action.type) {
             case FLUSH_ALL:
               Scheduler.unstable_flushAllWithoutAsserting();
@@ -1832,9 +1838,7 @@ describe('ReactNewContext', () => {
 
       const LIMIT = 100;
       for (let i = 0; i < LIMIT; i++) {
-        const seed = Math.random()
-          .toString(36)
-          .substr(2, 5);
+        const seed = Math.random().toString(36).substr(2, 5);
         const actions = randomActions(5);
         try {
           simulate(seed, actions);

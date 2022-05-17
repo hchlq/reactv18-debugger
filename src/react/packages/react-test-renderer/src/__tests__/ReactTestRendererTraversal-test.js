@@ -15,7 +15,7 @@ let ReactTestRenderer;
 let Context;
 
 const RCTView = 'RCTView';
-const View = props => <RCTView {...props} />;
+const View = (props) => <RCTView {...props} />;
 
 describe('ReactTestRendererTraversal', () => {
   beforeEach(() => {
@@ -61,8 +61,8 @@ describe('ReactTestRendererTraversal', () => {
   class ExampleSpread extends React.Component {
     render = () => <View {...this.props} />;
   }
-  const ExampleFn = props => <View baz="baz" />;
-  const ExampleNull = props => null;
+  const ExampleFn = (props) => <View baz="baz" />;
+  const ExampleNull = (props) => null;
 
   const ExampleForwardRef = React.forwardRef((props, ref) => (
     <View {...props} ref={ref} />
@@ -70,7 +70,7 @@ describe('ReactTestRendererTraversal', () => {
 
   it('initializes', () => {
     const render = ReactTestRenderer.create(<Example />);
-    const hasFooProp = node => node.props.hasOwnProperty('foo');
+    const hasFooProp = (node) => node.props.hasOwnProperty('foo');
 
     // assert .props, .type and .parent attributes
     const foo = render.root.find(hasFooProp);
@@ -82,14 +82,14 @@ describe('ReactTestRendererTraversal', () => {
 
   it('searches via .find() / .findAll()', () => {
     const render = ReactTestRenderer.create(<Example />);
-    const hasFooProp = node => node.props.hasOwnProperty('foo');
-    const hasBarProp = node => node.props.hasOwnProperty('bar');
-    const hasBazProp = node => node.props.hasOwnProperty('baz');
-    const hasBingProp = node => node.props.hasOwnProperty('bing');
-    const hasNullProp = node => node.props.hasOwnProperty('null');
-    const hasVoidProp = node => node.props.hasOwnProperty('void');
-    const hasItselfProp = node => node.props.hasOwnProperty('itself');
-    const hasNestedProp = node => node.props.hasOwnProperty('nested');
+    const hasFooProp = (node) => node.props.hasOwnProperty('foo');
+    const hasBarProp = (node) => node.props.hasOwnProperty('bar');
+    const hasBazProp = (node) => node.props.hasOwnProperty('baz');
+    const hasBingProp = (node) => node.props.hasOwnProperty('bing');
+    const hasNullProp = (node) => node.props.hasOwnProperty('null');
+    const hasVoidProp = (node) => node.props.hasOwnProperty('void');
+    const hasItselfProp = (node) => node.props.hasOwnProperty('itself');
+    const hasNestedProp = (node) => node.props.hasOwnProperty('nested');
 
     expect(() => render.root.find(hasFooProp)).not.toThrow(); // 1 match
     expect(() => render.root.find(hasBarProp)).toThrow(); // >1 matches

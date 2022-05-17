@@ -19,13 +19,8 @@ const run = async () => {
 
   const cwd = join(__dirname, '..', '..');
 
-  const {
-    branch,
-    buildNumber,
-    checksum,
-    commit,
-    reactVersion,
-  } = await getBuildInfo();
+  const {branch, buildNumber, checksum, commit, reactVersion} =
+    await getBuildInfo();
 
   const packages = getPublicPackages(join(cwd, 'packages'));
   const packagesDir = join(cwd, 'packages');

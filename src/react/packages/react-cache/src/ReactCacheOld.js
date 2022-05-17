@@ -4,39 +4,12 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                
 
 import * as React from 'react';
 
 import {createLRU} from './LRU';
-
-                                                                               
-
-                       
-            
-                   
-   
-
-                           
-            
-           
-   
-
-                        
-            
-               
-   
-
-                                                                    
-
-                       
-             
-                   
-     
-  
 
 const Pending = 0;
 const Resolved = 1;
@@ -82,16 +55,11 @@ function identityHashFn(input) {
 const CACHE_LIMIT = 500;
 const lru = createLRU(CACHE_LIMIT);
 
-const entries                                         = new Map();
+const entries = new Map();
 
 const CacheContext = React.createContext(null);
 
-function accessResult         (
-  resource     ,
-  fetch                  ,
-  input   ,
-  key   ,
-)            {
+function accessResult(resource, fetch, input, key) {
   let entriesForResource = entries.get(resource);
   if (entriesForResource === undefined) {
     entriesForResource = new Map();
@@ -101,22 +69,22 @@ function accessResult         (
   if (entry === undefined) {
     const thenable = fetch(input);
     thenable.then(
-      value => {
+      (value) => {
         if (newResult.status === Pending) {
-          const resolvedResult                    = (newResult     );
+          const resolvedResult = newResult;
           resolvedResult.status = Resolved;
           resolvedResult.value = value;
         }
       },
-      error => {
+      (error) => {
         if (newResult.status === Pending) {
-          const rejectedResult                 = (newResult     );
+          const rejectedResult = newResult;
           rejectedResult.status = Rejected;
           rejectedResult.value = error;
         }
       },
     );
-    const newResult                = {
+    const newResult = {
       status: Pending,
       value: thenable,
     };
@@ -124,7 +92,7 @@ function accessResult         (
     entriesForResource.set(key, newEntry);
     return newResult;
   } else {
-    return (lru.access(entry)     );
+    return lru.access(entry);
   }
 }
 
@@ -138,20 +106,17 @@ function deleteEntry(resource, key) {
   }
 }
 
-export function unstable_createResource                          (
-  fetch                  ,
-  maybeHashInput         ,
-)                 {
-  const hashInput         =
-    maybeHashInput !== undefined ? maybeHashInput : (identityHashFn     );
+export function unstable_createResource(fetch, maybeHashInput) {
+  const hashInput =
+    maybeHashInput !== undefined ? maybeHashInput : identityHashFn;
 
   const resource = {
-    read(input   )    {
+    read(input) {
       // react-cache currently doesn't rely on context, but it may in the
       // future, so we read anyway to prevent access outside of render.
       readContext(CacheContext);
       const key = hashInput(input);
-      const result            = accessResult(resource, fetch, input, key);
+      const result = accessResult(resource, fetch, input, key);
       switch (result.status) {
         case Pending: {
           const suspender = result.value;
@@ -167,11 +132,11 @@ export function unstable_createResource                          (
         }
         default:
           // Should be unreachable
-          return (undefined     );
+          return undefined;
       }
     },
 
-    preload(input   )       {
+    preload(input) {
       // react-cache currently doesn't rely on context, but it may in the
       // future, so we read anyway to prevent access outside of render.
       readContext(CacheContext);
@@ -182,6 +147,6 @@ export function unstable_createResource                          (
   return resource;
 }
 
-export function unstable_setGlobalCacheLimit(limit        ) {
+export function unstable_setGlobalCacheLimit(limit) {
   lru.setLimit(limit);
 }

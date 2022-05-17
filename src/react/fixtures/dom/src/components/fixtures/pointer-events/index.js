@@ -9,7 +9,8 @@ class PointerEvents extends React.Component {
     return (
       <FixtureSet
         title="Pointer Events"
-        description="Pointer Events are not supported in every browser. The examples below might not work in every browser. To test pointer events, make sure to use Google Chrome, Firefox, Internet Explorer, or Edge.">
+        description="Pointer Events are not supported in every browser. The examples below might not work in every browser. To test pointer events, make sure to use Google Chrome, Firefox, Internet Explorer, or Edge."
+      >
         <Drag />
         <Hover />
       </FixtureSet>

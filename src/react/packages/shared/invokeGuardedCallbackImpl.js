@@ -4,22 +4,12 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import invariant from 'shared/invariant';
 
-function invokeGuardedCallbackProd                           (
-  name               ,
-  func                                               ,
-  context         ,
-  a   ,
-  b   ,
-  c   ,
-  d   ,
-  e   ,
-  f   ,
-) {
+function invokeGuardedCallbackProd(name, func, context, a, b, c, d, e, f) {
   const funcArgs = Array.prototype.slice.call(arguments, 3);
   try {
     func.apply(context, funcArgs);
@@ -60,24 +50,16 @@ if (__DEV__) {
   ) {
     const fakeNode = document.createElement('react');
 
-    invokeGuardedCallbackImpl = function invokeGuardedCallbackDev 
-        
-        
-        
-        
-        
-        
-              
-     (
-      name               ,
-      func                                               ,
-      context         ,
-      a   ,
-      b   ,
-      c   ,
-      d   ,
-      e   ,
-      f   ,
+    invokeGuardedCallbackImpl = function invokeGuardedCallbackDev(
+      name,
+      func,
+      context,
+      a,
+      b,
+      c,
+      d,
+      e,
+      f,
     ) {
       // If document doesn't exist we know for sure we will crash in this method
       // when we call document.createEvent(). However this can cause confusing

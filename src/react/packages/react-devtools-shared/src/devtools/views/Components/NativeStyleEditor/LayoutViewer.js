@@ -4,20 +4,13 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
 import styles from './LayoutViewer.css';
 
-                                    
-
-               
-             
-                 
-   
-
-export default function LayoutViewer({id, layout}       ) {
+export default function LayoutViewer({id, layout}) {
   const {height, margin, padding, y, width, x} = layout;
 
   return (
@@ -62,7 +55,7 @@ export default function LayoutViewer({id, layout}       ) {
   );
 }
 
-function format(number        )                  {
+function format(number) {
   if (Math.round(number) === number) {
     return number;
   } else {

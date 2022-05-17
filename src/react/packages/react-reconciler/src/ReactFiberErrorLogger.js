@@ -4,20 +4,14 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                
-                                                        
 
 import {showErrorDialog} from './ReactFiberErrorDialog';
 import {ClassComponent} from './ReactWorkTags';
 import getComponentName from 'shared/getComponentName';
 
-export function logCapturedError(
-  boundary       ,
-  errorInfo                      ,
-)       {
+export function logCapturedError(boundary, errorInfo) {
   try {
     const logError = showErrorDialog(boundary, errorInfo);
 
@@ -27,7 +21,7 @@ export function logCapturedError(
       return;
     }
 
-    const error = (errorInfo.value     );
+    const error = errorInfo.value;
     if (__DEV__) {
       const source = errorInfo.source;
       const stack = errorInfo.stack;

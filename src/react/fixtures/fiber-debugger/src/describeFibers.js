@@ -49,8 +49,8 @@ function getFriendlyEffect(flags) {
     128: 'Ref',
   };
   return Object.keys(effects)
-    .filter(flag => flag & flags)
-    .map(flag => effects[flag])
+    .filter((flag) => flag & flags)
+    .map((flag) => effects[flag])
     .join(' & ');
 }
 

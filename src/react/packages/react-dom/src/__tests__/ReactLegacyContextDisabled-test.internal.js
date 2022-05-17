@@ -160,7 +160,7 @@ describe('ReactLegacyContextDisabled', () => {
 
     class RenderPropConsumer extends React.Component {
       render() {
-        return <Ctx.Consumer>{value => formatValue(value)}</Ctx.Consumer>;
+        return <Ctx.Consumer>{(value) => formatValue(value)}</Ctx.Consumer>;
       }
     }
 

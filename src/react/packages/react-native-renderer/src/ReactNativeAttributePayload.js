@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 // Modules provided by RN:
@@ -12,8 +12,6 @@ import {
   deepDiffer,
   flattenStyle,
 } from 'react-native/Libraries/ReactPrivate/ReactNativePrivateInterface';
-
-                                                               
 
 const emptyObject = {};
 
@@ -26,8 +24,6 @@ const emptyObject = {};
  * across modules, I've kept them isolated to this module.
  */
 
-                                             
-
 // Tracks removed keys
 let removedKeys = null;
 let removedKeyCount = 0;
@@ -36,7 +32,7 @@ const deepDifferOptions = {
   unsafelyIgnoreFunctions: true,
 };
 
-function defaultDiffer(prevProp       , nextProp       )          {
+function defaultDiffer(prevProp, nextProp) {
   if (typeof nextProp !== 'object' || nextProp === null) {
     // Scalars have already been checked for equality
     return true;
@@ -47,9 +43,9 @@ function defaultDiffer(prevProp       , nextProp       )          {
 }
 
 function restoreDeletedValuesInNestedArray(
-  updatePayload        ,
-  node            ,
-  validAttributes                          ,
+  updatePayload,
+  node,
+  validAttributes,
 ) {
   if (Array.isArray(node)) {
     let i = node.length;
@@ -104,11 +100,11 @@ function restoreDeletedValuesInNestedArray(
 }
 
 function diffNestedArrayProperty(
-  updatePayload               ,
-  prevArray                   ,
-  nextArray                   ,
-  validAttributes                          ,
-)                {
+  updatePayload,
+  prevArray,
+  nextArray,
+  validAttributes,
+) {
   const minLength =
     prevArray.length < nextArray.length ? prevArray.length : nextArray.length;
   let i;
@@ -142,11 +138,11 @@ function diffNestedArrayProperty(
 }
 
 function diffNestedProperty(
-  updatePayload               ,
-  prevProp            ,
-  nextProp            ,
-  validAttributes                          ,
-)                {
+  updatePayload,
+  prevProp,
+  nextProp,
+  validAttributes,
+) {
   if (!updatePayload && prevProp === nextProp) {
     // If no properties have been added, then we can bail out quickly on object
     // equality.
@@ -203,11 +199,7 @@ function diffNestedProperty(
  * attribute configurations. It processes each prop and adds it to the
  * updatePayload.
  */
-function addNestedProperty(
-  updatePayload               ,
-  nextProp            ,
-  validAttributes                          ,
-) {
+function addNestedProperty(updatePayload, nextProp, validAttributes) {
   if (!nextProp) {
     return updatePayload;
   }
@@ -233,11 +225,7 @@ function addNestedProperty(
  * clearNestedProperty takes a single set of props and valid attributes. It
  * adds a null sentinel to the updatePayload, for each prop key.
  */
-function clearNestedProperty(
-  updatePayload               ,
-  prevProp            ,
-  validAttributes                          ,
-)                {
+function clearNestedProperty(updatePayload, prevProp, validAttributes) {
   if (!prevProp) {
     return updatePayload;
   }
@@ -264,12 +252,7 @@ function clearNestedProperty(
  * If no updatePayload is provided, a new one is created and returned if
  * anything changed.
  */
-function diffProperties(
-  updatePayload               ,
-  prevProps        ,
-  nextProps        ,
-  validAttributes                          ,
-)                {
+function diffProperties(updatePayload, prevProps, nextProps, validAttributes) {
   let attributeConfig;
   let nextProp;
   let prevProp;
@@ -286,20 +269,20 @@ function diffProperties(
     // functions are converted to booleans as markers that the associated
     // events should be sent from native.
     if (typeof nextProp === 'function') {
-      nextProp = (true     );
+      nextProp = true;
       // If nextProp is not a function, then don't bother changing prevProp
       // since nextProp will win and go into the updatePayload regardless.
       if (typeof prevProp === 'function') {
-        prevProp = (true     );
+        prevProp = true;
       }
     }
 
     // An explicit value of undefined is treated as a null because it overrides
     // any other preceding value.
     if (typeof nextProp === 'undefined') {
-      nextProp = (null     );
+      nextProp = null;
       if (typeof prevProp === 'undefined') {
-        prevProp = (null     );
+        prevProp = null;
       }
     }
 
@@ -369,13 +352,13 @@ function diffProperties(
         updatePayload,
         prevProp,
         nextProp,
-        ((attributeConfig     )                          ),
+        attributeConfig,
       );
       if (removedKeyCount > 0 && updatePayload) {
         restoreDeletedValuesInNestedArray(
           updatePayload,
           nextProp,
-          ((attributeConfig     )                          ),
+          attributeConfig,
         );
         removedKeys = null;
       }
@@ -426,7 +409,7 @@ function diffProperties(
       updatePayload = clearNestedProperty(
         updatePayload,
         prevProp,
-        ((attributeConfig     )                          ),
+        attributeConfig,
       );
     }
   }
@@ -436,11 +419,7 @@ function diffProperties(
 /**
  * addProperties adds all the valid props to the payload after being processed.
  */
-function addProperties(
-  updatePayload               ,
-  props        ,
-  validAttributes                          ,
-)                {
+function addProperties(updatePayload, props, validAttributes) {
   // TODO: Fast path
   return diffProperties(updatePayload, emptyObject, props, validAttributes);
 }
@@ -449,19 +428,12 @@ function addProperties(
  * clearProperties clears all the previous props by adding a null sentinel
  * to the payload for each valid key.
  */
-function clearProperties(
-  updatePayload               ,
-  prevProps        ,
-  validAttributes                          ,
-)                {
+function clearProperties(updatePayload, prevProps, validAttributes) {
   // TODO: Fast path
   return diffProperties(updatePayload, prevProps, emptyObject, validAttributes);
 }
 
-export function create(
-  props        ,
-  validAttributes                          ,
-)                {
+export function create(props, validAttributes) {
   return addProperties(
     null, // updatePayload
     props,
@@ -469,11 +441,7 @@ export function create(
   );
 }
 
-export function diff(
-  prevProps        ,
-  nextProps        ,
-  validAttributes                          ,
-)                {
+export function diff(prevProps, nextProps, validAttributes) {
   return diffProperties(
     null, // updatePayload
     prevProps,

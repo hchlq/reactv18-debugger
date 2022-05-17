@@ -445,7 +445,7 @@ describe('ReactDOMServerHydration', () => {
   it('should be able to use lazy components after hydrating', async () => {
     const Lazy = React.lazy(
       () =>
-        new Promise(resolve => {
+        new Promise((resolve) => {
           setTimeout(
             () =>
               resolve({

@@ -21,12 +21,12 @@ import {
 /**
  * Unit test helpers
  */
-describeWithPointerEvent('describeWithPointerEvent', pointerEvent => {
+describeWithPointerEvent('describeWithPointerEvent', (pointerEvent) => {
   test('provides boolean to tests', () => {
     expect(pointerEvent).toMatchSnapshot();
   });
 
-  testWithPointerType('testWithPointerType', pointerType => {
+  testWithPointerType('testWithPointerType', (pointerType) => {
     expect(pointerType).toMatchSnapshot();
   });
 });
@@ -79,7 +79,7 @@ describe('createEventTarget', () => {
   describe('.blur()', () => {
     test('default', () => {
       const target = createEventTarget(node);
-      node.addEventListener('blur', e => {
+      node.addEventListener('blur', (e) => {
         expect(e.relatedTarget).toMatchInlineSnapshot(`null`);
       });
       target.blur();
@@ -87,7 +87,7 @@ describe('createEventTarget', () => {
 
     test('custom payload', () => {
       const target = createEventTarget(node);
-      node.addEventListener('blur', e => {
+      node.addEventListener('blur', (e) => {
         expect(e.relatedTarget).toMatchInlineSnapshot(`null`);
       });
       target.blur();
@@ -97,7 +97,7 @@ describe('createEventTarget', () => {
   describe('.click()', () => {
     test('default', () => {
       const target = createEventTarget(node);
-      node.addEventListener('click', e => {
+      node.addEventListener('click', (e) => {
         expect(e.altKey).toEqual(false);
         expect(e.button).toEqual(0);
         expect(e.buttons).toEqual(0);
@@ -124,7 +124,7 @@ describe('createEventTarget', () => {
 
     test('custom payload', () => {
       const target = createEventTarget(node);
-      node.addEventListener('click', e => {
+      node.addEventListener('click', (e) => {
         expect(e.altKey).toEqual(true);
         expect(e.button).toEqual(1);
         expect(e.buttons).toEqual(4);
@@ -164,7 +164,7 @@ describe('createEventTarget', () => {
   describe('.focus()', () => {
     test('default', () => {
       const target = createEventTarget(node);
-      node.addEventListener('focus', e => {
+      node.addEventListener('focus', (e) => {
         expect(e.relatedTarget).toMatchInlineSnapshot(`null`);
       });
       target.blur();
@@ -172,7 +172,7 @@ describe('createEventTarget', () => {
 
     test('custom payload', () => {
       const target = createEventTarget(node);
-      node.addEventListener('focus', e => {
+      node.addEventListener('focus', (e) => {
         expect(e.relatedTarget).toMatchInlineSnapshot(`null`);
       });
       target.blur();
@@ -182,7 +182,7 @@ describe('createEventTarget', () => {
   describe('.keydown()', () => {
     test('default', () => {
       const target = createEventTarget(node);
-      node.addEventListener('keydown', e => {
+      node.addEventListener('keydown', (e) => {
         expect(e.altKey).toEqual(false);
         expect(e.ctrlKey).toEqual(false);
         expect(typeof e.getModifierState).toEqual('function');
@@ -197,7 +197,7 @@ describe('createEventTarget', () => {
 
     test('custom payload', () => {
       const target = createEventTarget(node);
-      node.addEventListener('keydown', e => {
+      node.addEventListener('keydown', (e) => {
         expect(e.altKey).toEqual(true);
         expect(e.ctrlKey).toEqual(true);
         expect(e.isComposing).toEqual(true);
@@ -219,7 +219,7 @@ describe('createEventTarget', () => {
   describe('.keyup()', () => {
     test('default', () => {
       const target = createEventTarget(node);
-      node.addEventListener('keyup', e => {
+      node.addEventListener('keyup', (e) => {
         expect(e.altKey).toEqual(false);
         expect(e.ctrlKey).toEqual(false);
         expect(typeof e.getModifierState).toEqual('function');
@@ -234,7 +234,7 @@ describe('createEventTarget', () => {
 
     test('custom payload', () => {
       const target = createEventTarget(node);
-      node.addEventListener('keyup', e => {
+      node.addEventListener('keyup', (e) => {
         expect(e.altKey).toEqual(true);
         expect(e.ctrlKey).toEqual(true);
         expect(e.isComposing).toEqual(true);
@@ -256,7 +256,7 @@ describe('createEventTarget', () => {
   describe('.scroll()', () => {
     test('default', () => {
       const target = createEventTarget(node);
-      node.addEventListener('scroll', e => {
+      node.addEventListener('scroll', (e) => {
         expect(e.type).toEqual('scroll');
       });
       target.scroll();
@@ -266,7 +266,7 @@ describe('createEventTarget', () => {
   describe('.virtualclick()', () => {
     test('default', () => {
       const target = createEventTarget(node);
-      node.addEventListener('click', e => {
+      node.addEventListener('click', (e) => {
         expect(e.altKey).toEqual(false);
         expect(e.button).toEqual(0);
         expect(e.buttons).toEqual(0);
@@ -293,7 +293,7 @@ describe('createEventTarget', () => {
 
     test('custom payload', () => {
       const target = createEventTarget(node);
-      node.addEventListener('click', e => {
+      node.addEventListener('click', (e) => {
         // expect most of the custom payload to be ignored
         expect(e.altKey).toEqual(true);
         expect(e.button).toEqual(1);

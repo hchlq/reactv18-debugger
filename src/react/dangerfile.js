@@ -66,7 +66,7 @@ function generateMDTable(headers, body) {
     headers.map(() => ' --- ').join(' | '),
   ];
 
-  const tablebody = body.map(r => r.join(' | '));
+  const tablebody = body.map((r) => r.join(' | '));
   return tableHeaders.join('\n') + '\n' + tablebody.join('\n');
 }
 
@@ -94,7 +94,7 @@ function addPercent(change, includeEmoji) {
 
 function setBoldness(row, isBold) {
   if (isBold) {
-    return row.map(element => `**${element}**`);
+    return row.map((element) => `**${element}**`);
   } else {
     return row;
   }
@@ -105,7 +105,7 @@ function setBoldness(row, isBold) {
  * and master.
  */
 function git(args) {
-  return new Promise(res => {
+  return new Promise((res) => {
     exec('git ' + args, (err, stdout, stderr) => {
       if (err) {
         throw err;
@@ -116,7 +116,7 @@ function git(args) {
   });
 }
 
-(async function() {
+(async function () {
   // Use git locally to grab the commit which represents the place
   // where the branches differ
   const upstreamRepo = danger.github.pr.base.repo.full_name;
@@ -196,11 +196,11 @@ function git(args) {
 
   const packagesToShow = results
     .filter(
-      r =>
+      (r) =>
         Math.abs(r.prevFileSizeAbsoluteChange) >= 300 || // bytes
         Math.abs(r.prevGzipSizeAbsoluteChange) >= 100 // bytes
     )
-    .map(r => r.packageName);
+    .map((r) => r.packageName);
 
   if (packagesToShow.length) {
     let allTables = [];
@@ -210,7 +210,7 @@ function git(args) {
 
     if (packagesToShow.includes('react')) {
       const reactProd = results.find(
-        r => r.bundleType === 'UMD_PROD' && r.packageName === 'react'
+        (r) => r.bundleType === 'UMD_PROD' && r.packageName === 'react'
       );
       if (
         reactProd.prevFileSizeChange !== 0 ||
@@ -224,7 +224,7 @@ function git(args) {
 
     if (packagesToShow.includes('react-dom')) {
       const reactDOMProd = results.find(
-        r => r.bundleType === 'UMD_PROD' && r.packageName === 'react-dom'
+        (r) => r.bundleType === 'UMD_PROD' && r.packageName === 'react-dom'
       );
       if (
         reactDOMProd.prevFileSizeChange !== 0 ||
@@ -240,9 +240,9 @@ function git(args) {
 
     // eslint-disable-next-line no-var,no-for-of-loops/no-for-of-loops
     for (var name of new Set(packagesToShow)) {
-      const thisBundleResults = results.filter(r => r.packageName === name);
+      const thisBundleResults = results.filter((r) => r.packageName === name);
       const changedFiles = thisBundleResults.filter(
-        r => r.prevFileSizeChange !== 0 || r.prevGzipSizeChange !== 0
+        (r) => r.prevFileSizeChange !== 0 || r.prevGzipSizeChange !== 0
       );
 
       const mdHeaders = [
@@ -256,7 +256,7 @@ function git(args) {
         'ENV',
       ];
 
-      const mdRows = changedFiles.map(r => {
+      const mdRows = changedFiles.map((r) => {
         const isProd = r.bundleType.includes('PROD');
         return setBoldness(
           [

@@ -48,6 +48,6 @@ const run = async ({cwd, dry, tempDirectory}) => {
   await exec(`rm ./build/node_modules/*.tgz`, {cwd});
 };
 
-module.exports = async params => {
+module.exports = async (params) => {
   return logPromise(run(params), 'Packing artifacts');
 };

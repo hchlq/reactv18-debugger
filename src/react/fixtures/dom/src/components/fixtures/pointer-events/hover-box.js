@@ -23,7 +23,8 @@ class DrawBox extends React.Component {
         onPointerOver={this.props.onOver}
         onPointerOut={this.props.onOut}
         onPointerEnter={this.props.onEnter}
-        onPointerLeave={this.props.onLeave}>
+        onPointerLeave={this.props.onLeave}
+      >
         <div style={obstacleStyle} />
         <div style={obstacleStyle} />
       </div>

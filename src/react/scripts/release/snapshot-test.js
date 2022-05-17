@@ -51,7 +51,7 @@ const run = async () => {
     );
     promise.childProcess.stdin.setEncoding('utf-8');
     promise.childProcess.stdout.setEncoding('utf-8');
-    promise.childProcess.stdout.on('data', data => {
+    promise.childProcess.stdout.on('data', (data) => {
       if (data.includes('✓ Version for')) {
         // Update all packages to a stable version
         promise.childProcess.stdin.write(VERSION);

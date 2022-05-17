@@ -4,10 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                                  
 
 import {
   resolveModel,
@@ -24,9 +22,7 @@ import {
   createStringDecoder,
 } from './ReactFlightClientHostConfig';
 
-                       
-
-function processFullRow(response          , row        )       {
+function processFullRow(response, row) {
   if (row === '') {
     return;
   }
@@ -55,11 +51,7 @@ function processFullRow(response          , row        )       {
   }
 }
 
-export function processStringChunk(
-  response          ,
-  chunk        ,
-  offset        ,
-)       {
+export function processStringChunk(response, chunk, offset) {
   let linebreak = chunk.indexOf('\n', offset);
   while (linebreak > -1) {
     const fullrow = response._partialRow + chunk.substring(offset, linebreak);
@@ -71,10 +63,7 @@ export function processStringChunk(
   response._partialRow += chunk.substring(offset);
 }
 
-export function processBinaryChunk(
-  response          ,
-  chunk            ,
-)       {
+export function processBinaryChunk(response, chunk) {
   if (!supportsBinaryStreams) {
     throw new Error("This environment don't support binary chunks.");
   }
@@ -92,8 +81,8 @@ export function processBinaryChunk(
   response._partialRow += readPartialStringChunk(stringDecoder, chunk);
 }
 
-function createFromJSONCallback(response          ) {
-  return function(key        , value           ) {
+function createFromJSONCallback(response) {
+  return function (key, value) {
     if (typeof value === 'string') {
       // We can't use .bind here because we need the "this" value.
       return parseModelString(response, this, value);
@@ -105,11 +94,11 @@ function createFromJSONCallback(response          ) {
   };
 }
 
-export function createResponse()           {
+export function createResponse() {
   // NOTE: CHECK THE COMPILER OUTPUT EACH TIME YOU CHANGE THIS.
   // It should be inlined to one object literal but minor changes can break it.
   const stringDecoder = supportsBinaryStreams ? createStringDecoder() : null;
-  const response      = createResponseBase();
+  const response = createResponseBase();
   response._partialRow = '';
   if (supportsBinaryStreams) {
     response._stringDecoder = stringDecoder;

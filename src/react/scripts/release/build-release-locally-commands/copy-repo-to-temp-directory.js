@@ -24,7 +24,7 @@ const run = async ({commit, cwd, tempDirectory}) => {
   await exec(`tar -xf ./react.tgz -C ./${directory}`, {cwd: temp});
 };
 
-module.exports = async params => {
+module.exports = async (params) => {
   return logPromise(
     run(params),
     theme`Copying React repo to temporary directory ({path ${params.tempDirectory}})`

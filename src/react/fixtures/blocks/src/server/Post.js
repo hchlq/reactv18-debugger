@@ -22,7 +22,8 @@ export default function Post({post}) {
         marginBottom: 20,
         padding: 20,
         maxWidth: 500,
-      }}>
+      }}
+    >
       <h4 style={{marginTop: 0}}>
         {post.title}
         {' by '}
@@ -31,7 +32,8 @@ export default function Post({post}) {
       <p>{post.body}</p>
       <Suspense
         fallback={<h5>Loading comments...</h5>}
-        unstable_avoidThisFallback={true}>
+        unstable_avoidThisFallback={true}
+      >
         <Comments postId={post.id} />
       </Suspense>
     </div>

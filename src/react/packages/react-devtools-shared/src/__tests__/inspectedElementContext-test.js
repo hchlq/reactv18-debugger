@@ -4,25 +4,16 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                           
-             
-                           
-                          
-                
-                                                                                     
-                                                                     
-                                                                  
 
 describe('InspectedElementContext', () => {
   let React;
   let ReactDOM;
   let PropTypes;
-  let TestRenderer                   ;
-  let bridge                ;
-  let store       ;
+  let TestRenderer;
+  let bridge;
+  let store;
   let meta;
   let utils;
 
@@ -54,16 +45,16 @@ describe('InspectedElementContext', () => {
     TestRenderer = utils.requireTestRenderer();
     TestRendererAct = TestUtils.unstable_concurrentAct;
 
-    BridgeContext = require('react-devtools-shared/src/devtools/views/context')
-      .BridgeContext;
-    InspectedElementContext = require('react-devtools-shared/src/devtools/views/Components/InspectedElementContext')
-      .InspectedElementContext;
-    InspectedElementContextController = require('react-devtools-shared/src/devtools/views/Components/InspectedElementContext')
-      .InspectedElementContextController;
-    StoreContext = require('react-devtools-shared/src/devtools/views/context')
-      .StoreContext;
-    TreeContextController = require('react-devtools-shared/src/devtools/views/Components/TreeContext')
-      .TreeContextController;
+    BridgeContext =
+      require('react-devtools-shared/src/devtools/views/context').BridgeContext;
+    InspectedElementContext =
+      require('react-devtools-shared/src/devtools/views/Components/InspectedElementContext').InspectedElementContext;
+    InspectedElementContextController =
+      require('react-devtools-shared/src/devtools/views/Components/InspectedElementContext').InspectedElementContextController;
+    StoreContext =
+      require('react-devtools-shared/src/devtools/views/context').StoreContext;
+    TreeContextController =
+      require('react-devtools-shared/src/devtools/views/Components/TreeContext').TreeContextController;
   });
 
   const Contexts = ({
@@ -75,7 +66,8 @@ describe('InspectedElementContext', () => {
       <StoreContext.Provider value={store}>
         <TreeContextController
           defaultSelectedElementID={defaultSelectedElementID}
-          defaultSelectedElementIndex={defaultSelectedElementIndex}>
+          defaultSelectedElementIndex={defaultSelectedElementIndex}
+        >
           <InspectedElementContextController>
             {children}
           </InspectedElementContextController>
@@ -84,7 +76,7 @@ describe('InspectedElementContext', () => {
     </BridgeContext.Provider>
   );
 
-  it('should inspect the currently selected element', async done => {
+  it('should inspect the currently selected element', async (done) => {
     const Example = () => {
       const [count] = React.useState(1);
       return count;
@@ -95,7 +87,7 @@ describe('InspectedElementContext', () => {
       ReactDOM.render(<Example a={1} b="abc" />, container),
     );
 
-    const id = ((store.getElementIDAtIndex(0)     )        );
+    const id = store.getElementIDAtIndex(0);
 
     let didFinish = false;
 
@@ -112,7 +104,8 @@ describe('InspectedElementContext', () => {
         TestRenderer.create(
           <Contexts
             defaultSelectedElementID={id}
-            defaultSelectedElementIndex={0}>
+            defaultSelectedElementIndex={0}
+          >
             <React.Suspense fallback={null}>
               <Suspender target={id} />
             </React.Suspense>
@@ -125,13 +118,13 @@ describe('InspectedElementContext', () => {
     done();
   });
 
-  it('should have hasLegacyContext flag set to either "true" or "false" depending on which context API is used.', async done => {
+  it('should have hasLegacyContext flag set to either "true" or "false" depending on which context API is used.', async (done) => {
     const contextData = {
       bool: true,
     };
 
     // Legacy Context API.
-    class LegacyContextProvider extends React.Component      {
+    class LegacyContextProvider extends React.Component {
       static childContextTypes = {
         bool: PropTypes.bool,
       };
@@ -142,7 +135,7 @@ describe('InspectedElementContext', () => {
         return this.props.children;
       }
     }
-    class LegacyContextConsumer extends React.Component      {
+    class LegacyContextConsumer extends React.Component {
       static contextTypes = {
         bool: PropTypes.bool,
       };
@@ -155,7 +148,7 @@ describe('InspectedElementContext', () => {
     const BoolContext = React.createContext(contextData.bool);
     BoolContext.displayName = 'BoolContext';
 
-    class ModernContextType extends React.Component      {
+    class ModernContextType extends React.Component {
       static contextType = BoolContext;
       render() {
         return null;
@@ -172,10 +165,10 @@ describe('InspectedElementContext', () => {
           <LegacyContextProvider>
             <LegacyContextConsumer />
           </LegacyContextProvider>
-          <BoolContext.Consumer>{value => null}</BoolContext.Consumer>
+          <BoolContext.Consumer>{(value) => null}</BoolContext.Consumer>
           <ModernContextType />
           <ModernContext.Provider value={contextData}>
-            <ModernContext.Consumer>{value => null}</ModernContext.Consumer>
+            <ModernContext.Consumer>{(value) => null}</ModernContext.Consumer>
           </ModernContext.Provider>
         </React.Fragment>,
         container,
@@ -185,22 +178,22 @@ describe('InspectedElementContext', () => {
     const ids = [
       {
         // <LegacyContextConsumer />
-        id: ((store.getElementIDAtIndex(1)     )        ),
+        id: store.getElementIDAtIndex(1),
         shouldHaveLegacyContext: true,
       },
       {
         // <BoolContext.Consumer>
-        id: ((store.getElementIDAtIndex(2)     )        ),
+        id: store.getElementIDAtIndex(2),
         shouldHaveLegacyContext: false,
       },
       {
         // <ModernContextType />
-        id: ((store.getElementIDAtIndex(3)     )        ),
+        id: store.getElementIDAtIndex(3),
         shouldHaveLegacyContext: false,
       },
       {
         // <ModernContext.Consumer>
-        id: ((store.getElementIDAtIndex(5)     )        ),
+        id: store.getElementIDAtIndex(5),
         shouldHaveLegacyContext: false,
       },
     ];
@@ -223,7 +216,8 @@ describe('InspectedElementContext', () => {
           TestRenderer.create(
             <Contexts
               defaultSelectedElementID={id}
-              defaultSelectedElementIndex={0}>
+              defaultSelectedElementIndex={0}
+            >
               <React.Suspense fallback={null}>
                 <Suspender
                   target={id}
@@ -238,7 +232,7 @@ describe('InspectedElementContext', () => {
     done();
   });
 
-  it('should poll for updates for the currently selected element', async done => {
+  it('should poll for updates for the currently selected element', async (done) => {
     const Example = () => null;
 
     const container = document.createElement('div');
@@ -247,7 +241,7 @@ describe('InspectedElementContext', () => {
       false,
     );
 
-    const id = ((store.getElementIDAtIndex(0)     )        );
+    const id = store.getElementIDAtIndex(0);
 
     let inspectedElement = null;
 
@@ -281,7 +275,8 @@ describe('InspectedElementContext', () => {
         renderer.update(
           <Contexts
             defaultSelectedElementID={id}
-            defaultSelectedElementIndex={0}>
+            defaultSelectedElementIndex={0}
+          >
             <React.Suspense fallback={null}>
               <Suspender target={id} />
             </React.Suspense>
@@ -294,11 +289,11 @@ describe('InspectedElementContext', () => {
     done();
   });
 
-  it('should not re-render a function with hooks if it did not update since it was last inspected', async done => {
+  it('should not re-render a function with hooks if it did not update since it was last inspected', async (done) => {
     let targetRenderCount = 0;
 
     const Wrapper = ({children}) => children;
-    const Target = React.memo(props => {
+    const Target = React.memo((props) => {
       targetRenderCount++;
       React.useState(0);
       return null;
@@ -314,7 +309,7 @@ describe('InspectedElementContext', () => {
       ),
     );
 
-    const id = ((store.getElementIDAtIndex(1)     )        );
+    const id = store.getElementIDAtIndex(1);
 
     let inspectedElement = null;
 
@@ -332,7 +327,8 @@ describe('InspectedElementContext', () => {
         (renderer = TestRenderer.create(
           <Contexts
             defaultSelectedElementID={id}
-            defaultSelectedElementIndex={1}>
+            defaultSelectedElementIndex={1}
+          >
             <React.Suspense fallback={null}>
               <Suspender target={id} />
             </React.Suspense>
@@ -352,7 +348,8 @@ describe('InspectedElementContext', () => {
         renderer.update(
           <Contexts
             defaultSelectedElementID={id}
-            defaultSelectedElementIndex={1}>
+            defaultSelectedElementIndex={1}
+          >
             <React.Suspense fallback={null}>
               <Suspender target={id} />
             </React.Suspense>
@@ -383,15 +380,15 @@ describe('InspectedElementContext', () => {
     done();
   });
 
-  it('should temporarily disable console logging when re-running a component to inspect its hooks', async done => {
+  it('should temporarily disable console logging when re-running a component to inspect its hooks', async (done) => {
     let targetRenderCount = 0;
 
-    const errorSpy = ((console     ).error = jest.fn());
-    const infoSpy = ((console     ).info = jest.fn());
-    const logSpy = ((console     ).log = jest.fn());
-    const warnSpy = ((console     ).warn = jest.fn());
+    const errorSpy = (console.error = jest.fn());
+    const infoSpy = (console.info = jest.fn());
+    const logSpy = (console.log = jest.fn());
+    const warnSpy = (console.warn = jest.fn());
 
-    const Target = React.memo(props => {
+    const Target = React.memo((props) => {
       targetRenderCount++;
       console.error('error');
       console.info('info');
@@ -416,7 +413,7 @@ describe('InspectedElementContext', () => {
     expect(warnSpy).toHaveBeenCalledTimes(1);
     expect(warnSpy).toHaveBeenCalledWith('warn');
 
-    const id = ((store.getElementIDAtIndex(0)     )        );
+    const id = store.getElementIDAtIndex(0);
 
     let inspectedElement = null;
 
@@ -431,7 +428,8 @@ describe('InspectedElementContext', () => {
         TestRenderer.create(
           <Contexts
             defaultSelectedElementID={id}
-            defaultSelectedElementIndex={1}>
+            defaultSelectedElementIndex={1}
+          >
             <React.Suspense fallback={null}>
               <Suspender target={id} />
             </React.Suspense>
@@ -450,7 +448,7 @@ describe('InspectedElementContext', () => {
     done();
   });
 
-  it('should support simple data types', async done => {
+  it('should support simple data types', async (done) => {
     const Example = () => null;
 
     const container = document.createElement('div');
@@ -473,7 +471,7 @@ describe('InspectedElementContext', () => {
       ),
     );
 
-    const id = ((store.getElementIDAtIndex(0)     )        );
+    const id = store.getElementIDAtIndex(0);
     let inspectedElement = null;
 
     function Suspender({target}) {
@@ -487,7 +485,8 @@ describe('InspectedElementContext', () => {
         TestRenderer.create(
           <Contexts
             defaultSelectedElementID={id}
-            defaultSelectedElementIndex={0}>
+            defaultSelectedElementIndex={0}
+          >
             <React.Suspense fallback={null}>
               <Suspender target={id} />
             </React.Suspense>
@@ -499,7 +498,7 @@ describe('InspectedElementContext', () => {
     expect(inspectedElement).not.toBeNull();
     expect(inspectedElement).toMatchSnapshot('1: Initial inspection');
 
-    const {props} = (inspectedElement     );
+    const {props} = inspectedElement;
     expect(props.boolean_false).toBe(false);
     expect(props.boolean_true).toBe(true);
     expect(Number.isFinite(props.infinity)).toBe(false);
@@ -515,7 +514,7 @@ describe('InspectedElementContext', () => {
     done();
   });
 
-  it('should support complex data types', async done => {
+  it('should support complex data types', async (done) => {
     const Immutable = require('immutable');
 
     const Example = () => null;
@@ -547,7 +546,7 @@ describe('InspectedElementContext', () => {
       a: [{hello: 'there'}, 'fixed', true],
       b: 123,
       c: {
-        '1': 'xyz',
+        1: 'xyz',
         xyz: 1,
       },
     });
@@ -558,8 +557,8 @@ describe('InspectedElementContext', () => {
     const instance = new Class();
 
     const proxyInstance = new Proxy(() => {}, {
-      get: function(_, name) {
-        return function() {
+      get: function (_, name) {
+        return function () {
           return null;
         };
       },
@@ -596,7 +595,7 @@ describe('InspectedElementContext', () => {
       ),
     );
 
-    const id = ((store.getElementIDAtIndex(0)     )        );
+    const id = store.getElementIDAtIndex(0);
 
     let inspectedElement = null;
 
@@ -611,7 +610,8 @@ describe('InspectedElementContext', () => {
         TestRenderer.create(
           <Contexts
             defaultSelectedElementID={id}
-            defaultSelectedElementIndex={0}>
+            defaultSelectedElementIndex={0}
+          >
             <React.Suspense fallback={null}>
               <Suspender target={id} />
             </React.Suspense>
@@ -645,7 +645,7 @@ describe('InspectedElementContext', () => {
       set_of_sets,
       symbol,
       typed_array,
-    } = (inspectedElement     ).props;
+    } = inspectedElement.props;
 
     expect(anonymous_fn[meta.inspectable]).toBe(false);
     expect(anonymous_fn[meta.name]).toBe('function');
@@ -796,7 +796,7 @@ describe('InspectedElementContext', () => {
     done();
   });
 
-  it('should not consume iterables while inspecting', async done => {
+  it('should not consume iterables while inspecting', async (done) => {
     const Example = () => null;
 
     function* generator() {
@@ -810,7 +810,7 @@ describe('InspectedElementContext', () => {
       ReactDOM.render(<Example prop={iterable} />, container),
     );
 
-    const id = ((store.getElementIDAtIndex(0)     )        );
+    const id = store.getElementIDAtIndex(0);
 
     let inspectedElement = null;
 
@@ -825,7 +825,8 @@ describe('InspectedElementContext', () => {
         TestRenderer.create(
           <Contexts
             defaultSelectedElementID={id}
-            defaultSelectedElementIndex={0}>
+            defaultSelectedElementIndex={0}
+          >
             <React.Suspense fallback={null}>
               <Suspender target={id} />
             </React.Suspense>
@@ -837,7 +838,7 @@ describe('InspectedElementContext', () => {
     expect(inspectedElement).not.toBeNull();
     expect(inspectedElement).toMatchSnapshot(`1: Inspected element ${id}`);
 
-    const {prop} = (inspectedElement     ).props;
+    const {prop} = inspectedElement.props;
     expect(prop[meta.inspectable]).toBe(false);
     expect(prop[meta.name]).toBe('Generator');
     expect(prop[meta.type]).toBe('opaque_iterator');
@@ -847,7 +848,7 @@ describe('InspectedElementContext', () => {
     done();
   });
 
-  it('should support objects with no prototype', async done => {
+  it('should support objects with no prototype', async (done) => {
     const Example = () => null;
 
     const object = Object.create(null);
@@ -860,7 +861,7 @@ describe('InspectedElementContext', () => {
       ReactDOM.render(<Example object={object} />, container),
     );
 
-    const id = ((store.getElementIDAtIndex(0)     )        );
+    const id = store.getElementIDAtIndex(0);
 
     let inspectedElement = null;
 
@@ -875,7 +876,8 @@ describe('InspectedElementContext', () => {
         TestRenderer.create(
           <Contexts
             defaultSelectedElementID={id}
-            defaultSelectedElementIndex={0}>
+            defaultSelectedElementIndex={0}
+          >
             <React.Suspense fallback={null}>
               <Suspender target={id} />
             </React.Suspense>
@@ -895,7 +897,7 @@ describe('InspectedElementContext', () => {
     done();
   });
 
-  it('should support objects with overridden hasOwnProperty', async done => {
+  it('should support objects with overridden hasOwnProperty', async (done) => {
     const Example = () => null;
 
     const object = {
@@ -908,7 +910,7 @@ describe('InspectedElementContext', () => {
       ReactDOM.render(<Example object={object} />, container),
     );
 
-    const id = ((store.getElementIDAtIndex(0)     )        );
+    const id = store.getElementIDAtIndex(0);
 
     let inspectedElement = null;
 
@@ -923,7 +925,8 @@ describe('InspectedElementContext', () => {
         TestRenderer.create(
           <Contexts
             defaultSelectedElementID={id}
-            defaultSelectedElementIndex={0}>
+            defaultSelectedElementIndex={0}
+          >
             <React.Suspense fallback={null}>
               <Suspender target={id} />
             </React.Suspense>
@@ -942,7 +945,7 @@ describe('InspectedElementContext', () => {
     done();
   });
 
-  it('should support custom objects with enumerable properties and getters', async done => {
+  it('should support custom objects with enumerable properties and getters', async (done) => {
     class CustomData {
       _number = 42;
       get number() {
@@ -953,10 +956,10 @@ describe('InspectedElementContext', () => {
       }
     }
 
-    const descriptor = ((Object.getOwnPropertyDescriptor(
+    const descriptor = Object.getOwnPropertyDescriptor(
       CustomData.prototype,
       'number',
-    )     )                            );
+    );
     descriptor.enumerable = true;
     Object.defineProperty(CustomData.prototype, 'number', descriptor);
 
@@ -967,7 +970,7 @@ describe('InspectedElementContext', () => {
       ReactDOM.render(<Example data={new CustomData()} />, container),
     );
 
-    const id = ((store.getElementIDAtIndex(0)     )        );
+    const id = store.getElementIDAtIndex(0);
 
     let didFinish = false;
 
@@ -984,7 +987,8 @@ describe('InspectedElementContext', () => {
         TestRenderer.create(
           <Contexts
             defaultSelectedElementID={id}
-            defaultSelectedElementIndex={0}>
+            defaultSelectedElementIndex={0}
+          >
             <React.Suspense fallback={null}>
               <Suspender target={id} />
             </React.Suspense>
@@ -997,7 +1001,7 @@ describe('InspectedElementContext', () => {
     done();
   });
 
-  it('should support objects with with inherited keys', async done => {
+  it('should support objects with with inherited keys', async (done) => {
     const Example = () => null;
 
     const base = Object.create(Object.prototype, {
@@ -1065,7 +1069,7 @@ describe('InspectedElementContext', () => {
       ReactDOM.render(<Example object={object} />, container),
     );
 
-    const id = ((store.getElementIDAtIndex(0)     )        );
+    const id = store.getElementIDAtIndex(0);
 
     let inspectedElement = null;
 
@@ -1080,7 +1084,8 @@ describe('InspectedElementContext', () => {
         TestRenderer.create(
           <Contexts
             defaultSelectedElementID={id}
-            defaultSelectedElementIndex={0}>
+            defaultSelectedElementIndex={0}
+          >
             <React.Suspense fallback={null}>
               <Suspender target={id} />
             </React.Suspense>
@@ -1102,7 +1107,7 @@ describe('InspectedElementContext', () => {
     done();
   });
 
-  it('should not dehydrate nested values until explicitly requested', async done => {
+  it('should not dehydrate nested values until explicitly requested', async (done) => {
     const Example = () => {
       const [state] = React.useState({
         foo: {
@@ -1137,9 +1142,9 @@ describe('InspectedElementContext', () => {
       ),
     );
 
-    const id = ((store.getElementIDAtIndex(0)     )        );
+    const id = store.getElementIDAtIndex(0);
 
-    let getInspectedElementPath                          = ((null     )                         );
+    let getInspectedElementPath = null;
     let inspectedElement = null;
 
     function Suspender({target}) {
@@ -1154,7 +1159,8 @@ describe('InspectedElementContext', () => {
         TestRenderer.create(
           <Contexts
             defaultSelectedElementID={id}
-            defaultSelectedElementIndex={0}>
+            defaultSelectedElementIndex={0}
+          >
             <React.Suspense fallback={null}>
               <Suspender target={id} />
             </React.Suspense>
@@ -1233,7 +1239,7 @@ describe('InspectedElementContext', () => {
     done();
   });
 
-  it('should dehydrate complex nested values when requested', async done => {
+  it('should dehydrate complex nested values when requested', async (done) => {
     const Example = () => null;
 
     const container = document.createElement('div');
@@ -1246,9 +1252,9 @@ describe('InspectedElementContext', () => {
       ),
     );
 
-    const id = ((store.getElementIDAtIndex(0)     )        );
+    const id = store.getElementIDAtIndex(0);
 
-    let getInspectedElementPath                          = ((null     )                         );
+    let getInspectedElementPath = null;
     let inspectedElement = null;
 
     function Suspender({target}) {
@@ -1263,7 +1269,8 @@ describe('InspectedElementContext', () => {
         TestRenderer.create(
           <Contexts
             defaultSelectedElementID={id}
-            defaultSelectedElementIndex={0}>
+            defaultSelectedElementIndex={0}
+          >
             <React.Suspense fallback={null}>
               <Suspender target={id} />
             </React.Suspense>
@@ -1288,7 +1295,7 @@ describe('InspectedElementContext', () => {
     done();
   });
 
-  it('should include updates for nested values that were previously hydrated', async done => {
+  it('should include updates for nested values that were previously hydrated', async (done) => {
     const Example = () => null;
 
     const container = document.createElement('div');
@@ -1317,9 +1324,9 @@ describe('InspectedElementContext', () => {
       ),
     );
 
-    const id = ((store.getElementIDAtIndex(0)     )        );
+    const id = store.getElementIDAtIndex(0);
 
-    let getInspectedElementPath                          = ((null     )                         );
+    let getInspectedElementPath = null;
     let inspectedElement = null;
 
     function Suspender({target}) {
@@ -1334,7 +1341,8 @@ describe('InspectedElementContext', () => {
         TestRenderer.create(
           <Contexts
             defaultSelectedElementID={id}
-            defaultSelectedElementIndex={0}>
+            defaultSelectedElementIndex={0}
+          >
             <React.Suspense fallback={null}>
               <Suspender target={id} />
             </React.Suspense>
@@ -1399,7 +1407,7 @@ describe('InspectedElementContext', () => {
     done();
   });
 
-  it('should not tear if hydration is requested after an update', async done => {
+  it('should not tear if hydration is requested after an update', async (done) => {
     const Example = () => null;
 
     const container = document.createElement('div');
@@ -1420,9 +1428,9 @@ describe('InspectedElementContext', () => {
       ),
     );
 
-    const id = ((store.getElementIDAtIndex(0)     )        );
+    const id = store.getElementIDAtIndex(0);
 
-    let getInspectedElementPath                          = ((null     )                         );
+    let getInspectedElementPath = null;
     let inspectedElement = null;
 
     function Suspender({target}) {
@@ -1437,7 +1445,8 @@ describe('InspectedElementContext', () => {
         TestRenderer.create(
           <Contexts
             defaultSelectedElementID={id}
-            defaultSelectedElementIndex={0}>
+            defaultSelectedElementIndex={0}
+          >
             <React.Suspense fallback={null}>
               <Suspender target={id} />
             </React.Suspense>
@@ -1480,7 +1489,7 @@ describe('InspectedElementContext', () => {
     done();
   });
 
-  it('should inspect hooks for components that only use context', async done => {
+  it('should inspect hooks for components that only use context', async (done) => {
     const Context = React.createContext(true);
     const Example = () => {
       const value = React.useContext(Context);
@@ -1492,7 +1501,7 @@ describe('InspectedElementContext', () => {
       ReactDOM.render(<Example a={1} b="abc" />, container),
     );
 
-    const id = ((store.getElementIDAtIndex(0)     )        );
+    const id = store.getElementIDAtIndex(0);
 
     let didFinish = false;
 
@@ -1509,7 +1518,8 @@ describe('InspectedElementContext', () => {
         TestRenderer.create(
           <Contexts
             defaultSelectedElementID={id}
-            defaultSelectedElementIndex={0}>
+            defaultSelectedElementIndex={0}
+          >
             <React.Suspense fallback={null}>
               <Suspender target={id} />
             </React.Suspense>
@@ -1522,7 +1532,7 @@ describe('InspectedElementContext', () => {
     done();
   });
 
-  it('should enable inspected values to be stored as global variables', async done => {
+  it('should enable inspected values to be stored as global variables', async (done) => {
     const Example = () => null;
 
     const nestedObject = {
@@ -1544,9 +1554,9 @@ describe('InspectedElementContext', () => {
       ),
     );
 
-    const id = ((store.getElementIDAtIndex(0)     )        );
+    const id = store.getElementIDAtIndex(0);
 
-    let storeAsGlobal                = ((null     )               );
+    let storeAsGlobal = null;
 
     function Suspender({target}) {
       const context = React.useContext(InspectedElementContext);
@@ -1559,7 +1569,8 @@ describe('InspectedElementContext', () => {
         TestRenderer.create(
           <Contexts
             defaultSelectedElementID={id}
-            defaultSelectedElementIndex={0}>
+            defaultSelectedElementIndex={0}
+          >
             <React.Suspense fallback={null}>
               <Suspender target={id} />
             </React.Suspense>
@@ -1589,7 +1600,7 @@ describe('InspectedElementContext', () => {
     done();
   });
 
-  it('should enable inspected values to be copied to the clipboard', async done => {
+  it('should enable inspected values to be copied to the clipboard', async (done) => {
     const Example = () => null;
 
     const nestedObject = {
@@ -1611,9 +1622,9 @@ describe('InspectedElementContext', () => {
       ),
     );
 
-    const id = ((store.getElementIDAtIndex(0)     )        );
+    const id = store.getElementIDAtIndex(0);
 
-    let copyPath                           = ((null     )                          );
+    let copyPath = null;
 
     function Suspender({target}) {
       const context = React.useContext(InspectedElementContext);
@@ -1626,7 +1637,8 @@ describe('InspectedElementContext', () => {
         TestRenderer.create(
           <Contexts
             defaultSelectedElementID={id}
-            defaultSelectedElementIndex={0}>
+            defaultSelectedElementIndex={0}
+          >
             <React.Suspense fallback={null}>
               <Suspender target={id} />
             </React.Suspense>
@@ -1657,7 +1669,7 @@ describe('InspectedElementContext', () => {
     done();
   });
 
-  it('should enable complex values to be copied to the clipboard', async done => {
+  it('should enable complex values to be copied to the clipboard', async (done) => {
     const Immutable = require('immutable');
 
     const Example = () => null;
@@ -1679,7 +1691,7 @@ describe('InspectedElementContext', () => {
       a: [{hello: 'there'}, 'fixed', true],
       b: 123,
       c: {
-        '1': 'xyz',
+        1: 'xyz',
         xyz: 1,
       },
     });
@@ -1703,9 +1715,9 @@ describe('InspectedElementContext', () => {
       ),
     );
 
-    const id = ((store.getElementIDAtIndex(0)     )        );
+    const id = store.getElementIDAtIndex(0);
 
-    let copyPath                           = ((null     )                          );
+    let copyPath = null;
 
     function Suspender({target}) {
       const context = React.useContext(InspectedElementContext);
@@ -1718,7 +1730,8 @@ describe('InspectedElementContext', () => {
         TestRenderer.create(
           <Contexts
             defaultSelectedElementID={id}
-            defaultSelectedElementIndex={0}>
+            defaultSelectedElementIndex={0}
+          >
             <React.Suspense fallback={null}>
               <Suspender target={id} />
             </React.Suspense>
@@ -1756,8 +1769,8 @@ describe('InspectedElementContext', () => {
     done();
   });
 
-  it('should display complex values of useDebugValue', async done => {
-    let getInspectedElementPath                          = ((null     )                         );
+  it('should display complex values of useDebugValue', async (done) => {
+    let getInspectedElementPath = null;
     let inspectedElement = null;
     function Suspender({target}) {
       const context = React.useContext(InspectedElementContext);
@@ -1783,15 +1796,16 @@ describe('InspectedElementContext', () => {
     );
 
     const ignoredComplexValueIndex = 0;
-    const ignoredComplexValueId = ((store.getElementIDAtIndex(
+    const ignoredComplexValueId = store.getElementIDAtIndex(
       ignoredComplexValueIndex,
-    )     )        );
+    );
     await utils.actAsync(
       () =>
         TestRenderer.create(
           <Contexts
             defaultSelectedElementID={ignoredComplexValueId}
-            defaultSelectedElementIndex={ignoredComplexValueIndex}>
+            defaultSelectedElementIndex={ignoredComplexValueIndex}
+          >
             <React.Suspense fallback={null}>
               <Suspender target={ignoredComplexValueId} />
             </React.Suspense>

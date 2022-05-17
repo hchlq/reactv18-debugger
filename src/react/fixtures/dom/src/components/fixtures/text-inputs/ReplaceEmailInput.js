@@ -11,7 +11,7 @@ class ReplaceEmailInput extends React.Component {
     this.setState({formSubmitted: false});
   };
 
-  onSubmit = event => {
+  onSubmit = (event) => {
     event.preventDefault();
     this.setState({formSubmitted: true});
   };

@@ -21,13 +21,13 @@ module.exports = function autoImporter(babel) {
   }
 
   return {
-    pre: function() {
+    pre: function () {
       // map from module to generated identifier
       this.id = null;
     },
 
     visitor: {
-      CallExpression: function(path, file) {
+      CallExpression: function (path, file) {
         if (file.filename.indexOf('object-assign') !== -1) {
           // Don't replace Object.assign if we're transforming object-assign
           return;
@@ -39,7 +39,7 @@ module.exports = function autoImporter(babel) {
         }
       },
 
-      MemberExpression: function(path, file) {
+      MemberExpression: function (path, file) {
         if (file.filename.indexOf('object-assign') !== -1) {
           // Don't replace Object.assign if we're transforming object-assign
           return;

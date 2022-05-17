@@ -18,7 +18,8 @@ export default function PostGlimmer() {
         padding: 20,
         maxWidth: 500,
         height: 180,
-      }}>
+      }}
+    >
       <div
         style={{
           marginBottom: 20,

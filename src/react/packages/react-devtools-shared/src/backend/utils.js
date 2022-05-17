@@ -4,19 +4,13 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import {copy} from 'clipboard-js';
 import {dehydrate} from '../hydration';
 
-                                                                                              
-
-export function cleanForBridge(
-  data               ,
-  isPathAllowed                                           ,
-  path                          = [],
-)                        {
+export function cleanForBridge(data, isPathAllowed, path = []) {
   if (data !== null) {
     const cleanedPaths = [];
     const unserializablePaths = [];
@@ -38,7 +32,7 @@ export function cleanForBridge(
   }
 }
 
-export function copyToClipboard(value     )       {
+export function copyToClipboard(value) {
   const safeToCopy = serializeToString(value);
   const text = safeToCopy === undefined ? 'undefined' : safeToCopy;
   const {clipboardCopyText} = window.__REACT_DEVTOOLS_GLOBAL_HOOK__;
@@ -49,22 +43,18 @@ export function copyToClipboard(value     )       {
   // clipboardCopyText is an helper injected into the page from.
   // injectGlobalHook.
   if (typeof clipboardCopyText === 'function') {
-    clipboardCopyText(text).catch(err => {});
+    clipboardCopyText(text).catch((err) => {});
   } else {
     copy(text);
   }
 }
 
-export function copyWithDelete(
-  obj                     ,
-  path                        ,
-  index         = 0,
-)                      {
+export function copyWithDelete(obj, path, index = 0) {
   const key = path[index];
   const updated = Array.isArray(obj) ? obj.slice() : {...obj};
   if (index + 1 === path.length) {
     if (Array.isArray(updated)) {
-      updated.splice(((key     )        ), 1);
+      updated.splice(key, 1);
     } else {
       delete updated[key];
     }
@@ -77,12 +67,7 @@ export function copyWithDelete(
 
 // This function expects paths to be the same except for the final value.
 // e.g. ['path', 'to', 'foo'] and ['path', 'to', 'bar']
-export function copyWithRename(
-  obj                     ,
-  oldPath                        ,
-  newPath                        ,
-  index         = 0,
-)                      {
+export function copyWithRename(obj, oldPath, newPath, index = 0) {
   const oldKey = oldPath[index];
   const updated = Array.isArray(obj) ? obj.slice() : {...obj};
   if (index + 1 === oldPath.length) {
@@ -90,7 +75,7 @@ export function copyWithRename(
     // $FlowFixMe number or string is fine here
     updated[newKey] = updated[oldKey];
     if (Array.isArray(updated)) {
-      updated.splice(((oldKey     )        ), 1);
+      updated.splice(oldKey, 1);
     } else {
       delete updated[oldKey];
     }
@@ -101,12 +86,7 @@ export function copyWithRename(
   return updated;
 }
 
-export function copyWithSet(
-  obj                     ,
-  path                        ,
-  value     ,
-  index         = 0,
-)                      {
+export function copyWithSet(obj, path, value, index = 0) {
   if (index >= path.length) {
     return value;
   }
@@ -117,7 +97,7 @@ export function copyWithSet(
   return updated;
 }
 
-export function serializeToString(data     )         {
+export function serializeToString(data) {
   const cache = new Set();
   // Use a custom replacer function to protect against circular references.
   return JSON.stringify(data, (key, value) => {

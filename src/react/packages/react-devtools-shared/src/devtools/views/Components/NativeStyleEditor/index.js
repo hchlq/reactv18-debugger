@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -16,15 +16,13 @@ import LayoutViewer from './LayoutViewer';
 import StyleEditor from './StyleEditor';
 import {TreeStateContext} from '../TreeContext';
 
-                  
-
-export default function NativeStyleEditorWrapper(_       ) {
+export default function NativeStyleEditorWrapper(_) {
   const store = useContext(StoreContext);
 
   const subscription = useMemo(
     () => ({
       getCurrentValue: () => store.supportsNativeStyleEditor,
-      subscribe: (callback          ) => {
+      subscribe: (callback) => {
         store.addListener('supportsNativeStyleEditor', callback);
         return () => {
           store.removeListener('supportsNativeStyleEditor', callback);
@@ -33,7 +31,7 @@ export default function NativeStyleEditorWrapper(_       ) {
     }),
     [store],
   );
-  const supportsNativeStyleEditor = useSubscription         (subscription);
+  const supportsNativeStyleEditor = useSubscription(subscription);
 
   if (!supportsNativeStyleEditor) {
     return null;
@@ -42,7 +40,7 @@ export default function NativeStyleEditorWrapper(_       ) {
   return <NativeStyleEditor />;
 }
 
-function NativeStyleEditor(_       ) {
+function NativeStyleEditor(_) {
   const {getStyleAndLayout} = useContext(NativeStyleContext);
 
   const {inspectedElementID} = useContext(TreeStateContext);

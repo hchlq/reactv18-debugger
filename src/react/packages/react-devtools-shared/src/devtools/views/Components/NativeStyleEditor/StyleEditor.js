@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -22,21 +22,11 @@ import AutoSizeInput from './AutoSizeInput';
 import styles from './StyleEditor.css';
 import {sanitizeForParse} from '../../../utils';
 
-                                   
-
-               
-             
-               
-   
-
-                                                                                
-                                                        
-
-export default function StyleEditor({id, style}       ) {
+export default function StyleEditor({id, style}) {
   const bridge = useContext(BridgeContext);
   const store = useContext(StoreContext);
 
-  const changeAttribute = (oldName        , newName        , value     ) => {
+  const changeAttribute = (oldName, newName, value) => {
     const rendererID = store.getRendererIDForElement(id);
     if (rendererID !== null) {
       bridge.send('NativeStyleEditor_renameAttribute', {
@@ -49,7 +39,7 @@ export default function StyleEditor({id, style}       ) {
     }
   };
 
-  const changeValue = (name        , value     ) => {
+  const changeValue = (name, value) => {
     const rendererID = store.getRendererIDForElement(id);
     if (rendererID !== null) {
       bridge.send('NativeStyleEditor_setValue', {
@@ -76,7 +66,7 @@ export default function StyleEditor({id, style}       ) {
         </Button>
       </div>
       {keys.length > 0 &&
-        keys.map(attribute => (
+        keys.map((attribute) => (
           <Row
             key={attribute}
             attribute={attribute}
@@ -96,28 +86,18 @@ export default function StyleEditor({id, style}       ) {
   );
 }
 
-                     
-                                     
-                             
-                                                 
-   
-
-function NewRow({changeAttribute, changeValue, validAttributes}             ) {
-  const [key, setKey] = useState        (0);
+function NewRow({changeAttribute, changeValue, validAttributes}) {
+  const [key, setKey] = useState(0);
   const reset = () => setKey(key + 1);
 
-  const newAttributeRef = useRef        ('');
+  const newAttributeRef = useRef('');
 
-  const changeAttributeWrapper = (
-    oldAttribute        ,
-    newAttribute        ,
-    value     ,
-  ) => {
+  const changeAttributeWrapper = (oldAttribute, newAttribute, value) => {
     // Ignore attribute changes until a value has been specified
     newAttributeRef.current = newAttribute;
   };
 
-  const changeValueWrapper = (attribute        , value     ) => {
+  const changeValueWrapper = (attribute, value) => {
     // Blur events should reset/cancel if there's no value or no attribute
     if (newAttributeRef.current !== '') {
       if (value !== '') {
@@ -141,16 +121,6 @@ function NewRow({changeAttribute, changeValue, validAttributes}             ) {
   );
 }
 
-                  
-                    
-                                
-                                     
-                             
-                                                 
-             
-                            
-   
-
 function Row({
   attribute,
   attributePlaceholder,
@@ -159,7 +129,7 @@ function Row({
   validAttributes,
   value,
   valuePlaceholder,
-}          ) {
+}) {
   // TODO (RN style editor) Use @reach/combobox to auto-complete attributes.
   // The list of valid attributes would need to be injected by RN backend,
   // which would need to require them from ReactNativeViewViewConfig "validAttributes.style" keys.
@@ -171,7 +141,7 @@ function Row({
   const [isAttributeValid, setIsAttributeValid] = useState(true);
   const [isValueValid, setIsValueValid] = useState(true);
 
-  const validateAndSetLocalAttribute = newAttribute => {
+  const validateAndSetLocalAttribute = (newAttribute) => {
     const isValid =
       newAttribute === '' ||
       validAttributes === null ||
@@ -183,7 +153,7 @@ function Row({
     });
   };
 
-  const validateAndSetLocalValue = newValue => {
+  const validateAndSetLocalValue = (newValue) => {
     let isValid = false;
     try {
       JSON.parse(sanitizeForParse(newValue));
@@ -245,24 +215,8 @@ function Row({
   );
 }
 
-                    
-                    
-                                 
-                      
-                       
-                       
-             
-   
-
-function Field({
-  className,
-  onChange,
-  onReset,
-  onSubmit,
-  placeholder,
-  value,
-}            ) {
-  const onKeyDown = event => {
+function Field({className, onChange, onReset, onSubmit, placeholder, value}) {
+  const onKeyDown = (event) => {
     switch (event.key) {
       case 'Enter':
         onSubmit();
@@ -285,7 +239,7 @@ function Field({
     <AutoSizeInput
       className={`${className} ${styles.Input}`}
       onBlur={onSubmit}
-      onChange={event => onChange(event.target.value)}
+      onChange={(event) => onChange(event.target.value)}
       onKeyDown={onKeyDown}
       placeholder={placeholder}
       value={value}

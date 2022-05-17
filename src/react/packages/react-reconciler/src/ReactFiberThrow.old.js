@@ -4,16 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                
-                                                    
-                                                  
-                                                        
-                                                   
-                                                
-                                                                     
 
 import getComponentName from 'shared/getComponentName';
 import {
@@ -71,11 +63,7 @@ import {
 
 const PossiblyWeakMap = typeof WeakMap === 'function' ? WeakMap : Map;
 
-function createRootErrorUpdate(
-  fiber       ,
-  errorInfo                      ,
-  lane      ,
-)                {
+function createRootErrorUpdate(fiber, errorInfo, lane) {
   const update = createUpdate(NoTimestamp, lane);
   // Unmount the root by rendering null.
   update.tag = CaptureUpdate;
@@ -90,11 +78,7 @@ function createRootErrorUpdate(
   return update;
 }
 
-function createClassErrorUpdate(
-  fiber       ,
-  errorInfo                      ,
-  lane      ,
-)                {
+function createClassErrorUpdate(fiber, errorInfo, lane) {
   const update = createUpdate(NoTimestamp, lane);
   update.tag = CaptureUpdate;
   const getDerivedStateFromError = fiber.type.getDerivedStateFromError;
@@ -133,7 +117,7 @@ function createClassErrorUpdate(
           // If componentDidCatch is the only error boundary method defined,
           // then it needs to call setState to recover from errors.
           // If no state update is scheduled then the boundary will swallow the error.
-          if (!includesSomeLane(fiber.lanes, (SyncLane      ))) {
+          if (!includesSomeLane(fiber.lanes, SyncLane)) {
             console.error(
               '%s: Error boundaries should implement getDerivedStateFromError(). ' +
                 'In that method, return a state update to display an error message or fallback UI.',
@@ -151,7 +135,7 @@ function createClassErrorUpdate(
   return update;
 }
 
-function attachPingListener(root           , wakeable          , lanes       ) {
+function attachPingListener(root, wakeable, lanes) {
   // Attach a listener to the promise to "ping" the root and retry. But only if
   // one does not already exist for the lanes we're currently rendering (which
   // acts like a "thread ID" here).
@@ -177,11 +161,11 @@ function attachPingListener(root           , wakeable          , lanes       ) {
 }
 
 function throwException(
-  root           ,
-  returnFiber       ,
-  sourceFiber       ,
-  value       ,
-  rootRenderLanes       ,
+  root,
+  returnFiber,
+  sourceFiber,
+  value,
+  rootRenderLanes,
 ) {
   // The source fiber did not complete.
   sourceFiber.flags |= Incomplete;
@@ -194,7 +178,7 @@ function throwException(
     typeof value.then === 'function'
   ) {
     // This is a wakeable.
-    const wakeable           = (value     );
+    const wakeable = value;
 
     if (__DEV__) {
       if (enableDebugTracing) {
@@ -225,7 +209,7 @@ function throwException(
 
     const hasInvisibleParentBoundary = hasSuspenseContext(
       suspenseStackCursor.current,
-      (InvisibleParentSuspenseContext                 ),
+      InvisibleParentSuspenseContext,
     );
 
     // Schedule the nearest Suspense to re-render the timed out view.
@@ -239,9 +223,9 @@ function throwException(
 
         // Stash the promise on the boundary fiber. If the boundary times out, we'll
         // attach another listener to flip the boundary back to its normal state.
-        const wakeables                = (workInProgress.updateQueue     );
+        const wakeables = workInProgress.updateQueue;
         if (wakeables === null) {
-          const updateQueue = (new Set()     );
+          const updateQueue = new Set();
           updateQueue.add(wakeable);
           workInProgress.updateQueue = updateQueue;
         } else {

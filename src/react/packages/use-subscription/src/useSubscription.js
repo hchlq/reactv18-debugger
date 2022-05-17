@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import {useDebugValue, useEffect, useState} from 'react';
@@ -15,17 +15,14 @@ import {useDebugValue, useEffect, useState} from 'react';
 // the parameters passed to this hook should be memoized in some way–
 // either by wrapping the entire params object with useMemo()
 // or by wrapping the individual callbacks with useCallback().
-export function useSubscription       ({
+export function useSubscription({
   // (Synchronously) returns the current value of our subscription.
   getCurrentValue,
 
   // This function is passed an event handler to attach to the subscription.
   // It should return an unsubscribe function that removes the handler.
   subscribe,
-}    
-                               
-                                                
-  )        {
+}) {
   // Read the current value from our subscription.
   // When this value changes, we'll schedule an update with React.
   // It's important to also store the hook params so that we can check for staleness.
@@ -85,7 +82,7 @@ export function useSubscription       ({
       // This avoids visual "tearing" when a mutation happens during a (concurrent) render.
       const value = getCurrentValue();
 
-      setState(prevState => {
+      setState((prevState) => {
         // Ignore values from stale sources!
         // Since we subscribe an unsubscribe in a passive effect,
         // it's possible that this callback will be invoked for a stale (previous) subscription.

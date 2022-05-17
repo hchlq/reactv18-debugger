@@ -16,7 +16,7 @@ function validateVersion(version) {
   throw new Error('Suspicious browser version in manifest: ' + version);
 }
 
-module.exports = api => {
+module.exports = (api) => {
   const isTest = api.env('test');
   const targets = {};
   if (isTest) {

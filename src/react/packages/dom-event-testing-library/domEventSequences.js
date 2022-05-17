@@ -112,7 +112,7 @@ export function contextmenu(
   defaultPayload,
   {pointerType = 'mouse', modified} = {},
 ) {
-  const dispatch = arg => target.dispatchEvent(arg);
+  const dispatch = (arg) => target.dispatchEvent(arg);
 
   const payload = {
     pointerId: defaultPointerId,
@@ -173,7 +173,7 @@ export function contextmenu(
 }
 
 export function pointercancel(target, defaultPayload) {
-  const dispatchEvent = arg => target.dispatchEvent(arg);
+  const dispatchEvent = (arg) => target.dispatchEvent(arg);
   const pointerType = getPointerType(defaultPayload);
 
   const payload = {
@@ -197,7 +197,7 @@ export function pointercancel(target, defaultPayload) {
 }
 
 export function pointerdown(target, defaultPayload) {
-  const dispatch = arg => target.dispatchEvent(arg);
+  const dispatch = (arg) => target.dispatchEvent(arg);
   const pointerType = getPointerType(defaultPayload);
 
   const payload = {
@@ -239,7 +239,7 @@ export function pointerdown(target, defaultPayload) {
 }
 
 export function pointerenter(target, defaultPayload) {
-  const dispatch = arg => target.dispatchEvent(arg);
+  const dispatch = (arg) => target.dispatchEvent(arg);
 
   const payload = {
     pointerId: defaultPointerId,
@@ -255,7 +255,7 @@ export function pointerenter(target, defaultPayload) {
 }
 
 export function pointerexit(target, defaultPayload) {
-  const dispatch = arg => target.dispatchEvent(arg);
+  const dispatch = (arg) => target.dispatchEvent(arg);
 
   const payload = {
     pointerId: defaultPointerId,
@@ -271,7 +271,7 @@ export function pointerexit(target, defaultPayload) {
 }
 
 export function pointerhover(target, defaultPayload) {
-  const dispatch = arg => target.dispatchEvent(arg);
+  const dispatch = (arg) => target.dispatchEvent(arg);
 
   const payload = {
     pointerId: defaultPointerId,
@@ -285,7 +285,7 @@ export function pointerhover(target, defaultPayload) {
 }
 
 export function pointermove(target, defaultPayload) {
-  const dispatch = arg => target.dispatchEvent(arg);
+  const dispatch = (arg) => target.dispatchEvent(arg);
   const pointerType = getPointerType(defaultPayload);
 
   const payload = {
@@ -314,7 +314,7 @@ export function pointermove(target, defaultPayload) {
 }
 
 export function pointerup(target, defaultPayload) {
-  const dispatch = arg => target.dispatchEvent(arg);
+  const dispatch = (arg) => target.dispatchEvent(arg);
   const pointerType = getPointerType(defaultPayload);
 
   const payload = {

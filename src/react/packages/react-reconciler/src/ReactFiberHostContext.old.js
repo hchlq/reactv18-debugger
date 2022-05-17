@@ -4,46 +4,35 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                
-                                                       
-                                                                   
 
 import invariant from 'shared/invariant';
 
 import {getChildHostContext, getRootHostContext} from './ReactFiberHostConfig';
 import {createCursor, push, pop} from './ReactFiberStack.old';
 
-                           
-const NO_CONTEXT             = ({}     );
+const NO_CONTEXT = {};
 
-const contextStackCursor                                        = createCursor(
-  NO_CONTEXT,
-);
-const contextFiberStackCursor                                  = createCursor(
-  NO_CONTEXT,
-);
-const rootInstanceStackCursor              
-                         
-  = createCursor(NO_CONTEXT);
+const contextStackCursor = createCursor(NO_CONTEXT);
+const contextFiberStackCursor = createCursor(NO_CONTEXT);
+const rootInstanceStackCursor = createCursor(NO_CONTEXT);
 
-function requiredContext       (c                    )        {
+function requiredContext(c) {
   invariant(
     c !== NO_CONTEXT,
     'Expected host context to exist. This error is likely caused by a bug ' +
       'in React. Please file an issue.',
   );
-  return (c     );
+  return c;
 }
 
-function getRootHostContainer()            {
+function getRootHostContainer() {
   const rootInstance = requiredContext(rootInstanceStackCursor.current);
   return rootInstance;
 }
 
-function pushHostContainer(fiber       , nextRootInstance           ) {
+function pushHostContainer(fiber, nextRootInstance) {
   // Push current root instance onto the stack;
   // This allows us to reset root when portals are popped.
   push(rootInstanceStackCursor, nextRootInstance, fiber);
@@ -63,22 +52,20 @@ function pushHostContainer(fiber       , nextRootInstance           ) {
   push(contextStackCursor, nextRootContext, fiber);
 }
 
-function popHostContainer(fiber       ) {
+function popHostContainer(fiber) {
   pop(contextStackCursor, fiber);
   pop(contextFiberStackCursor, fiber);
   pop(rootInstanceStackCursor, fiber);
 }
 
-function getHostContext()              {
+function getHostContext() {
   const context = requiredContext(contextStackCursor.current);
   return context;
 }
 
-function pushHostContext(fiber       )       {
-  const rootInstance            = requiredContext(
-    rootInstanceStackCursor.current,
-  );
-  const context              = requiredContext(contextStackCursor.current);
+function pushHostContext(fiber) {
+  const rootInstance = requiredContext(rootInstanceStackCursor.current);
+  const context = requiredContext(contextStackCursor.current);
   const nextContext = getChildHostContext(context, fiber.type, rootInstance);
 
   // Don't push this Fiber's context unless it's unique.
@@ -92,7 +79,7 @@ function pushHostContext(fiber       )       {
   push(contextStackCursor, nextContext, fiber);
 }
 
-function popHostContext(fiber       )       {
+function popHostContext(fiber) {
   // Do not pop unless this Fiber provided the current context.
   // pushHostContext() only pushes Fibers that provide unique contexts.
   if (contextFiberStackCursor.current !== fiber) {

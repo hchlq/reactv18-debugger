@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -37,17 +37,7 @@ import styles from './Tree.css';
 // Never indent more than this number of pixels (even if we have the room).
 const DEFAULT_INDENTATION_SIZE = 12;
 
-                         
-                      
-                                    
-                                                   
-                                            
-                       
-   
-
-                  
-
-export default function Tree(props       ) {
+export default function Tree(props) {
   const dispatch = useContext(TreeDispatcherContext);
   const {
     numElements,
@@ -59,17 +49,14 @@ export default function Tree(props       ) {
   } = useContext(TreeStateContext);
   const bridge = useContext(BridgeContext);
   const store = useContext(StoreContext);
-  const [isNavigatingWithKeyboard, setIsNavigatingWithKeyboard] = useState(
-    false,
-  );
-  const {
-    highlightNativeElement,
-    clearHighlightNativeElement,
-  } = useHighlightNativeElement();
-  const treeRef = useRef                       (null);
-  const focusTargetRef = useRef                       (null);
+  const [isNavigatingWithKeyboard, setIsNavigatingWithKeyboard] =
+    useState(false);
+  const {highlightNativeElement, clearHighlightNativeElement} =
+    useHighlightNativeElement();
+  const treeRef = useRef(null);
+  const focusTargetRef = useRef(null);
 
-  const [treeFocused, setTreeFocused] = useState         (false);
+  const [treeFocused, setTreeFocused] = useState(false);
 
   const {lineHeight} = useContext(SettingsContext);
 
@@ -85,7 +72,7 @@ export default function Tree(props       ) {
   // meaning the scroll action would be skipped (since ref updates don't re-run effects).
   // Using a callback ref accounts for this case...
   const listCallbackRef = useCallback(
-    list => {
+    (list) => {
       if (list != null && selectedElementIndex !== null) {
         list.scrollToItem(selectedElementIndex, 'smart');
       }
@@ -109,7 +96,7 @@ export default function Tree(props       ) {
   // This ref is passed down the context to elements.
   // It lets them avoid autoscrolling to the same item many times
   // when a selected virtual row goes in and out of the viewport.
-  const lastScrolledIDRef = useRef               (null);
+  const lastScrolledIDRef = useRef(null);
 
   // Navigate the tree with up/down arrow keys.
   useEffect(() => {
@@ -117,8 +104,8 @@ export default function Tree(props       ) {
       return () => {};
     }
 
-    const handleKeyDown = (event               ) => {
-      if ((event     ).target.tagName === 'INPUT' || event.defaultPrevented) {
+    const handleKeyDown = (event) => {
+      if (event.target.tagName === 'INPUT' || event.defaultPrevented) {
         return;
       }
 
@@ -213,7 +200,7 @@ export default function Tree(props       ) {
   }, [dispatch, numElements, selectedElementIndex]);
 
   const handleKeyPress = useCallback(
-    event => {
+    (event) => {
       switch (event.key) {
         case 'Enter':
         case ' ':
@@ -259,7 +246,7 @@ export default function Tree(props       ) {
 
   // Highlight last hovered element.
   const handleElementMouseEnter = useCallback(
-    id => {
+    (id) => {
       // Ignore hover while we're navigating with keyboard.
       // This avoids flicker from the hovered nodes under the mouse.
       if (!isNavigatingWithKeyboard) {
@@ -279,7 +266,7 @@ export default function Tree(props       ) {
 
   // Let react-window know to re-render any time the underlying tree data changes.
   // This includes the owner context, since it controls a filtered view of the tree.
-  const itemData = useMemo          (
+  const itemData = useMemo(
     () => ({
       numElements,
       isNavigatingWithKeyboard,
@@ -297,7 +284,7 @@ export default function Tree(props       ) {
   );
 
   const itemKey = useCallback(
-    (index        ) => store.getElementIDAtIndex(index),
+    (index) => store.getElementIDAtIndex(index),
     [store],
   );
 
@@ -325,7 +312,8 @@ export default function Tree(props       ) {
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
           ref={focusTargetRef}
-          tabIndex={0}>
+          tabIndex={0}
+        >
           <AutoSizer>
             {({height, width}) => (
               // $FlowFixMe https://github.com/facebook/flow/issues/7341
@@ -338,7 +326,8 @@ export default function Tree(props       ) {
                 itemKey={itemKey}
                 itemSize={lineHeight}
                 ref={listCallbackRef}
-                width={width}>
+                width={width}
+              >
                 {ElementView}
               </FixedSizeList>
             )}
@@ -390,12 +379,12 @@ export default function Tree(props       ) {
 // given the child's fixed width and depth within the tree.
 // Then we take the smallest of these indentation sizes...
 function updateIndentationSizeVar(
-  innerDiv                ,
-  cachedChildWidths                              ,
-  indentationSizeRef                     ,
-  prevListWidthRef                     ,
-)       {
-  const list = ((innerDiv.parentElement     )                );
+  innerDiv,
+  cachedChildWidths,
+  indentationSizeRef,
+  prevListWidthRef,
+) {
+  const list = innerDiv.parentElement;
   const listWidth = list.clientWidth;
 
   // Skip measurements when the Components panel is hidden.
@@ -409,13 +398,13 @@ function updateIndentationSizeVar(
   }
   prevListWidthRef.current = listWidth;
 
-  let maxIndentationSize         = indentationSizeRef.current;
+  let maxIndentationSize = indentationSizeRef.current;
 
   // eslint-disable-next-line no-for-of-loops/no-for-of-loops
   for (const child of innerDiv.children) {
     const depth = parseInt(child.getAttribute('data-depth'), 10) || 0;
 
-    let childWidth         = 0;
+    let childWidth = 0;
 
     const cachedChildWidth = cachedChildWidths.get(child);
     if (cachedChildWidth != null) {
@@ -443,10 +432,7 @@ function updateIndentationSizeVar(
 function InnerElementType({children, style, ...rest}) {
   const {ownerID} = useContext(TreeStateContext);
 
-  const cachedChildWidths = useMemo                              (
-    () => new WeakMap(),
-    [],
-  );
+  const cachedChildWidths = useMemo(() => new WeakMap(), []);
 
   // This ref tracks the current indentation size.
   // We decrease indentation to fit wider/deeper trees.
@@ -459,10 +445,10 @@ function InnerElementType({children, style, ...rest}) {
   // The user may have resized the window specifically to make more room for DevTools.
   // In either case, this should reset our max indentation size logic.
   // 2. The second is when the user enters or exits an owner tree.
-  const indentationSizeRef = useRef        (DEFAULT_INDENTATION_SIZE);
-  const prevListWidthRef = useRef        (0);
-  const prevOwnerIDRef = useRef               (ownerID);
-  const divRef = useRef                       (null);
+  const indentationSizeRef = useRef(DEFAULT_INDENTATION_SIZE);
+  const prevListWidthRef = useRef(0);
+  const prevOwnerIDRef = useRef(ownerID);
+  const divRef = useRef(null);
 
   // We shouldn't retain this width across different conceptual trees though,
   // so when the user opens the "owners tree" view, we should discard the previous width.
@@ -492,7 +478,8 @@ function InnerElementType({children, style, ...rest}) {
       className={styles.InnerElementType}
       ref={divRef}
       style={style}
-      {...rest}>
+      {...rest}
+    >
       <SelectedTreeHighlight />
       {children}
     </div>

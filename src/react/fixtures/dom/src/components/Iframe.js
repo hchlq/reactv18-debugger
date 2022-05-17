@@ -4,7 +4,7 @@ const ReactDOM = window.ReactDOM;
 class IframePortal extends React.Component {
   iframeRef = null;
 
-  handleRef = ref => {
+  handleRef = (ref) => {
     if (ref !== this.iframeRef) {
       this.iframeRef = ref;
       if (ref) {

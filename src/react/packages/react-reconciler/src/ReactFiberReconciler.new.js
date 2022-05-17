@@ -4,23 +4,10 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
-                                                                            
-                                                    
-                                             
-             
-           
-               
-            
-                 
-                                
-                                                                     
 import {FundamentalComponent} from './ReactWorkTags';
-                                                     
-                                                         
-                                                                     
 
 import {
   findCurrentHostFiber,
@@ -106,21 +93,8 @@ export {
   observeVisibleRects,
 } from './ReactTestSelectors';
 
-                            
-
 // 0 is PROD, 1 is DEV.
 // Might add PROFILE later.
-                        
-
-                        
-                         
-                  
-                              
-                                                                
-                                                             
-                                                                                
-                                            
-   
 
 let didWarnAboutNestedUpdates;
 let didWarnAboutFindNodeInStrictMode;
@@ -130,9 +104,7 @@ if (__DEV__) {
   didWarnAboutFindNodeInStrictMode = {};
 }
 
-function getContextForSubtree(
-  parentComponent                            ,
-)         {
+function getContextForSubtree(parentComponent) {
   if (!parentComponent) {
     return emptyContextObject;
   }
@@ -150,7 +122,7 @@ function getContextForSubtree(
   return parentContext;
 }
 
-function findHostInstance(component        )                        {
+function findHostInstance(component) {
   const fiber = getInstance(component);
   if (fiber === undefined) {
     if (typeof component.render === 'function') {
@@ -170,10 +142,7 @@ function findHostInstance(component        )                        {
   return hostFiber.stateNode;
 }
 
-function findHostInstanceWithWarning(
-  component        ,
-  methodName        ,
-)                        {
+function findHostInstanceWithWarning(component, methodName) {
   if (__DEV__) {
     const fiber = getInstance(component);
     if (fiber === undefined) {
@@ -239,20 +208,15 @@ function findHostInstanceWithWarning(
 }
 
 export function createContainer(
-  containerInfo           ,
-  tag         ,
-  hydrate         ,
-  hydrationCallbacks                                   ,
-)             {
+  containerInfo,
+  tag,
+  hydrate,
+  hydrationCallbacks,
+) {
   return createFiberRoot(containerInfo, tag, hydrate, hydrationCallbacks);
 }
 
-export function updateContainer(
-  element               ,
-  container            ,
-  parentComponent                            ,
-  callback           ,
-)       {
+export function updateContainer(element, container, parentComponent, callback) {
   if (__DEV__) {
     onScheduleRoot(container, element);
   }
@@ -334,9 +298,7 @@ export {
   act,
 };
 
-export function getPublicRootInstance(
-  container            ,
-)                                                    {
+export function getPublicRootInstance(container) {
   const containerFiber = container.current;
   if (!containerFiber.child) {
     return null;
@@ -349,10 +311,10 @@ export function getPublicRootInstance(
   }
 }
 
-export function attemptSynchronousHydration(fiber       )       {
+export function attemptSynchronousHydration(fiber) {
   switch (fiber.tag) {
     case HostRoot:
-      const root            = fiber.stateNode;
+      const root = fiber.stateNode;
       if (root.hydrate) {
         // Flush the first scheduled "update".
         const lanes = getHighestPriorityPendingLanes(root);
@@ -371,8 +333,8 @@ export function attemptSynchronousHydration(fiber       )       {
   }
 }
 
-function markRetryLaneImpl(fiber       , retryLane      ) {
-  const suspenseState                       = fiber.memoizedState;
+function markRetryLaneImpl(fiber, retryLane) {
+  const suspenseState = fiber.memoizedState;
   if (suspenseState !== null && suspenseState.dehydrated !== null) {
     suspenseState.retryLane = higherPriorityLane(
       suspenseState.retryLane,
@@ -382,7 +344,7 @@ function markRetryLaneImpl(fiber       , retryLane      ) {
 }
 
 // Increases the priority of thennables when they resolve within this boundary.
-function markRetryLaneIfNotHydrated(fiber       , retryLane      ) {
+function markRetryLaneIfNotHydrated(fiber, retryLane) {
   markRetryLaneImpl(fiber, retryLane);
   const alternate = fiber.alternate;
   if (alternate) {
@@ -390,7 +352,7 @@ function markRetryLaneIfNotHydrated(fiber       , retryLane      ) {
   }
 }
 
-export function attemptUserBlockingHydration(fiber       )       {
+export function attemptUserBlockingHydration(fiber) {
   if (fiber.tag !== SuspenseComponent) {
     // We ignore HostRoots here because we can't increase
     // their priority and they should not suspend on I/O,
@@ -404,7 +366,7 @@ export function attemptUserBlockingHydration(fiber       )       {
   markRetryLaneIfNotHydrated(fiber, lane);
 }
 
-export function attemptContinuousHydration(fiber       )       {
+export function attemptContinuousHydration(fiber) {
   if (fiber.tag !== SuspenseComponent) {
     // We ignore HostRoots here because we can't increase
     // their priority and they should not suspend on I/O,
@@ -418,7 +380,7 @@ export function attemptContinuousHydration(fiber       )       {
   markRetryLaneIfNotHydrated(fiber, lane);
 }
 
-export function attemptHydrationAtCurrentPriority(fiber       )       {
+export function attemptHydrationAtCurrentPriority(fiber) {
   if (fiber.tag !== SuspenseComponent) {
     // We ignore HostRoots here because we can't increase
     // their priority other than synchronously flush it.
@@ -430,7 +392,7 @@ export function attemptHydrationAtCurrentPriority(fiber       )       {
   markRetryLaneIfNotHydrated(fiber, lane);
 }
 
-export function runWithPriority   (priority              , fn         ) {
+export function runWithPriority(priority, fn) {
   const previousPriority = getCurrentUpdateLanePriority();
   try {
     setCurrentUpdateLanePriority(priority);
@@ -446,9 +408,7 @@ export {findHostInstance};
 
 export {findHostInstanceWithWarning};
 
-export function findHostInstanceWithNoPortals(
-  fiber       ,
-)                        {
+export function findHostInstanceWithNoPortals(fiber) {
   const hostFiber = findCurrentHostFiberWithNoPortals(fiber);
   if (hostFiber === null) {
     return null;
@@ -459,9 +419,9 @@ export function findHostInstanceWithNoPortals(
   return hostFiber.stateNode;
 }
 
-let shouldSuspendImpl = fiber => false;
+let shouldSuspendImpl = (fiber) => false;
 
-export function shouldSuspend(fiber       )          {
+export function shouldSuspend(fiber) {
   return shouldSuspendImpl(fiber);
 }
 
@@ -475,16 +435,12 @@ let scheduleUpdate = null;
 let setSuspenseHandler = null;
 
 if (__DEV__) {
-  const copyWithDeleteImpl = (
-    obj                     ,
-    path                        ,
-    index        ,
-  ) => {
+  const copyWithDeleteImpl = (obj, path, index) => {
     const key = path[index];
     const updated = Array.isArray(obj) ? obj.slice() : {...obj};
     if (index + 1 === path.length) {
       if (Array.isArray(updated)) {
-        updated.splice(((key     )        ), 1);
+        updated.splice(key, 1);
       } else {
         delete updated[key];
       }
@@ -495,19 +451,11 @@ if (__DEV__) {
     return updated;
   };
 
-  const copyWithDelete = (
-    obj                     ,
-    path                        ,
-  )                      => {
+  const copyWithDelete = (obj, path) => {
     return copyWithDeleteImpl(obj, path, 0);
   };
 
-  const copyWithRenameImpl = (
-    obj                     ,
-    oldPath                        ,
-    newPath                        ,
-    index        ,
-  ) => {
+  const copyWithRenameImpl = (obj, oldPath, newPath, index) => {
     const oldKey = oldPath[index];
     const updated = Array.isArray(obj) ? obj.slice() : {...obj};
     if (index + 1 === oldPath.length) {
@@ -515,7 +463,7 @@ if (__DEV__) {
       // $FlowFixMe number or string is fine here
       updated[newKey] = updated[oldKey];
       if (Array.isArray(updated)) {
-        updated.splice(((oldKey     )        ), 1);
+        updated.splice(oldKey, 1);
       } else {
         delete updated[oldKey];
       }
@@ -532,11 +480,7 @@ if (__DEV__) {
     return updated;
   };
 
-  const copyWithRename = (
-    obj                     ,
-    oldPath                        ,
-    newPath                        ,
-  )                      => {
+  const copyWithRename = (obj, oldPath, newPath) => {
     if (oldPath.length !== newPath.length) {
       console.warn('copyWithRename() expects paths of the same length');
       return;
@@ -553,12 +497,7 @@ if (__DEV__) {
     return copyWithRenameImpl(obj, oldPath, newPath, 0);
   };
 
-  const copyWithSetImpl = (
-    obj                     ,
-    path                        ,
-    index        ,
-    value     ,
-  ) => {
+  const copyWithSetImpl = (obj, path, index, value) => {
     if (index >= path.length) {
       return value;
     }
@@ -569,15 +508,11 @@ if (__DEV__) {
     return updated;
   };
 
-  const copyWithSet = (
-    obj                     ,
-    path                        ,
-    value     ,
-  )                      => {
+  const copyWithSet = (obj, path, value) => {
     return copyWithSetImpl(obj, path, 0, value);
   };
 
-  const findHook = (fiber       , id        ) => {
+  const findHook = (fiber, id) => {
     // For now, the "id" of stateful hooks is just the stateful hook index.
     // This may change in the future with e.g. nested hooks.
     let currentHook = fiber.memoizedState;
@@ -589,12 +524,7 @@ if (__DEV__) {
   };
 
   // Support DevTools editable values for useState and useReducer.
-  overrideHookState = (
-    fiber       ,
-    id        ,
-    path                        ,
-    value     ,
-  ) => {
+  overrideHookState = (fiber, id, path, value) => {
     const hook = findHook(fiber, id);
     if (hook !== null) {
       const newState = copyWithSet(hook.memoizedState, path, value);
@@ -611,11 +541,7 @@ if (__DEV__) {
       scheduleUpdateOnFiber(fiber, SyncLane, NoTimestamp);
     }
   };
-  overrideHookStateDeletePath = (
-    fiber       ,
-    id        ,
-    path                        ,
-  ) => {
+  overrideHookStateDeletePath = (fiber, id, path) => {
     const hook = findHook(fiber, id);
     if (hook !== null) {
       const newState = copyWithDelete(hook.memoizedState, path);
@@ -632,12 +558,7 @@ if (__DEV__) {
       scheduleUpdateOnFiber(fiber, SyncLane, NoTimestamp);
     }
   };
-  overrideHookStateRenamePath = (
-    fiber       ,
-    id        ,
-    oldPath                        ,
-    newPath                        ,
-  ) => {
+  overrideHookStateRenamePath = (fiber, id, oldPath, newPath) => {
     const hook = findHook(fiber, id);
     if (hook !== null) {
       const newState = copyWithRename(hook.memoizedState, oldPath, newPath);
@@ -656,25 +577,21 @@ if (__DEV__) {
   };
 
   // Support DevTools props for function components, forwardRef, memo, host components, etc.
-  overrideProps = (fiber       , path                        , value     ) => {
+  overrideProps = (fiber, path, value) => {
     fiber.pendingProps = copyWithSet(fiber.memoizedProps, path, value);
     if (fiber.alternate) {
       fiber.alternate.pendingProps = fiber.pendingProps;
     }
     scheduleUpdateOnFiber(fiber, SyncLane, NoTimestamp);
   };
-  overridePropsDeletePath = (fiber       , path                        ) => {
+  overridePropsDeletePath = (fiber, path) => {
     fiber.pendingProps = copyWithDelete(fiber.memoizedProps, path);
     if (fiber.alternate) {
       fiber.alternate.pendingProps = fiber.pendingProps;
     }
     scheduleUpdateOnFiber(fiber, SyncLane, NoTimestamp);
   };
-  overridePropsRenamePath = (
-    fiber       ,
-    oldPath                        ,
-    newPath                        ,
-  ) => {
+  overridePropsRenamePath = (fiber, oldPath, newPath) => {
     fiber.pendingProps = copyWithRename(fiber.memoizedProps, oldPath, newPath);
     if (fiber.alternate) {
       fiber.alternate.pendingProps = fiber.pendingProps;
@@ -682,16 +599,16 @@ if (__DEV__) {
     scheduleUpdateOnFiber(fiber, SyncLane, NoTimestamp);
   };
 
-  scheduleUpdate = (fiber       ) => {
+  scheduleUpdate = (fiber) => {
     scheduleUpdateOnFiber(fiber, SyncLane, NoTimestamp);
   };
 
-  setSuspenseHandler = (newShouldSuspendImpl                  ) => {
+  setSuspenseHandler = (newShouldSuspendImpl) => {
     shouldSuspendImpl = newShouldSuspendImpl;
   };
 }
 
-function findHostInstanceByFiber(fiber       )                                 {
+function findHostInstanceByFiber(fiber) {
   const hostFiber = findCurrentHostFiber(fiber);
   if (hostFiber === null) {
     return null;
@@ -699,9 +616,7 @@ function findHostInstanceByFiber(fiber       )                                 {
   return hostFiber.stateNode;
 }
 
-function emptyFindFiberByHostInstance(
-  instance                         ,
-)               {
+function emptyFindFiberByHostInstance(instance) {
   return null;
 }
 
@@ -709,7 +624,7 @@ function getCurrentFiberForDevTools() {
   return ReactCurrentFiberCurrent;
 }
 
-export function injectIntoDevTools(devToolsConfig                )          {
+export function injectIntoDevTools(devToolsConfig) {
   const {findFiberByHostInstance} = devToolsConfig;
   const {ReactCurrentDispatcher} = ReactSharedInternals;
 

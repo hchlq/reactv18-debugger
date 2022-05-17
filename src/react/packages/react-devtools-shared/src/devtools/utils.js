@@ -4,15 +4,12 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import JSON5 from 'json5';
 
-                                                      
-                                 
-
-export function printElement(element         , includeWeight          = false) {
+export function printElement(element, includeWeight = false) {
   let prefix = ' ';
   if (element.children.length > 0) {
     prefix = element.isCollapsed ? '▸' : '▾';
@@ -36,26 +33,24 @@ export function printElement(element         , includeWeight          = false) {
     suffix = ` (${element.isCollapsed ? 1 : element.weight})`;
   }
 
-  return `${'  '.repeat(element.depth + 1)}${prefix} <${element.displayName ||
-    'null'}${key}>${hocs}${suffix}`;
+  return `${'  '.repeat(element.depth + 1)}${prefix} <${
+    element.displayName || 'null'
+  }${key}>${hocs}${suffix}`;
 }
 
-export function printOwnersList(
-  elements                ,
-  includeWeight          = false,
-) {
+export function printOwnersList(elements, includeWeight = false) {
   return elements
-    .map(element => printElement(element, includeWeight))
+    .map((element) => printElement(element, includeWeight))
     .join('\n');
 }
 
-export function printStore(store       , includeWeight          = false) {
+export function printStore(store, includeWeight = false) {
   const snapshotLines = [];
 
   let rootWeight = 0;
 
-  store.roots.forEach(rootID => {
-    const {weight} = ((store.getElementByID(rootID)     )         );
+  store.roots.forEach((rootID) => {
+    const {weight} = store.getElementByID(rootID);
 
     snapshotLines.push('[root]' + (includeWeight ? ` (${weight})` : ''));
 
@@ -89,7 +84,7 @@ export function printStore(store       , includeWeight          = false) {
 // We use JSON.parse to parse string values
 // e.g. 'foo' is not valid JSON but it is a valid string
 // so this method replaces e.g. 'foo' with "foo"
-export function sanitizeForParse(value     ) {
+export function sanitizeForParse(value) {
   if (typeof value === 'string') {
     if (
       value.length >= 2 &&
@@ -102,7 +97,7 @@ export function sanitizeForParse(value     ) {
   return value;
 }
 
-export function smartParse(value     ) {
+export function smartParse(value) {
   switch (value) {
     case 'Infinity':
       return Infinity;
@@ -115,7 +110,7 @@ export function smartParse(value     ) {
   }
 }
 
-export function smartStringify(value     ) {
+export function smartStringify(value) {
   if (typeof value === 'number') {
     if (Number.isNaN(value)) {
       return 'NaN';

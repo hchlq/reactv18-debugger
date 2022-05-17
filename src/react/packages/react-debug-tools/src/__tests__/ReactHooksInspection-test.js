@@ -305,7 +305,7 @@ describe('ReactHooksInspection', () => {
 
     it('should support an optional formatter function param', () => {
       function useCustom() {
-        React.useDebugValue({bar: 123}, object => `bar:${object.bar}`);
+        React.useDebugValue({bar: 123}, (object) => `bar:${object.bar}`);
         React.useState(0);
       }
       function Foo(props) {

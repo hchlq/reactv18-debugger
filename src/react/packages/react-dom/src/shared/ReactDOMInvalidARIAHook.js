@@ -89,7 +89,7 @@ function warnInvalidARIAProps(type, props) {
     }
 
     const unknownPropString = invalidProps
-      .map(prop => '`' + prop + '`')
+      .map((prop) => '`' + prop + '`')
       .join(', ');
 
     if (invalidProps.length === 1) {

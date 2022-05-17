@@ -4,68 +4,25 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import {enableSchedulerTracing} from 'shared/ReactFeatureFlags';
 
-                            
-                  
-             
-               
-                    
-   
-
-                          
-                                                               
-                                                          
-
-                                                              
-                                                                          
-
-                                                                 
-                                                                             
-                                                                                    
-                                                                                     
-                                                                        
-                                                                              
-
-                                                 
-                                                                   
-                                                                             
-
-                                                           
-                                                              
-                                                                               
-                                                                           
-                                                                                   
-                                                                   
-                                                                            
-
-                                                             
-                                                                   
-                                                                            
-     
-  
-
-                                                            
-
-                                                           
-
 const DEFAULT_THREAD_ID = 0;
 
 // Counters used to generate unique IDs.
-let interactionIDCounter         = 0;
-let threadIDCounter         = 0;
+let interactionIDCounter = 0;
+let threadIDCounter = 0;
 
 // Set of currently traced interactions.
 // Interactions "stack"–
 // Meaning that newly traced interactions are appended to the previously active set.
 // When an interaction goes out of scope, the previous set (if any) is restored.
-let interactionsRef                  = (null     );
+let interactionsRef = null;
 
 // Listener(s) to notify when interactions begin and end.
-let subscriberRef                = (null     );
+let subscriberRef = null;
 
 if (enableSchedulerTracing) {
   interactionsRef = {
@@ -78,7 +35,7 @@ if (enableSchedulerTracing) {
 
 export {interactionsRef as __interactionsRef, subscriberRef as __subscriberRef};
 
-export function unstable_clear(callback          )      {
+export function unstable_clear(callback) {
   if (!enableSchedulerTracing) {
     return callback();
   }
@@ -93,7 +50,7 @@ export function unstable_clear(callback          )      {
   }
 }
 
-export function unstable_getCurrent()                          {
+export function unstable_getCurrent() {
   if (!enableSchedulerTracing) {
     return null;
   } else {
@@ -101,21 +58,21 @@ export function unstable_getCurrent()                          {
   }
 }
 
-export function unstable_getThreadID()         {
+export function unstable_getThreadID() {
   return ++threadIDCounter;
 }
 
 export function unstable_trace(
-  name        ,
-  timestamp        ,
-  callback          ,
-  threadID         = DEFAULT_THREAD_ID,
-)      {
+  name,
+  timestamp,
+  callback,
+  threadID = DEFAULT_THREAD_ID,
+) {
   if (!enableSchedulerTracing) {
     return callback();
   }
 
-  const interaction              = {
+  const interaction = {
     __count: 1,
     id: interactionIDCounter++,
     name,
@@ -169,10 +126,7 @@ export function unstable_trace(
   return returnValue;
 }
 
-export function unstable_wrap(
-  callback          ,
-  threadID         = DEFAULT_THREAD_ID,
-)           {
+export function unstable_wrap(callback, threadID = DEFAULT_THREAD_ID) {
   if (!enableSchedulerTracing) {
     return callback;
   }
@@ -186,7 +140,7 @@ export function unstable_wrap(
 
   // Update the pending async work count for the current interactions.
   // Update after calling subscribers in case of error.
-  wrappedInteractions.forEach(interaction => {
+  wrappedInteractions.forEach((interaction) => {
     interaction.__count++;
   });
 
@@ -228,7 +182,7 @@ export function unstable_wrap(
         // Update pending async counts for all wrapped interactions.
         // If this was the last scheduled async work for any of them,
         // Mark them as completed.
-        wrappedInteractions.forEach(interaction => {
+        wrappedInteractions.forEach((interaction) => {
           interaction.__count--;
 
           if (subscriber !== null && interaction.__count === 0) {
@@ -250,7 +204,7 @@ export function unstable_wrap(
       // Update pending async counts for all wrapped interactions.
       // If this was the last scheduled async work for any of them,
       // Mark them as completed.
-      wrappedInteractions.forEach(interaction => {
+      wrappedInteractions.forEach((interaction) => {
         interaction.__count--;
 
         if (subscriber && interaction.__count === 0) {

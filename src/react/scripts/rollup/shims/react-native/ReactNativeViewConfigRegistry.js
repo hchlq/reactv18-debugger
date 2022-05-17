@@ -12,29 +12,11 @@
 
 'use strict';
 
-             
-                                     
-                   
-                            
-
 const invariant = require('invariant');
 
 // Event configs
-const customBubblingEventTypes   
-                                   
-                                         
-                       
-                      
-        
-      
-      
-  = {};
-const customDirectEventTypes   
-                                   
-                             
-      
-      
-  = {};
+const customBubblingEventTypes = {};
+const customDirectEventTypes = {};
 
 exports.customBubblingEventTypes = customBubblingEventTypes;
 exports.customDirectEventTypes = customDirectEventTypes;
@@ -42,9 +24,7 @@ exports.customDirectEventTypes = customDirectEventTypes;
 const viewConfigCallbacks = new Map();
 const viewConfigs = new Map();
 
-function processEventTypes(
-  viewConfig                                      ,
-)       {
+function processEventTypes(viewConfig) {
   const {bubblingEventTypes, directEventTypes} = viewConfig;
 
   if (__DEV__) {
@@ -82,7 +62,7 @@ function processEventTypes(
  * A callback is provided to load the view config from UIManager.
  * The callback is deferred until the view is actually rendered.
  */
-exports.register = function(name        , callback                  )         {
+exports.register = function (name, callback) {
   invariant(
     !viewConfigCallbacks.has(name),
     'Tried to register two views with the same name %s',
@@ -103,7 +83,7 @@ exports.register = function(name        , callback                  )         {
  * If this is the first time the view has been used,
  * This configuration will be lazy-loaded from UIManager.
  */
-exports.get = function(name        )                                       {
+exports.get = function (name) {
   let viewConfig;
   if (!viewConfigs.has(name)) {
     const callback = viewConfigCallbacks.get(name);

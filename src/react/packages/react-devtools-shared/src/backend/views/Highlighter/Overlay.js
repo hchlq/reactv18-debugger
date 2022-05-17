@@ -4,28 +4,23 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import assign from 'object-assign';
 import {getElementDimensions, getNestedBoundingClientRect} from '../utils';
-
-                                                                          
-                                   
-
-                                                                        
 
 // Note that the Overlay components are not affected by the active Theme,
 // because they highlight elements in the main Chrome window (outside of devtools).
 // The colors below were chosen to roughly match those used by Chrome devtools.
 
 class OverlayRect {
-  node             ;
-  border             ;
-  padding             ;
-  content             ;
+  node;
+  border;
+  padding;
+  content;
 
-  constructor(doc          , container             ) {
+  constructor(doc, container) {
     this.node = doc.createElement('div');
     this.border = doc.createElement('div');
     this.padding = doc.createElement('div');
@@ -55,7 +50,7 @@ class OverlayRect {
     }
   }
 
-  update(box      , dims     ) {
+  update(box, dims) {
     boxWrap(dims, 'margin', this.node);
     boxWrap(dims, 'border', this.border);
     boxWrap(dims, 'padding', this.padding);
@@ -85,11 +80,11 @@ class OverlayRect {
 }
 
 class OverlayTip {
-  tip             ;
-  nameSpan             ;
-  dimSpan             ;
+  tip;
+  nameSpan;
+  dimSpan;
 
-  constructor(doc          , container             ) {
+  constructor(doc, container) {
     this.tip = doc.createElement('div');
     assign(this.tip.style, {
       display: 'flex',
@@ -130,13 +125,13 @@ class OverlayTip {
     }
   }
 
-  updateText(name        , width        , height        ) {
+  updateText(name, width, height) {
     this.nameSpan.textContent = name;
     this.dimSpan.textContent =
       Math.round(width) + 'px × ' + Math.round(height) + 'px';
   }
 
-  updatePosition(dims     , bounds     ) {
+  updatePosition(dims, bounds) {
     const tipRect = this.tip.getBoundingClientRect();
     const tipPos = findTipPos(dims, bounds, {
       width: tipRect.width,
@@ -147,11 +142,11 @@ class OverlayTip {
 }
 
 export default class Overlay {
-  window        ;
-  tipBoundsWindow        ;
-  container             ;
-  tip            ;
-  rects                    ;
+  window;
+  tipBoundsWindow;
+  container;
+  tip;
+  rects;
 
   constructor() {
     // Find the root window, because overlays are positioned relative to it.
@@ -174,7 +169,7 @@ export default class Overlay {
 
   remove() {
     this.tip.remove();
-    this.rects.forEach(rect => {
+    this.rects.forEach((rect) => {
       rect.remove();
     });
     this.rects.length = 0;
@@ -183,10 +178,12 @@ export default class Overlay {
     }
   }
 
-  inspect(nodes                    , name          ) {
+  inspect(nodes, name) {
     // We can't get the size of text nodes or comment nodes. React as of v15
     // heavily uses comment nodes to delimit text.
-    const elements = nodes.filter(node => node.nodeType === Node.ELEMENT_NODE);
+    const elements = nodes.filter(
+      (node) => node.nodeType === Node.ELEMENT_NODE,
+    );
 
     while (this.rects.length > elements.length) {
       const rect = this.rects.pop();
@@ -229,7 +226,7 @@ export default class Overlay {
       name = elements[0].nodeName.toLowerCase();
 
       const node = elements[0];
-      const hook               =
+      const hook =
         node.ownerDocument.defaultView.__REACT_DEVTOOLS_GLOBAL_HOOK__;
       if (hook != null && hook.rendererInterfaces != null) {
         let ownerName = null;

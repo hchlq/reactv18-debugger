@@ -30,7 +30,8 @@ describe('ReactIncremental', () => {
     return (
       <div hidden={mode === 'hidden'}>
         <React.unstable_LegacyHidden
-          mode={mode === 'hidden' ? 'unstable-defer-without-hiding' : mode}>
+          mode={mode === 'hidden' ? 'unstable-defer-without-hiding' : mode}
+        >
           {children}
         </React.unstable_LegacyHidden>
       </div>
@@ -2497,7 +2498,7 @@ describe('ReactIncremental', () => {
       });
       render = () => this.props.children;
       updateCount = () =>
-        this.setState(state => ({
+        this.setState((state) => ({
           count: state.count + 1,
         }));
     }
@@ -2551,7 +2552,7 @@ describe('ReactIncremental', () => {
       });
       render = () => this.props.children;
       updateCount = () =>
-        this.setState(state => ({
+        this.setState((state) => ({
           count: state.count + 1,
         }));
     }
@@ -2611,7 +2612,7 @@ describe('ReactIncremental', () => {
       });
       render = () => this.props.children;
       updateCount = () =>
-        this.setState(state => ({
+        this.setState((state) => ({
           count: state.count + 1,
         }));
     }
@@ -2681,7 +2682,7 @@ describe('ReactIncremental', () => {
       });
       render = () => this.props.children;
       updateCount = () =>
-        this.setState(state => ({
+        this.setState((state) => ({
           count: state.count + 1,
         }));
     }
@@ -2705,7 +2706,7 @@ describe('ReactIncremental', () => {
       getChildContext = () => ({
         name: this.state.name,
       });
-      updateName = name => {
+      updateName = (name) => {
         this.setState({name});
       };
       render = () => this.props.children;
@@ -2845,7 +2846,7 @@ describe('ReactIncremental', () => {
     jest.resetModules();
     let receivedNonExtensibleObjects;
     // eslint-disable-next-line no-extend-native
-    Map.prototype.set = function(key) {
+    Map.prototype.set = function (key) {
       if (typeof key === 'object' && key !== null) {
         if (!Object.isExtensible(key)) {
           receivedNonExtensibleObjects = true;
@@ -2873,7 +2874,7 @@ describe('ReactIncremental', () => {
     // doesn't cause a failure.
     jest.resetModules();
     // eslint-disable-next-line no-extend-native
-    Map.prototype.set = function(key, value) {
+    Map.prototype.set = function (key, value) {
       if (typeof key === 'object' && key !== null) {
         // A polyfill could do something like this.
         // It would throw if an object is not extensible.

@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import invariant from 'shared/invariant';
@@ -20,11 +20,12 @@ import {disableJavaScriptURLs} from 'shared/ReactFeatureFlags';
 // https://infra.spec.whatwg.org/#c0-control-or-space
 
 /* eslint-disable max-len */
-const isJavaScriptProtocol = /^[\u0000-\u001F ]*j[\r\n\t]*a[\r\n\t]*v[\r\n\t]*a[\r\n\t]*s[\r\n\t]*c[\r\n\t]*r[\r\n\t]*i[\r\n\t]*p[\r\n\t]*t[\r\n\t]*\:/i;
+const isJavaScriptProtocol =
+  /^[\u0000-\u001F ]*j[\r\n\t]*a[\r\n\t]*v[\r\n\t]*a[\r\n\t]*s[\r\n\t]*c[\r\n\t]*r[\r\n\t]*i[\r\n\t]*p[\r\n\t]*t[\r\n\t]*\:/i;
 
 let didWarn = false;
 
-function sanitizeURL(url        ) {
+function sanitizeURL(url) {
   if (disableJavaScriptURLs) {
     invariant(
       !isJavaScriptProtocol.test(url),

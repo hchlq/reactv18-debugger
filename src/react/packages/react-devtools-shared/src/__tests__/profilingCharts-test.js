@@ -4,19 +4,16 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                          
-                                                                  
 
 describe('profiling charts', () => {
   let React;
   let ReactDOM;
   let Scheduler;
   let SchedulerTracing;
-  let TestRenderer                  ;
-  let store       ;
+  let TestRenderer;
+  let store;
   let utils;
 
   beforeEach(() => {
@@ -36,7 +33,7 @@ describe('profiling charts', () => {
 
   describe('flamegraph chart', () => {
     it('should contain valid data', () => {
-      const Parent = (_      ) => {
+      const Parent = (_) => {
         Scheduler.unstable_advanceTime(10);
         return (
           <React.Fragment>
@@ -77,13 +74,12 @@ describe('profiling charts', () => {
           commitIndex,
           rootID,
         });
-        const chartData = store.profilerStore.profilingCache.getFlamegraphChartData(
-          {
+        const chartData =
+          store.profilerStore.profilingCache.getFlamegraphChartData({
             commitIndex,
             commitTree,
             rootID,
-          },
-        );
+          });
         expect(commitTree).toMatchSnapshot(`${commitIndex}: CommitTree`);
         expect(chartData).toMatchSnapshot(
           `${commitIndex}: FlamegraphChartData`,
@@ -112,7 +108,7 @@ describe('profiling charts', () => {
 
   describe('ranked chart', () => {
     it('should contain valid data', () => {
-      const Parent = (_      ) => {
+      const Parent = (_) => {
         Scheduler.unstable_advanceTime(10);
         return (
           <React.Fragment>
@@ -184,7 +180,7 @@ describe('profiling charts', () => {
 
   describe('interactions', () => {
     it('should contain valid data', () => {
-      const Parent = (_      ) => {
+      const Parent = (_) => {
         Scheduler.unstable_advanceTime(10);
         return (
           <React.Fragment>
@@ -221,11 +217,10 @@ describe('profiling charts', () => {
       let renderFinished = false;
 
       function Validator({commitIndex, rootID}) {
-        const chartData = store.profilerStore.profilingCache.getInteractionsChartData(
-          {
+        const chartData =
+          store.profilerStore.profilingCache.getInteractionsChartData({
             rootID,
-          },
-        );
+          });
         expect(chartData).toMatchSnapshot('Interactions');
         renderFinished = true;
         return null;

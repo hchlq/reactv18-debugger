@@ -4,10 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                             
 
 // Intentionally not named imports because Rollup would use dynamic dispatch for
 // CommonJS interop named imports.
@@ -53,32 +51,28 @@ if (enableSchedulerTracing) {
   );
 }
 
-                                                                              
-
-                                                        
-
 const fakeCallbackNode = {};
 
 // Except for NoPriority, these correspond to Scheduler priorities. We use
 // ascending numbers so we can compare them like numbers. They start at 90 to
 // avoid clashing with Scheduler's priorities.
-export const ImmediatePriority                     = 99;
-export const UserBlockingPriority                     = 98;
-export const NormalPriority                     = 97;
-export const LowPriority                     = 96;
-export const IdlePriority                     = 95;
+export const ImmediatePriority = 99;
+export const UserBlockingPriority = 98;
+export const NormalPriority = 97;
+export const LowPriority = 96;
+export const IdlePriority = 95;
 // NoPriority is the absence of priority. Also React-only.
-export const NoPriority                     = 90;
+export const NoPriority = 90;
 
 export const shouldYield = Scheduler_shouldYield;
 export const requestPaint =
   // Fall back gracefully if we're running an older version of Scheduler.
   Scheduler_requestPaint !== undefined ? Scheduler_requestPaint : () => {};
 
-let syncQueue                                  = null;
-let immediateQueueCallbackNode               = null;
-let isFlushingSyncQueue          = false;
-const initialTimeMs         = Scheduler_now();
+let syncQueue = null;
+let immediateQueueCallbackNode = null;
+let isFlushingSyncQueue = false;
+const initialTimeMs = Scheduler_now();
 
 // If the initial timestamp is reasonably small, use Scheduler's `now` directly.
 // This will be the case for modern browsers that support `performance.now`. In
@@ -90,7 +84,7 @@ const initialTimeMs         = Scheduler_now();
 export const now =
   initialTimeMs < 10000 ? Scheduler_now : () => Scheduler_now() - initialTimeMs;
 
-export function getCurrentPriorityLevel()                     {
+export function getCurrentPriorityLevel() {
   switch (Scheduler_getCurrentPriorityLevel()) {
     case Scheduler_ImmediatePriority:
       return ImmediatePriority;
@@ -124,24 +118,17 @@ function reactPriorityToSchedulerPriority(reactPriorityLevel) {
   }
 }
 
-export function runWithPriority   (
-  reactPriorityLevel                    ,
-  fn         ,
-)    {
+export function runWithPriority(reactPriorityLevel, fn) {
   const priorityLevel = reactPriorityToSchedulerPriority(reactPriorityLevel);
   return Scheduler_runWithPriority(priorityLevel, fn);
 }
 
-export function scheduleCallback(
-  reactPriorityLevel                    ,
-  callback                   ,
-  options                                        ,
-) {
+export function scheduleCallback(reactPriorityLevel, callback, options) {
   const priorityLevel = reactPriorityToSchedulerPriority(reactPriorityLevel);
   return Scheduler_scheduleCallback(priorityLevel, callback, options);
 }
 
-export function scheduleSyncCallback(callback                   ) {
+export function scheduleSyncCallback(callback) {
   // Push this callback into an internal queue. We'll flush these either in
   // the next tick, or earlier if something calls `flushSyncCallbackQueue`.
   if (syncQueue === null) {
@@ -159,13 +146,13 @@ export function scheduleSyncCallback(callback                   ) {
   return fakeCallbackNode;
 }
 
-export function cancelCallback(callbackNode       ) {
+export function cancelCallback(callbackNode) {
   if (callbackNode !== fakeCallbackNode) {
     Scheduler_cancelCallback(callbackNode);
   }
 }
 
-export function flushSyncCallbackQueue()          {
+export function flushSyncCallbackQueue() {
   if (immediateQueueCallbackNode !== null) {
     const node = immediateQueueCallbackNode;
     immediateQueueCallbackNode = null;

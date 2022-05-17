@@ -4,11 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                        
-                                     
 
 import memoize from 'memoize-one';
 
@@ -17,7 +14,7 @@ import {zeroPoint} from './geometry';
 
 // hidpi canvas: https://www.html5rocks.com/en/tutorials/canvas/hidpi/
 function configureRetinaCanvas(canvas, height, width) {
-  const dpr         = window.devicePixelRatio || 1;
+  const dpr = window.devicePixelRatio || 1;
   canvas.width = width * dpr;
   canvas.height = height * dpr;
   canvas.style.width = `${width}px`;
@@ -26,12 +23,7 @@ function configureRetinaCanvas(canvas, height, width) {
 }
 
 const getCanvasContext = memoize(
-  (
-    canvas                   ,
-    height        ,
-    width        ,
-    scaleCanvas          = true,
-  )                           => {
+  (canvas, height, width, scaleCanvas = true) => {
     const context = canvas.getContext('2d', {alpha: false});
     if (scaleCanvas) {
       const dpr = configureRetinaCanvas(canvas, height, width);
@@ -47,11 +39,11 @@ const getCanvasContext = memoize(
  * place where all interactions enter the view heirarchy.
  */
 export class Surface {
-  rootView       ;
-  _context                           ;
-  _canvasSize       ;
+  rootView;
+  _context;
+  _canvasSize;
 
-  setCanvas(canvas                   , canvasSize      ) {
+  setCanvas(canvas, canvasSize) {
     this._context = getCanvasContext(
       canvas,
       canvasSize.height,
@@ -80,7 +72,7 @@ export class Surface {
     rootView.displayIfNeeded(_context);
   }
 
-  handleInteraction(interaction             ) {
+  handleInteraction(interaction) {
     if (!this.rootView) {
       return;
     }

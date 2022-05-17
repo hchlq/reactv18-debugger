@@ -4,19 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                      
-             
-                
-                                   
-                                 
-                           
-                
-                                     
-                         
-                            
 
 import {mountSafeCallback_NOT_REALLY_SAFE} from './NativeMethodsMixinUtils';
 import {create, diff} from './ReactNativeAttributePayload';
@@ -56,40 +45,6 @@ const {get: getViewConfigForType} = ReactNativeViewConfigRegistry;
 // This means that they never overlap.
 let nextReactTag = 2;
 
-                   
-                          
-                           
-                        
-             
-                                      
-     
-  
-                                             
-                                                         
-                                                      
-                               
-                              
-                                      
-                           
-    
-                                   
-
-                                      
-                           
-
-                                
-
-                                                   
-                                                              
-                                                       
-                                    
-                          
-                      
-                      
-                                                          
-            
-    
-
 // TODO: Remove this conditional once all changes have propagated.
 if (registerEventHandler) {
   /**
@@ -102,17 +57,12 @@ if (registerEventHandler) {
  * This is used for refs on host components.
  */
 class ReactFabricHostComponent {
-  _nativeTag        ;
-  viewConfig                                      ;
-  currentProps       ;
-  _internalInstanceHandle        ;
+  _nativeTag;
+  viewConfig;
+  currentProps;
+  _internalInstanceHandle;
 
-  constructor(
-    tag        ,
-    viewConfig                                      ,
-    props       ,
-    internalInstanceHandle        ,
-  ) {
+  constructor(tag, viewConfig, props, internalInstanceHandle) {
     this._nativeTag = tag;
     this.viewConfig = viewConfig;
     this.currentProps = props;
@@ -127,14 +77,14 @@ class ReactFabricHostComponent {
     TextInputState.focusTextInput(this);
   }
 
-  measure(callback                          ) {
+  measure(callback) {
     fabricMeasure(
       this._internalInstanceHandle.stateNode.node,
       mountSafeCallback_NOT_REALLY_SAFE(this, callback),
     );
   }
 
-  measureInWindow(callback                                  ) {
+  measureInWindow(callback) {
     fabricMeasureInWindow(
       this._internalInstanceHandle.stateNode.node,
       mountSafeCallback_NOT_REALLY_SAFE(this, callback),
@@ -142,9 +92,9 @@ class ReactFabricHostComponent {
   }
 
   measureLayout(
-    relativeToNativeNode                                           ,
-    onSuccess                                ,
-    onFail              /* currently unused */,
+    relativeToNativeNode,
+    onSuccess,
+    onFail /* currently unused */,
   ) {
     if (
       typeof relativeToNativeNode === 'number' ||
@@ -167,7 +117,7 @@ class ReactFabricHostComponent {
     );
   }
 
-  setNativeProps(nativeProps        ) {
+  setNativeProps(nativeProps) {
     if (__DEV__) {
       console.error(
         'Warning: setNativeProps is not currently supported in Fabric',
@@ -179,27 +129,24 @@ class ReactFabricHostComponent {
 }
 
 // eslint-disable-next-line no-unused-expressions
-(ReactFabricHostComponent.prototype               );
+ReactFabricHostComponent.prototype;
 
 export * from 'react-reconciler/src/ReactFiberHostConfigWithNoMutation';
 export * from 'react-reconciler/src/ReactFiberHostConfigWithNoHydration';
 export * from 'react-reconciler/src/ReactFiberHostConfigWithNoScopes';
 export * from 'react-reconciler/src/ReactFiberHostConfigWithNoTestSelectors';
 
-export function appendInitialChild(
-  parentInstance          ,
-  child                         ,
-)       {
+export function appendInitialChild(parentInstance, child) {
   appendChildNode(parentInstance.node, child.node);
 }
 
 export function createInstance(
-  type        ,
-  props       ,
-  rootContainerInstance           ,
-  hostContext             ,
-  internalInstanceHandle        ,
-)           {
+  type,
+  props,
+  rootContainerInstance,
+  hostContext,
+  internalInstanceHandle,
+) {
   const tag = nextReactTag;
   nextReactTag += 2;
 
@@ -237,11 +184,11 @@ export function createInstance(
 }
 
 export function createTextInstance(
-  text        ,
-  rootContainerInstance           ,
-  hostContext             ,
-  internalInstanceHandle        ,
-)               {
+  text,
+  rootContainerInstance,
+  hostContext,
+  internalInstanceHandle,
+) {
   invariant(
     hostContext.isInAParentText,
     'Text strings must be rendered within a <Text> component.',
@@ -264,26 +211,24 @@ export function createTextInstance(
 }
 
 export function finalizeInitialChildren(
-  parentInstance          ,
-  type        ,
-  props       ,
-  rootContainerInstance           ,
-  hostContext             ,
-)          {
+  parentInstance,
+  type,
+  props,
+  rootContainerInstance,
+  hostContext,
+) {
   return false;
 }
 
-export function getRootHostContext(
-  rootContainerInstance           ,
-)              {
+export function getRootHostContext(rootContainerInstance) {
   return {isInAParentText: false};
 }
 
 export function getChildHostContext(
-  parentHostContext             ,
-  type        ,
-  rootContainerInstance           ,
-)              {
+  parentHostContext,
+  type,
+  rootContainerInstance,
+) {
   const prevIsInAParentText = parentHostContext.isInAParentText;
   const isInAParentText =
     type === 'AndroidTextInput' || // Android
@@ -299,23 +244,23 @@ export function getChildHostContext(
   }
 }
 
-export function getPublicInstance(instance          )    {
+export function getPublicInstance(instance) {
   return instance.canonical;
 }
 
-export function prepareForCommit(containerInfo           )                {
+export function prepareForCommit(containerInfo) {
   // Noop
   return null;
 }
 
 export function prepareUpdate(
-  instance          ,
-  type        ,
-  oldProps       ,
-  newProps       ,
-  rootContainerInstance           ,
-  hostContext             ,
-)                {
+  instance,
+  type,
+  oldProps,
+  newProps,
+  rootContainerInstance,
+  hostContext,
+) {
   const viewConfig = instance.canonical.viewConfig;
   const updatePayload = diff(oldProps, newProps, viewConfig.validAttributes);
   // TODO: If the event handlers have changed, we need to update the current props
@@ -325,11 +270,11 @@ export function prepareUpdate(
   return updatePayload;
 }
 
-export function resetAfterCommit(containerInfo           )       {
+export function resetAfterCommit(containerInfo) {
   // Noop
 }
 
-export function shouldSetTextContent(type        , props       )          {
+export function shouldSetTextContent(type, props) {
   // TODO (bvaughn) Revisit this decision.
   // Always returning false simplifies the createInstance() implementation,
   // But creates an additional child Fiber for raw text children.
@@ -356,15 +301,15 @@ export const noTimeout = -1;
 export const supportsPersistence = true;
 
 export function cloneInstance(
-  instance          ,
-  updatePayload               ,
-  type        ,
-  oldProps       ,
-  newProps       ,
-  internalInstanceHandle        ,
-  keepChildren         ,
-  recyclableInstance                 ,
-)           {
+  instance,
+  updatePayload,
+  type,
+  oldProps,
+  newProps,
+  internalInstanceHandle,
+  keepChildren,
+  recyclableInstance,
+) {
   const node = instance.node;
   let clone;
   if (keepChildren) {
@@ -387,11 +332,11 @@ export function cloneInstance(
 }
 
 export function cloneHiddenInstance(
-  instance          ,
-  type        ,
-  props       ,
-  internalInstanceHandle        ,
-)           {
+  instance,
+  type,
+  props,
+  internalInstanceHandle,
+) {
   const viewConfig = instance.canonical.viewConfig;
   const node = instance.node;
   const updatePayload = create(
@@ -405,79 +350,68 @@ export function cloneHiddenInstance(
 }
 
 export function cloneHiddenTextInstance(
-  instance          ,
-  text        ,
-  internalInstanceHandle        ,
-)               {
+  instance,
+  text,
+  internalInstanceHandle,
+) {
   throw new Error('Not yet implemented.');
 }
 
-export function createContainerChildSet(container           )           {
+export function createContainerChildSet(container) {
   return createChildNodeSet(container);
 }
 
-export function appendChildToContainerChildSet(
-  childSet          ,
-  child                         ,
-)       {
+export function appendChildToContainerChildSet(childSet, child) {
   appendChildNodeToSet(childSet, child.node);
 }
 
-export function finalizeContainerChildren(
-  container           ,
-  newChildren          ,
-)       {
+export function finalizeContainerChildren(container, newChildren) {
   completeRoot(container, newChildren);
 }
 
-export function replaceContainerChildren(
-  container           ,
-  newChildren          ,
-)       {}
+export function replaceContainerChildren(container, newChildren) {}
 
-export function getFundamentalComponentInstance(fundamentalInstance     ) {
+export function getFundamentalComponentInstance(fundamentalInstance) {
   throw new Error('Not yet implemented.');
 }
 
-export function mountFundamentalComponent(fundamentalInstance     ) {
+export function mountFundamentalComponent(fundamentalInstance) {
   throw new Error('Not yet implemented.');
 }
 
-export function shouldUpdateFundamentalComponent(fundamentalInstance     ) {
+export function shouldUpdateFundamentalComponent(fundamentalInstance) {
   throw new Error('Not yet implemented.');
 }
 
-export function updateFundamentalComponent(fundamentalInstance     ) {
+export function updateFundamentalComponent(fundamentalInstance) {
   throw new Error('Not yet implemented.');
 }
 
-export function unmountFundamentalComponent(fundamentalInstance     ) {
+export function unmountFundamentalComponent(fundamentalInstance) {
   throw new Error('Not yet implemented.');
 }
 
-export function cloneFundamentalInstance(fundamentalInstance     ) {
+export function cloneFundamentalInstance(fundamentalInstance) {
   throw new Error('Not yet implemented.');
 }
 
-export function getInstanceFromNode(node     ) {
+export function getInstanceFromNode(node) {
   throw new Error('Not yet implemented.');
 }
 
-export function isOpaqueHydratingObject(value       )          {
+export function isOpaqueHydratingObject(value) {
   throw new Error('Not yet implemented');
 }
 
-export function makeOpaqueHydratingObject(
-  attemptToReadValue            ,
-)               {
+export function makeOpaqueHydratingObject(attemptToReadValue) {
   throw new Error('Not yet implemented.');
 }
 
-export function makeClientId()               {
+export function makeClientId() {
   throw new Error('Not yet implemented');
 }
 
-export function makeClientIdInDEV(warnOnAccessInDEV            )               {
+export function makeClientIdInDEV(warnOnAccessInDEV) {
   throw new Error('Not yet implemented');
 }
 
@@ -489,6 +423,6 @@ export function afterActiveInstanceBlur() {
   // noop
 }
 
-export function preparePortalMount(portalInstance          )       {
+export function preparePortalMount(portalInstance) {
   // noop
 }

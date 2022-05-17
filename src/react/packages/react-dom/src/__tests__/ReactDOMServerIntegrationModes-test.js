@@ -49,7 +49,7 @@ describe('ReactDOMServerIntegration', () => {
         spyOnDevAndProd(console, 'log');
       });
 
-      itRenders('with one child', async render => {
+      itRenders('with one child', async (render) => {
         const e = await render(
           <React.unstable_DebugTracingMode>
             <div>text1</div>
@@ -59,11 +59,11 @@ describe('ReactDOMServerIntegration', () => {
         expect(parent.childNodes[0].tagName).toBe('DIV');
       });
 
-      itRenders('mode with several children', async render => {
-        const Header = props => {
+      itRenders('mode with several children', async (render) => {
+        const Header = (props) => {
           return <p>header</p>;
         };
-        const Footer = props => {
+        const Footer = (props) => {
           return (
             <React.unstable_DebugTracingMode>
               <h2>footer</h2>
@@ -90,7 +90,7 @@ describe('ReactDOMServerIntegration', () => {
   }
 
   describe('React.StrictMode', () => {
-    itRenders('a strict mode with one child', async render => {
+    itRenders('a strict mode with one child', async (render) => {
       const e = await render(
         <React.StrictMode>
           <div>text1</div>
@@ -100,11 +100,11 @@ describe('ReactDOMServerIntegration', () => {
       expect(parent.childNodes[0].tagName).toBe('DIV');
     });
 
-    itRenders('a strict mode with several children', async render => {
-      const Header = props => {
+    itRenders('a strict mode with several children', async (render) => {
+      const Header = (props) => {
         return <p>header</p>;
       };
-      const Footer = props => {
+      const Footer = (props) => {
         return (
           <React.StrictMode>
             <h2>footer</h2>
@@ -128,7 +128,7 @@ describe('ReactDOMServerIntegration', () => {
       expect(parent.childNodes[4].tagName).toBe('H3');
     });
 
-    itRenders('a nested strict mode', async render => {
+    itRenders('a nested strict mode', async (render) => {
       const e = await render(
         <React.StrictMode>
           <React.StrictMode>
@@ -152,7 +152,7 @@ describe('ReactDOMServerIntegration', () => {
       expect(parent.childNodes[2].tagName).toBe('P');
     });
 
-    itRenders('an empty strict mode', async render => {
+    itRenders('an empty strict mode', async (render) => {
       expect(await render(<React.StrictMode />)).toBe(null);
     });
   });

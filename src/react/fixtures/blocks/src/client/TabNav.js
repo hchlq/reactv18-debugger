@@ -17,7 +17,8 @@ export function TabBar({children}) {
         padding: 20,
         marginBottom: 20,
         width: 500,
-      }}>
+      }}
+    >
       {children}
     </div>
   );
@@ -32,7 +33,8 @@ export function TabLink({to, partial, children}) {
         style={{
           display: 'inline-block',
           marginRight: 20,
-        }}>
+        }}
+      >
         {children}
       </b>
     );
@@ -43,7 +45,8 @@ export function TabLink({to, partial, children}) {
         display: 'inline-block',
         marginRight: 20,
       }}
-      to={to}>
+      to={to}
+    >
       {children}
     </Link>
   );

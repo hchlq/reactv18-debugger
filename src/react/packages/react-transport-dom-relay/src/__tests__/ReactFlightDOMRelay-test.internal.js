@@ -50,7 +50,7 @@ describe('ReactFlightDOMRelay', () => {
     if (load === undefined) {
       return ReactDOMFlightRelayServerRuntime.serverBlock(render);
     }
-    return function(...args) {
+    return function (...args) {
       const curriedLoad = () => {
         return load(...args);
       };

@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 // Helpers to patch console.logs to avoid logging during side-effect free
@@ -24,7 +24,7 @@ let prevGroupEnd;
 function disabledLog() {}
 disabledLog.__reactDisabledLog = true;
 
-export function disableLogs()       {
+export function disableLogs() {
   if (__DEV__) {
     if (disabledDepth === 0) {
       /* eslint-disable react-internal/no-production-logging */
@@ -58,7 +58,7 @@ export function disableLogs()       {
   }
 }
 
-export function reenableLogs()       {
+export function reenableLogs() {
   if (__DEV__) {
     disabledDepth--;
     if (disabledDepth === 0) {

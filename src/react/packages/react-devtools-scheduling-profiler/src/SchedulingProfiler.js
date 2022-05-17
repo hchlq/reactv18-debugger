@@ -4,12 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                                       
-                                               
-                                                                          
 
 import * as React from 'react';
 import {Suspense, useCallback, useState} from 'react';
@@ -23,16 +19,14 @@ import ImportWorker from './import-worker/import.worker';
 import profilerBrowser from './assets/profilerBrowser.png';
 import styles from './SchedulingProfiler.css';
 
-                                                                    
-
-function createDataResourceFromImportedFile(file      )               {
+function createDataResourceFromImportedFile(file) {
   return createResource(
     () => {
-      return new Promise                           ((resolve, reject) => {
-        const worker         = new (ImportWorker     )();
+      return new Promise((resolve, reject) => {
+        const worker = new ImportWorker();
 
-        worker.onmessage = function(event) {
-          const data = ((event.data     )                        );
+        worker.onmessage = function (event) {
+          const data = event.data;
           switch (data.status) {
             case 'SUCCESS':
               resolve(data.processedData);
@@ -55,10 +49,10 @@ function createDataResourceFromImportedFile(file      )               {
   );
 }
 
-export function SchedulingProfiler(_      ) {
-  const [dataResource, setDataResource] = useState                     (null);
+export function SchedulingProfiler(_) {
+  const [dataResource, setDataResource] = useState(null);
 
-  const handleFileSelect = useCallback((file      ) => {
+  const handleFileSelect = useCallback((file) => {
     setDataResource(createDataResourceFromImportedFile(file));
   }, []);
 
@@ -87,7 +81,7 @@ export function SchedulingProfiler(_      ) {
   );
 }
 
-const Welcome = ({onFileSelect}                                        ) => (
+const Welcome = ({onFileSelect}) => (
   <div className={styles.EmptyStateContainer}>
     <div className={styles.ScreenshotWrapper}>
       <img
@@ -128,13 +122,7 @@ const CouldNotLoadProfile = ({error, onFileSelect}) => (
   </div>
 );
 
-const DataResourceComponent = ({
-  dataResource,
-  onFileSelect,
-}    
-                             
-                                     
-  ) => {
+const DataResourceComponent = ({dataResource, onFileSelect}) => {
   const dataOrError = dataResource.read();
   if (dataOrError instanceof Error) {
     return (

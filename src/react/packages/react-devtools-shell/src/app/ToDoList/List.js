@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -12,22 +12,14 @@ import {Fragment, useCallback, useState} from 'react';
 import ListItem from './ListItem';
 import styles from './List.css';
 
-                     
-             
-                      
-               
-   
-
-                  
-
-export default function List(props       ) {
-  const [newItemText, setNewItemText] = useState        ('');
-  const [items, setItems] = useState             ([
+export default function List(props) {
+  const [newItemText, setNewItemText] = useState('');
+  const [items, setItems] = useState([
     {id: 1, isComplete: true, text: 'First'},
     {id: 2, isComplete: true, text: 'Second'},
     {id: 3, isComplete: false, text: 'Third'},
   ]);
-  const [uid, setUID] = useState        (4);
+  const [uid, setUID] = useState(4);
 
   const handleClick = useCallback(() => {
     if (newItemText !== '') {
@@ -45,7 +37,7 @@ export default function List(props       ) {
   }, [newItemText, items, uid]);
 
   const handleKeyPress = useCallback(
-    event => {
+    (event) => {
       if (event.key === 'Enter') {
         handleClick();
       }
@@ -54,22 +46,22 @@ export default function List(props       ) {
   );
 
   const handleChange = useCallback(
-    event => {
+    (event) => {
       setNewItemText(event.currentTarget.value);
     },
     [setNewItemText],
   );
 
   const removeItem = useCallback(
-    itemToRemove => setItems(items.filter(item => item !== itemToRemove)),
+    (itemToRemove) => setItems(items.filter((item) => item !== itemToRemove)),
     [items],
   );
 
   const toggleItem = useCallback(
-    itemToToggle => {
+    (itemToToggle) => {
       // Dont use indexOf()
       // because editing props in DevTools creates a new Object.
-      const index = items.findIndex(item => item.id === itemToToggle.id);
+      const index = items.findIndex((item) => item.id === itemToToggle.id);
 
       setItems(
         items
@@ -98,13 +90,14 @@ export default function List(props       ) {
       <button
         className={styles.IconButton}
         disabled={newItemText === ''}
-        onClick={handleClick}>
+        onClick={handleClick}
+      >
         <span role="img" aria-label="Add item">
           ➕
         </span>
       </button>
       <ul className={styles.List}>
-        {items.map(item => (
+        {items.map((item) => (
           <ListItem
             key={item.id}
             item={item}

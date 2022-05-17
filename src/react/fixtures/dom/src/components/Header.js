@@ -64,7 +64,8 @@ class Header extends React.Component {
               <span className="sr-only">Select an example</span>
               <select
                 value={window.location.pathname}
-                onChange={this.handleFixtureChange}>
+                onChange={this.handleFixtureChange}
+              >
                 <option value="/">Home</option>
                 <option value="/hydration">Hydration</option>
                 <option value="/range-inputs">Range Inputs</option>

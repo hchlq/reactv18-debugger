@@ -4,26 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-             
-           
-               
-                   
-            
-           
-                
-                                
-                                                
-                                                    
-                                            
-                                                                     
-                                                        
-                                                                        
-                                                
-                                                             
-                                                                   
 
 import {unstable_wrap as Schedule_tracing_wrap} from 'scheduler/tracing';
 import {
@@ -126,14 +108,14 @@ import {
 } from './ReactHookEffectTags';
 import {didWarnAboutReassigningProps} from './ReactFiberBeginWork.old';
 
-let didWarnAboutUndefinedSnapshotBeforeUpdate                    = null;
+let didWarnAboutUndefinedSnapshotBeforeUpdate = null;
 if (__DEV__) {
   didWarnAboutUndefinedSnapshotBeforeUpdate = new Set();
 }
 
 const PossiblyWeakSet = typeof WeakSet === 'function' ? WeakSet : Set;
 
-const callComponentWillUnmountWithTimer = function(current, instance) {
+const callComponentWillUnmountWithTimer = function (current, instance) {
   instance.props = current.memoizedProps;
   instance.state = current.memoizedState;
   if (
@@ -153,7 +135,7 @@ const callComponentWillUnmountWithTimer = function(current, instance) {
 };
 
 // Capture errors so they don't interrupt unmounting.
-function safelyCallComponentWillUnmount(current       , instance     ) {
+function safelyCallComponentWillUnmount(current, instance) {
   if (__DEV__) {
     invokeGuardedCallback(
       null,
@@ -175,7 +157,7 @@ function safelyCallComponentWillUnmount(current       , instance     ) {
   }
 }
 
-function safelyDetachRef(current       ) {
+function safelyDetachRef(current) {
   const ref = current.ref;
   if (ref !== null) {
     if (typeof ref === 'function') {
@@ -198,7 +180,7 @@ function safelyDetachRef(current       ) {
   }
 }
 
-function safelyCallDestroy(current       , destroy            ) {
+function safelyCallDestroy(current, destroy) {
   if (__DEV__) {
     invokeGuardedCallback(null, destroy, null);
     if (hasCaughtError()) {
@@ -214,10 +196,7 @@ function safelyCallDestroy(current       , destroy            ) {
   }
 }
 
-function commitBeforeMutationLifeCycles(
-  current              ,
-  finishedWork       ,
-)       {
+function commitBeforeMutationLifeCycles(current, finishedWork) {
   switch (finishedWork.tag) {
     case FunctionComponent:
     case ForwardRef:
@@ -268,7 +247,7 @@ function commitBeforeMutationLifeCycles(
             prevState,
           );
           if (__DEV__) {
-            const didWarnSet = ((didWarnAboutUndefinedSnapshotBeforeUpdate     )            );
+            const didWarnSet = didWarnAboutUndefinedSnapshotBeforeUpdate;
             if (snapshot === undefined && !didWarnSet.has(finishedWork.type)) {
               didWarnSet.add(finishedWork.type);
               console.error(
@@ -306,8 +285,8 @@ function commitBeforeMutationLifeCycles(
   );
 }
 
-function commitHookEffectListUnmount(tag        , finishedWork       ) {
-  const updateQueue                                      = (finishedWork.updateQueue     );
+function commitHookEffectListUnmount(tag, finishedWork) {
+  const updateQueue = finishedWork.updateQueue;
   const lastEffect = updateQueue !== null ? updateQueue.lastEffect : null;
   if (lastEffect !== null) {
     const firstEffect = lastEffect.next;
@@ -326,8 +305,8 @@ function commitHookEffectListUnmount(tag        , finishedWork       ) {
   }
 }
 
-function commitHookEffectListMount(tag        , finishedWork       ) {
-  const updateQueue                                      = (finishedWork.updateQueue     );
+function commitHookEffectListMount(tag, finishedWork) {
+  const updateQueue = finishedWork.updateQueue;
   const lastEffect = updateQueue !== null ? updateQueue.lastEffect : null;
   if (lastEffect !== null) {
     const firstEffect = lastEffect.next;
@@ -376,8 +355,8 @@ function commitHookEffectListMount(tag        , finishedWork       ) {
   }
 }
 
-function schedulePassiveEffects(finishedWork       ) {
-  const updateQueue                                      = (finishedWork.updateQueue     );
+function schedulePassiveEffects(finishedWork) {
+  const updateQueue = finishedWork.updateQueue;
   const lastEffect = updateQueue !== null ? updateQueue.lastEffect : null;
   if (lastEffect !== null) {
     const firstEffect = lastEffect.next;
@@ -396,10 +375,7 @@ function schedulePassiveEffects(finishedWork       ) {
   }
 }
 
-export function commitPassiveEffectDurations(
-  finishedRoot           ,
-  finishedWork       ,
-)       {
+export function commitPassiveEffectDurations(finishedRoot, finishedWork) {
   if (enableProfilerTimer && enableProfilerCommitHooks) {
     // Only Profilers with work in their subtree will have an Update effect scheduled.
     if ((finishedWork.flags & Update) !== NoFlags) {
@@ -451,12 +427,7 @@ export function commitPassiveEffectDurations(
   }
 }
 
-function commitLifeCycles(
-  finishedRoot           ,
-  current              ,
-  finishedWork       ,
-  committedLanes       ,
-)       {
+function commitLifeCycles(finishedRoot, current, finishedWork, committedLanes) {
   switch (finishedWork.tag) {
     case FunctionComponent:
     case ForwardRef:
@@ -595,9 +566,7 @@ function commitLifeCycles(
 
       // TODO: I think this is now always non-null by the time it reaches the
       // commit phase. Consider removing the type check.
-      const updateQueue              
-          
-               = (finishedWork.updateQueue     );
+      const updateQueue = finishedWork.updateQueue;
       if (updateQueue !== null) {
         if (__DEV__) {
           if (
@@ -636,9 +605,7 @@ function commitLifeCycles(
     case HostRoot: {
       // TODO: I think this is now always non-null by the time it reaches the
       // commit phase. Consider removing the type check.
-      const updateQueue              
-          
-               = (finishedWork.updateQueue     );
+      const updateQueue = finishedWork.updateQueue;
       if (updateQueue !== null) {
         let instance = null;
         if (finishedWork.child !== null) {
@@ -656,7 +623,7 @@ function commitLifeCycles(
       return;
     }
     case HostComponent: {
-      const instance           = finishedWork.stateNode;
+      const instance = finishedWork.stateNode;
 
       // Renderers may schedule work to be done after host components are mounted
       // (eg DOM renderer may schedule auto-focus for inputs and form controls).
@@ -771,7 +738,7 @@ function hideOrUnhideAllChildren(finishedWork, isHidden) {
   if (supportsMutation) {
     // We only have the top Fiber that was inserted but we need to recurse down its
     // children to find all the terminal nodes.
-    let node        = finishedWork;
+    let node = finishedWork;
     while (true) {
       if (node.tag === HostComponent) {
         const instance = node.stateNode;
@@ -790,7 +757,7 @@ function hideOrUnhideAllChildren(finishedWork, isHidden) {
       } else if (
         (node.tag === OffscreenComponent ||
           node.tag === LegacyHiddenComponent) &&
-        (node.memoizedState                ) !== null &&
+        node.memoizedState !== null &&
         node !== finishedWork
       ) {
         // Found a nested Offscreen component that is hidden. Don't search
@@ -815,7 +782,7 @@ function hideOrUnhideAllChildren(finishedWork, isHidden) {
   }
 }
 
-function commitAttachRef(finishedWork       ) {
+function commitAttachRef(finishedWork) {
   const ref = finishedWork.ref;
   if (ref !== null) {
     const instance = finishedWork.stateNode;
@@ -849,7 +816,7 @@ function commitAttachRef(finishedWork       ) {
   }
 }
 
-function commitDetachRef(current       ) {
+function commitDetachRef(current) {
   const currentRef = current.ref;
   if (currentRef !== null) {
     if (typeof currentRef === 'function') {
@@ -863,11 +830,7 @@ function commitDetachRef(current       ) {
 // User-originating errors (lifecycles and refs) should not interrupt
 // deletion, so don't let them throw. Host-originating errors should
 // interrupt deletion, so it's okay
-function commitUnmount(
-  finishedRoot           ,
-  current       ,
-  renderPriorityLevel                    ,
-)       {
+function commitUnmount(finishedRoot, current, renderPriorityLevel) {
   onCommitUnmount(current);
 
   switch (current.tag) {
@@ -876,7 +839,7 @@ function commitUnmount(
     case MemoComponent:
     case SimpleMemoComponent:
     case Block: {
-      const updateQueue                                      = (current.updateQueue     );
+      const updateQueue = current.updateQueue;
       if (updateQueue !== null) {
         const lastEffect = updateQueue.lastEffect;
         if (lastEffect !== null) {
@@ -947,7 +910,7 @@ function commitUnmount(
         if (hydrationCallbacks !== null) {
           const onDeleted = hydrationCallbacks.onDeleted;
           if (onDeleted) {
-            onDeleted((current.stateNode                  ));
+            onDeleted(current.stateNode);
           }
         }
       }
@@ -962,17 +925,13 @@ function commitUnmount(
   }
 }
 
-function commitNestedUnmounts(
-  finishedRoot           ,
-  root       ,
-  renderPriorityLevel                    ,
-)       {
+function commitNestedUnmounts(finishedRoot, root, renderPriorityLevel) {
   // While we're inside a removed host node we don't want to call
   // removeChild on the inner nodes because they're removed by the top
   // call anyway. We also want to call componentWillUnmount on all
   // composites before this host node is removed from the tree. Therefore
   // we do an inner loop while we're still inside the host node.
-  let node        = root;
+  let node = root;
   while (true) {
     commitUnmount(finishedRoot, node, renderPriorityLevel);
     // Visit children because they may contain more composite or host nodes.
@@ -1001,7 +960,7 @@ function commitNestedUnmounts(
   }
 }
 
-function detachFiberMutation(fiber       ) {
+function detachFiberMutation(fiber) {
   // Cut off the return pointers to disconnect it from the tree. Ideally, we
   // should clear the child pointer of the parent alternate to let this
   // get GC:ed but we don't know which for sure which parent is the current
@@ -1030,22 +989,18 @@ function detachFiberMutation(fiber       ) {
   }
 }
 
-function emptyPortalContainer(current       ) {
+function emptyPortalContainer(current) {
   if (!supportsPersistence) {
     return;
   }
 
-  const portal   
-                             
-                              
-       
-    = current.stateNode;
+  const portal = current.stateNode;
   const {containerInfo} = portal;
   const emptyChildSet = createContainerChildSet(containerInfo);
   replaceContainerChildren(containerInfo, emptyChildSet);
 }
 
-function commitContainer(finishedWork       ) {
+function commitContainer(finishedWork) {
   if (!supportsPersistence) {
     return;
   }
@@ -1059,11 +1014,7 @@ function commitContainer(finishedWork       ) {
     }
     case HostRoot:
     case HostPortal: {
-      const portalOrRoot   
-                                 
-                                  
-           
-        = finishedWork.stateNode;
+      const portalOrRoot = finishedWork.stateNode;
       const {containerInfo, pendingChildren} = portalOrRoot;
       replaceContainerChildren(containerInfo, pendingChildren);
       return;
@@ -1076,7 +1027,7 @@ function commitContainer(finishedWork       ) {
   );
 }
 
-function getHostParentFiber(fiber       )        {
+function getHostParentFiber(fiber) {
   let parent = fiber.return;
   while (parent !== null) {
     if (isHostParent(parent)) {
@@ -1091,7 +1042,7 @@ function getHostParentFiber(fiber       )        {
   );
 }
 
-function isHostParent(fiber       )          {
+function isHostParent(fiber) {
   return (
     fiber.tag === HostComponent ||
     fiber.tag === HostRoot ||
@@ -1099,12 +1050,12 @@ function isHostParent(fiber       )          {
   );
 }
 
-function getHostSibling(fiber       )            {
+function getHostSibling(fiber) {
   // We're going to search forward into the tree until we find a sibling host
   // node. Unfortunately, if multiple insertions are done in a row we have to
   // search past them. This leads to exponential search for the next sibling.
   // TODO: Find a more efficient way to do this.
-  let node        = fiber;
+  let node = fiber;
   siblings: while (true) {
     // If we didn't find anything, let's try the next sibling.
     while (node.sibling === null) {
@@ -1145,7 +1096,7 @@ function getHostSibling(fiber       )            {
   }
 }
 
-function commitPlacement(finishedWork       )       {
+function commitPlacement(finishedWork) {
   if (!supportsMutation) {
     return;
   }
@@ -1200,11 +1151,7 @@ function commitPlacement(finishedWork       )       {
   }
 }
 
-function insertOrAppendPlacementNodeIntoContainer(
-  node       ,
-  before           ,
-  parent           ,
-)       {
+function insertOrAppendPlacementNodeIntoContainer(node, before, parent) {
   const {tag} = node;
   const isHost = tag === HostComponent || tag === HostText;
   if (isHost || (enableFundamentalAPI && tag === FundamentalComponent)) {
@@ -1231,11 +1178,7 @@ function insertOrAppendPlacementNodeIntoContainer(
   }
 }
 
-function insertOrAppendPlacementNode(
-  node       ,
-  before           ,
-  parent          ,
-)       {
+function insertOrAppendPlacementNode(node, before, parent) {
   const {tag} = node;
   const isHost = tag === HostComponent || tag === HostText;
   if (isHost || (enableFundamentalAPI && tag === FundamentalComponent)) {
@@ -1262,14 +1205,10 @@ function insertOrAppendPlacementNode(
   }
 }
 
-function unmountHostComponents(
-  finishedRoot           ,
-  current       ,
-  renderPriorityLevel                    ,
-)       {
+function unmountHostComponents(finishedRoot, current, renderPriorityLevel) {
   // We only have the top Fiber that was deleted but we need to recurse down its
   // children to find all the terminal nodes.
-  let node        = current;
+  let node = current;
 
   // Each iteration, currentParent is populated with node's host parent if not
   // currentParentIsValid.
@@ -1318,15 +1257,9 @@ function unmountHostComponents(
       // After all the children have unmounted, it is now safe to remove the
       // node from the tree.
       if (currentParentIsContainer) {
-        removeChildFromContainer(
-          ((currentParent     )           ),
-          (node.stateNode                         ),
-        );
+        removeChildFromContainer(currentParent, node.stateNode);
       } else {
-        removeChild(
-          ((currentParent     )          ),
-          (node.stateNode                         ),
-        );
+        removeChild(currentParent, node.stateNode);
       }
       // Don't visit children because we already visited them.
     } else if (enableFundamentalAPI && node.tag === FundamentalComponent) {
@@ -1335,15 +1268,9 @@ function unmountHostComponents(
       // After all the children have unmounted, it is now safe to remove the
       // node from the tree.
       if (currentParentIsContainer) {
-        removeChildFromContainer(
-          ((currentParent     )           ),
-          (fundamentalNode          ),
-        );
+        removeChildFromContainer(currentParent, fundamentalNode);
       } else {
-        removeChild(
-          ((currentParent     )          ),
-          (fundamentalNode          ),
-        );
+        removeChild(currentParent, fundamentalNode);
       }
     } else if (
       enableSuspenseServerRenderer &&
@@ -1354,22 +1281,16 @@ function unmountHostComponents(
         if (hydrationCallbacks !== null) {
           const onDeleted = hydrationCallbacks.onDeleted;
           if (onDeleted) {
-            onDeleted((node.stateNode                  ));
+            onDeleted(node.stateNode);
           }
         }
       }
 
       // Delete the dehydrated suspense boundary and all of its content.
       if (currentParentIsContainer) {
-        clearSuspenseBoundaryFromContainer(
-          ((currentParent     )           ),
-          (node.stateNode                  ),
-        );
+        clearSuspenseBoundaryFromContainer(currentParent, node.stateNode);
       } else {
-        clearSuspenseBoundary(
-          ((currentParent     )          ),
-          (node.stateNode                  ),
-        );
+        clearSuspenseBoundary(currentParent, node.stateNode);
       }
     } else if (node.tag === HostPortal) {
       if (node.child !== null) {
@@ -1410,11 +1331,7 @@ function unmountHostComponents(
   }
 }
 
-function commitDeletion(
-  finishedRoot           ,
-  current       ,
-  renderPriorityLevel                    ,
-)       {
+function commitDeletion(finishedRoot, current, renderPriorityLevel) {
   if (supportsMutation) {
     // Recursively delete all host nodes from the parent.
     // Detach refs and call componentWillUnmount() on the whole subtree.
@@ -1430,7 +1347,7 @@ function commitDeletion(
   }
 }
 
-function commitWork(current              , finishedWork       )       {
+function commitWork(current, finishedWork) {
   if (!supportsMutation) {
     switch (finishedWork.tag) {
       case FunctionComponent:
@@ -1476,7 +1393,7 @@ function commitWork(current              , finishedWork       )       {
       }
       case HostRoot: {
         if (supportsHydration) {
-          const root            = finishedWork.stateNode;
+          const root = finishedWork.stateNode;
           if (root.hydrate) {
             // We've just hydrated. No need to hydrate again.
             root.hydrate = false;
@@ -1526,7 +1443,7 @@ function commitWork(current              , finishedWork       )       {
       return;
     }
     case HostComponent: {
-      const instance           = finishedWork.stateNode;
+      const instance = finishedWork.stateNode;
       if (instance != null) {
         // Commit the work prepared earlier.
         const newProps = finishedWork.memoizedProps;
@@ -1536,7 +1453,7 @@ function commitWork(current              , finishedWork       )       {
         const oldProps = current !== null ? current.memoizedProps : newProps;
         const type = finishedWork.type;
         // TODO: Type the updateQueue to be specific to host components.
-        const updatePayload                       = (finishedWork.updateQueue     );
+        const updatePayload = finishedWork.updateQueue;
         finishedWork.updateQueue = null;
         if (updatePayload !== null) {
           commitUpdate(
@@ -1557,19 +1474,18 @@ function commitWork(current              , finishedWork       )       {
         'This should have a text node initialized. This error is likely ' +
           'caused by a bug in React. Please file an issue.',
       );
-      const textInstance               = finishedWork.stateNode;
-      const newText         = finishedWork.memoizedProps;
+      const textInstance = finishedWork.stateNode;
+      const newText = finishedWork.memoizedProps;
       // For hydration we reuse the update path but we treat the oldProps
       // as the newProps. The updatePayload will contain the real change in
       // this case.
-      const oldText         =
-        current !== null ? current.memoizedProps : newText;
+      const oldText = current !== null ? current.memoizedProps : newText;
       commitTextUpdate(textInstance, oldText, newText);
       return;
     }
     case HostRoot: {
       if (supportsHydration) {
-        const root            = finishedWork.stateNode;
+        const root = finishedWork.stateNode;
         if (root.hydrate) {
           // We've just hydrated. No need to hydrate again.
           root.hydrate = false;
@@ -1611,7 +1527,7 @@ function commitWork(current              , finishedWork       )       {
     }
     case OffscreenComponent:
     case LegacyHiddenComponent: {
-      const newState                        = finishedWork.memoizedState;
+      const newState = finishedWork.memoizedState;
       const isHidden = newState !== null;
       hideOrUnhideAllChildren(finishedWork, isHidden);
       return;
@@ -1624,8 +1540,8 @@ function commitWork(current              , finishedWork       )       {
   );
 }
 
-function commitSuspenseComponent(finishedWork       ) {
-  const newState                       = finishedWork.memoizedState;
+function commitSuspenseComponent(finishedWork) {
+  const newState = finishedWork.memoizedState;
 
   if (newState !== null) {
     markCommitTimeOfFallback();
@@ -1640,7 +1556,7 @@ function commitSuspenseComponent(finishedWork       ) {
       // second pass, but doing it this way is less complicated. This would be
       // simpler if we got rid of the effect list and traversed the tree, like
       // we're planning to do.
-      const primaryChildParent        = (finishedWork.child     );
+      const primaryChildParent = finishedWork.child;
       hideOrUnhideAllChildren(primaryChildParent, true);
     }
   }
@@ -1648,7 +1564,7 @@ function commitSuspenseComponent(finishedWork       ) {
   if (enableSuspenseCallback && newState !== null) {
     const suspenseCallback = finishedWork.memoizedProps.suspenseCallback;
     if (typeof suspenseCallback === 'function') {
-      const wakeables                       = (finishedWork.updateQueue     );
+      const wakeables = finishedWork.updateQueue;
       if (wakeables !== null) {
         suspenseCallback(new Set(wakeables));
       }
@@ -1660,18 +1576,15 @@ function commitSuspenseComponent(finishedWork       ) {
   }
 }
 
-function commitSuspenseHydrationCallbacks(
-  finishedRoot           ,
-  finishedWork       ,
-) {
+function commitSuspenseHydrationCallbacks(finishedRoot, finishedWork) {
   if (!supportsHydration) {
     return;
   }
-  const newState                       = finishedWork.memoizedState;
+  const newState = finishedWork.memoizedState;
   if (newState === null) {
     const current = finishedWork.alternate;
     if (current !== null) {
-      const prevState                       = current.memoizedState;
+      const prevState = current.memoizedState;
       if (prevState !== null) {
         const suspenseInstance = prevState.dehydrated;
         if (suspenseInstance !== null) {
@@ -1691,18 +1604,18 @@ function commitSuspenseHydrationCallbacks(
   }
 }
 
-function attachSuspenseRetryListeners(finishedWork       ) {
+function attachSuspenseRetryListeners(finishedWork) {
   // If this boundary just timed out, then it will have a set of wakeables.
   // For each wakeable, attach a listener so that when it resolves, React
   // attempts to re-render the boundary in the primary (pre-timeout) state.
-  const wakeables                       = (finishedWork.updateQueue     );
+  const wakeables = finishedWork.updateQueue;
   if (wakeables !== null) {
     finishedWork.updateQueue = null;
     let retryCache = finishedWork.stateNode;
     if (retryCache === null) {
       retryCache = finishedWork.stateNode = new PossiblyWeakSet();
     }
-    wakeables.forEach(wakeable => {
+    wakeables.forEach((wakeable) => {
       // Memoize using the boundary fiber to prevent redundant listeners.
       let retry = resolveRetryWakeable.bind(null, finishedWork, wakeable);
       if (!retryCache.has(wakeable)) {
@@ -1721,21 +1634,18 @@ function attachSuspenseRetryListeners(finishedWork       ) {
 // This function detects when a Suspense boundary goes from visible to hidden.
 // It returns false if the boundary is already hidden.
 // TODO: Use an effect tag.
-export function isSuspenseBoundaryBeingHidden(
-  current              ,
-  finishedWork       ,
-)          {
+export function isSuspenseBoundaryBeingHidden(current, finishedWork) {
   if (current !== null) {
-    const oldState                       = current.memoizedState;
+    const oldState = current.memoizedState;
     if (oldState === null || oldState.dehydrated !== null) {
-      const newState                       = finishedWork.memoizedState;
+      const newState = finishedWork.memoizedState;
       return newState !== null && newState.dehydrated === null;
     }
   }
   return false;
 }
 
-function commitResetTextContent(current       ) {
+function commitResetTextContent(current) {
   if (!supportsMutation) {
     return;
   }

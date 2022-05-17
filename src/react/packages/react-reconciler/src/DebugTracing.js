@@ -4,25 +4,22 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                  
-                                                
 
 import {enableDebugTracing} from 'shared/ReactFeatureFlags';
 
-const nativeConsole         = console;
-let nativeConsoleLog                  = null;
+const nativeConsole = console;
+let nativeConsoleLog = null;
 
-const pendingGroupArgs             = [];
-let printedGroupIndex         = -1;
+const pendingGroupArgs = [];
+let printedGroupIndex = -1;
 
-function formatLanes(laneOrLanes              )         {
-  return '0b' + (laneOrLanes     ).toString(2).padStart(31, '0');
+function formatLanes(laneOrLanes) {
+  return '0b' + laneOrLanes.toString(2).padStart(31, '0');
 }
 
-function group(...groupArgs)       {
+function group(...groupArgs) {
   pendingGroupArgs.push(groupArgs);
 
   if (nativeConsoleLog === null) {
@@ -31,7 +28,7 @@ function group(...groupArgs)       {
   }
 }
 
-function groupEnd()       {
+function groupEnd() {
   pendingGroupArgs.pop();
   while (printedGroupIndex >= pendingGroupArgs.length) {
     nativeConsole.groupEnd();
@@ -44,7 +41,7 @@ function groupEnd()       {
   }
 }
 
-function log(...logArgs)       {
+function log(...logArgs) {
   if (printedGroupIndex < pendingGroupArgs.length - 1) {
     for (let i = printedGroupIndex + 1; i < pendingGroupArgs.length; i++) {
       const groupArgs = pendingGroupArgs[i];
@@ -62,7 +59,7 @@ function log(...logArgs)       {
 const REACT_LOGO_STYLE =
   'background-color: #20232a; color: #61dafb; padding: 0 2px;';
 
-export function logCommitStarted(lanes       )       {
+export function logCommitStarted(lanes) {
   if (__DEV__) {
     if (enableDebugTracing) {
       group(
@@ -75,7 +72,7 @@ export function logCommitStarted(lanes       )       {
   }
 }
 
-export function logCommitStopped()       {
+export function logCommitStopped() {
   if (__DEV__) {
     if (enableDebugTracing) {
       groupEnd();
@@ -85,23 +82,20 @@ export function logCommitStopped()       {
 
 const PossiblyWeakMap = typeof WeakMap === 'function' ? WeakMap : Map;
 // $FlowFixMe: Flow cannot handle polymorphic WeakMaps
-const wakeableIDs                            = new PossiblyWeakMap();
-let wakeableID         = 0;
-function getWakeableID(wakeable          )         {
+const wakeableIDs = new PossiblyWeakMap();
+let wakeableID = 0;
+function getWakeableID(wakeable) {
   if (!wakeableIDs.has(wakeable)) {
     wakeableIDs.set(wakeable, wakeableID++);
   }
-  return ((wakeableIDs.get(wakeable)     )        );
+  return wakeableIDs.get(wakeable);
 }
 
-export function logComponentSuspended(
-  componentName        ,
-  wakeable          ,
-)       {
+export function logComponentSuspended(componentName, wakeable) {
   if (__DEV__) {
     if (enableDebugTracing) {
       const id = getWakeableID(wakeable);
-      const display = (wakeable     ).displayName || wakeable;
+      const display = wakeable.displayName || wakeable;
       log(
         `%c⚛️%c ${componentName} suspended`,
         REACT_LOGO_STYLE,
@@ -133,7 +127,7 @@ export function logComponentSuspended(
   }
 }
 
-export function logLayoutEffectsStarted(lanes       )       {
+export function logLayoutEffectsStarted(lanes) {
   if (__DEV__) {
     if (enableDebugTracing) {
       group(
@@ -146,7 +140,7 @@ export function logLayoutEffectsStarted(lanes       )       {
   }
 }
 
-export function logLayoutEffectsStopped()       {
+export function logLayoutEffectsStopped() {
   if (__DEV__) {
     if (enableDebugTracing) {
       groupEnd();
@@ -154,7 +148,7 @@ export function logLayoutEffectsStopped()       {
   }
 }
 
-export function logPassiveEffectsStarted(lanes       )       {
+export function logPassiveEffectsStarted(lanes) {
   if (__DEV__) {
     if (enableDebugTracing) {
       group(
@@ -167,7 +161,7 @@ export function logPassiveEffectsStarted(lanes       )       {
   }
 }
 
-export function logPassiveEffectsStopped()       {
+export function logPassiveEffectsStopped() {
   if (__DEV__) {
     if (enableDebugTracing) {
       groupEnd();
@@ -175,7 +169,7 @@ export function logPassiveEffectsStopped()       {
   }
 }
 
-export function logRenderStarted(lanes       )       {
+export function logRenderStarted(lanes) {
   if (__DEV__) {
     if (enableDebugTracing) {
       group(
@@ -188,7 +182,7 @@ export function logRenderStarted(lanes       )       {
   }
 }
 
-export function logRenderStopped()       {
+export function logRenderStopped() {
   if (__DEV__) {
     if (enableDebugTracing) {
       groupEnd();
@@ -196,10 +190,7 @@ export function logRenderStopped()       {
   }
 }
 
-export function logForceUpdateScheduled(
-  componentName        ,
-  lane      ,
-)       {
+export function logForceUpdateScheduled(componentName, lane) {
   if (__DEV__) {
     if (enableDebugTracing) {
       log(
@@ -212,11 +203,7 @@ export function logForceUpdateScheduled(
   }
 }
 
-export function logStateUpdateScheduled(
-  componentName        ,
-  lane      ,
-  payloadOrAction     ,
-)       {
+export function logStateUpdateScheduled(componentName, lane, payloadOrAction) {
   if (__DEV__) {
     if (enableDebugTracing) {
       log(

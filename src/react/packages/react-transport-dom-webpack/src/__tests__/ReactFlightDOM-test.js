@@ -10,17 +10,18 @@
 'use strict';
 
 // Polyfills for test environment
-global.ReadableStream = require('@mattiasbuelens/web-streams-polyfill/ponyfill/es6').ReadableStream;
+global.ReadableStream =
+  require('@mattiasbuelens/web-streams-polyfill/ponyfill/es6').ReadableStream;
 global.TextDecoder = require('util').TextDecoder;
 
 // Don't wait before processing work on the server.
 // TODO: we can replace this with FlightServer.act().
-global.setImmediate = cb => cb();
+global.setImmediate = (cb) => cb();
 
 let webpackModuleIdx = 0;
 let webpackModules = {};
 let webpackMap = {};
-global.__webpack_require__ = function(id) {
+global.__webpack_require__ = function (id) {
   return webpackModules[id];
 };
 
@@ -50,7 +51,7 @@ describe('ReactFlightDOM', () => {
     const writable = new Stream.PassThrough();
     const readable = new ReadableStream({
       start(controller) {
-        writable.on('data', chunk => {
+        writable.on('data', (chunk) => {
           controller.enqueue(chunk);
         });
         writable.on('end', () => {
@@ -79,7 +80,7 @@ describe('ReactFlightDOM', () => {
         return ReactTransportDOMServerRuntime.serverBlockNoData('path/' + idx);
       };
     }
-    return function(...args) {
+    return function (...args) {
       const curriedLoad = () => {
         return load(...args);
       };
@@ -297,7 +298,7 @@ describe('ReactFlightDOM', () => {
           promise = null;
           resolve();
         };
-        _reject = e => {
+        _reject = (e) => {
           error = e;
           promise = null;
           reject(e);
@@ -326,7 +327,7 @@ describe('ReactFlightDOM', () => {
           promise = null;
           resolve();
         };
-        _reject = e => {
+        _reject = (e) => {
           error = e;
           promise = null;
           reject(e);
@@ -399,7 +400,7 @@ describe('ReactFlightDOM', () => {
             <Suspense fallback={<p>(loading posts)</p>}>
               <ProfilePosts response={response} />
             </Suspense>
-            <ErrorBoundary fallback={e => <p>{e.message}</p>}>
+            <ErrorBoundary fallback={(e) => <p>{e.message}</p>}>
               <Suspense fallback={<p>(loading games)</p>}>
                 <ProfileGames response={response} />
               </Suspense>

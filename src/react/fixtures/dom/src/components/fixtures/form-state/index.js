@@ -9,7 +9,8 @@ export default class FormStateCases extends React.Component {
       <FixtureSet title="Form State">
         <TestCase
           title="Form state autofills from browser"
-          description="Form start should autofill/autocomplete if user has autocomplete/autofill information saved. The user may need to set-up autofill or autocomplete with their specific browser.">
+          description="Form start should autofill/autocomplete if user has autocomplete/autofill information saved. The user may need to set-up autofill or autocomplete with their specific browser."
+        >
           <TestCase.Steps>
             <li>
               Set up autofill/autocomplete for your browser.

@@ -10,6 +10,6 @@ const run = async () => {
   return version;
 };
 
-module.exports = async params => {
+module.exports = async (params) => {
   return logPromise(run(params), 'Determining latest "next" release version');
 };

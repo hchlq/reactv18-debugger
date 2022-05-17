@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 // UpdateQueue is a linked list of prioritized updates.
@@ -84,9 +84,6 @@
 // regardless of priority. Intermediate state may vary according to system
 // resources, but the final state is always the same.
 
-                                                
-                                                  
-
 import {NoLane, NoLanes, isSubsetOfLanes, mergeLanes} from './ReactFiberLane';
 import {
   enterDisallowedContextReadInDEV,
@@ -102,31 +99,6 @@ import {markSkippedUpdateLanes} from './ReactFiberWorkLoop.new';
 import invariant from 'shared/invariant';
 
 import {disableLogs, reenableLogs} from 'shared/ConsolePatchingDev';
-
-                              
-                                                                
-                                          
-                    
-             
-
-                     
-               
-                                 
-
-                             
-   
-
-                            
-                                
-   
-
-                                   
-                   
-                                        
-                                       
-                             
-                                       
-   
 
 export const UpdateState = 0;
 export const ReplaceState = 1;
@@ -149,8 +121,8 @@ if (__DEV__) {
   };
 }
 
-export function initializeUpdateQueue       (fiber       )       {
-  const queue                     = {
+export function initializeUpdateQueue(fiber) {
+  const queue = {
     baseState: fiber.memoizedState,
     firstBaseUpdate: null,
     lastBaseUpdate: null,
@@ -162,15 +134,12 @@ export function initializeUpdateQueue       (fiber       )       {
   fiber.updateQueue = queue;
 }
 
-export function cloneUpdateQueue       (
-  current       ,
-  workInProgress       ,
-)       {
+export function cloneUpdateQueue(current, workInProgress) {
   // Clone the update queue from current. Unless it's already a clone.
-  const queue                     = (workInProgress.updateQueue     );
-  const currentQueue                     = (current.updateQueue     );
+  const queue = workInProgress.updateQueue;
+  const currentQueue = current.updateQueue;
   if (queue === currentQueue) {
-    const clone                     = {
+    const clone = {
       baseState: currentQueue.baseState,
       firstBaseUpdate: currentQueue.firstBaseUpdate,
       lastBaseUpdate: currentQueue.lastBaseUpdate,
@@ -181,8 +150,8 @@ export function cloneUpdateQueue       (
   }
 }
 
-export function createUpdate(eventTime        , lane      )            {
-  const update            = {
+export function createUpdate(eventTime, lane) {
+  const update = {
     eventTime,
     lane,
 
@@ -195,14 +164,14 @@ export function createUpdate(eventTime        , lane      )            {
   return update;
 }
 
-export function enqueueUpdate       (fiber       , update               ) {
+export function enqueueUpdate(fiber, update) {
   const updateQueue = fiber.updateQueue;
   if (updateQueue === null) {
     // Only occurs if the fiber has been unmounted.
     return;
   }
 
-  const sharedQueue                     = (updateQueue     ).shared;
+  const sharedQueue = updateQueue.shared;
   const pending = sharedQueue.pending;
   if (pending === null) {
     // This is the first update. Create a circular list.
@@ -229,19 +198,16 @@ export function enqueueUpdate       (fiber       , update               ) {
   }
 }
 
-export function enqueueCapturedUpdate       (
-  workInProgress       ,
-  capturedUpdate               ,
-) {
+export function enqueueCapturedUpdate(workInProgress, capturedUpdate) {
   // Captured updates are updates that are thrown by a child during the render
   // phase. They should be discarded if the render is aborted. Therefore,
   // we should only put them on the work-in-progress queue, not the current one.
-  let queue                     = (workInProgress.updateQueue     );
+  let queue = workInProgress.updateQueue;
 
   // Check if the work-in-progress queue is a clone.
   const current = workInProgress.alternate;
   if (current !== null) {
-    const currentQueue                     = (current.updateQueue     );
+    const currentQueue = current.updateQueue;
     if (queue === currentQueue) {
       // The work-in-progress queue is the same as current. This happens when
       // we bail out on a parent fiber that then captures an error thrown by
@@ -256,7 +222,7 @@ export function enqueueCapturedUpdate       (
         // Loop through the updates and clone them.
         let update = firstBaseUpdate;
         do {
-          const clone                = {
+          const clone = {
             eventTime: update.eventTime,
             lane: update.lane,
 
@@ -308,14 +274,14 @@ export function enqueueCapturedUpdate       (
   queue.lastBaseUpdate = capturedUpdate;
 }
 
-function getStateFromUpdate       (
-  workInProgress       ,
-  queue                    ,
-  update               ,
-  prevState       ,
-  nextProps     ,
-  instance     ,
-)      {
+function getStateFromUpdate(
+  workInProgress,
+  queue,
+  update,
+  prevState,
+  nextProps,
+  instance,
+) {
   switch (update.tag) {
     case ReplaceState: {
       const payload = update.payload;
@@ -391,14 +357,14 @@ function getStateFromUpdate       (
   return prevState;
 }
 
-export function processUpdateQueue       (
-  workInProgress       ,
-  props     ,
-  instance     ,
-  renderLanes       ,
-)       {
+export function processUpdateQueue(
+  workInProgress,
+  props,
+  instance,
+  renderLanes,
+) {
   // This is always non-null on a ClassComponent or HostRoot
-  const queue                     = (workInProgress.updateQueue     );
+  const queue = workInProgress.updateQueue;
 
   hasForceUpdate = false;
 
@@ -435,7 +401,7 @@ export function processUpdateQueue       (
     const current = workInProgress.alternate;
     if (current !== null) {
       // This is always non-null on a ClassComponent or HostRoot
-      const currentQueue                     = (current.updateQueue     );
+      const currentQueue = current.updateQueue;
       const currentLastBaseUpdate = currentQueue.lastBaseUpdate;
       if (currentLastBaseUpdate !== lastBaseUpdate) {
         if (currentLastBaseUpdate === null) {
@@ -468,7 +434,7 @@ export function processUpdateQueue       (
         // Priority is insufficient. Skip this update. If this is the first
         // skipped update, the previous update/state is the new base
         // update/state.
-        const clone                = {
+        const clone = {
           eventTime: updateEventTime,
           lane: updateLane,
 
@@ -490,7 +456,7 @@ export function processUpdateQueue       (
         // This update does have sufficient priority.
 
         if (newLastBaseUpdate !== null) {
-          const clone                = {
+          const clone = {
             eventTime: updateEventTime,
             // This update is going to be committed so we never want uncommit
             // it. Using NoLane works because 0 is a subset of all bitmasks, so
@@ -537,7 +503,7 @@ export function processUpdateQueue       (
           const lastPendingUpdate = pendingQueue;
           // Intentionally unsound. Pending updates form a circular list, but we
           // unravel them when transferring them to the base queue.
-          const firstPendingUpdate = ((lastPendingUpdate.next     )               );
+          const firstPendingUpdate = lastPendingUpdate.next;
           lastPendingUpdate.next = null;
           update = firstPendingUpdate;
           queue.lastBaseUpdate = lastPendingUpdate;
@@ -550,7 +516,7 @@ export function processUpdateQueue       (
       newBaseState = newState;
     }
 
-    queue.baseState = ((newBaseState     )       );
+    queue.baseState = newBaseState;
     queue.firstBaseUpdate = newFirstBaseUpdate;
     queue.lastBaseUpdate = newLastBaseUpdate;
 
@@ -585,15 +551,11 @@ export function resetHasForceUpdateBeforeProcessing() {
   hasForceUpdate = false;
 }
 
-export function checkHasForceUpdateAfterProcessing()          {
+export function checkHasForceUpdateAfterProcessing() {
   return hasForceUpdate;
 }
 
-export function commitUpdateQueue       (
-  finishedWork       ,
-  finishedQueue                    ,
-  instance     ,
-)       {
+export function commitUpdateQueue(finishedWork, finishedQueue, instance) {
   // Commit the effects
   const effects = finishedQueue.effects;
   finishedQueue.effects = null;

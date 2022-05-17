@@ -119,7 +119,7 @@ describe('forwardRef', () => {
     let setRefCount = 0;
     let ref;
 
-    const setRef = r => {
+    const setRef = (r) => {
       setRefCount++;
       ref = r;
     };

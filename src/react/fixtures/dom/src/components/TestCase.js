@@ -24,7 +24,7 @@ class TestCase extends React.Component {
     };
   }
 
-  handleChange = e => {
+  handleChange = (e) => {
     this.setState({
       complete: e.target.checked,
     });
@@ -69,7 +69,8 @@ class TestCase extends React.Component {
           {introducedIn && (
             <dd>
               <a
-                href={'https://github.com/facebook/react/tag/v' + introducedIn}>
+                href={'https://github.com/facebook/react/tag/v' + introducedIn}
+              >
                 <code>{introducedIn}</code>
               </a>
             </dd>
@@ -91,7 +92,8 @@ class TestCase extends React.Component {
                 href={
                   'https://github.com/facebook/react/pull/' +
                   resolvedBy.slice(1)
-                }>
+                }
+              >
                 <code>{resolvedBy}</code>
               </a>
             </dd>

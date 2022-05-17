@@ -23,8 +23,8 @@ describe('ReactIdentity', () => {
 
   it('should allow key property to express identity', () => {
     let node;
-    const Component = props => (
-      <div ref={c => (node = c)}>
+    const Component = (props) => (
+      <div ref={(c) => (node = c)}>
         <div key={props.swap ? 'banana' : 'apple'} />
         <div key={props.swap ? 'apple' : 'banana'} />
       </div>
@@ -51,13 +51,13 @@ describe('ReactIdentity', () => {
     let node2;
     ReactDOM.render(
       <Wrapper key="wrap1">
-        <span ref={c => (node1 = c)} />
+        <span ref={(c) => (node1 = c)} />
       </Wrapper>,
       container,
     );
     ReactDOM.render(
       <Wrapper key="wrap2">
-        <span ref={c => (node2 = c)} />
+        <span ref={(c) => (node2 = c)} />
       </Wrapper>,
       container,
     );
@@ -140,7 +140,7 @@ describe('ReactIdentity', () => {
       }
     }
 
-    expect(function() {
+    expect(function () {
       ReactTestUtils.renderIntoDocument(<TestContainer />);
     }).not.toThrow();
   });
@@ -175,7 +175,7 @@ describe('ReactIdentity', () => {
       }
     }
 
-    expect(function() {
+    expect(function () {
       ReactTestUtils.renderIntoDocument(<TestContainer />);
     }).not.toThrow();
   });
@@ -203,7 +203,7 @@ describe('ReactIdentity', () => {
       }
     }
 
-    expect(function() {
+    expect(function () {
       ReactTestUtils.renderIntoDocument(<TestContainer />);
     }).not.toThrow();
   });
@@ -258,7 +258,7 @@ describe('ReactIdentity', () => {
       </div>
     );
 
-    expect(function() {
+    expect(function () {
       ReactTestUtils.renderIntoDocument(component);
     }).not.toThrow();
   });

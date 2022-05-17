@@ -6,7 +6,7 @@ const {exec, execSync} = require('child_process');
 const {readFileSync, writeFileSync} = require('fs');
 const {join} = require('path');
 
-const main = async buildId => {
+const main = async (buildId) => {
   const root = join(__dirname, buildId);
   const buildPath = join(root, 'build');
 
@@ -27,10 +27,7 @@ const main = async buildId => {
   const json = JSON.parse(file);
   const alias = json.alias[0];
 
-  const commit = execSync('git rev-parse HEAD')
-    .toString()
-    .trim()
-    .substr(0, 7);
+  const commit = execSync('git rev-parse HEAD').toString().trim().substr(0, 7);
 
   let date = new Date();
   date = `${date.toLocaleDateString()} – ${date.toLocaleTimeString()}`;

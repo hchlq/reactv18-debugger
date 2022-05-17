@@ -38,7 +38,7 @@ function normalizeCodeLocInfo(str) {
   return str && str.replace(/at .+?:\d+/g, 'at **');
 }
 
-const createMatcherFor = consoleMethod =>
+const createMatcherFor = (consoleMethod) =>
   function matcher(callback, expectedMessages, options = {}) {
     if (__DEV__) {
       // Warn about incorrect usage of matcher.
@@ -81,7 +81,7 @@ const createMatcherFor = consoleMethod =>
       // and result in a test that passes when it shouldn't.
       let caughtError;
 
-      const isLikelyAComponentStack = message =>
+      const isLikelyAComponentStack = (message) =>
         typeof message === 'string' && message.includes('\n    in ');
 
       const consoleSpy = (format, ...args) => {
@@ -206,7 +206,7 @@ const createMatcherFor = consoleMethod =>
             return {
               message: () =>
                 `Expected ${withoutStack} warnings without a component stack but received ${warningsWithoutComponentStack.length}:\n` +
-                warningsWithoutComponentStack.map(warning =>
+                warningsWithoutComponentStack.map((warning) =>
                   this.utils.printReceived(warning)
                 ),
               pass: false,

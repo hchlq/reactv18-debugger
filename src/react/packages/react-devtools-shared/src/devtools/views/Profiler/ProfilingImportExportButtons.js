@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -22,15 +22,13 @@ import {downloadFile} from '../utils';
 
 import styles from './ProfilingImportExportButtons.css';
 
-                                                 
-
 export default function ProfilingImportExportButtons() {
   const {isProfiling, profilingData, rootID} = useContext(ProfilerContext);
   const store = useContext(StoreContext);
   const {profilerStore} = store;
 
-  const inputRef = useRef                         (null);
-  const downloadRef = useRef                          (null);
+  const inputRef = useRef(null);
+  const downloadRef = useRef(null);
 
   const {dispatch: modalDialogDispatch} = useContext(ModalDialogContext);
 
@@ -76,13 +74,10 @@ export default function ProfilingImportExportButtons() {
       const fileReader = new FileReader();
       fileReader.addEventListener('load', () => {
         try {
-          const raw = ((fileReader.result     )        );
-          const profilingDataExport = ((JSON.parse(
-            raw,
-          )     )                     );
-          profilerStore.profilingData = prepareProfilingDataFrontendFromExport(
-            profilingDataExport,
-          );
+          const raw = fileReader.result;
+          const profilingDataExport = JSON.parse(raw);
+          profilerStore.profilingData =
+            prepareProfilingDataFrontendFromExport(profilingDataExport);
         } catch (error) {
           modalDialogDispatch({
             type: 'SHOW',
@@ -117,13 +112,15 @@ export default function ProfilingImportExportButtons() {
       <Button
         disabled={isProfiling}
         onClick={uploadData}
-        title="Load profile...">
+        title="Load profile..."
+      >
         <ButtonIcon type="import" />
       </Button>
       <Button
         disabled={isProfiling || !profilerStore.didRecordCommits}
         onClick={downloadData}
-        title="Save profile...">
+        title="Save profile..."
+      >
         <ButtonIcon type="export" />
       </Button>
     </Fragment>

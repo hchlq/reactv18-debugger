@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 describe('console', () => {
@@ -50,7 +50,7 @@ describe('console', () => {
     });
 
     const inject = global.__REACT_DEVTOOLS_GLOBAL_HOOK__.inject;
-    global.__REACT_DEVTOOLS_GLOBAL_HOOK__.inject = internals => {
+    global.__REACT_DEVTOOLS_GLOBAL_HOOK__.inject = (internals) => {
       inject(internals);
 
       Console.registerRenderer(internals);
@@ -66,7 +66,7 @@ describe('console', () => {
   function normalizeCodeLocInfo(str) {
     return (
       str &&
-      str.replace(/\n +(?:at|in) ([\S]+)[^\n]*/g, function(m, name) {
+      str.replace(/\n +(?:at|in) ([\S]+)[^\n]*/g, function (m, name) {
         return '\n    in ' + name + ' (at **)';
       })
     );
@@ -231,7 +231,7 @@ describe('console', () => {
         <Child />
       </Intermediate>
     );
-    class Child extends React.Component      {
+    class Child extends React.Component {
       componentDidMount() {
         fakeConsole.error('didMount error');
         fakeConsole.log('didMount log');
@@ -287,7 +287,7 @@ describe('console', () => {
         <Child />
       </Intermediate>
     );
-    class Child extends React.Component           {
+    class Child extends React.Component {
       state = {};
       static getDerivedStateFromProps() {
         fakeConsole.error('error');
@@ -357,7 +357,7 @@ describe('console', () => {
   });
 
   it('should be resilient to prepareStackTrace', () => {
-    Error.prepareStackTrace = function(error, callsites) {
+    Error.prepareStackTrace = function (error, callsites) {
       const stack = ['An error occurred:', error.message];
       for (let i = 0; i < callsites.length; i++) {
         const callsite = callsites[i];

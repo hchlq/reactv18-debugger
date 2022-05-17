@@ -27,18 +27,18 @@ describe('ReactComponent', () => {
   it('should throw on invalid render targets', () => {
     const container = document.createElement('div');
     // jQuery objects are basically arrays; people often pass them in by mistake
-    expect(function() {
+    expect(function () {
       ReactDOM.render(<div />, [container]);
     }).toThrowError(/Target container is not a DOM element./);
 
-    expect(function() {
+    expect(function () {
       ReactDOM.render(<div />, null);
     }).toThrowError(/Target container is not a DOM element./);
   });
 
   it('should throw when supplying a ref outside of render method', () => {
     let instance = <div ref="badDiv" />;
-    expect(function() {
+    expect(function () {
       instance = ReactTestUtils.renderIntoDocument(instance);
     }).toThrow();
   });
@@ -179,10 +179,10 @@ describe('ReactComponent', () => {
     class Component extends React.Component {
       render() {
         const inner = (
-          <Wrapper object={innerObj} ref={c => (this.innerRef = c)} />
+          <Wrapper object={innerObj} ref={(c) => (this.innerRef = c)} />
         );
         const outer = (
-          <Wrapper object={outerObj} ref={c => (this.outerRef = c)}>
+          <Wrapper object={outerObj} ref={(c) => (this.outerRef = c)}>
             {inner}
           </Wrapper>
         );
@@ -260,14 +260,14 @@ describe('ReactComponent', () => {
       getInner = () => {
         // (With old-style refs, it's impossible to get a ref to this div
         // because Wrapper is the current owner when this function is called.)
-        return <div className="inner" ref={c => (this.innerRef = c)} />;
+        return <div className="inner" ref={(c) => (this.innerRef = c)} />;
       };
 
       render() {
         return (
           <Wrapper
             title="wrapper"
-            ref={c => (this.wrapperRef = c)}
+            ref={(c) => (this.wrapperRef = c)}
             getContent={this.getInner}
           />
         );
@@ -313,13 +313,13 @@ describe('ReactComponent', () => {
           <div>
             <Inner
               id={1}
-              ref={c => {
+              ref={(c) => {
                 log.push(`ref 1 got ${c ? `instance ${c.props.id}` : 'null'}`);
               }}
             />
             <Inner
               id={2}
-              ref={c => {
+              ref={(c) => {
                 log.push(`ref 2 got ${c ? `instance ${c.props.id}` : 'null'}`);
               }}
             />

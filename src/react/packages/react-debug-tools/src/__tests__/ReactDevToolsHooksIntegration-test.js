@@ -22,7 +22,7 @@ describe('React hooks DevTools integration', () => {
 
   beforeEach(() => {
     global.__REACT_DEVTOOLS_GLOBAL_HOOK__ = {
-      inject: injected => {
+      inject: (injected) => {
         overrideHookState = injected.overrideHookState;
         scheduleUpdate = injected.scheduleUpdate;
         setSuspenseHandler = injected.setSuspenseHandler;
@@ -71,7 +71,7 @@ describe('React hooks DevTools integration', () => {
         children: ['count:', '10'],
       });
 
-      act(() => setCountFn(count => count + 1));
+      act(() => setCountFn((count) => count + 1));
       expect(renderer.toJSON()).toEqual({
         type: 'div',
         props: {},
@@ -171,7 +171,7 @@ describe('React hooks DevTools integration', () => {
         children: ['count:', '10'],
       });
 
-      act(() => setStateFn(state => ({count: state.count + 1})));
+      act(() => setStateFn((state) => ({count: state.count + 1})));
       expect(renderer.toJSON()).toEqual({
         type: 'div',
         props: {},
@@ -222,10 +222,10 @@ describe('React hooks DevTools integration', () => {
       expect(renderer.toJSON().children).toEqual(['Done']);
 
       // Ensure it checks specific fibers.
-      setSuspenseHandler(f => f === fiber || f === fiber.alternate);
+      setSuspenseHandler((f) => f === fiber || f === fiber.alternate);
       scheduleUpdate(fiber); // Re-render
       expect(renderer.toJSON().children).toEqual(['Loading']);
-      setSuspenseHandler(f => f !== fiber && f !== fiber.alternate);
+      setSuspenseHandler((f) => f !== fiber && f !== fiber.alternate);
       scheduleUpdate(fiber); // Re-render
       expect(renderer.toJSON().children).toEqual(['Done']);
     } else {
@@ -281,10 +281,10 @@ describe('React hooks DevTools integration', () => {
       expect(renderer.toJSON().children).toEqual(['Done']);
 
       // Ensure it checks specific fibers.
-      setSuspenseHandler(f => f === fiber || f === fiber.alternate);
+      setSuspenseHandler((f) => f === fiber || f === fiber.alternate);
       scheduleUpdate(fiber); // Re-render
       expect(renderer.toJSON().children).toEqual(['Loading']);
-      setSuspenseHandler(f => f !== fiber && f !== fiber.alternate);
+      setSuspenseHandler((f) => f !== fiber && f !== fiber.alternate);
       scheduleUpdate(fiber); // Re-render
       expect(renderer.toJSON().children).toEqual(['Done']);
     } else {

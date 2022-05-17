@@ -4,21 +4,15 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                           
-                                                                     
-                                                                                               
-                                                                                                       
-                                                                  
 
 describe('ProfilerContext', () => {
   let React;
   let ReactDOM;
-  let TestRenderer                   ;
-  let bridge                ;
-  let store       ;
+  let TestRenderer;
+  let bridge;
+  let store;
   let utils;
 
   let BridgeContext;
@@ -42,42 +36,43 @@ describe('ProfilerContext', () => {
     ReactDOM = require('react-dom');
     TestRenderer = utils.requireTestRenderer();
 
-    BridgeContext = require('react-devtools-shared/src/devtools/views/context')
-      .BridgeContext;
-    ProfilerContext = require('react-devtools-shared/src/devtools/views/Profiler/ProfilerContext')
-      .ProfilerContext;
-    ProfilerContextController = require('react-devtools-shared/src/devtools/views/Profiler/ProfilerContext')
-      .ProfilerContextController;
-    StoreContext = require('react-devtools-shared/src/devtools/views/context')
-      .StoreContext;
-    TreeContextController = require('react-devtools-shared/src/devtools/views/Components/TreeContext')
-      .TreeContextController;
-    TreeDispatcherContext = require('react-devtools-shared/src/devtools/views/Components/TreeContext')
-      .TreeDispatcherContext;
-    TreeStateContext = require('react-devtools-shared/src/devtools/views/Components/TreeContext')
-      .TreeStateContext;
+    BridgeContext =
+      require('react-devtools-shared/src/devtools/views/context').BridgeContext;
+    ProfilerContext =
+      require('react-devtools-shared/src/devtools/views/Profiler/ProfilerContext').ProfilerContext;
+    ProfilerContextController =
+      require('react-devtools-shared/src/devtools/views/Profiler/ProfilerContext').ProfilerContextController;
+    StoreContext =
+      require('react-devtools-shared/src/devtools/views/context').StoreContext;
+    TreeContextController =
+      require('react-devtools-shared/src/devtools/views/Components/TreeContext').TreeContextController;
+    TreeDispatcherContext =
+      require('react-devtools-shared/src/devtools/views/Components/TreeContext').TreeDispatcherContext;
+    TreeStateContext =
+      require('react-devtools-shared/src/devtools/views/Components/TreeContext').TreeStateContext;
   });
 
   const Contexts = ({
     children = null,
     defaultSelectedElementID = null,
     defaultSelectedElementIndex = null,
-  }     ) => (
+  }) => (
     <BridgeContext.Provider value={bridge}>
       <StoreContext.Provider value={store}>
         <TreeContextController
           defaultSelectedElementID={defaultSelectedElementID}
-          defaultSelectedElementIndex={defaultSelectedElementIndex}>
+          defaultSelectedElementIndex={defaultSelectedElementIndex}
+        >
           <ProfilerContextController>{children}</ProfilerContextController>
         </TreeContextController>
       </StoreContext.Provider>
     </BridgeContext.Provider>
   );
 
-  it('updates updates profiling support based on the attached roots', async done => {
+  it('updates updates profiling support based on the attached roots', async (done) => {
     const Component = () => null;
 
-    let context          = ((null     )         );
+    let context = null;
 
     function ContextReader() {
       context = React.useContext(ProfilerContext);
@@ -109,14 +104,14 @@ describe('ProfilerContext', () => {
     done();
   });
 
-  it('should gracefully handle an empty profiling session (with no recorded commits)', async done => {
+  it('should gracefully handle an empty profiling session (with no recorded commits)', async (done) => {
     const Example = () => null;
 
     utils.act(() =>
       ReactDOM.render(<Example />, document.createElement('div')),
     );
 
-    let context          = ((null     )         );
+    let context = null;
 
     function ContextReader() {
       context = React.useContext(ProfilerContext);
@@ -148,7 +143,7 @@ describe('ProfilerContext', () => {
     done();
   });
 
-  it('should auto-select the root ID matching the Components tab selection if it has profiling data', async done => {
+  it('should auto-select the root ID matching the Components tab selection if it has profiling data', async (done) => {
     const Parent = () => <Child />;
     const Child = () => null;
 
@@ -164,7 +159,7 @@ describe('ProfilerContext', () => {
     await utils.actAsync(() => ReactDOM.render(<Parent />, containerTwo));
     await utils.actAsync(() => store.profilerStore.stopProfiling());
 
-    let context          = ((null     )         );
+    let context = null;
     function ContextReader() {
       context = React.useContext(ProfilerContext);
       return null;
@@ -175,7 +170,8 @@ describe('ProfilerContext', () => {
       TestRenderer.create(
         <Contexts
           defaultSelectedElementID={store.getElementIDAtIndex(3)}
-          defaultSelectedElementIndex={3}>
+          defaultSelectedElementIndex={3}
+        >
           <ContextReader />
         </Contexts>,
       ),
@@ -183,13 +179,13 @@ describe('ProfilerContext', () => {
 
     expect(context).not.toBeNull();
     expect(context.rootID).toBe(
-      store.getRootIDForElement(((store.getElementIDAtIndex(3)     )        )),
+      store.getRootIDForElement(store.getElementIDAtIndex(3)),
     );
 
     done();
   });
 
-  it('should not select the root ID matching the Components tab selection if it has no profiling data', async done => {
+  it('should not select the root ID matching the Components tab selection if it has no profiling data', async (done) => {
     const Parent = () => <Child />;
     const Child = () => null;
 
@@ -204,7 +200,7 @@ describe('ProfilerContext', () => {
     await utils.actAsync(() => ReactDOM.render(<Parent />, containerOne));
     await utils.actAsync(() => store.profilerStore.stopProfiling());
 
-    let context          = ((null     )         );
+    let context = null;
     function ContextReader() {
       context = React.useContext(ProfilerContext);
       return null;
@@ -215,7 +211,8 @@ describe('ProfilerContext', () => {
       TestRenderer.create(
         <Contexts
           defaultSelectedElementID={store.getElementIDAtIndex(3)}
-          defaultSelectedElementIndex={3}>
+          defaultSelectedElementIndex={3}
+        >
           <ContextReader />
         </Contexts>,
       ),
@@ -224,13 +221,13 @@ describe('ProfilerContext', () => {
     // Verify the default profiling root is the first one.
     expect(context).not.toBeNull();
     expect(context.rootID).toBe(
-      store.getRootIDForElement(((store.getElementIDAtIndex(0)     )        )),
+      store.getRootIDForElement(store.getElementIDAtIndex(0)),
     );
 
     done();
   });
 
-  it('should maintain root selection between profiling sessions so long as there is data for that root', async done => {
+  it('should maintain root selection between profiling sessions so long as there is data for that root', async (done) => {
     const Parent = () => <Child />;
     const Child = () => null;
 
@@ -246,8 +243,8 @@ describe('ProfilerContext', () => {
     await utils.actAsync(() => ReactDOM.render(<Parent />, containerB));
     await utils.actAsync(() => store.profilerStore.stopProfiling());
 
-    let context          = ((null     )         );
-    let dispatch                    = ((null     )                   );
+    let context = null;
+    let dispatch = null;
     let selectedElementID = null;
     function ContextReader() {
       context = React.useContext(ProfilerContext);
@@ -256,7 +253,7 @@ describe('ProfilerContext', () => {
       return null;
     }
 
-    const id = ((store.getElementIDAtIndex(3)     )        );
+    const id = store.getElementIDAtIndex(3);
 
     // Select an element within the second root.
     await utils.actAsync(() =>
@@ -275,7 +272,7 @@ describe('ProfilerContext', () => {
     await utils.actAsync(() => ReactDOM.render(<Parent />, containerB));
     await utils.actAsync(() => store.profilerStore.stopProfiling());
 
-    const otherID = ((store.getElementIDAtIndex(0)     )        );
+    const otherID = store.getElementIDAtIndex(0);
 
     // Change the selected element within a the Components tab.
     utils.act(() => dispatch({type: 'SELECT_ELEMENT_AT_INDEX', payload: 0}));
@@ -288,7 +285,7 @@ describe('ProfilerContext', () => {
     done();
   });
 
-  it('should sync selected element in the Components tab too, provided the element is a match', async done => {
+  it('should sync selected element in the Components tab too, provided the element is a match', async (done) => {
     const GrandParent = ({includeChild}) => (
       <Parent includeChild={includeChild} />
     );
@@ -301,8 +298,8 @@ describe('ProfilerContext', () => {
     );
     expect(store).toMatchSnapshot('mounted');
 
-    const parentID = ((store.getElementIDAtIndex(1)     )        );
-    const childID = ((store.getElementIDAtIndex(2)     )        );
+    const parentID = store.getElementIDAtIndex(1);
+    const childID = store.getElementIDAtIndex(2);
 
     // Profile and record updates.
     await utils.actAsync(() => store.profilerStore.startProfiling());
@@ -316,7 +313,7 @@ describe('ProfilerContext', () => {
 
     expect(store).toMatchSnapshot('updated');
 
-    let context          = ((null     )         );
+    let context = null;
     let selectedElementID = null;
     function ContextReader() {
       context = React.useContext(ProfilerContext);

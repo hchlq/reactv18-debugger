@@ -9,7 +9,7 @@ class Persistence extends React.Component {
     pooled: [],
   };
 
-  addPersisted = event => {
+  addPersisted = (event) => {
     let {persisted, pooled} = this.state;
 
     event.persist();
@@ -17,12 +17,12 @@ class Persistence extends React.Component {
     if (event.type === 'mousemove') {
       this.setState({
         persisted: persisted + 1,
-        pooled: pooled.filter(e => e !== event),
+        pooled: pooled.filter((e) => e !== event),
       });
     }
   };
 
-  addPooled = event => {
+  addPooled = (event) => {
     let {pooled} = this.state;
 
     if (event.type === 'mousemove' && pooled.indexOf(event) === -1) {

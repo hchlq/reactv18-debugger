@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 // This context combines tree/selection state, search, and the owners stack.
@@ -44,137 +44,13 @@ import {createRegExp} from '../utils';
 import {BridgeContext, StoreContext} from '../context';
 import Store from '../../store';
 
-                                     
-
-                             
-         
-                      
-                                           
-                                   
-                                      
-
-           
-                             
-                               
-                     
-
-           
-                         
-                                       
-
-                             
-                                    
-   
-
-                                         
-                                   
-   
-                                             
-                                       
-   
-                                      
-                                
-                                                
-   
-                                  
-                            
-   
-                                             
-                                       
-   
-                                        
-                                  
-                         
-   
-                                     
-                               
-                         
-   
-                                            
-                                      
-   
-                                            
-                                      
-   
-                             
-                       
-                  
-   
-                                              
-                                        
-   
-                                                
-                                          
-   
-                                                
-                                          
-   
-                                                       
-                                                 
-   
-                                                           
-                                                     
-   
-                                
-                          
-                  
-   
-                                            
-                                      
-   
-
-             
-                                   
-                                       
-                                
-                            
-                                       
-                                  
-                               
-                                      
-                                      
-                       
-                                        
-                                          
-                                          
-                                                 
-                                                     
-                          
-                                       
-
-                                                         
-
-const TreeStateContext = createContext              (
-  ((null     )              ),
-);
+const TreeStateContext = createContext(null);
 TreeStateContext.displayName = 'TreeStateContext';
 
-const TreeDispatcherContext = createContext                   (
-  ((null     )                   ),
-);
+const TreeDispatcherContext = createContext(null);
 TreeDispatcherContext.displayName = 'TreeDispatcherContext';
 
-               
-         
-                      
-                                           
-                                   
-                                      
-
-           
-                             
-                               
-                     
-
-           
-                         
-                                       
-
-                             
-                                    
-   
-
-function reduceTreeState(store       , state       , action        )        {
+function reduceTreeState(store, state, action) {
   let {
     numElements,
     ownerSubtreeLeafElementID,
@@ -200,9 +76,7 @@ function reduceTreeState(store       , state       , action        )        {
           selectedElementID !== null &&
           removedIDs.has(selectedElementID)
         ) {
-          selectedElementID = ((removedIDs.get(
-            selectedElementID,
-          )     )        );
+          selectedElementID = removedIDs.get(selectedElementID);
         }
         if (selectedElementID === 0) {
           // The whole root was removed.
@@ -213,9 +87,7 @@ function reduceTreeState(store       , state       , action        )        {
         ownerSubtreeLeafElementID = null;
 
         if (selectedElementIndex !== null) {
-          const selectedElement = store.getElementAtIndex(
-            ((selectedElementIndex     )        ),
-          );
+          const selectedElement = store.getElementAtIndex(selectedElementIndex);
           if (
             selectedElement !== null &&
             selectedElement.children.length > 0 &&
@@ -232,7 +104,7 @@ function reduceTreeState(store       , state       , action        )        {
       case 'SELECT_ELEMENT_AT_INDEX':
         ownerSubtreeLeafElementID = null;
 
-        selectedElementIndex = (action                                ).payload;
+        selectedElementIndex = action.payload;
         break;
       case 'SELECT_ELEMENT_BY_ID':
         ownerSubtreeLeafElementID = null;
@@ -241,7 +113,7 @@ function reduceTreeState(store       , state       , action        )        {
         // It might also cause problems if the specified element was inside of a (not yet expanded) subtree.
         lookupIDForIndex = false;
 
-        selectedElementID = (action                             ).payload;
+        selectedElementID = action.payload;
         selectedElementIndex =
           selectedElementID === null
             ? null
@@ -263,9 +135,7 @@ function reduceTreeState(store       , state       , action        )        {
         ownerSubtreeLeafElementID = null;
 
         if (selectedElementIndex !== null) {
-          const selectedElement = store.getElementAtIndex(
-            ((selectedElementIndex     )        ),
-          );
+          const selectedElement = store.getElementAtIndex(selectedElementIndex);
           if (selectedElement !== null && selectedElement.parentID !== 0) {
             const parent = store.getElementByID(selectedElement.parentID);
             if (parent !== null) {
@@ -312,9 +182,7 @@ function reduceTreeState(store       , state       , action        )        {
             ownerSubtreeLeafElementID = selectedElementID;
           }
 
-          const selectedElement = store.getElementAtIndex(
-            ((selectedElementIndex     )        ),
-          );
+          const selectedElement = store.getElementAtIndex(selectedElementIndex);
           if (selectedElement !== null && selectedElement.ownerID !== 0) {
             const ownerIndex = store.getIndexOfElementID(
               selectedElement.ownerID,
@@ -329,9 +197,7 @@ function reduceTreeState(store       , state       , action        )        {
         ownerSubtreeLeafElementID = null;
 
         if (selectedElementIndex !== null) {
-          const selectedElement = store.getElementAtIndex(
-            ((selectedElementIndex     )        ),
-          );
+          const selectedElement = store.getElementAtIndex(selectedElementIndex);
           if (selectedElement !== null && selectedElement.parentID !== 0) {
             const parentIndex = store.getIndexOfElementID(
               selectedElement.parentID,
@@ -355,9 +221,7 @@ function reduceTreeState(store       , state       , action        )        {
         ownerSubtreeLeafElementID = null;
 
         if (selectedElementIndex !== null) {
-          const selectedElement = store.getElementAtIndex(
-            ((selectedElementIndex     )        ),
-          );
+          const selectedElement = store.getElementAtIndex(selectedElementIndex);
           if (selectedElement !== null && selectedElement.parentID !== 0) {
             const parent = store.getElementByID(selectedElement.parentID);
             if (parent !== null) {
@@ -383,9 +247,7 @@ function reduceTreeState(store       , state       , action        )        {
     if (selectedElementIndex === null) {
       selectedElementID = null;
     } else {
-      selectedElementID = store.getElementIDAtIndex(
-        ((selectedElementIndex     )        ),
-      );
+      selectedElementID = store.getElementIDAtIndex(selectedElementIndex);
     }
   }
 
@@ -399,7 +261,7 @@ function reduceTreeState(store       , state       , action        )        {
   };
 }
 
-function reduceSearchState(store       , state       , action        )        {
+function reduceSearchState(store, state, action) {
   let {
     searchIndex,
     searchResults,
@@ -433,17 +295,12 @@ function reduceSearchState(store       , state       , action        )        {
         if (numPrevSearchResults > 0) {
           didRequestSearch = true;
           searchIndex =
-            ((searchIndex     )        ) > 0
-              ? ((searchIndex     )        ) - 1
-              : numPrevSearchResults - 1;
+            searchIndex > 0 ? searchIndex - 1 : numPrevSearchResults - 1;
         }
         break;
       case 'HANDLE_STORE_MUTATION':
         if (searchText !== '') {
-          const [
-            addedElementIDs,
-            removedElementIDs,
-          ] = (action                              ).payload;
+          const [addedElementIDs, removedElementIDs] = action.payload;
 
           removedElementIDs.forEach((parentID, id) => {
             // Prune this item from the search results.
@@ -456,14 +313,14 @@ function reduceSearchState(store       , state       , action        )        {
               // If the results are now empty, also deselect things.
               if (searchResults.length === 0) {
                 searchIndex = null;
-              } else if (((searchIndex     )        ) >= searchResults.length) {
+              } else if (searchIndex >= searchResults.length) {
                 searchIndex = searchResults.length - 1;
               }
             }
           });
 
-          addedElementIDs.forEach(id => {
-            const element = ((store.getElementByID(id)     )         );
+          addedElementIDs.forEach((id) => {
+            const element = store.getElementByID(id);
 
             // It's possible that multiple tree operations will fire before this action has run.
             // So it's important to check for elements that may have been added and then removed.
@@ -473,17 +330,12 @@ function reduceSearchState(store       , state       , action        )        {
               // Add this item to the search results if it matches.
               const regExp = createRegExp(searchText);
               if (displayName !== null && regExp.test(displayName)) {
-                const newElementIndex = ((store.getIndexOfElementID(
-                  id,
-                )     )        );
+                const newElementIndex = store.getIndexOfElementID(id);
 
                 let foundMatch = false;
                 for (let index = 0; index < searchResults.length; index++) {
                   const resultID = searchResults[index];
-                  if (
-                    newElementIndex <
-                    ((store.getIndexOfElementID(resultID)     )        )
-                  ) {
+                  if (newElementIndex < store.getIndexOfElementID(resultID)) {
                     foundMatch = true;
                     searchResults = searchResults
                       .slice(0, index)
@@ -505,11 +357,11 @@ function reduceSearchState(store       , state       , action        )        {
       case 'SET_SEARCH_TEXT':
         searchIndex = null;
         searchResults = [];
-        searchText = (action                        ).payload;
+        searchText = action.payload;
 
         if (searchText !== '') {
           const regExp = createRegExp(searchText);
-          store.roots.forEach(rootID => {
+          store.roots.forEach((rootID) => {
             recursivelySearchTree(store, rootID, regExp, searchResults);
           });
           if (searchResults.length > 0) {
@@ -524,10 +376,7 @@ function reduceSearchState(store       , state       , action        )        {
                 searchIndex = 0;
               }
             } else {
-              searchIndex = Math.min(
-                ((prevSearchIndex     )        ),
-                searchResults.length - 1,
-              );
+              searchIndex = Math.min(prevSearchIndex, searchResults.length - 1);
             }
           }
         }
@@ -551,10 +400,8 @@ function reduceSearchState(store       , state       , action        )        {
     }
   }
   if (didRequestSearch && searchIndex !== null) {
-    selectedElementID = ((searchResults[searchIndex]     )        );
-    selectedElementIndex = store.getIndexOfElementID(
-      ((selectedElementID     )        ),
-    );
+    selectedElementID = searchResults[searchIndex];
+    selectedElementIndex = store.getIndexOfElementID(selectedElementID);
   }
 
   return {
@@ -569,7 +416,7 @@ function reduceSearchState(store       , state       , action        )        {
   };
 }
 
-function reduceOwnersState(store       , state       , action        )        {
+function reduceOwnersState(store, state, action) {
   let {
     numElements,
     selectedElementID,
@@ -593,7 +440,7 @@ function reduceOwnersState(store       , state       , action        )        {
           if (selectedElementID !== null) {
             // Mutation might have caused the index of this ID to shift.
             selectedElementIndex = ownerFlatTree.findIndex(
-              element => element.id === selectedElementID,
+              (element) => element.id === selectedElementID,
             );
           }
         }
@@ -619,17 +466,17 @@ function reduceOwnersState(store       , state       , action        )        {
       break;
     case 'SELECT_ELEMENT_AT_INDEX':
       if (ownerFlatTree !== null) {
-        selectedElementIndex = (action                                ).payload;
+        selectedElementIndex = action.payload;
       }
       break;
     case 'SELECT_ELEMENT_BY_ID':
       if (ownerFlatTree !== null) {
-        const payload = (action                             ).payload;
+        const payload = action.payload;
         if (payload === null) {
           selectedElementIndex = null;
         } else {
           selectedElementIndex = ownerFlatTree.findIndex(
-            element => element.id === payload,
+            (element) => element.id === payload,
           );
 
           // If the selected element is outside of the current owners list,
@@ -663,7 +510,7 @@ function reduceOwnersState(store       , state       , action        )        {
       // If the Store doesn't have any owners metadata, don't drill into an empty stack.
       // This is a confusing user experience.
       if (store.hasOwnerMetadata) {
-        ownerID = (action                     ).payload;
+        ownerID = action.payload;
         ownerFlatTree = store.getOwnersListForElement(ownerID);
 
         // Always force reset selection to be the top of the new owner tree.
@@ -715,11 +562,7 @@ function reduceOwnersState(store       , state       , action        )        {
   };
 }
 
-function reduceSuspenseState(
-  store       ,
-  state       ,
-  action        ,
-)        {
+function reduceSuspenseState(store, state, action) {
   const {type} = action;
   switch (type) {
     case 'UPDATE_INSPECTED_ELEMENT_ID':
@@ -738,16 +581,6 @@ function reduceSuspenseState(
   return state;
 }
 
-               
-                       
-
-                               
-                                      
-                           
-                                     
-                                        
-   
-
 // TODO Remove TreeContextController wrapper element once global ConsearchText.write API exists.
 function TreeContextController({
   children,
@@ -755,7 +588,7 @@ function TreeContextController({
   defaultOwnerID,
   defaultSelectedElementID,
   defaultSelectedElementIndex,
-}       ) {
+}) {
   const bridge = useContext(BridgeContext);
   const store = useContext(StoreContext);
 
@@ -765,7 +598,7 @@ function TreeContextController({
   // The store is mutable, but the Store itself is global and lives for the lifetime of the DevTools,
   // so it's okay for the reducer to have an empty dependencies array.
   const reducer = useMemo(
-    () => (state       , action        )        => {
+    () => (state, action) => {
       const {type} = action;
       switch (type) {
         case 'GO_TO_NEXT_SEARCH_RESULT':
@@ -835,7 +668,7 @@ function TreeContextController({
   });
 
   const dispatchWrapper = useCallback(
-    (action        ) => {
+    (action) => {
       // Run the first update at "user-blocking" priority in case dispatch is called from a non-React event.
       // In this case, the current (and "next") priorities would both be "normal",
       // and suspense would potentially block both updates.
@@ -847,7 +680,7 @@ function TreeContextController({
 
   // Listen for host element selections.
   useEffect(() => {
-    const handleSelectFiber = (id        ) =>
+    const handleSelectFiber = (id) =>
       dispatchWrapper({type: 'SELECT_ELEMENT_BY_ID', payload: id});
     bridge.addListener('selectFiber', handleSelectFiber);
     return () => bridge.removeListener('selectFiber', handleSelectFiber);
@@ -855,7 +688,7 @@ function TreeContextController({
 
   // If a newly-selected search result or inspection selection is inside of a collapsed subtree, auto expand it.
   // This needs to be a layout effect to avoid temporarily flashing an incorrect selection.
-  const prevSelectedElementID = useRef               (null);
+  const prevSelectedElementID = useRef(null);
   useLayoutEffect(() => {
     if (state.selectedElementID !== prevSelectedElementID.current) {
       prevSelectedElementID.current = state.selectedElementID;
@@ -871,10 +704,7 @@ function TreeContextController({
 
   // Mutations to the underlying tree may impact this context (e.g. search results, selection state).
   useEffect(() => {
-    const handleStoreMutated = ([addedElementIDs, removedElementIDs]   
-                    
-                          
-     ) => {
+    const handleStoreMutated = ([addedElementIDs, removedElementIDs]) => {
       dispatchWrapper({
         type: 'HANDLE_STORE_MUTATION',
         payload: [addedElementIDs, removedElementIDs],
@@ -905,37 +735,27 @@ function TreeContextController({
     </TreeStateContext.Provider>
   );
 }
-function recursivelySearchTree(
-  store       ,
-  elementID        ,
-  regExp        ,
-  searchResults               ,
-)       {
-  const {children, displayName, hocDisplayNames} = ((store.getElementByID(
-    elementID,
-  )     )         );
+function recursivelySearchTree(store, elementID, regExp, searchResults) {
+  const {children, displayName, hocDisplayNames} =
+    store.getElementByID(elementID);
 
   if (displayName != null && regExp.test(displayName) === true) {
     searchResults.push(elementID);
   } else if (
     hocDisplayNames != null &&
     hocDisplayNames.length > 0 &&
-    hocDisplayNames.some(name => regExp.test(name)) === true
+    hocDisplayNames.some((name) => regExp.test(name)) === true
   ) {
     searchResults.push(elementID);
   }
 
-  children.forEach(childID =>
+  children.forEach((childID) =>
     recursivelySearchTree(store, childID, regExp, searchResults),
   );
 }
 
-function getNearestResultIndex(
-  store       ,
-  searchResults               ,
-  selectedElementIndex        ,
-)         {
-  const index = searchResults.findIndex(id => {
+function getNearestResultIndex(store, searchResults, selectedElementIndex) {
+  const index = searchResults.findIndex((id) => {
     const innerIndex = store.getIndexOfElementID(id);
     return innerIndex !== null && innerIndex >= selectedElementIndex;
   });

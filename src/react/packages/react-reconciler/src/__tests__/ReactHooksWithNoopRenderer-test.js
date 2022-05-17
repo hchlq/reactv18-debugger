@@ -60,7 +60,7 @@ describe('ReactHooksWithNoopRenderer', () => {
 
     textCache = new Map();
 
-    readText = text => {
+    readText = (text) => {
       const record = textCache.get(text);
       if (record !== undefined) {
         switch (record.status) {
@@ -73,7 +73,7 @@ describe('ReactHooksWithNoopRenderer', () => {
         }
       } else {
         let ping;
-        const promise = new Promise(resolve => (ping = resolve));
+        const promise = new Promise((resolve) => (ping = resolve));
         const newRecord = {
           status: 'pending',
           ping: ping,
@@ -84,7 +84,7 @@ describe('ReactHooksWithNoopRenderer', () => {
       }
     };
 
-    resolveText = text => {
+    resolveText = (text) => {
       const record = textCache.get(text);
       if (record !== undefined) {
         if (record.status === 'pending') {
@@ -165,7 +165,7 @@ describe('ReactHooksWithNoopRenderer', () => {
     // Schedule some updates
     ReactNoop.batchedUpdates(() => {
       counter.current.updateCount(1);
-      counter.current.updateCount(count => count + 10);
+      counter.current.updateCount((count) => count + 10);
     });
 
     // Partially flush without committing
@@ -276,7 +276,7 @@ describe('ReactHooksWithNoopRenderer', () => {
       expect(Scheduler).toHaveYielded(['Count: 1']);
       expect(ReactNoop.getChildren()).toEqual([span('Count: 1')]);
 
-      act(() => counter.current.updateCount(count => count + 10));
+      act(() => counter.current.updateCount((count) => count + 10));
       expect(Scheduler).toHaveYielded(['Count: 11']);
       expect(ReactNoop.getChildren()).toEqual([span('Count: 11')]);
     });
@@ -340,7 +340,7 @@ describe('ReactHooksWithNoopRenderer', () => {
 
       const secondUpdater = updater;
 
-      act(() => firstUpdater(count => count + 10));
+      act(() => firstUpdater((count) => count + 10));
       expect(Scheduler).toHaveYielded(['Count: 11']);
       expect(ReactNoop.getChildren()).toEqual([span('Count: 11')]);
 
@@ -477,7 +477,7 @@ describe('ReactHooksWithNoopRenderer', () => {
 
       function Bar({triggerUpdate}) {
         if (triggerUpdate) {
-          setStep(x => x + 1);
+          setStep((x) => x + 1);
         }
         return <Text text="Bar" />;
       }
@@ -555,9 +555,9 @@ describe('ReactHooksWithNoopRenderer', () => {
       function Counter({row: newRow}) {
         const [count, setCount] = useState(0);
         if (count < 12) {
-          setCount(c => c + 1);
-          setCount(c => c + 1);
-          setCount(c => c + 1);
+          setCount((c) => c + 1);
+          setCount((c) => c + 1);
+          setCount((c) => c + 1);
         }
         Scheduler.unstable_yieldValue('Render: ' + count);
         return <Text text={count} />;
@@ -698,7 +698,7 @@ describe('ReactHooksWithNoopRenderer', () => {
 
         // Increment a counter every time the signal changes
         if (signal !== newSignal) {
-          setCounter(c => c + 1);
+          setCounter((c) => c + 1);
           setSignal(newSignal);
           if (counter === 0) {
             // We're suspending during a render that includes render phase
@@ -751,7 +751,7 @@ describe('ReactHooksWithNoopRenderer', () => {
 
         // Increment a counter every time the signal changes
         if (signal !== newSignal) {
-          setCounter(c => c + 1);
+          setCounter((c) => c + 1);
           setSignal(newSignal);
         }
 
@@ -832,7 +832,7 @@ describe('ReactHooksWithNoopRenderer', () => {
 
         if (counter === 0) {
           startTransition(() => {
-            setCounter(c => c + 1);
+            setCounter((c) => c + 1);
           });
         }
 
@@ -902,7 +902,7 @@ describe('ReactHooksWithNoopRenderer', () => {
       }
 
       function Counter(props, ref) {
-        const [count, dispatch] = useReducer(reducer, props, p => {
+        const [count, dispatch] = useReducer(reducer, props, (p) => {
           Scheduler.unstable_yieldValue('Init');
           return p.initialCount;
         });
@@ -1333,7 +1333,7 @@ describe('ReactHooksWithNoopRenderer', () => {
         ]);
 
         // Update children.
-        setChildStates.forEach(setChildState => setChildState(1));
+        setChildStates.forEach((setChildState) => setChildState(1));
         expect(Scheduler).toFlushAndYieldThrough([
           'Child one render',
           'Child two render',
@@ -1342,7 +1342,7 @@ describe('ReactHooksWithNoopRenderer', () => {
         ]);
 
         // Schedule another update for children, and partially process it.
-        setChildStates.forEach(setChildState => setChildState(2));
+        setChildStates.forEach((setChildState) => setChildState(2));
         expect(Scheduler).toFlushAndYieldThrough(['Child one render']);
 
         // Schedule unmount for the parent that unmounts children with pending update.
@@ -1356,7 +1356,7 @@ describe('ReactHooksWithNoopRenderer', () => {
         ]);
 
         // Schedule updates for children too (which should be ignored)
-        setChildStates.forEach(setChildState => setChildState(2));
+        setChildStates.forEach((setChildState) => setChildState(2));
         expect(Scheduler).toFlushAndYield([
           'Child one passive destroy',
           'Child two passive destroy',
@@ -2360,7 +2360,7 @@ describe('ReactHooksWithNoopRenderer', () => {
       let LogOnlyErrorBoundary;
 
       beforeEach(() => {
-        BrokenUseEffectCleanup = function() {
+        BrokenUseEffectCleanup = function () {
           useEffect(() => {
             Scheduler.unstable_yieldValue('BrokenUseEffectCleanup useEffect');
             return () => {
@@ -3065,9 +3065,10 @@ describe('ReactHooksWithNoopRenderer', () => {
 
       function Counter({incrementBy}) {
         const [count, updateCount] = useState(0);
-        const increment = useCallback(() => updateCount(c => c + incrementBy), [
-          incrementBy,
-        ]);
+        const increment = useCallback(
+          () => updateCount((c) => c + incrementBy),
+          [incrementBy],
+        );
         return (
           <>
             <IncrementButton increment={increment} ref={button} />
@@ -3176,9 +3177,10 @@ describe('ReactHooksWithNoopRenderer', () => {
 
     it('should not invoke memoized function during re-renders unless inputs change', () => {
       function LazyCompute(props) {
-        const computed = useMemo(() => props.compute(props.input), [
-          props.input,
-        ]);
+        const computed = useMemo(
+          () => props.compute(props.input),
+          [props.input],
+        );
         const [count, setCount] = useState(0);
         if (count < 3) {
           setCount(count + 1);
@@ -3226,7 +3228,7 @@ describe('ReactHooksWithNoopRenderer', () => {
       let ping;
       function App() {
         ping = useDebouncedCallback(
-          value => {
+          (value) => {
             Scheduler.unstable_yieldValue('ping: ' + value);
           },
           100,
@@ -3407,7 +3409,8 @@ describe('ReactHooksWithNoopRenderer', () => {
         };
         return (
           <Suspense
-            fallback={<Text text={`Loading... Pending: ${isPending}`} />}>
+            fallback={<Text text={`Loading... Pending: ${isPending}`} />}
+          >
             {show ? (
               <AsyncText text={`After... Pending: ${isPending}`} />
             ) : (

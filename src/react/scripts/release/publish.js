@@ -25,7 +25,7 @@ const run = async () => {
 
     // Pre-filter any skipped packages to simplify the following commands.
     // As part of doing this we can also validate that none of the skipped packages were misspelled.
-    params.skipPackages.forEach(packageName => {
+    params.skipPackages.forEach((packageName) => {
       const index = params.packages.indexOf(packageName);
       if (index < 0) {
         console.log(

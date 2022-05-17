@@ -4,12 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                      
-                                                     
-                                      
 
 import './ReactFabricInjection';
 
@@ -44,9 +40,7 @@ import getComponentName from 'shared/getComponentName';
 
 const ReactCurrentOwner = ReactSharedInternals.ReactCurrentOwner;
 
-function findHostInstance_DEPRECATED(
-  componentOrHandle     ,
-)                                    {
+function findHostInstance_DEPRECATED(componentOrHandle) {
   if (__DEV__) {
     const owner = ReactCurrentOwner.current;
     if (owner !== null && owner.stateNode !== null) {
@@ -86,14 +80,14 @@ function findHostInstance_DEPRECATED(
   if (hostInstance == null) {
     return hostInstance;
   }
-  if ((hostInstance     ).canonical) {
+  if (hostInstance.canonical) {
     // Fabric
-    return (hostInstance     ).canonical;
+    return hostInstance.canonical;
   }
   return hostInstance;
 }
 
-function findNodeHandle(componentOrHandle     )          {
+function findNodeHandle(componentOrHandle) {
   if (__DEV__) {
     const owner = ReactCurrentOwner.current;
     if (owner !== null && owner.stateNode !== null) {
@@ -139,14 +133,14 @@ function findNodeHandle(componentOrHandle     )          {
   }
   // TODO: the code is right but the types here are wrong.
   // https://github.com/facebook/react/pull/12863
-  if ((hostInstance     ).canonical) {
+  if (hostInstance.canonical) {
     // Fabric
-    return (hostInstance     ).canonical._nativeTag;
+    return hostInstance.canonical._nativeTag;
   }
   return hostInstance._nativeTag;
 }
 
-function dispatchCommand(handle     , command        , args            ) {
+function dispatchCommand(handle, command, args) {
   if (handle._nativeTag == null) {
     if (__DEV__) {
       console.error(
@@ -169,11 +163,7 @@ function dispatchCommand(handle     , command        , args            ) {
   }
 }
 
-function render(
-  element                    ,
-  containerTag     ,
-  callback           ,
-) {
+function render(element, containerTag, callback) {
   let root = roots.get(containerTag);
 
   if (!root) {
@@ -187,11 +177,11 @@ function render(
   return getPublicRootInstance(root);
 }
 
-function unmountComponentAtNode(containerTag        ) {
+function unmountComponentAtNode(containerTag) {
   this.stopSurface(containerTag);
 }
 
-function stopSurface(containerTag        ) {
+function stopSurface(containerTag) {
   const root = roots.get(containerTag);
   if (root) {
     // TODO: Is it safe to reset this now or should I wait since this unmount could be deferred?
@@ -201,11 +191,7 @@ function stopSurface(containerTag        ) {
   }
 }
 
-function createPortal(
-  children               ,
-  containerTag        ,
-  key          = null,
-) {
+function createPortal(children, containerTag, key = null) {
   return createPortalImpl(children, containerTag, null, key);
 }
 

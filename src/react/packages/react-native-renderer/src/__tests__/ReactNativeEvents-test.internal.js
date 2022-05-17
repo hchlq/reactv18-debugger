@@ -64,16 +64,17 @@ beforeEach(() => {
   jest.resetModules();
 
   PropTypes = require('prop-types');
-  RCTEventEmitter = require('react-native/Libraries/ReactPrivate/ReactNativePrivateInterface')
-    .RCTEventEmitter;
+  RCTEventEmitter =
+    require('react-native/Libraries/ReactPrivate/ReactNativePrivateInterface').RCTEventEmitter;
   React = require('react');
   ReactNative = require('react-native-renderer');
-  ResponderEventPlugin = require('react-native-renderer/src/legacy-events/ResponderEventPlugin')
-    .default;
-  UIManager = require('react-native/Libraries/ReactPrivate/ReactNativePrivateInterface')
-    .UIManager;
-  createReactNativeComponentClass = require('react-native/Libraries/ReactPrivate/ReactNativePrivateInterface')
-    .ReactNativeViewConfigRegistry.register;
+  ResponderEventPlugin =
+    require('react-native-renderer/src/legacy-events/ResponderEventPlugin').default;
+  UIManager =
+    require('react-native/Libraries/ReactPrivate/ReactNativePrivateInterface').UIManager;
+  createReactNativeComponentClass =
+    require('react-native/Libraries/ReactPrivate/ReactNativePrivateInterface')
+      .ReactNativeViewConfigRegistry.register;
 });
 
 it('fails to register the same event name with different types', () => {
@@ -152,7 +153,8 @@ it('handles events', () => {
       onTouchEnd={() => log.push('outer touchend')}
       onTouchEndCapture={() => log.push('outer touchend capture')}
       onTouchStart={() => log.push('outer touchstart')}
-      onTouchStartCapture={() => log.push('outer touchstart capture')}>
+      onTouchStartCapture={() => log.push('outer touchstart capture')}
+    >
       <View
         foo="inner"
         onTouchEndCapture={() => log.push('inner touchend capture')}
@@ -170,7 +172,7 @@ it('handles events', () => {
   // Don't depend on the order of createView() calls.
   // Stack creates views outside-in; fiber creates them inside-out.
   const innerTag = UIManager.createView.mock.calls.find(
-    args => args[3].foo === 'inner',
+    (args) => args[3].foo === 'inner',
   )[0];
 
   EventEmitter.receiveTouches(
@@ -219,14 +221,16 @@ it('handles events on text nodes', () => {
           onTouchEnd={() => log.push('string touchend')}
           onTouchEndCapture={() => log.push('string touchend capture')}
           onTouchStart={() => log.push('string touchstart')}
-          onTouchStartCapture={() => log.push('string touchstart capture')}>
+          onTouchStartCapture={() => log.push('string touchstart capture')}
+        >
           Text Content
         </Text>
         <Text
           onTouchEnd={() => log.push('number touchend')}
           onTouchEndCapture={() => log.push('number touchend capture')}
           onTouchStart={() => log.push('number touchstart')}
-          onTouchStartCapture={() => log.push('number touchstart capture')}>
+          onTouchStartCapture={() => log.push('number touchstart capture')}
+        >
           {123}
         </Text>
       </Text>
@@ -239,10 +243,10 @@ it('handles events on text nodes', () => {
   // Don't depend on the order of createView() calls.
   // Stack creates views outside-in; fiber creates them inside-out.
   const innerTagString = UIManager.createView.mock.calls.find(
-    args => args[3] && args[3].text === 'Text Content',
+    (args) => args[3] && args[3].text === 'Text Content',
   )[0];
   const innerTagNumber = UIManager.createView.mock.calls.find(
-    args => args[3] && args[3].text === '123',
+    (args) => args[3] && args[3].text === '123',
   )[0];
 
   EventEmitter.receiveTouches(
@@ -285,7 +289,7 @@ it('handles when a responder is unmounted while a touch sequence is in progress'
 
   function getViewById(id) {
     return UIManager.createView.mock.calls.find(
-      args => args[3] && args[3].id === id,
+      (args) => args[3] && args[3].id === id,
     )[0];
   }
 
@@ -375,7 +379,7 @@ it('handles events without target', () => {
 
   function getViewById(id) {
     return UIManager.createView.mock.calls.find(
-      args => args[3] && args[3].id === id,
+      (args) => args[3] && args[3].id === id,
     )[0];
   }
 
@@ -465,7 +469,7 @@ it('dispatches event with target as instance', () => {
 
   function getViewById(id) {
     return UIManager.createView.mock.calls.find(
-      args => args[3] && args[3].id === id,
+      (args) => args[3] && args[3].id === id,
     )[0];
   }
 
@@ -477,7 +481,7 @@ it('dispatches event with target as instance', () => {
       <View
         ref={ref1}
         id="one"
-        onResponderStart={event => {
+        onResponderStart={(event) => {
           expect(ref1.current).not.toBeNull();
           // Check for referential equality
           expect(ref1.current).toBe(event.target);
@@ -488,7 +492,7 @@ it('dispatches event with target as instance', () => {
       <View
         ref={ref2}
         id="two"
-        onResponderStart={event => {
+        onResponderStart={(event) => {
           expect(ref2.current).not.toBeNull();
           // Check for referential equality
           expect(ref2.current).toBe(event.target);

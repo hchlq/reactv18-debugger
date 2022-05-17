@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -23,12 +23,7 @@ import InspectedElementView from './InspectedElementView';
 
 import styles from './InspectedElement.css';
 
-                                                                           
-                                              
-
-                         
-
-export default function InspectedElementWrapper(_       ) {
+export default function InspectedElementWrapper(_) {
   const {inspectedElementID} = useContext(TreeStateContext);
   const dispatch = useContext(TreeDispatcherContext);
   const {canViewElementSourceFunction, viewElementSourceFunction} = useContext(
@@ -43,7 +38,7 @@ export default function InspectedElementWrapper(_       ) {
     getInspectedElementPath,
     getInspectedElement,
     storeAsGlobal,
-  } = useContext                             (InspectedElementContext);
+  } = useContext(InspectedElementContext);
 
   const element =
     inspectedElementID !== null
@@ -83,10 +78,7 @@ export default function InspectedElementWrapper(_       ) {
 
   const viewSource = useCallback(() => {
     if (viewElementSourceFunction != null && inspectedElement !== null) {
-      viewElementSourceFunction(
-        inspectedElement.id,
-        ((inspectedElement     )                  ),
-      );
+      viewElementSourceFunction(inspectedElement.id, inspectedElement);
     }
   }, [inspectedElement, viewElementSourceFunction]);
 
@@ -192,7 +184,8 @@ export default function InspectedElementWrapper(_       ) {
               isSuspended
                 ? 'Unsuspend the selected component'
                 : 'Suspend the selected component'
-            }>
+            }
+          >
             <ButtonIcon type="suspend" />
           </Toggle>
         )}
@@ -200,21 +193,24 @@ export default function InspectedElementWrapper(_       ) {
           <Button
             className={styles.IconButton}
             onClick={highlightElement}
-            title="Inspect the matching DOM element">
+            title="Inspect the matching DOM element"
+          >
             <ButtonIcon type="view-dom" />
           </Button>
         )}
         <Button
           className={styles.IconButton}
           onClick={logElement}
-          title="Log this component data to the console">
+          title="Log this component data to the console"
+        >
           <ButtonIcon type="log-data" />
         </Button>
         <Button
           className={styles.IconButton}
           disabled={!canViewSource}
           onClick={viewSource}
-          title="View source for this element">
+          title="View source for this element"
+        >
           <ButtonIcon type="view-source" />
         </Button>
       </div>

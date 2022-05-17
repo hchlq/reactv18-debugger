@@ -3,19 +3,13 @@
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
- *      
+ *
  */
 
-             
-                       
-                            
-                           
 import {REACT_FUNDAMENTAL_TYPE} from 'shared/ReactSymbols';
 import {hasBadMapPolyfill} from './BadMapPolyfill';
 
-export function createFundamental      (
-  impl                            ,
-)                                  {
+export function createFundamental(impl) {
   // We use responder as a Map key later on. When we have a bad
   // polyfill, then we can't use it as a key as the polyfill tries
   // to add a property to the object.

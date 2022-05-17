@@ -19,7 +19,7 @@ let ReactDOMServer;
 let ReactTestUtils;
 
 function runTests(itRenders, itRejectsRendering, expectToReject) {
-  itRenders('a http link with the word javascript in it', async render => {
+  itRenders('a http link with the word javascript in it', async (render) => {
     const e = await render(
       <a href="http://javascript:0/thisisfine">Click me</a>,
     );
@@ -27,7 +27,7 @@ function runTests(itRenders, itRejectsRendering, expectToReject) {
     expect(e.href).toBe('http://javascript:0/thisisfine');
   });
 
-  itRejectsRendering('a javascript protocol href', async render => {
+  itRejectsRendering('a javascript protocol href', async (render) => {
     // Only the first one warns. The second warning is deduped.
     const e = await render(
       <div>
@@ -42,7 +42,7 @@ function runTests(itRenders, itRejectsRendering, expectToReject) {
 
   itRejectsRendering(
     'a javascript protocol with leading spaces',
-    async render => {
+    async (render) => {
       const e = await render(
         <a href={'  \t \u0000\u001F\u0003javascript\n: notfine'}>p0wned</a>,
         1,
@@ -55,7 +55,7 @@ function runTests(itRenders, itRejectsRendering, expectToReject) {
 
   itRejectsRendering(
     'a javascript protocol with intermediate new lines and mixed casing',
-    async render => {
+    async (render) => {
       const e = await render(
         <a href={'\t\r\n Jav\rasCr\r\niP\t\n\rt\n:notfine'}>p0wned</a>,
         1,
@@ -64,7 +64,7 @@ function runTests(itRenders, itRejectsRendering, expectToReject) {
     },
   );
 
-  itRejectsRendering('a javascript protocol area href', async render => {
+  itRejectsRendering('a javascript protocol area href', async (render) => {
     const e = await render(
       <map>
         <area href="javascript:notfine" />
@@ -74,33 +74,36 @@ function runTests(itRenders, itRejectsRendering, expectToReject) {
     expect(e.firstChild.href).toBe('javascript:notfine');
   });
 
-  itRejectsRendering('a javascript protocol form action', async render => {
+  itRejectsRendering('a javascript protocol form action', async (render) => {
     const e = await render(<form action="javascript:notfine">p0wned</form>, 1);
     expect(e.action).toBe('javascript:notfine');
   });
 
   itRejectsRendering(
     'a javascript protocol button formAction',
-    async render => {
+    async (render) => {
       const e = await render(<input formAction="javascript:notfine" />, 1);
       expect(e.getAttribute('formAction')).toBe('javascript:notfine');
     },
   );
 
-  itRejectsRendering('a javascript protocol input formAction', async render => {
-    const e = await render(
-      <button formAction="javascript:notfine">p0wned</button>,
-      1,
-    );
-    expect(e.getAttribute('formAction')).toBe('javascript:notfine');
-  });
+  itRejectsRendering(
+    'a javascript protocol input formAction',
+    async (render) => {
+      const e = await render(
+        <button formAction="javascript:notfine">p0wned</button>,
+        1,
+      );
+      expect(e.getAttribute('formAction')).toBe('javascript:notfine');
+    },
+  );
 
-  itRejectsRendering('a javascript protocol iframe src', async render => {
+  itRejectsRendering('a javascript protocol iframe src', async (render) => {
     const e = await render(<iframe src="javascript:notfine" />, 1);
     expect(e.src).toBe('javascript:notfine');
   });
 
-  itRejectsRendering('a javascript protocol frame src', async render => {
+  itRejectsRendering('a javascript protocol frame src', async (render) => {
     const e = await render(
       <html>
         <head />
@@ -113,7 +116,7 @@ function runTests(itRenders, itRejectsRendering, expectToReject) {
     expect(e.lastChild.firstChild.src).toBe('javascript:notfine');
   });
 
-  itRejectsRendering('a javascript protocol in an SVG link', async render => {
+  itRejectsRendering('a javascript protocol in an SVG link', async (render) => {
     const e = await render(
       <svg>
         <a href="javascript:notfine" />
@@ -125,7 +128,7 @@ function runTests(itRenders, itRejectsRendering, expectToReject) {
 
   itRejectsRendering(
     'a javascript protocol in an SVG link with a namespace',
-    async render => {
+    async (render) => {
       const e = await render(
         <svg>
           <a xlinkHref="javascript:notfine" />
@@ -169,7 +172,7 @@ describe('ReactDOMServerIntegration - Untrusted URLs', () => {
     resetModules();
   });
 
-  runTests(itRenders, itRenders, fn =>
+  runTests(itRenders, itRenders, (fn) =>
     expect(fn).toErrorDev(
       'Warning: A future version of React will block javascript: URLs as a security precaution. ' +
         'Use event handlers instead if you can. If you need to generate unsafe HTML try using ' +
@@ -206,7 +209,7 @@ describe('ReactDOMServerIntegration - Untrusted URLs - disableJavaScriptURLs', (
     clientRenderOnServerString,
   } = ReactDOMServerIntegrationUtils(initModules);
 
-  const expectToReject = fn => {
+  const expectToReject = (fn) => {
     let msg;
     try {
       fn();
@@ -229,7 +232,7 @@ describe('ReactDOMServerIntegration - Untrusted URLs - disableJavaScriptURLs', (
     expectToReject,
   );
 
-  itRenders('only the first invocation of toString', async render => {
+  itRenders('only the first invocation of toString', async (render) => {
     let expectedToStringCalls = 1;
     if (render === clientRenderOnBadMarkup) {
       // It gets called once on the server and once on the client

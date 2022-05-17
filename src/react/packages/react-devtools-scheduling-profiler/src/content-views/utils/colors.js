@@ -4,28 +4,16 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
-                                                                        
-
 // Docstrings from https://www.w3schools.com/css/css_colors_hsl.asp
-                             
-                                                                                                   
-            
-                                                                                                
-            
-                                                                                             
-            
-                                                                                           
-            
-    
 
-export function hslaColorToString({h, s, l, a}           )         {
+export function hslaColorToString({h, s, l, a}) {
   return `hsl(${h}deg ${s}% ${l}% / ${a})`;
 }
 
-export function dimmedColor(color           , dimDelta        )            {
+export function dimmedColor(color, dimDelta) {
   return {
     ...color,
     l: color.l - dimDelta,
@@ -33,7 +21,7 @@ export function dimmedColor(color           , dimDelta        )            {
 }
 
 // Source: https://source.chromium.org/chromium/chromium/src/+/master:out/Debug/gen/devtools/platform/utilities.js;l=120
-function hashCode(string        )         {
+function hashCode(string) {
   // Hash algorithm for substrings is described in "Über die Komplexität der Multiplikation in
   // eingeschränkten Branchingprogrammmodellen" by Woelfe.
   // http://opendatastructures.org/versions/edition-0.1d/ods-java/node33.html#SECTION00832000000000000000
@@ -51,7 +39,7 @@ function hashCode(string        )         {
   return Math.abs(s | 0);
 }
 
-function indexToValueInSpace(index        , space            )         {
+function indexToValueInSpace(index, space) {
   if (typeof space === 'number') {
     return space;
   }
@@ -68,18 +56,13 @@ function indexToValueInSpace(index        , space            )         {
  * Adapted from: https://source.chromium.org/chromium/chromium/src/+/master:out/Debug/gen/devtools/common/Color.js
  */
 export class ColorGenerator {
-  _hueSpace            ;
-  _satSpace            ;
-  _lightnessSpace            ;
-  _alphaSpace            ;
-  _colors                        ;
+  _hueSpace;
+  _satSpace;
+  _lightnessSpace;
+  _alphaSpace;
+  _colors;
 
-  constructor(
-    hueSpace             ,
-    satSpace             ,
-    lightnessSpace             ,
-    alphaSpace             ,
-  ) {
+  constructor(hueSpace, satSpace, lightnessSpace, alphaSpace) {
     this._hueSpace = hueSpace || {min: 0, max: 360};
     this._satSpace = satSpace || 67;
     this._lightnessSpace = lightnessSpace || 80;
@@ -87,11 +70,11 @@ export class ColorGenerator {
     this._colors = new Map();
   }
 
-  setColorForID(id        , color           ) {
+  setColorForID(id, color) {
     this._colors.set(id, color);
   }
 
-  colorForID(id        )            {
+  colorForID(id) {
     const cachedColor = this._colors.get(id);
     if (cachedColor) {
       return cachedColor;
@@ -101,7 +84,7 @@ export class ColorGenerator {
     return color;
   }
 
-  _generateColorForID(id        )            {
+  _generateColorForID(id) {
     const hash = hashCode(id);
     return {
       h: indexToValueInSpace(hash, this._hueSpace),

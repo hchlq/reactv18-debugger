@@ -4,11 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                
-                                                       
 
 import {isFiberMounted} from './ReactFiberTreeReflection';
 import {disableLegacyContext} from 'shared/ReactFeatureFlags';
@@ -31,21 +28,19 @@ if (__DEV__) {
 }
 
 // A cursor to the current merged context object on the stack.
-const contextStackCursor                      = createCursor(
-  emptyContextObject,
-);
+const contextStackCursor = createCursor(emptyContextObject);
 // A cursor to a boolean indicating whether the context has changed.
-const didPerformWorkStackCursor                       = createCursor(false);
+const didPerformWorkStackCursor = createCursor(false);
 // Keep track of the previous context object that was on the stack.
 // We use this to get access to the parent context after we have already
 // pushed the next context provider, and now need to merge their contexts.
-let previousContext         = emptyContextObject;
+let previousContext = emptyContextObject;
 
 function getUnmaskedContext(
-  workInProgress       ,
-  Component          ,
-  didPushOwnContextIfProvider         ,
-)         {
+  workInProgress,
+  Component,
+  didPushOwnContextIfProvider,
+) {
   if (disableLegacyContext) {
     return emptyContextObject;
   } else {
@@ -60,11 +55,7 @@ function getUnmaskedContext(
   }
 }
 
-function cacheContext(
-  workInProgress       ,
-  unmaskedContext        ,
-  maskedContext        ,
-)       {
+function cacheContext(workInProgress, unmaskedContext, maskedContext) {
   if (disableLegacyContext) {
     return;
   } else {
@@ -74,10 +65,7 @@ function cacheContext(
   }
 }
 
-function getMaskedContext(
-  workInProgress       ,
-  unmaskedContext        ,
-)         {
+function getMaskedContext(workInProgress, unmaskedContext) {
   if (disableLegacyContext) {
     return emptyContextObject;
   } else {
@@ -118,7 +106,7 @@ function getMaskedContext(
   }
 }
 
-function hasContextChanged()          {
+function hasContextChanged() {
   if (disableLegacyContext) {
     return false;
   } else {
@@ -126,7 +114,7 @@ function hasContextChanged()          {
   }
 }
 
-function isContextProvider(type          )          {
+function isContextProvider(type) {
   if (disableLegacyContext) {
     return false;
   } else {
@@ -135,7 +123,7 @@ function isContextProvider(type          )          {
   }
 }
 
-function popContext(fiber       )       {
+function popContext(fiber) {
   if (disableLegacyContext) {
     return;
   } else {
@@ -144,7 +132,7 @@ function popContext(fiber       )       {
   }
 }
 
-function popTopLevelContextObject(fiber       )       {
+function popTopLevelContextObject(fiber) {
   if (disableLegacyContext) {
     return;
   } else {
@@ -153,11 +141,7 @@ function popTopLevelContextObject(fiber       )       {
   }
 }
 
-function pushTopLevelContextObject(
-  fiber       ,
-  context        ,
-  didChange         ,
-)       {
+function pushTopLevelContextObject(fiber, context, didChange) {
   if (disableLegacyContext) {
     return;
   } else {
@@ -172,11 +156,7 @@ function pushTopLevelContextObject(
   }
 }
 
-function processChildContext(
-  fiber       ,
-  type     ,
-  parentContext        ,
-)         {
+function processChildContext(fiber, type, parentContext) {
   if (disableLegacyContext) {
     return parentContext;
   } else {
@@ -221,7 +201,7 @@ function processChildContext(
   }
 }
 
-function pushContextProvider(workInProgress       )          {
+function pushContextProvider(workInProgress) {
   if (disableLegacyContext) {
     return false;
   } else {
@@ -247,11 +227,7 @@ function pushContextProvider(workInProgress       )          {
   }
 }
 
-function invalidateContextProvider(
-  workInProgress       ,
-  type     ,
-  didChange         ,
-)       {
+function invalidateContextProvider(workInProgress, type, didChange) {
   if (disableLegacyContext) {
     return;
   } else {
@@ -287,7 +263,7 @@ function invalidateContextProvider(
   }
 }
 
-function findCurrentUnmaskedContext(fiber       )         {
+function findCurrentUnmaskedContext(fiber) {
   if (disableLegacyContext) {
     return emptyContextObject;
   } else {

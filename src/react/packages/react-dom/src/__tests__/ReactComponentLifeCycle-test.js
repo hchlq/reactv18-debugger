@@ -14,7 +14,7 @@ let ReactDOM;
 let ReactTestUtils;
 let PropTypes;
 
-const clone = function(o) {
+const clone = function (o) {
   return JSON.parse(JSON.stringify(o));
 };
 
@@ -176,7 +176,7 @@ describe('ReactComponentLifeCycle', () => {
     }
 
     let instance = <StatefulComponent />;
-    expect(function() {
+    expect(function () {
       instance = ReactTestUtils.renderIntoDocument(instance);
     }).toThrow();
   });
@@ -193,7 +193,7 @@ describe('ReactComponentLifeCycle', () => {
     }
 
     let instance = <StatefulComponent />;
-    expect(function() {
+    expect(function () {
       instance = ReactTestUtils.renderIntoDocument(instance);
     }).not.toThrow();
   });
@@ -349,9 +349,8 @@ describe('ReactComponentLifeCycle', () => {
           hasWillUnmountCompleted: false,
         };
         this._testJournal.returnedFromGetInitialState = clone(initState);
-        this._testJournal.lifeCycleAtStartOfGetInitialState = getLifeCycleState(
-          this,
-        );
+        this._testJournal.lifeCycleAtStartOfGetInitialState =
+          getLifeCycleState(this);
         this.state = initState;
       }
 
@@ -383,9 +382,8 @@ describe('ReactComponentLifeCycle', () => {
 
       componentWillUnmount() {
         this._testJournal.stateAtStartOfWillUnmount = clone(this.state);
-        this._testJournal.lifeCycleAtStartOfWillUnmount = getLifeCycleState(
-          this,
-        );
+        this._testJournal.lifeCycleAtStartOfWillUnmount =
+          getLifeCycleState(this);
         this.state.hasWillUnmountCompleted = true;
       }
     }
@@ -522,8 +520,8 @@ describe('ReactComponentLifeCycle', () => {
 
   it('should call nested legacy lifecycle methods in the right order', () => {
     let log;
-    const logger = function(msg) {
-      return function() {
+    const logger = function (msg) {
+      return function () {
         // return true for shouldComponentUpdate
         log.push(msg);
         return true;
@@ -597,8 +595,8 @@ describe('ReactComponentLifeCycle', () => {
 
   it('should call nested new lifecycle methods in the right order', () => {
     let log;
-    const logger = function(msg) {
-      return function() {
+    const logger = function (msg) {
+      return function () {
         // return true for shouldComponentUpdate
         log.push(msg);
         return true;
@@ -984,7 +982,7 @@ describe('ReactComponentLifeCycle', () => {
   });
 
   if (!require('shared/ReactFeatureFlags').disableModulePatternComponents) {
-    it('calls effects on module-pattern component', function() {
+    it('calls effects on module-pattern component', function () {
       const log = [];
 
       function Parent() {
@@ -1021,7 +1019,7 @@ describe('ReactComponentLifeCycle', () => {
 
       const div = document.createElement('div');
       expect(() =>
-        ReactDOM.render(<Parent ref={c => c && log.push('ref')} />, div),
+        ReactDOM.render(<Parent ref={(c) => c && log.push('ref')} />, div),
       ).toErrorDev(
         'Warning: The <Parent /> component appears to be a function component that returns a class instance. ' +
           'Change Parent to a class that extends React.Component instead. ' +
@@ -1029,7 +1027,7 @@ describe('ReactComponentLifeCycle', () => {
           '`Parent.prototype = React.Component.prototype`. ' +
           "Don't use an arrow function since it cannot be called with `new` by React.",
       );
-      ReactDOM.render(<Parent ref={c => c && log.push('ref')} />, div);
+      ReactDOM.render(<Parent ref={(c) => c && log.push('ref')} />, div);
 
       expect(log).toEqual([
         'will mount',
@@ -1144,7 +1142,7 @@ describe('ReactComponentLifeCycle', () => {
         return {...prevState, remote: nextProps.remote};
       }
       updateState = () => {
-        this.setState(state => ({local: state.local + 1}));
+        this.setState((state) => ({local: state.local + 1}));
         this.props.onChange(this.state.remote + 1);
       };
       render() {
@@ -1152,16 +1150,15 @@ describe('ReactComponentLifeCycle', () => {
         return (
           <div
             onClick={this.updateState}
-            ref={
-              divRef
-            }>{`remote:${this.state.remote}, local:${this.state.local}`}</div>
+            ref={divRef}
+          >{`remote:${this.state.remote}, local:${this.state.local}`}</div>
         );
       }
     }
 
     class Parent extends React.Component {
       state = {value: 0};
-      handleChange = value => {
+      handleChange = (value) => {
         this.setState({value});
       };
       render() {
@@ -1369,7 +1366,7 @@ describe('ReactComponentLifeCycle', () => {
     ReactDOM.render(<MyComponent />, div);
   });
 
-  it('warns about deprecated unsafe lifecycles', function() {
+  it('warns about deprecated unsafe lifecycles', function () {
     class MyComponent extends React.Component {
       componentWillMount() {}
       componentWillReceiveProps() {}

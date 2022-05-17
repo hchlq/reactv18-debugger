@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -12,21 +12,12 @@ import {Fragment} from 'react';
 import styles from './EditableValue.css';
 import {useEditableValue} from '../hooks';
 
-                                                                          
-
-                            
-                     
-                                 
-                               
-             
-   
-
 export default function EditableValue({
   className = '',
   overrideValue,
   path,
   value,
-}                    ) {
+}) {
   const [state, dispatch] = useEditableValue(value);
   const {editableValue, hasPendingChanges, isValid, parsedValue} = state;
 
@@ -58,7 +49,7 @@ export default function EditableValue({
     overrideValue(path, target.checked);
   };
 
-  const handleKeyDown = event => {
+  const handleKeyDown = (event) => {
     // Prevent keydown events from e.g. change selected element in the tree
     event.stopPropagation();
 

@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import {createElement} from 'react';
@@ -29,19 +29,14 @@ import DevTools from 'react-devtools-shared/src/devtools/views/DevTools';
 import {doesFilePathExist, launchEditor} from './editor';
 import {__DEBUG__} from 'react-devtools-shared/src/constants';
 
-                                                                     
-                                                                                                
-
 installHook(window);
 
-                                                       
+let node = null;
+let nodeWaitingToConnectHTML = '';
+let projectRoots = [];
+let statusListener = (message) => {};
 
-let node              = ((null     )             );
-let nodeWaitingToConnectHTML         = '';
-let projectRoots                = [];
-let statusListener                 = (message        ) => {};
-
-function setContentDOMNode(value             ) {
+function setContentDOMNode(value) {
   node = value;
 
   // Save so we can restore the exact waiting message between sessions.
@@ -50,24 +45,24 @@ function setContentDOMNode(value             ) {
   return DevtoolsUI;
 }
 
-function setProjectRoots(value               ) {
+function setProjectRoots(value) {
   projectRoots = value;
 }
 
-function setStatusListener(value                ) {
+function setStatusListener(value) {
   statusListener = value;
   return DevtoolsUI;
 }
 
-let bridge                        = null;
-let store               = null;
+let bridge = null;
+let store = null;
 let root = null;
 
 const log = (...args) => console.log('[React DevTools]', ...args);
 log.warn = (...args) => console.warn('[React DevTools]', ...args);
 log.error = (...args) => console.error('[React DevTools]', ...args);
 
-function debug(methodName        , ...args) {
+function debug(methodName, ...args) {
   if (__DEBUG__) {
     console.log(
       `%c[core/standalone] %c${methodName}`,
@@ -96,10 +91,10 @@ function reload() {
     root = createRoot(node);
     root.render(
       createElement(DevTools, {
-        bridge: ((bridge     )                ),
+        bridge: bridge,
         canViewElementSourceFunction,
         showTabBar: true,
-        store: ((store     )       ),
+        store: store,
         warnIfLegacyBackendDetected: true,
         viewElementSourceFunction,
       }),
@@ -107,9 +102,7 @@ function reload() {
   }, 100);
 }
 
-function canViewElementSourceFunction(
-  inspectedElement                  ,
-)          {
+function canViewElementSourceFunction(inspectedElement) {
   if (
     inspectedElement.canViewSource === false ||
     inspectedElement.source === null
@@ -122,10 +115,7 @@ function canViewElementSourceFunction(
   return doesFilePathExist(source.fileName, projectRoots);
 }
 
-function viewElementSourceFunction(
-  id        ,
-  inspectedElement                  ,
-)       {
+function viewElementSourceFunction(id, inspectedElement) {
   const {source} = inspectedElement;
   if (source !== null) {
     launchEditor(source.fileName, source.lineNumber, projectRoots);
@@ -168,9 +158,9 @@ function onError({code, message}) {
   }
 }
 
-function initialize(socket           ) {
+function initialize(socket) {
   const listeners = [];
-  socket.onmessage = event => {
+  socket.onmessage = (event) => {
     let data;
     try {
       if (typeof event.data === 'string') {
@@ -186,7 +176,7 @@ function initialize(socket           ) {
       log.error('Failed to parse JSON', event.data);
       return;
     }
-    listeners.forEach(fn => {
+    listeners.forEach((fn) => {
       try {
         fn(data);
       } catch (error) {
@@ -206,13 +196,13 @@ function initialize(socket           ) {
         }
       };
     },
-    send(event        , payload     , transferable             ) {
+    send(event, payload, transferable) {
       if (socket.readyState === socket.OPEN) {
         socket.send(JSON.stringify({event, payload}));
       }
     },
   });
-  ((bridge     )                ).addListener('shutdown', () => {
+  bridge.addListener('shutdown', () => {
     socket.close();
   });
 
@@ -222,10 +212,10 @@ function initialize(socket           ) {
   reload();
 }
 
-let startServerTimeoutID                   = null;
+let startServerTimeoutID = null;
 
-function connectToSocket(socket           ) {
-  socket.onerror = err => {
+function connectToSocket(socket) {
+  socket.onerror = (err) => {
     onDisconnected();
     log.error('Error with websocket connection', err);
   };
@@ -236,29 +226,20 @@ function connectToSocket(socket           ) {
   initialize(socket);
 
   return {
-    close: function() {
+    close: function () {
       onDisconnected();
     },
   };
 }
 
-                      
-               
-                
-  
-
-function startServer(
-  port          = 8097,
-  host          = 'localhost',
-  httpsOptions                ,
-) {
+function startServer(port = 8097, host = 'localhost', httpsOptions) {
   const useHttps = !!httpsOptions;
   const httpServer = useHttps
     ? require('https').createServer(httpsOptions)
     : require('http').createServer();
   const server = new Server({server: httpServer});
-  let connected                   = null;
-  server.on('connection', (socket           ) => {
+  let connected = null;
+  server.on('connection', (socket) => {
     if (connected !== null) {
       connected.close();
       log.warn(
@@ -267,7 +248,7 @@ function startServer(
       );
     }
     connected = socket;
-    socket.onerror = error => {
+    socket.onerror = (error) => {
       connected = null;
       onDisconnected();
       log.error('Error with websocket connection', error);
@@ -280,7 +261,7 @@ function startServer(
     initialize(socket);
   });
 
-  server.on('error', event => {
+  server.on('error', (event) => {
     onError(event);
     log.error('Failed to start the DevTools server', event);
     startServerTimeoutID = setTimeout(() => startServer(port), 1000);
@@ -316,7 +297,7 @@ function startServer(
     );
   });
 
-  httpServer.on('error', event => {
+  httpServer.on('error', (event) => {
     onError(event);
     statusListener('Failed to start the server.');
     startServerTimeoutID = setTimeout(() => startServer(port), 1000);
@@ -327,7 +308,7 @@ function startServer(
   });
 
   return {
-    close: function() {
+    close: function () {
       connected = null;
       onDisconnected();
       if (startServerTimeoutID !== null) {

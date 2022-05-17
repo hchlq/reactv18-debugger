@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -15,20 +15,6 @@ import EditableValue from './EditableValue';
 import {parseHookPathForEdit} from './utils';
 import styles from './NewKeyValue.css';
 
-                                              
-                                                                     
-
-               
-                         
-                
-                  
-                   
-                                     
-                               
-               
-                                                
-   
-
 export default function NewKeyValue({
   bridge,
   depth,
@@ -38,9 +24,9 @@ export default function NewKeyValue({
   path,
   store,
   type,
-}       ) {
-  const [newPropKey, setNewPropKey] = useState        (0);
-  const [newPropName, setNewPropName] = useState        ('');
+}) {
+  const [newPropKey, setNewPropKey] = useState(0);
+  const [newPropName, setNewPropName] = useState('');
 
   const overrideNewEntryName = (oldPath, newPath) => {
     setNewPropName(newPath[newPath.length - 1]);
@@ -79,7 +65,8 @@ export default function NewKeyValue({
       hidden={hidden}
       style={{
         paddingLeft: `${(depth - 1) * 0.75}rem`,
-      }}>
+      }}
+    >
       <div className={styles.NewKeyValue}>
         <EditableName
           autoFocus={newPropKey > 0}

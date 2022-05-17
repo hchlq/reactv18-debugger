@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -15,15 +15,9 @@ import {StoreContext} from '../context';
 
 import styles from './SidebarCommitInfo.css';
 
-                         
-
-export default function SidebarCommitInfo(_       ) {
-  const {
-    selectedCommitIndex,
-    rootID,
-    selectInteraction,
-    selectTab,
-  } = useContext(ProfilerContext);
+export default function SidebarCommitInfo(_) {
+  const {selectedCommitIndex, rootID, selectInteraction, selectTab} =
+    useContext(ProfilerContext);
 
   const {profilerStore} = useContext(StoreContext);
 
@@ -32,14 +26,10 @@ export default function SidebarCommitInfo(_       ) {
   }
 
   const {interactions} = profilerStore.getDataForRoot(rootID);
-  const {
-    duration,
-    interactionIDs,
-    priorityLevel,
-    timestamp,
-  } = profilerStore.getCommitData(rootID, selectedCommitIndex);
+  const {duration, interactionIDs, priorityLevel, timestamp} =
+    profilerStore.getCommitData(rootID, selectedCommitIndex);
 
-  const viewInteraction = interactionID => {
+  const viewInteraction = (interactionID) => {
     selectTab('interactions');
     selectInteraction(interactionID);
   };
@@ -69,7 +59,7 @@ export default function SidebarCommitInfo(_       ) {
               {interactionIDs.length === 0 ? (
                 <div className={styles.NoInteractions}>None</div>
               ) : null}
-              {interactionIDs.map(interactionID => {
+              {interactionIDs.map((interactionID) => {
                 const interaction = interactions.get(interactionID);
                 if (interaction == null) {
                   throw Error(`Invalid interaction "${interactionID}"`);
@@ -78,7 +68,8 @@ export default function SidebarCommitInfo(_       ) {
                   <button
                     key={interactionID}
                     className={styles.Interaction}
-                    onClick={() => viewInteraction(interactionID)}>
+                    onClick={() => viewInteraction(interactionID)}
+                  >
                     {interaction.name}
                   </button>
                 );

@@ -27,7 +27,8 @@ export default function App() {
               padding: 20,
               border: '1px solid black',
               minHeight: 300,
-            }}>
+            }}
+          >
             <button onClick={handleToggleClick}>Toggle Theme Context</button>
             <br />
             <Suspense fallback={<Spinner />}>

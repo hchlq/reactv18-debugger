@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import {
@@ -18,13 +18,6 @@ import {utfDecodeString} from 'react-devtools-shared/src/utils';
 import {ElementTypeRoot} from 'react-devtools-shared/src/types';
 import ProfilerStore from 'react-devtools-shared/src/devtools/ProfilerStore';
 
-                                                                 
-             
-             
-                 
-                               
-                                                                 
-
 const debug = (methodName, ...args) => {
   if (__DEBUG__) {
     console.log(
@@ -36,24 +29,14 @@ const debug = (methodName, ...args) => {
   }
 };
 
-const rootToCommitTreeMap                                 = new Map();
+const rootToCommitTreeMap = new Map();
 
-export function getCommitTree({
-  commitIndex,
-  profilerStore,
-  rootID,
-}    
-                      
-                               
-                 
-  )             {
+export function getCommitTree({commitIndex, profilerStore, rootID}) {
   if (!rootToCommitTreeMap.has(rootID)) {
     rootToCommitTreeMap.set(rootID, []);
   }
 
-  const commitTrees = ((rootToCommitTreeMap.get(
-    rootID,
-  )     )                   );
+  const commitTrees = rootToCommitTreeMap.get(rootID);
 
   if (commitIndex < commitTrees.length) {
     return commitTrees[commitIndex];
@@ -118,12 +101,7 @@ export function getCommitTree({
   );
 }
 
-function recursivelyInitializeTree(
-  id        ,
-  parentID        ,
-  nodes                             ,
-  dataForRoot                              ,
-)       {
+function recursivelyInitializeTree(id, parentID, nodes, dataForRoot) {
   const node = dataForRoot.snapshots.get(id);
   if (node != null) {
     nodes.set(id, {
@@ -133,37 +111,29 @@ function recursivelyInitializeTree(
       hocDisplayNames: node.hocDisplayNames,
       key: node.key,
       parentID,
-      treeBaseDuration: ((dataForRoot.initialTreeBaseDurations.get(
-        id,
-      )     )        ),
+      treeBaseDuration: dataForRoot.initialTreeBaseDurations.get(id),
       type: node.type,
     });
 
-    node.children.forEach(childID =>
+    node.children.forEach((childID) =>
       recursivelyInitializeTree(childID, id, nodes, dataForRoot),
     );
   }
 }
 
-function updateTree(
-  commitTree            ,
-  operations               ,
-)             {
+function updateTree(commitTree, operations) {
   // Clone the original tree so edits don't affect it.
   const nodes = new Map(commitTree.nodes);
 
   // Clone nodes before mutating them so edits don't affect them.
-  const getClonedNode = (id        )                 => {
-    const clonedNode = ((Object.assign(
-      {},
-      nodes.get(id),
-    )     )                );
+  const getClonedNode = (id) => {
+    const clonedNode = Object.assign({}, nodes.get(id));
     nodes.set(id, clonedNode);
     return clonedNode;
   };
 
   let i = 2;
-  let id         = ((null     )        );
+  let id = null;
 
   // Reassemble the string table.
   const stringTable = [
@@ -173,9 +143,7 @@ function updateTree(
   const stringTableEnd = i + stringTableSize;
   while (i < stringTableEnd) {
     const nextLength = operations[i++];
-    const nextString = utfDecodeString(
-      (operations.slice(i, i + nextLength)     ),
-    );
+    const nextString = utfDecodeString(operations.slice(i, i + nextLength));
     stringTable.push(nextString);
     i += nextLength;
   }
@@ -185,8 +153,8 @@ function updateTree(
 
     switch (operation) {
       case TREE_OPERATION_ADD:
-        id = ((operations[i + 1]     )        );
-        const type = ((operations[i + 2]     )             );
+        id = operations[i + 1];
+        const type = operations[i + 2];
 
         i += 3;
 
@@ -206,7 +174,7 @@ function updateTree(
             debug('Add', `new root fiber ${id}`);
           }
 
-          const node                 = {
+          const node = {
             children: [],
             displayName: null,
             hocDisplayNames: null,
@@ -219,7 +187,7 @@ function updateTree(
 
           nodes.set(id, node);
         } else {
-          const parentID = ((operations[i]     )        );
+          const parentID = operations[i];
           i++;
 
           i++; // ownerID
@@ -242,7 +210,7 @@ function updateTree(
           const parentNode = getClonedNode(parentID);
           parentNode.children = parentNode.children.concat(id);
 
-          const node                 = {
+          const node = {
             children: [],
             displayName,
             hocDisplayNames: null,
@@ -258,11 +226,11 @@ function updateTree(
 
         break;
       case TREE_OPERATION_REMOVE: {
-        const removeLength = ((operations[i + 1]     )        );
+        const removeLength = operations[i + 1];
         i += 2;
 
         for (let removeIndex = 0; removeIndex < removeLength; removeIndex++) {
-          id = ((operations[i]     )        );
+          id = operations[i];
           i++;
 
           if (!nodes.has(id)) {
@@ -288,19 +256,16 @@ function updateTree(
             }
 
             parentNode.children = parentNode.children.filter(
-              childID => childID !== id,
+              (childID) => childID !== id,
             );
           }
         }
         break;
       }
       case TREE_OPERATION_REORDER_CHILDREN: {
-        id = ((operations[i + 1]     )        );
-        const numChildren = ((operations[i + 2]     )        );
-        const children = ((operations.slice(
-          i + 3,
-          i + 3 + numChildren,
-        )     )               );
+        id = operations[i + 1];
+        const numChildren = operations[i + 2];
+        const children = operations.slice(i + 3, i + 3 + numChildren);
 
         i = i + 3 + numChildren;
 
@@ -340,12 +305,12 @@ function updateTree(
   };
 }
 
-export function invalidateCommitTrees()       {
+export function invalidateCommitTrees() {
   rootToCommitTreeMap.clear();
 }
 
 // DEBUG
-const __printTree = (commitTree            ) => {
+const __printTree = (commitTree) => {
   if (__DEBUG__) {
     const {nodes, rootID} = commitTree;
     console.group('__printTree()');
@@ -365,7 +330,7 @@ const __printTree = (commitTree            ) => {
         } (${node.treeBaseDuration})`,
       );
 
-      node.children.forEach(childID => {
+      node.children.forEach((childID) => {
         queue.push(childID, depth + 1);
       });
     }

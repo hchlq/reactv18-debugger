@@ -11,7 +11,7 @@ const os = require('os');
 const timesToRun = 10;
 
 function wait(val) {
-  return new Promise(resolve => setTimeout(resolve, val));
+  return new Promise((resolve) => setTimeout(resolve, val));
 }
 
 async function runScenario(benchmark, chrome) {

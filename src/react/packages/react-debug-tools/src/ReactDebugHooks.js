@@ -4,21 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-             
-                
-                             
-                           
-               
-                    
-                           
-             
-        
-                               
-                                                 
-                                                                            
 
 import {NoMode} from 'react-reconciler/src/ReactTypeOfMode';
 
@@ -33,35 +20,17 @@ import {
   Block,
 } from 'react-reconciler/src/ReactWorkTags';
 
-                                                                               
-
 // Used to track hooks called during a render
 
-                     
-                    
-                    
-               
-     
-  
-
-let hookLog                      = [];
+let hookLog = [];
 
 // Primitives
 
-                                        
+let primitiveStackCache = null;
 
-                             
+let currentFiber = null;
 
-let primitiveStackCache                                 = null;
-
-let currentFiber               = null;
-
-             
-                     
-                    
-  
-
-function getPrimitiveStackCache()                          {
+function getPrimitiveStackCache() {
   // This initializes a cache of all primitive hooks so that the top
   // most stack frames added by calling the primitive hook can be removed.
   if (primitiveStackCache === null) {
@@ -69,7 +38,7 @@ function getPrimitiveStackCache()                          {
     let readHookLog;
     try {
       // Use all hooks here to add them to the hook log.
-      Dispatcher.useContext(({_currentValue: null}     ));
+      Dispatcher.useContext({_currentValue: null});
       Dispatcher.useState(null);
       Dispatcher.useReducer((s, a) => s, null);
       Dispatcher.useRef(null);
@@ -92,8 +61,8 @@ function getPrimitiveStackCache()                          {
   return primitiveStackCache;
 }
 
-let currentHook              = null;
-function nextHook()              {
+let currentHook = null;
+function nextHook() {
   const hook = currentHook;
   if (hook !== null) {
     currentHook = hook.next;
@@ -101,18 +70,12 @@ function nextHook()              {
   return hook;
 }
 
-function readContext   (
-  context                 ,
-  observedBits                         ,
-)    {
+function readContext(context, observedBits) {
   // For now we don't expose readContext usage in the hooks debugging info.
   return context._currentValue;
 }
 
-function useContext   (
-  context                 ,
-  observedBits                         ,
-)    {
+function useContext(context, observedBits) {
   hookLog.push({
     primitive: 'Context',
     stackError: new Error(),
@@ -121,11 +84,9 @@ function useContext   (
   return context._currentValue;
 }
 
-function useState   (
-  initialState               ,
-)                                     {
+function useState(initialState) {
   const hook = nextHook();
-  const state    =
+  const state =
     hook !== null
       ? hook.memoizedState
       : typeof initialState === 'function'
@@ -133,30 +94,26 @@ function useState   (
         initialState()
       : initialState;
   hookLog.push({primitive: 'State', stackError: new Error(), value: state});
-  return [state, (action                     ) => {}];
+  return [state, (action) => {}];
 }
 
-function useReducer         (
-  reducer             ,
-  initialArg   ,
-  init         ,
-)                   {
+function useReducer(reducer, initialArg, init) {
   const hook = nextHook();
   let state;
   if (hook !== null) {
     state = hook.memoizedState;
   } else {
-    state = init !== undefined ? init(initialArg) : ((initialArg     )   );
+    state = init !== undefined ? init(initialArg) : initialArg;
   }
   hookLog.push({
     primitive: 'Reducer',
     stackError: new Error(),
     value: state,
   });
-  return [state, (action   ) => {}];
+  return [state, (action) => {}];
 }
 
-function useRef   (initialValue   )                 {
+function useRef(initialValue) {
   const hook = nextHook();
   const ref = hook !== null ? hook.memoizedState : {current: initialValue};
   hookLog.push({
@@ -167,10 +124,7 @@ function useRef   (initialValue   )                 {
   return ref;
 }
 
-function useLayoutEffect(
-  create                           ,
-  inputs                            ,
-)       {
+function useLayoutEffect(create, inputs) {
   nextHook();
   hookLog.push({
     primitive: 'LayoutEffect',
@@ -179,19 +133,12 @@ function useLayoutEffect(
   });
 }
 
-function useEffect(
-  create                           ,
-  inputs                            ,
-)       {
+function useEffect(create, inputs) {
   nextHook();
   hookLog.push({primitive: 'Effect', stackError: new Error(), value: create});
 }
 
-function useImperativeHandle   (
-  ref                                                                   ,
-  create         ,
-  inputs                            ,
-)       {
+function useImperativeHandle(ref, create, inputs) {
   nextHook();
   // We don't actually store the instance anywhere if there is no ref callback
   // and if there is a ref callback it might not store it but if it does we
@@ -208,7 +155,7 @@ function useImperativeHandle   (
   });
 }
 
-function useDebugValue(value     , formatterFn                      ) {
+function useDebugValue(value, formatterFn) {
   hookLog.push({
     primitive: 'DebugValue',
     stackError: new Error(),
@@ -216,7 +163,7 @@ function useDebugValue(value     , formatterFn                      ) {
   });
 }
 
-function useCallback   (callback   , inputs                            )    {
+function useCallback(callback, inputs) {
   const hook = nextHook();
   hookLog.push({
     primitive: 'Callback',
@@ -226,21 +173,14 @@ function useCallback   (callback   , inputs                            )    {
   return callback;
 }
 
-function useMemo   (
-  nextCreate         ,
-  inputs                            ,
-)    {
+function useMemo(nextCreate, inputs) {
   const hook = nextHook();
   const value = hook !== null ? hook.memoizedState[0] : nextCreate();
   hookLog.push({primitive: 'Memo', stackError: new Error(), value});
   return value;
 }
 
-function useMutableSource                  (
-  source                       ,
-  getSnapshot                                              ,
-  subscribe                                            ,
-)           {
+function useMutableSource(source, getSnapshot, subscribe) {
   // useMutableSource() composes multiple hooks internally.
   // Advance the current hook index the same number of times
   // so that subsequent hooks have the right memoized state.
@@ -253,7 +193,7 @@ function useMutableSource                  (
   return value;
 }
 
-function useTransition()                                  {
+function useTransition() {
   // useTransition() composes multiple hooks internally.
   // Advance the current hook index the same number of times
   // so that subsequent hooks have the right memoized state.
@@ -264,10 +204,10 @@ function useTransition()                                  {
     stackError: new Error(),
     value: undefined,
   });
-  return [callback => {}, false];
+  return [(callback) => {}, false];
 }
 
-function useDeferredValue   (value   )    {
+function useDeferredValue(value) {
   // useDeferredValue() composes multiple hooks internally.
   // Advance the current hook index the same number of times
   // so that subsequent hooks have the right memoized state.
@@ -281,7 +221,7 @@ function useDeferredValue   (value   )    {
   return value;
 }
 
-function useOpaqueIdentifier()                      {
+function useOpaqueIdentifier() {
   const hook = nextHook(); // State
   if (currentFiber && currentFiber.mode === NoMode) {
     nextHook(); // Effect
@@ -298,7 +238,7 @@ function useOpaqueIdentifier()                      {
   return value;
 }
 
-const Dispatcher                 = {
+const Dispatcher = {
   readContext,
   useCallback,
   useContext,
@@ -317,16 +257,6 @@ const Dispatcher                 = {
 };
 
 // Inspect
-
-                         
-                    
-                           
-               
-               
-                             
-     
-  
-                                         
 
 // Don't assume
 //
@@ -445,7 +375,7 @@ function parseTrimmedStack(rootStack, hook) {
   return hookStack.slice(primitiveIndex, rootIndex - 1);
 }
 
-function parseCustomHookName(functionName               )         {
+function parseCustomHookName(functionName) {
   if (!functionName) {
     return '';
   }
@@ -459,7 +389,7 @@ function parseCustomHookName(functionName               )         {
   return functionName.substr(startIndex);
 }
 
-function buildTree(rootStack, readHookLog)            {
+function buildTree(rootStack, readHookLog) {
   const rootChildren = [];
   let prevStack = null;
   let levelChildren = rootChildren;
@@ -538,11 +468,8 @@ function buildTree(rootStack, readHookLog)            {
 // but these values aren't intended to appear alongside of the other hooks.
 // Instead they should be attributed to their parent custom hook.
 // This method walks the tree and assigns debug values to their custom hook owners.
-function processDebugValues(
-  hooksTree           ,
-  parentHooksNode                  ,
-)       {
-  const debugValueHooksNodes                   = [];
+function processDebugValues(hooksTree, parentHooksNode) {
+  const debugValueHooksNodes = [];
 
   for (let i = 0; i < hooksTree.length; i++) {
     const hooksNode = hooksTree[i];
@@ -567,11 +494,7 @@ function processDebugValues(
   }
 }
 
-export function inspectHooks       (
-  renderFunction                     ,
-  props       ,
-  currentDispatcher                       ,
-)            {
+export function inspectHooks(renderFunction, props, currentDispatcher) {
   // DevTools will pass the current renderer's injected dispatcher.
   // Other apps might compile debug hooks as part of their app though.
   if (currentDispatcher == null) {
@@ -594,12 +517,12 @@ export function inspectHooks       (
   return buildTree(rootStack, readHookLog);
 }
 
-function setupContexts(contextMap                             , fiber       ) {
+function setupContexts(contextMap, fiber) {
   let current = fiber;
   while (current) {
     if (current.tag === ContextProvider) {
-      const providerType                         = current.type;
-      const context                    = providerType._context;
+      const providerType = current.type;
+      const context = providerType._context;
       if (!contextMap.has(context)) {
         // Store the current value that we're going to restore later.
         contextMap.set(context, context._currentValue);
@@ -611,16 +534,16 @@ function setupContexts(contextMap                             , fiber       ) {
   }
 }
 
-function restoreContexts(contextMap                             ) {
+function restoreContexts(contextMap) {
   contextMap.forEach((value, context) => (context._currentValue = value));
 }
 
-function inspectHooksOfForwardRef            (
-  renderFunction                            ,
-  props       ,
-  ref     ,
-  currentDispatcher                      ,
-)            {
+function inspectHooksOfForwardRef(
+  renderFunction,
+  props,
+  ref,
+  currentDispatcher,
+) {
   const previousDispatcher = currentDispatcher.current;
   let readHookLog;
   currentDispatcher.current = Dispatcher;
@@ -652,10 +575,7 @@ function resolveDefaultProps(Component, baseProps) {
   return baseProps;
 }
 
-export function inspectHooksOfFiber(
-  fiber       ,
-  currentDispatcher                       ,
-) {
+export function inspectHooksOfFiber(fiber, currentDispatcher) {
   // DevTools will pass the current renderer's injected dispatcher.
   // Other apps might compile debug hooks as part of their app though.
   if (currentDispatcher == null) {
@@ -683,7 +603,7 @@ export function inspectHooksOfFiber(
   }
   // Set up the current hook so that we can step through and read the
   // current state from them.
-  currentHook = (fiber.memoizedState      );
+  currentHook = fiber.memoizedState;
   const contextMap = new Map();
   try {
     setupContexts(contextMap, fiber);

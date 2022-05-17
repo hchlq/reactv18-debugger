@@ -10,7 +10,7 @@ import {
   MESSAGE_TYPE_SAVED_PREFERENCES,
 } from './constants';
 
-function startActivation(contentWindow        ) {
+function startActivation(contentWindow) {
   const {parent} = contentWindow;
 
   const onMessage = ({data}) => {
@@ -20,14 +20,13 @@ function startActivation(contentWindow        ) {
         // so it's safe to cleanup after we've received it.
         contentWindow.removeEventListener('message', onMessage);
 
-        const {
-          appendComponentStack,
-          breakOnConsoleErrors,
-          componentFilters,
-        } = data;
+        const {appendComponentStack, breakOnConsoleErrors, componentFilters} =
+          data;
 
-        contentWindow.__REACT_DEVTOOLS_APPEND_COMPONENT_STACK__ = appendComponentStack;
-        contentWindow.__REACT_DEVTOOLS_BREAK_ON_CONSOLE_ERRORS__ = breakOnConsoleErrors;
+        contentWindow.__REACT_DEVTOOLS_APPEND_COMPONENT_STACK__ =
+          appendComponentStack;
+        contentWindow.__REACT_DEVTOOLS_BREAK_ON_CONSOLE_ERRORS__ =
+          breakOnConsoleErrors;
         contentWindow.__REACT_DEVTOOLS_COMPONENT_FILTERS__ = componentFilters;
 
         // TRICKY
@@ -37,8 +36,10 @@ function startActivation(contentWindow        ) {
         // Technically we don't need to store them on the contentWindow in this case,
         // but it doesn't really hurt anything to store them there too.
         if (contentWindow !== window) {
-          window.__REACT_DEVTOOLS_APPEND_COMPONENT_STACK__ = appendComponentStack;
-          window.__REACT_DEVTOOLS_BREAK_ON_CONSOLE_ERRORS__ = breakOnConsoleErrors;
+          window.__REACT_DEVTOOLS_APPEND_COMPONENT_STACK__ =
+            appendComponentStack;
+          window.__REACT_DEVTOOLS_BREAK_ON_CONSOLE_ERRORS__ =
+            breakOnConsoleErrors;
           window.__REACT_DEVTOOLS_COMPONENT_FILTERS__ = componentFilters;
         }
 
@@ -58,12 +59,12 @@ function startActivation(contentWindow        ) {
   parent.postMessage({type: MESSAGE_TYPE_GET_SAVED_PREFERENCES}, '*');
 }
 
-function finishActivation(contentWindow        ) {
+function finishActivation(contentWindow) {
   const {parent} = contentWindow;
 
   const bridge = new Bridge({
     listen(fn) {
-      const onMessage = event => {
+      const onMessage = (event) => {
         fn(event.data);
       };
       contentWindow.addEventListener('message', onMessage);
@@ -71,7 +72,7 @@ function finishActivation(contentWindow        ) {
         contentWindow.removeEventListener('message', onMessage);
       };
     },
-    send(event        , payload     , transferable             ) {
+    send(event, payload, transferable) {
       parent.postMessage({event, payload}, '*', transferable);
     },
   });
@@ -94,10 +95,10 @@ function finishActivation(contentWindow        ) {
   }
 }
 
-export function activate(contentWindow        )       {
+export function activate(contentWindow) {
   startActivation(contentWindow);
 }
 
-export function initialize(contentWindow        )       {
+export function initialize(contentWindow) {
   installHook(contentWindow);
 }

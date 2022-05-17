@@ -4,21 +4,12 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
-                                     
-             
-                        
-               
-  
-
 // eslint-disable-next-line no-unused-vars
-                                                       
 
-export function resolveModuleReference   (
-  moduleData                ,
-)                     {
+export function resolveModuleReference(moduleData) {
   return moduleData;
 }
 
@@ -26,11 +17,11 @@ export function resolveModuleReference   (
 // If they're still pending they're a thenable. This map also exists
 // in Webpack but unfortunately it's not exposed so we have to
 // replicate it in user space. null means that it has already loaded.
-const chunkCache                                           = new Map();
+const chunkCache = new Map();
 
 // Start preloading the modules since we might need them soon.
 // This function doesn't suspend.
-export function preloadModule   (moduleData                    )       {
+export function preloadModule(moduleData) {
   const chunks = moduleData.chunks;
   for (let i = 0; i < chunks.length; i++) {
     const chunkId = chunks[i];
@@ -47,7 +38,7 @@ export function preloadModule   (moduleData                    )       {
 
 // Actually require the module or suspend if it's not yet ready.
 // Increase priority if necessary.
-export function requireModule   (moduleData                    )    {
+export function requireModule(moduleData) {
   const chunks = moduleData.chunks;
   for (let i = 0; i < chunks.length; i++) {
     const chunkId = chunks[i];

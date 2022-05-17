@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 // This is a host config that's used for the `react-server` package on npm.
@@ -23,8 +23,7 @@
 // So `$$$config` looks like a global variable, but it's
 // really an argument to a top-level wrapping function.
 
-                               
-                                        // eslint-disable-line no-undef
+// eslint-disable-line no-undef
 
 export const formatChunkAsString = $$$hostConfig.formatChunkAsString;
 export const formatChunk = $$$hostConfig.formatChunk;

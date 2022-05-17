@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -23,48 +23,32 @@ import Tooltip from './Tooltip';
 
 import styles from './CommitRanked.css';
 
-                                                         
-                                                    
-                                        
-
-                         
-                       
-                                                             
-                                  
-                                                           
-                                 
-                             
-                                                                
-                
-   
-
-export default function CommitRankedAutoSizer(_      ) {
+export default function CommitRankedAutoSizer(_) {
   const {profilerStore} = useContext(StoreContext);
-  const {rootID, selectedCommitIndex, selectFiber} = useContext(
-    ProfilerContext,
-  );
+  const {rootID, selectedCommitIndex, selectFiber} =
+    useContext(ProfilerContext);
   const {profilingCache} = profilerStore;
 
   const deselectCurrentFiber = useCallback(
-    event => {
+    (event) => {
       event.stopPropagation();
       selectFiber(null, null);
     },
     [selectFiber],
   );
 
-  let commitTree                    = null;
-  let chartData                   = null;
+  let commitTree = null;
+  let chartData = null;
   if (selectedCommitIndex !== null) {
     commitTree = profilingCache.getCommitTree({
       commitIndex: selectedCommitIndex,
-      rootID: ((rootID     )        ),
+      rootID: rootID,
     });
 
     chartData = profilingCache.getRankedChartData({
       commitIndex: selectedCommitIndex,
       commitTree,
-      rootID: ((rootID     )        ),
+      rootID: rootID,
     });
   }
 
@@ -74,8 +58,8 @@ export default function CommitRankedAutoSizer(_      ) {
         <AutoSizer>
           {({height, width}) => (
             <CommitRanked
-              chartData={((chartData     )           )}
-              commitTree={((commitTree     )            )}
+              chartData={chartData}
+              commitTree={commitTree}
               height={height}
               width={width}
             />
@@ -88,24 +72,12 @@ export default function CommitRankedAutoSizer(_      ) {
   }
 }
 
-               
-                       
-                         
-                 
-                
-   
-
-function CommitRanked({chartData, commitTree, height, width}       ) {
-  const [
-    hoveredFiberData,
-    setHoveredFiberData,
-  ] = useState                         (null);
+function CommitRanked({chartData, commitTree, height, width}) {
+  const [hoveredFiberData, setHoveredFiberData] = useState(null);
   const {lineHeight} = useContext(SettingsContext);
   const {selectedFiberID, selectFiber} = useContext(ProfilerContext);
-  const {
-    highlightNativeElement,
-    clearHighlightNativeElement,
-  } = useHighlightNativeElement();
+  const {highlightNativeElement, clearHighlightNativeElement} =
+    useHighlightNativeElement();
 
   const selectedFiberIndex = useMemo(
     () => getNodeIndex(chartData, selectedFiberID),
@@ -125,7 +97,7 @@ function CommitRanked({chartData, commitTree, height, width}       ) {
     setHoveredFiberData(null); // clear hovered fiber data for tooltip
   }, [clearHighlightNativeElement]);
 
-  const itemData = useMemo          (
+  const itemData = useMemo(
     () => ({
       chartData,
       onElementMouseEnter: handleElementMouseEnter,
@@ -164,14 +136,15 @@ function CommitRanked({chartData, commitTree, height, width}       ) {
         itemCount={chartData.nodes.length}
         itemData={itemData}
         itemSize={lineHeight}
-        width={width}>
+        width={width}
+      >
         {CommitRankedListItem}
       </FixedSizeList>
     </Tooltip>
   );
 }
 
-const getNodeIndex = (chartData           , id               )         => {
+const getNodeIndex = (chartData, id) => {
   if (id === null) {
     return 0;
   }

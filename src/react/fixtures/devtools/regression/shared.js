@@ -113,7 +113,7 @@ switch (major) {
         // lazy
         const LazyWithDefaultProps = React.lazy(
           () =>
-            new Promise(resolve => {
+            new Promise((resolve) => {
               function FooWithDefaultProps(props) {
                 return (
                   <h1>
@@ -143,7 +143,7 @@ switch (major) {
         class ProfilerChild extends React.Component {
           state = {count: 0};
           incrementCount = () =>
-            this.setState(prevState => ({count: prevState.count + 1}));
+            this.setState((prevState) => ({count: prevState.count + 1}));
           render() {
             return (
               <div>
@@ -159,7 +159,8 @@ switch (major) {
           <Feature
             key="unstable_Profiler"
             label="unstable_Profiler"
-            version="16.4+">
+            version="16.4+"
+          >
             <Profiler id="count" onRender={onRender}>
               <div>
                 <ProfilerChild />
@@ -176,12 +177,12 @@ switch (major) {
           <Feature key="createContext" label="createContext" version="16.3+">
             <ThemeContext.Provider value="blue">
               <ThemeContext.Consumer>
-                {theme => <div>theme: {theme}</div>}
+                {(theme) => <div>theme: {theme}</div>}
               </ThemeContext.Consumer>
             </ThemeContext.Provider>
             <LocaleContext.Provider value="en-US">
               <LocaleContext.Consumer>
-                {locale => <div>locale: {locale}</div>}
+                {(locale) => <div>locale: {locale}</div>}
               </LocaleContext.Consumer>
             </LocaleContext.Provider>
           </Feature>
@@ -229,7 +230,8 @@ switch (major) {
           <Feature
             key="AsyncMode/ConcurrentMode"
             label="AsyncMode/ConcurrentMode"
-            version="16.3+">
+            version="16.3+"
+          >
             <ConcurrentMode>
               <div>
                 unstable_AsyncMode was added in 16.3, renamed to
@@ -271,7 +273,7 @@ function Even() {
 class SimpleApp extends React.Component {
   state = {count: 0};
   incrementCount = () => {
-    const updaterFn = prevState => ({count: prevState.count + 1});
+    const updaterFn = (prevState) => ({count: prevState.count + 1});
     trace('Updating count', performance.now(), () => this.setState(updaterFn));
   };
   render() {

@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import {clamp} from './clamp';
@@ -18,12 +18,8 @@ import {clamp} from './clamp';
  *     |<-------------------length------------------->|
  * ```
  */
-                                      
-                 
-                 
-    
 
-function clampOffset(state             , containerLength        )              {
+function clampOffset(state, containerLength) {
   return {
     offset: clamp(-(state.length - containerLength), 0, state.offset),
     length: state.length,
@@ -35,12 +31,7 @@ function clampLength({
   minContentLength,
   maxContentLength,
   containerLength,
-}   
-                     
-                           
-                           
-                          
- )              {
+}) {
   return {
     offset: state.offset,
     length: clamp(
@@ -62,12 +53,7 @@ export function clampState({
   minContentLength,
   maxContentLength,
   containerLength,
-}   
-                     
-                           
-                           
-                          
- )              {
+}) {
   return clampOffset(
     clampLength({
       state,
@@ -79,15 +65,7 @@ export function clampState({
   );
 }
 
-export function translateState({
-  state,
-  delta,
-  containerLength,
-}   
-                     
-                
-                          
- )              {
+export function translateState({state, delta, containerLength}) {
   return clampOffset(
     {
       offset: state.offset + delta,
@@ -119,15 +97,7 @@ export function zoomState({
   minContentLength,
   maxContentLength,
   containerLength,
-}   
-                     
-                     
-                     
-
-                           
-                           
-                          
- )              {
+}) {
   // Length and offset must be computed separately, so that if the length is
   // clamped the offset will still be correct (unless it gets clamped too).
 
@@ -164,16 +134,7 @@ export function moveStateToRange({
   minContentLength,
   maxContentLength,
   containerLength,
-}   
-                     
-                     
-                   
-                        
-
-                           
-                           
-                          
- )              {
+}) {
   // Length and offset must be computed separately, so that if the length is
   // clamped the offset will still be correct (unless it gets clamped too).
 
@@ -198,9 +159,6 @@ export function moveStateToRange({
   return offsetAdjustedState;
 }
 
-export function areScrollStatesEqual(
-  state1             ,
-  state2             ,
-)          {
+export function areScrollStatesEqual(state1, state2) {
   return state1.offset === state2.offset && state1.length === state2.length;
 }

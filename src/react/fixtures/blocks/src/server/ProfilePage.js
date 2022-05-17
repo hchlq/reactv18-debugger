@@ -17,8 +17,8 @@ import ProfileNav from '../client/ProfileNav';
 
 // TODO: Router component?
 const ProfileRoutes = {
-  '/': props => <ProfileTimeline {...props} key="timeline" />,
-  '/bio': props => <ProfileBio {...props} key="bio" />,
+  '/': (props) => <ProfileTimeline {...props} key="timeline" />,
+  '/bio': (props) => <ProfileBio {...props} key="bio" />,
 };
 
 export default function ProfilePage(props) {

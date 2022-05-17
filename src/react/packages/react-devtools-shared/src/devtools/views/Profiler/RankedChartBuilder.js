@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import {
@@ -14,33 +14,9 @@ import {
 import {formatDuration} from './utils';
 import ProfilerStore from 'react-devtools-shared/src/devtools/ProfilerStore';
 
-                                        
+const cachedChartData = new Map();
 
-                          
-             
-                
-               
-                
-   
-
-                          
-                   
-                          
-   
-
-const cachedChartData                         = new Map();
-
-export function getChartData({
-  commitIndex,
-  commitTree,
-  profilerStore,
-  rootID,
-}    
-                      
-                         
-                               
-                 
-  )            {
+export function getChartData({commitIndex, commitTree, profilerStore, rootID}) {
   const commitDatum = profilerStore.getCommitData(rootID, commitIndex);
 
   const {fiberActualDurations, fiberSelfDurations} = commitDatum;
@@ -48,12 +24,12 @@ export function getChartData({
 
   const chartDataKey = `${rootID}-${commitIndex}`;
   if (cachedChartData.has(chartDataKey)) {
-    return ((cachedChartData.get(chartDataKey)     )           );
+    return cachedChartData.get(chartDataKey);
   }
 
   let maxSelfDuration = 0;
 
-  const chartNodes                   = [];
+  const chartNodes = [];
   fiberActualDurations.forEach((actualDuration, id) => {
     const node = nodes.get(id);
 
@@ -101,6 +77,6 @@ export function getChartData({
   return chartData;
 }
 
-export function invalidateChartData()       {
+export function invalidateChartData() {
   cachedChartData.clear();
 }

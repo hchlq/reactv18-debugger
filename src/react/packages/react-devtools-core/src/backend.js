@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import Agent from 'react-devtools-shared/src/backend/agent';
@@ -15,29 +15,13 @@ import {__DEBUG__} from 'react-devtools-shared/src/constants';
 import setupNativeStyleEditor from 'react-devtools-shared/src/backend/NativeStyleEditor/setupNativeStyleEditor';
 import {getDefaultComponentFilters} from 'react-devtools-shared/src/utils';
 
-                                                                    
-                                                                     
-                                                                          
-                                                                                                                   
-
-                       
-                
-                                                            
-                
-                     
-                                      
-                              
-                         
-     
-  
-
 installHook(window);
 
-const hook                = window.__REACT_DEVTOOLS_GLOBAL_HOOK__;
+const hook = window.__REACT_DEVTOOLS_GLOBAL_HOOK__;
 
-let savedComponentFilters                         = getDefaultComponentFilters();
+let savedComponentFilters = getDefaultComponentFilters();
 
-function debug(methodName        , ...args) {
+function debug(methodName, ...args) {
   if (__DEBUG__) {
     console.log(
       `%c[core/backend] %c${methodName}`,
@@ -48,7 +32,7 @@ function debug(methodName        , ...args) {
   }
 }
 
-export function connectToDevTools(options                 ) {
+export function connectToDevTools(options) {
   if (hook == null) {
     // DevTools didn't get injected into this page (maybe b'c of the contentType).
     return;
@@ -64,7 +48,7 @@ export function connectToDevTools(options                 ) {
   } = options || {};
 
   const protocol = useHttps ? 'wss' : 'ws';
-  let retryTimeoutID                   = null;
+  let retryTimeoutID = null;
 
   function scheduleRetry() {
     if (retryTimeoutID === null) {
@@ -80,7 +64,7 @@ export function connectToDevTools(options                 ) {
     return;
   }
 
-  let bridge                       = null;
+  let bridge = null;
 
   const messageListeners = [];
   const uri = protocol + '://' + host + ':' + port;
@@ -92,7 +76,7 @@ export function connectToDevTools(options                 ) {
   ws.onclose = handleClose;
   ws.onerror = handleFailed;
   ws.onmessage = handleMessage;
-  ws.onopen = function() {
+  ws.onopen = function () {
     bridge = new Bridge({
       listen(fn) {
         messageListeners.push(fn);
@@ -103,7 +87,7 @@ export function connectToDevTools(options                 ) {
           }
         };
       },
-      send(event        , payload     , transferable             ) {
+      send(event, payload, transferable) {
         if (ws.readyState === ws.OPEN) {
           if (__DEBUG__) {
             debug('wall.send()', event, payload);
@@ -126,30 +110,22 @@ export function connectToDevTools(options                 ) {
         }
       },
     });
-    bridge.addListener(
-      'inspectElement',
-      ({id, rendererID}                                       ) => {
-        const renderer = agent.rendererInterfaces[rendererID];
-        if (renderer != null) {
-          // Send event for RN to highlight.
-          const nodes                      = renderer.findNativeNodesForFiberID(
-            id,
-          );
-          if (nodes != null && nodes[0] != null) {
-            agent.emit('showNativeHighlight', nodes[0]);
-          }
+    bridge.addListener('inspectElement', ({id, rendererID}) => {
+      const renderer = agent.rendererInterfaces[rendererID];
+      if (renderer != null) {
+        // Send event for RN to highlight.
+        const nodes = renderer.findNativeNodesForFiberID(id);
+        if (nodes != null && nodes[0] != null) {
+          agent.emit('showNativeHighlight', nodes[0]);
         }
-      },
-    );
-    bridge.addListener(
-      'updateComponentFilters',
-      (componentFilters                        ) => {
-        // Save filter changes in memory, in case DevTools is reloaded.
-        // In that case, the renderer will already be using the updated values.
-        // We'll lose these in between backend reloads but that can't be helped.
-        savedComponentFilters = componentFilters;
-      },
-    );
+      }
+    });
+    bridge.addListener('updateComponentFilters', (componentFilters) => {
+      // Save filter changes in memory, in case DevTools is reloaded.
+      // In that case, the renderer will already be using the updated values.
+      // We'll lose these in between backend reloads but that can't be helped.
+      savedComponentFilters = componentFilters;
+    });
 
     // The renderer interface doesn't read saved component filters directly,
     // because they are generally stored in localStorage within the context of the extension.
@@ -178,7 +154,7 @@ export function connectToDevTools(options                 ) {
       setupNativeStyleEditor(
         bridge,
         agent,
-        ((resolveRNStyle || hook.resolveRNStyle     )                    ),
+        resolveRNStyle || hook.resolveRNStyle,
         nativeStyleEditorValidAttributes ||
           hook.nativeStyleEditorValidAttributes ||
           null,
@@ -202,36 +178,28 @@ export function connectToDevTools(options                 ) {
       };
 
       if (!hook.hasOwnProperty('resolveRNStyle')) {
-        Object.defineProperty(
-          hook,
-          'resolveRNStyle',
-          ({
-            enumerable: false,
-            get() {
-              return lazyResolveRNStyle;
-            },
-            set(value) {
-              lazyResolveRNStyle = value;
-              initAfterTick();
-            },
-          }        ),
-        );
+        Object.defineProperty(hook, 'resolveRNStyle', {
+          enumerable: false,
+          get() {
+            return lazyResolveRNStyle;
+          },
+          set(value) {
+            lazyResolveRNStyle = value;
+            initAfterTick();
+          },
+        });
       }
       if (!hook.hasOwnProperty('nativeStyleEditorValidAttributes')) {
-        Object.defineProperty(
-          hook,
-          'nativeStyleEditorValidAttributes',
-          ({
-            enumerable: false,
-            get() {
-              return lazyNativeStyleEditorValidAttributes;
-            },
-            set(value) {
-              lazyNativeStyleEditorValidAttributes = value;
-              initAfterTick();
-            },
-          }        ),
-        );
+        Object.defineProperty(hook, 'nativeStyleEditorValidAttributes', {
+          enumerable: false,
+          get() {
+            return lazyNativeStyleEditorValidAttributes;
+          },
+          set(value) {
+            lazyNativeStyleEditorValidAttributes = value;
+            initAfterTick();
+          },
+        });
       }
     }
   };
@@ -268,12 +236,10 @@ export function connectToDevTools(options                 ) {
         throw Error();
       }
     } catch (e) {
-      console.error(
-        '[React DevTools] Failed to parse JSON: ' + (event.data     ),
-      );
+      console.error('[React DevTools] Failed to parse JSON: ' + event.data);
       return;
     }
-    messageListeners.forEach(fn => {
+    messageListeners.forEach((fn) => {
       try {
         fn(data);
       } catch (error) {

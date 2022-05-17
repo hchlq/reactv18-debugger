@@ -4,10 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                
 
 import * as React from 'react';
 import {createContext} from 'react';
@@ -22,42 +20,13 @@ import {createContext} from 'react';
 //    The size of this cache is bounded by how many renders were profiled,
 //    and it will be fully reset between profiling sessions.
 
-                       
-
-                                                                               
-
-                       
-            
-                   
-   
-
-                               
-            
-               
-   
-
-                        
-            
-               
-   
-
-                                                                            
-
-                                           
-                
-                        
-                     
-                       
-                          
-     
-  
-
 const Pending = 0;
 const Resolved = 1;
 const Rejected = 2;
 
-const ReactCurrentDispatcher = (React     )
-  .__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.ReactCurrentDispatcher;
+const ReactCurrentDispatcher =
+  React.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED
+    .ReactCurrentDispatcher;
 
 function readContext(Context, observedBits) {
   const dispatcher = ReactCurrentDispatcher.current;
@@ -73,18 +42,11 @@ function readContext(Context, observedBits) {
 
 const CacheContext = createContext(null);
 
-                                          
+const entries = new Map();
+const resourceConfigs = new Map();
 
-const entries      
-                          
-                                    
-  = new Map();
-const resourceConfigs                                       = new Map();
-
-function getEntriesForResource(
-  resource     ,
-)                                    {
-  let entriesForResource = ((entries.get(resource)     )               );
+function getEntriesForResource(resource) {
+  let entriesForResource = entries.get(resource);
   if (entriesForResource === undefined) {
     const config = resourceConfigs.get(resource);
     entriesForResource =
@@ -94,33 +56,28 @@ function getEntriesForResource(
   return entriesForResource;
 }
 
-function accessResult                   (
-  resource     ,
-  fetch                          ,
-  input       ,
-  key     ,
-)                {
+function accessResult(resource, fetch, input, key) {
   const entriesForResource = getEntriesForResource(resource);
   const entry = entriesForResource.get(key);
   if (entry === undefined) {
     const thenable = fetch(input);
     thenable.then(
-      value => {
+      (value) => {
         if (newResult.status === Pending) {
-          const resolvedResult                        = (newResult     );
+          const resolvedResult = newResult;
           resolvedResult.status = Resolved;
           resolvedResult.value = value;
         }
       },
-      error => {
+      (error) => {
         if (newResult.status === Pending) {
-          const rejectedResult                 = (newResult     );
+          const rejectedResult = newResult;
           rejectedResult.status = Rejected;
           rejectedResult.value = error;
         }
       },
     );
-    const newResult                = {
+    const newResult = {
       status: Pending,
       value: thenable,
     };
@@ -131,27 +88,23 @@ function accessResult                   (
   }
 }
 
-export function createResource                   (
-  fetch                          ,
-  hashInput              ,
-  config          = {},
-)                              {
+export function createResource(fetch, hashInput, config = {}) {
   const resource = {
-    clear()       {
+    clear() {
       entries.delete(resource);
     },
 
-    invalidate(key     )       {
+    invalidate(key) {
       const entriesForResource = getEntriesForResource(resource);
       entriesForResource.delete(key);
     },
 
-    read(input       )        {
+    read(input) {
       // Prevent access outside of render.
       readContext(CacheContext);
 
       const key = hashInput(input);
-      const result                = accessResult(resource, fetch, input, key);
+      const result = accessResult(resource, fetch, input, key);
       switch (result.status) {
         case Pending: {
           const suspender = result.value;
@@ -167,11 +120,11 @@ export function createResource                   (
         }
         default:
           // Should be unreachable
-          return (undefined     );
+          return undefined;
       }
     },
 
-    preload(input       )       {
+    preload(input) {
       // Prevent access outside of render.
       readContext(CacheContext);
 
@@ -179,10 +132,10 @@ export function createResource                   (
       accessResult(resource, fetch, input, key);
     },
 
-    write(key     , value       )       {
+    write(key, value) {
       const entriesForResource = getEntriesForResource(resource);
 
-      const resolvedResult                        = {
+      const resolvedResult = {
         status: Resolved,
         value,
       };
@@ -196,6 +149,6 @@ export function createResource                   (
   return resource;
 }
 
-export function invalidateResources()       {
+export function invalidateResources() {
   entries.clear();
 }

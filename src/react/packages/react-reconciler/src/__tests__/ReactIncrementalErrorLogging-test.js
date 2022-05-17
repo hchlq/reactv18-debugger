@@ -110,7 +110,7 @@ describe('ReactIncrementalErrorLogging', () => {
 
   it('should ignore errors thrown in log method to prevent cycle', () => {
     const logCapturedErrorCalls = [];
-    console.error.mockImplementation(error => {
+    console.error.mockImplementation((error) => {
       // Test what happens when logging itself is buggy.
       logCapturedErrorCalls.push(error);
       throw new Error('logCapturedError error');

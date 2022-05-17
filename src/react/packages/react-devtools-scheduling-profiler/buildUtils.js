@@ -11,9 +11,7 @@ const {resolve} = require('path');
 
 function getGitCommit() {
   try {
-    return execSync('git show -s --format=%h')
-      .toString()
-      .trim();
+    return execSync('git show -s --format=%h').toString().trim();
   } catch (error) {
     // Mozilla runs this command from a git archive.
     // In that context, there is no Git revision.

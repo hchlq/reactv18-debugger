@@ -4,19 +4,14 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import escapeStringRegExp from 'escape-string-regexp';
 import {meta} from '../../hydration';
 import {formatDataForPreview} from '../../utils';
 
-                                                                     
-
-export function alphaSortEntries(
-  entryA                 ,
-  entryB                 ,
-)         {
+export function alphaSortEntries(entryA, entryB) {
   const a = entryA[0];
   const b = entryB[0];
   if ('' + +a === a) {
@@ -28,7 +23,7 @@ export function alphaSortEntries(
   return a < b ? -1 : 1;
 }
 
-export function createRegExp(string        )         {
+export function createRegExp(string) {
   // Allow /regex/ syntax with optional last /
   if (string[0] === '/') {
     // Cut off first slash
@@ -46,11 +41,11 @@ export function createRegExp(string        )         {
     }
   }
 
-  function isLetter(char        ) {
+  function isLetter(char) {
     return char.toLowerCase() !== char.toUpperCase();
   }
 
-  function matchAnyCase(char        ) {
+  function matchAnyCase(char) {
     if (!isLetter(char)) {
       // Don't mess with special characters like [.
       return char;
@@ -92,7 +87,7 @@ export function createRegExp(string        )         {
   );
 }
 
-export function getMetaValueLabel(data        )                {
+export function getMetaValueLabel(data) {
   if (hasOwnProperty.call(data, meta.preview_long)) {
     return data[meta.preview_long];
   } else {
@@ -100,7 +95,7 @@ export function getMetaValueLabel(data        )                {
   }
 }
 
-function sanitize(data        )       {
+function sanitize(data) {
   for (const key in data) {
     const value = data[key];
 
@@ -116,7 +111,7 @@ function sanitize(data        )       {
   }
 }
 
-export function serializeDataForCopy(props        )         {
+export function serializeDataForCopy(props) {
   const cloned = Object.assign({}, props);
 
   sanitize(cloned);
@@ -128,7 +123,7 @@ export function serializeDataForCopy(props        )         {
   }
 }
 
-export function serializeHooksForCopy(hooks                  )         {
+export function serializeHooksForCopy(hooks) {
   // $FlowFixMe "HooksTree is not an object"
   const cloned = Object.assign([], hooks);
 
@@ -159,11 +154,7 @@ export function serializeHooksForCopy(hooks                  )         {
 // Without this, we would see a "Download failed: network error" failure.
 let downloadUrl = null;
 
-export function downloadFile(
-  element                   ,
-  filename        ,
-  text        ,
-)       {
+export function downloadFile(element, filename, text) {
   const blob = new Blob([text], {type: 'text/plain;charset=utf-8'});
 
   if (downloadUrl !== null) {
@@ -178,7 +169,7 @@ export function downloadFile(
   element.click();
 }
 
-export function truncateText(text        , maxLength        )         {
+export function truncateText(text, maxLength) {
   const {length} = text;
   if (length > maxLength) {
     return (

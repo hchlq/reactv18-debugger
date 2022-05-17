@@ -37,7 +37,7 @@ describe('ReactFlight', () => {
         return ReactNoopFlightServerRuntime.serverBlockNoData(render);
       };
     }
-    return function(...args) {
+    return function (...args) {
       const curriedLoad = () => {
         return load(...args);
       };

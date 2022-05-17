@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -39,29 +39,20 @@ import {
 
 import styles from './SettingsShared.css';
 
-             
-                         
-                  
-                      
-              
-                             
-                        
-                                         
-
-export default function ComponentsSettings(_      ) {
+export default function ComponentsSettings(_) {
   const store = useContext(StoreContext);
 
   const collapseNodesByDefaultSubscription = useMemo(
     () => ({
       getCurrentValue: () => store.collapseNodesByDefault,
-      subscribe: (callback          ) => {
+      subscribe: (callback) => {
         store.addListener('collapseNodesByDefault', callback);
         return () => store.removeListener('collapseNodesByDefault', callback);
       },
     }),
     [store],
   );
-  const collapseNodesByDefault = useSubscription         (
+  const collapseNodesByDefault = useSubscription(
     collapseNodesByDefaultSubscription,
   );
 
@@ -72,12 +63,12 @@ export default function ComponentsSettings(_      ) {
     [store],
   );
 
-  const [componentFilters, setComponentFilters] = useState 
-                           
-   (() => [...store.componentFilters]);
+  const [componentFilters, setComponentFilters] = useState(() => [
+    ...store.componentFilters,
+  ]);
 
   const addFilter = useCallback(() => {
-    setComponentFilters(prevComponentFilters => {
+    setComponentFilters((prevComponentFilters) => {
       return [
         ...prevComponentFilters,
         {
@@ -89,147 +80,135 @@ export default function ComponentsSettings(_      ) {
     });
   }, []);
 
-  const changeFilterType = useCallback(
-    (componentFilter                 , type                     ) => {
-      setComponentFilters(prevComponentFilters => {
-        const cloned                         = [...prevComponentFilters];
+  const changeFilterType = useCallback((componentFilter, type) => {
+    setComponentFilters((prevComponentFilters) => {
+      const cloned = [...prevComponentFilters];
+      const index = prevComponentFilters.indexOf(componentFilter);
+      if (index >= 0) {
+        if (type === ComponentFilterElementType) {
+          cloned[index] = {
+            type: ComponentFilterElementType,
+            isEnabled: componentFilter.isEnabled,
+            value: ElementTypeHostComponent,
+          };
+        } else if (type === ComponentFilterDisplayName) {
+          cloned[index] = {
+            type: ComponentFilterDisplayName,
+            isEnabled: componentFilter.isEnabled,
+            isValid: true,
+            value: '',
+          };
+        } else if (type === ComponentFilterLocation) {
+          cloned[index] = {
+            type: ComponentFilterLocation,
+            isEnabled: componentFilter.isEnabled,
+            isValid: true,
+            value: '',
+          };
+        } else if (type === ComponentFilterHOC) {
+          cloned[index] = {
+            type: ComponentFilterHOC,
+            isEnabled: componentFilter.isEnabled,
+            isValid: true,
+          };
+        }
+      }
+      return cloned;
+    });
+  }, []);
+
+  const updateFilterValueElementType = useCallback((componentFilter, value) => {
+    if (componentFilter.type !== ComponentFilterElementType) {
+      throw Error('Invalid value for element type filter');
+    }
+
+    setComponentFilters((prevComponentFilters) => {
+      const cloned = [...prevComponentFilters];
+      if (componentFilter.type === ComponentFilterElementType) {
         const index = prevComponentFilters.indexOf(componentFilter);
         if (index >= 0) {
-          if (type === ComponentFilterElementType) {
-            cloned[index] = {
-              type: ComponentFilterElementType,
-              isEnabled: componentFilter.isEnabled,
-              value: ElementTypeHostComponent,
-            };
-          } else if (type === ComponentFilterDisplayName) {
-            cloned[index] = {
-              type: ComponentFilterDisplayName,
-              isEnabled: componentFilter.isEnabled,
-              isValid: true,
-              value: '',
-            };
-          } else if (type === ComponentFilterLocation) {
-            cloned[index] = {
-              type: ComponentFilterLocation,
-              isEnabled: componentFilter.isEnabled,
-              isValid: true,
-              value: '',
-            };
-          } else if (type === ComponentFilterHOC) {
-            cloned[index] = {
-              type: ComponentFilterHOC,
-              isEnabled: componentFilter.isEnabled,
-              isValid: true,
-            };
-          }
+          cloned[index] = {
+            ...componentFilter,
+            value,
+          };
         }
-        return cloned;
-      });
-    },
-    [],
-  );
-
-  const updateFilterValueElementType = useCallback(
-    (componentFilter                 , value             ) => {
-      if (componentFilter.type !== ComponentFilterElementType) {
-        throw Error('Invalid value for element type filter');
       }
+      return cloned;
+    });
+  }, []);
 
-      setComponentFilters(prevComponentFilters => {
-        const cloned                         = [...prevComponentFilters];
-        if (componentFilter.type === ComponentFilterElementType) {
-          const index = prevComponentFilters.indexOf(componentFilter);
-          if (index >= 0) {
-            cloned[index] = {
-              ...componentFilter,
-              value,
-            };
+  const updateFilterValueRegExp = useCallback((componentFilter, value) => {
+    if (componentFilter.type === ComponentFilterElementType) {
+      throw Error('Invalid value for element type filter');
+    }
+
+    setComponentFilters((prevComponentFilters) => {
+      const cloned = [...prevComponentFilters];
+      if (
+        componentFilter.type === ComponentFilterDisplayName ||
+        componentFilter.type === ComponentFilterLocation
+      ) {
+        const index = prevComponentFilters.indexOf(componentFilter);
+        if (index >= 0) {
+          let isValid = true;
+          try {
+            new RegExp(value); // eslint-disable-line no-new
+          } catch (error) {
+            isValid = false;
           }
+          cloned[index] = {
+            ...componentFilter,
+            isValid,
+            value,
+          };
         }
-        return cloned;
-      });
-    },
-    [],
-  );
-
-  const updateFilterValueRegExp = useCallback(
-    (componentFilter                 , value        ) => {
-      if (componentFilter.type === ComponentFilterElementType) {
-        throw Error('Invalid value for element type filter');
       }
+      return cloned;
+    });
+  }, []);
 
-      setComponentFilters(prevComponentFilters => {
-        const cloned                         = [...prevComponentFilters];
-        if (
-          componentFilter.type === ComponentFilterDisplayName ||
-          componentFilter.type === ComponentFilterLocation
-        ) {
-          const index = prevComponentFilters.indexOf(componentFilter);
-          if (index >= 0) {
-            let isValid = true;
-            try {
-              new RegExp(value); // eslint-disable-line no-new
-            } catch (error) {
-              isValid = false;
-            }
-            cloned[index] = {
-              ...componentFilter,
-              isValid,
-              value,
-            };
-          }
-        }
-        return cloned;
-      });
-    },
-    [],
-  );
-
-  const removeFilter = useCallback((index        ) => {
-    setComponentFilters(prevComponentFilters => {
-      const cloned                         = [...prevComponentFilters];
+  const removeFilter = useCallback((index) => {
+    setComponentFilters((prevComponentFilters) => {
+      const cloned = [...prevComponentFilters];
       cloned.splice(index, 1);
       return cloned;
     });
   }, []);
 
-  const toggleFilterIsEnabled = useCallback(
-    (componentFilter                 , isEnabled         ) => {
-      setComponentFilters(prevComponentFilters => {
-        const cloned                         = [...prevComponentFilters];
-        const index = prevComponentFilters.indexOf(componentFilter);
-        if (index >= 0) {
-          if (componentFilter.type === ComponentFilterElementType) {
-            cloned[index] = {
-              ...((cloned[index]     )                            ),
-              isEnabled,
-            };
-          } else if (
-            componentFilter.type === ComponentFilterDisplayName ||
-            componentFilter.type === ComponentFilterLocation
-          ) {
-            cloned[index] = {
-              ...((cloned[index]     )                       ),
-              isEnabled,
-            };
-          } else if (componentFilter.type === ComponentFilterHOC) {
-            cloned[index] = {
-              ...((cloned[index]     )                        ),
-              isEnabled,
-            };
-          }
+  const toggleFilterIsEnabled = useCallback((componentFilter, isEnabled) => {
+    setComponentFilters((prevComponentFilters) => {
+      const cloned = [...prevComponentFilters];
+      const index = prevComponentFilters.indexOf(componentFilter);
+      if (index >= 0) {
+        if (componentFilter.type === ComponentFilterElementType) {
+          cloned[index] = {
+            ...cloned[index],
+            isEnabled,
+          };
+        } else if (
+          componentFilter.type === ComponentFilterDisplayName ||
+          componentFilter.type === ComponentFilterLocation
+        ) {
+          cloned[index] = {
+            ...cloned[index],
+            isEnabled,
+          };
+        } else if (componentFilter.type === ComponentFilterHOC) {
+          cloned[index] = {
+            ...cloned[index],
+            isEnabled,
+          };
         }
-        return cloned;
-      });
-    },
-    [],
-  );
+      }
+      return cloned;
+    });
+  }, []);
 
   // Filter updates are expensive to apply (since they impact the entire tree).
   // Only apply them on unmount.
   // The Store will avoid doing any expensive work unless they've changed.
   // We just want to batch the work in the event that they do change.
-  const componentFiltersRef = useRef                        (componentFilters);
+  const componentFiltersRef = useRef(componentFilters);
   useEffect(() => {
     componentFiltersRef.current = componentFilters;
     return () => {};
@@ -273,7 +252,7 @@ export default function ComponentsSettings(_      ) {
                       : styles.InvalidRegExp
                   }
                   isChecked={componentFilter.isEnabled}
-                  onChange={isEnabled =>
+                  onChange={(isEnabled) =>
                     toggleFilterIsEnabled(componentFilter, isEnabled)
                   }
                   title={
@@ -282,7 +261,8 @@ export default function ComponentsSettings(_      ) {
                       : componentFilter.isEnabled
                       ? 'Filter enabled'
                       : 'Filter disabled'
-                  }>
+                  }
+                >
                   <ToggleIcon
                     isEnabled={componentFilter.isEnabled}
                     isValid={
@@ -299,12 +279,10 @@ export default function ComponentsSettings(_      ) {
                   onChange={({currentTarget}) =>
                     changeFilterType(
                       componentFilter,
-                      ((parseInt(
-                        currentTarget.value,
-                        10,
-                      )     )                     ),
+                      parseInt(currentTarget.value, 10),
                     )
-                  }>
+                  }
+                >
                   <option value={ComponentFilterLocation}>location</option>
                   <option value={ComponentFilterDisplayName}>name</option>
                   <option value={ComponentFilterElementType}>type</option>
@@ -326,9 +304,10 @@ export default function ComponentsSettings(_      ) {
                     onChange={({currentTarget}) =>
                       updateFilterValueElementType(
                         componentFilter,
-                        ((parseInt(currentTarget.value, 10)     )             ),
+                        parseInt(currentTarget.value, 10),
                       )
-                    }>
+                    }
+                  >
                     <option value={ElementTypeClass}>class</option>
                     <option value={ElementTypeContext}>context</option>
                     <option value={ElementTypeFunction}>function</option>
@@ -361,7 +340,8 @@ export default function ComponentsSettings(_      ) {
               <td className={styles.TableCell}>
                 <Button
                   onClick={() => removeFilter(index)}
-                  title="Delete filter">
+                  title="Delete filter"
+                >
                   <ButtonIcon type="delete" />
                 </Button>
               </td>
@@ -378,11 +358,7 @@ export default function ComponentsSettings(_      ) {
   );
 }
 
-                         
-                     
-                   
-   
-function ToggleIcon({isEnabled, isValid}                 ) {
+function ToggleIcon({isEnabled, isValid}) {
   let className;
   if (isValid) {
     className = isEnabled ? styles.ToggleOn : styles.ToggleOff;

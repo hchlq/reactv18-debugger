@@ -32,7 +32,7 @@ function initModules() {
   memo = React.memo;
 
   yieldedValues = [];
-  unstable_yieldValue = value => {
+  unstable_yieldValue = (value) => {
     yieldedValues.push(value);
   };
   clearYields = () => {
@@ -56,7 +56,7 @@ describe('ReactDOMServerIntegration', () => {
     resetModules();
   });
 
-  itRenders('a forwardedRef component and its children', async render => {
+  itRenders('a forwardedRef component and its children', async (render) => {
     const FunctionComponent = ({label, forwardedRef}) => (
       <div ref={forwardedRef}>{label}</div>
     );
@@ -74,7 +74,7 @@ describe('ReactDOMServerIntegration', () => {
     expect(div.textContent).toBe('Test');
   });
 
-  itRenders('a Profiler component and its children', async render => {
+  itRenders('a Profiler component and its children', async (render) => {
     const element = await render(
       <React.Profiler id="profiler" onRender={jest.fn()}>
         <div>Test</div>
@@ -100,13 +100,13 @@ describe('ReactDOMServerIntegration', () => {
       return <Text text={'Count: ' + count} />;
     }
 
-    itRenders('basic render', async render => {
+    itRenders('basic render', async (render) => {
       const MemoCounter = memo(Counter);
       const domNode = await render(<MemoCounter count={0} />);
       expect(domNode.textContent).toEqual('Count: 0');
     });
 
-    itRenders('composition with forwardRef', async render => {
+    itRenders('composition with forwardRef', async (render) => {
       const RefCounter = (props, ref) => <Counter count={ref.current} />;
       const MemoRefCounter = memo(forwardRef(RefCounter));
 
@@ -117,7 +117,7 @@ describe('ReactDOMServerIntegration', () => {
       expect(clearYields()).toEqual(['Count: 0']);
     });
 
-    itRenders('with comparator', async render => {
+    itRenders('with comparator', async (render) => {
       const MemoCounter = memo(Counter, (oldProps, newProps) => false);
       await render(<MemoCounter count={0} />);
       expect(clearYields()).toEqual(['Count: 0']);
@@ -125,7 +125,7 @@ describe('ReactDOMServerIntegration', () => {
 
     itRenders(
       'comparator functions are not invoked on the server',
-      async render => {
+      async (render) => {
         const MemoCounter = React.memo(Counter, (oldProps, newProps) => {
           unstable_yieldValue(
             `Old count: ${oldProps.count}, New count: ${newProps.count}`,

@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -16,23 +16,12 @@ import {createRegExp} from '../utils';
 import {TreeDispatcherContext, TreeStateContext} from './TreeContext';
 import {StoreContext} from '../context';
 
-                                     
-                                     
-
 import styles from './Element.css';
 
-              
-                 
-                
-                
-     
-  
-
-export default function ElementView({data, index, style}       ) {
+export default function ElementView({data, index, style}) {
   const store = useContext(StoreContext);
-  const {ownerFlatTree, ownerID, selectedElementID} = useContext(
-    TreeStateContext,
-  );
+  const {ownerFlatTree, ownerID, selectedElementID} =
+    useContext(TreeStateContext);
   const dispatch = useContext(TreeDispatcherContext);
 
   const element =
@@ -72,7 +61,7 @@ export default function ElementView({data, index, style}       ) {
     setIsHovered(false);
   };
 
-  const handleKeyDoubleClick = event => {
+  const handleKeyDoubleClick = (event) => {
     // Double clicks on key value are used for text selection (if the text has been truncated).
     // They should not enter the owners tree view.
     event.stopPropagation();
@@ -87,13 +76,7 @@ export default function ElementView({data, index, style}       ) {
     return null;
   }
 
-  const {
-    depth,
-    displayName,
-    hocDisplayNames,
-    key,
-    type,
-  } = ((element     )         );
+  const {depth, displayName, hocDisplayNames, key, type} = element;
 
   let className = styles.Element;
   if (isSelected) {
@@ -112,7 +95,8 @@ export default function ElementView({data, index, style}       ) {
       onMouseDown={handleMouseDown}
       onDoubleClick={handleDoubleClick}
       style={style}
-      data-depth={depth}>
+      data-depth={depth}
+    >
       {/* This wrapper is used by Tree for measurement purposes. */}
       <div
         className={styles.Wrapper}
@@ -120,18 +104,20 @@ export default function ElementView({data, index, style}       ) {
           // Left offset presents the appearance of a nested tree structure.
           // We must use padding rather than margin/left because of the selected background color.
           transform: `translateX(calc(${depth} * var(--indentation-size)))`,
-        }}>
+        }}
+      >
         {ownerID === null ? (
           <ExpandCollapseToggle element={element} store={store} />
         ) : null}
-        <DisplayName displayName={displayName} id={((id     )        )} />
+        <DisplayName displayName={displayName} id={id} />
         {key && (
           <Fragment>
             &nbsp;<span className={styles.KeyName}>key</span>="
             <span
               className={styles.KeyValue}
               title={key}
-              onDoubleClick={handleKeyDoubleClick}>
+              onDoubleClick={handleKeyDoubleClick}
+            >
               {key}
             </span>
             "
@@ -141,11 +127,9 @@ export default function ElementView({data, index, style}       ) {
           <Badge
             className={styles.Badge}
             hocDisplayNames={hocDisplayNames}
-            type={type}>
-            <DisplayName
-              displayName={hocDisplayNames[0]}
-              id={((id     )        )}
-            />
+            type={type}
+          >
+            <DisplayName displayName={hocDisplayNames[0]} id={id} />
           </Badge>
         ) : null}
       </div>
@@ -154,27 +138,22 @@ export default function ElementView({data, index, style}       ) {
 }
 
 // Prevent double clicks on toggle from drilling into the owner list.
-const swallowDoubleClick = event => {
+const swallowDoubleClick = (event) => {
   event.preventDefault();
   event.stopPropagation();
 };
 
-                                   
-                   
-               
-   
-
-function ExpandCollapseToggle({element, store}                           ) {
+function ExpandCollapseToggle({element, store}) {
   const {children, id, isCollapsed} = element;
 
-  const toggleCollapsed = event => {
+  const toggleCollapsed = (event) => {
     event.preventDefault();
     event.stopPropagation();
 
     store.toggleIsCollapsed(id, !isCollapsed);
   };
 
-  const stopPropagation = event => {
+  const stopPropagation = (event) => {
     // Prevent the row from selecting
     event.stopPropagation();
   };
@@ -188,18 +167,14 @@ function ExpandCollapseToggle({element, store}                           ) {
       className={styles.ExpandCollapseToggle}
       onMouseDown={stopPropagation}
       onClick={toggleCollapsed}
-      onDoubleClick={swallowDoubleClick}>
+      onDoubleClick={swallowDoubleClick}
+    >
       <ButtonIcon type={isCollapsed ? 'collapsed' : 'expanded'} />
     </div>
   );
 }
 
-                          
-                             
-             
-   
-
-function DisplayName({displayName, id}                  ) {
+function DisplayName({displayName, id}) {
   const {searchIndex, searchResults, searchText} = useContext(TreeStateContext);
   const isSearchResult = useMemo(() => {
     return searchResults.includes(id);
@@ -227,7 +202,8 @@ function DisplayName({displayName, id}                  ) {
   children.push(
     <mark
       key="middle"
-      className={isCurrentResult ? styles.CurrentHighlight : styles.Highlight}>
+      className={isCurrentResult ? styles.CurrentHighlight : styles.Highlight}
+    >
       {displayName.slice(startIndex, stopIndex)}
     </mark>,
   );

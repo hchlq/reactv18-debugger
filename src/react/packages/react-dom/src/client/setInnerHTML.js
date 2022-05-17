@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import {Namespaces} from '../shared/DOMNamespaces';
@@ -21,10 +21,7 @@ let reusableSVGContainer;
  * @param {string} html
  * @internal
  */
-const setInnerHTML = createMicrosoftUnsafeLocalFunction(function(
-  node         ,
-  html                                             ,
-)       {
+const setInnerHTML = createMicrosoftUnsafeLocalFunction(function (node, html) {
   if (node.namespaceURI === Namespaces.svg) {
     if (__DEV__) {
       if (enableTrustedTypesIntegration) {
@@ -60,7 +57,7 @@ const setInnerHTML = createMicrosoftUnsafeLocalFunction(function(
       return;
     }
   }
-  node.innerHTML = (html     );
+  node.innerHTML = html;
 });
 
 export default setInnerHTML;

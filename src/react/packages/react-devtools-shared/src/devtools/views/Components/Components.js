@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -32,34 +32,11 @@ import {NativeStyleContextController} from './NativeStyleEditor/context';
 
 import styles from './Components.css';
 
-                                             
+function Components(_) {
+  const wrapperElementRef = useRef(null);
+  const resizeElementRef = useRef(null);
 
-                       
-                          
-                            
-                                      
-                                     
-
-                      
-                         
-               
-   
-
-                     
-                               
-                      
-                             
-   
-
-function Components(_      ) {
-  const wrapperElementRef = useRef                    (null);
-  const resizeElementRef = useRef                    (null);
-
-  const [state, dispatch] = useReducer                                (
-    resizeReducer,
-    null,
-    initResizeState,
-  );
+  const [state, dispatch] = useReducer(resizeReducer, null, initResizeState);
 
   const {horizontalPercentage, verticalPercentage} = state;
 
@@ -99,7 +76,7 @@ function Components(_      ) {
     onResizeEnd = () =>
       dispatch({type: 'ACTION_SET_IS_RESIZING', payload: false});
 
-    onResize = event => {
+    onResize = (event) => {
       const resizeElement = resizeElementRef.current;
       const wrapperElement = wrapperElementRef.current;
 
@@ -157,7 +134,8 @@ function Components(_      ) {
             className={styles.Components}
             onMouseMove={onResize}
             onMouseLeave={onResizeEnd}
-            onMouseUp={onResizeEnd}>
+            onMouseUp={onResizeEnd}
+          >
             <Fragment>
               <div ref={resizeElementRef} className={styles.TreeWrapper}>
                 <Tree />
@@ -190,7 +168,7 @@ const LOCAL_STORAGE_KEY = 'React::DevTools::createResizeReducer';
 const VERTICAL_MODE_MAX_WIDTH = 600;
 const MINIMUM_SIZE = 50;
 
-function initResizeState()              {
+function initResizeState() {
   let horizontalPercentage = 0.65;
   let verticalPercentage = 0.5;
 
@@ -210,7 +188,7 @@ function initResizeState()              {
   };
 }
 
-function resizeReducer(state             , action              )              {
+function resizeReducer(state, action) {
   switch (action.type) {
     case 'ACTION_SET_IS_RESIZING':
       return {
@@ -232,9 +210,7 @@ function resizeReducer(state             , action              )              {
   }
 }
 
-function getOrientation(
-  wrapperElement                    ,
-)                     {
+function getOrientation(wrapperElement) {
   if (wrapperElement != null) {
     const {width} = wrapperElement.getBoundingClientRect();
     return width > VERTICAL_MODE_MAX_WIDTH ? 'horizontal' : 'vertical';
@@ -242,11 +218,7 @@ function getOrientation(
   return null;
 }
 
-function setResizeCSSVariable(
-  resizeElement                    ,
-  orientation                    ,
-  percentage        ,
-)       {
+function setResizeCSSVariable(resizeElement, orientation, percentage) {
   if (resizeElement !== null && orientation !== null) {
     resizeElement.style.setProperty(
       `--${orientation}-resize-percentage`,

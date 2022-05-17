@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 describe('Store', () => {
@@ -849,7 +849,7 @@ describe('Store', () => {
     expect(store).toMatchSnapshot('1: mount');
   });
 
-  it('should show the right display names for special component types', async done => {
+  it('should show the right display names for special component types', async (done) => {
     async function fakeImport(result) {
       return {default: result};
     }
@@ -861,9 +861,8 @@ describe('Store', () => {
       <MyComponent2 />
     ));
     const MyComponent3 = (props, ref) => null;
-    const ForwardRefComponentWithCustomDisplayName = React.forwardRef(
-      MyComponent3,
-    );
+    const ForwardRefComponentWithCustomDisplayName =
+      React.forwardRef(MyComponent3);
     ForwardRefComponentWithCustomDisplayName.displayName = 'Custom';
     const MyComponent4 = (props, ref) => null;
     const MemoComponent = React.memo(MyComponent4);

@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -25,91 +25,42 @@ import {
 import {useLocalStorage} from '../hooks';
 import {BridgeContext} from '../context';
 
-                                              
-
-                                                       
-                                              
-
-                 
-                                 
-                                                 
-
-                                  
-                                                                                 
-                     
-
-                                
-                                                    
-
-                                
-                                                    
-
-               
-                               
-
-                               
-                                                   
-   
-
-const SettingsContext = createContext         (((null     )         ));
+const SettingsContext = createContext(null);
 SettingsContext.displayName = 'SettingsContext';
-
-                                           
-
-               
-                             
-                       
-                                      
-                                    
-   
 
 function SettingsContextController({
   browserTheme,
   children,
   componentsPortalContainer,
   profilerPortalContainer,
-}       ) {
+}) {
   const bridge = useContext(BridgeContext);
 
-  const [displayDensity, setDisplayDensity] = useLocalStorage                (
+  const [displayDensity, setDisplayDensity] = useLocalStorage(
     'React::DevTools::displayDensity',
     'compact',
   );
-  const [theme, setTheme] = useLocalStorage       (
-    'React::DevTools::theme',
-    'auto',
+  const [theme, setTheme] = useLocalStorage('React::DevTools::theme', 'auto');
+  const [appendComponentStack, setAppendComponentStack] = useLocalStorage(
+    LOCAL_STORAGE_SHOULD_PATCH_CONSOLE_KEY,
+    true,
   );
-  const [
-    appendComponentStack,
-    setAppendComponentStack,
-  ] = useLocalStorage         (LOCAL_STORAGE_SHOULD_PATCH_CONSOLE_KEY, true);
-  const [
-    breakOnConsoleErrors,
-    setBreakOnConsoleErrors,
-  ] = useLocalStorage         (
+  const [breakOnConsoleErrors, setBreakOnConsoleErrors] = useLocalStorage(
     LOCAL_STORAGE_SHOULD_BREAK_ON_CONSOLE_ERRORS,
     false,
   );
-  const [
-    traceUpdatesEnabled,
-    setTraceUpdatesEnabled,
-  ] = useLocalStorage         (LOCAL_STORAGE_TRACE_UPDATES_ENABLED_KEY, false);
+  const [traceUpdatesEnabled, setTraceUpdatesEnabled] = useLocalStorage(
+    LOCAL_STORAGE_TRACE_UPDATES_ENABLED_KEY,
+    false,
+  );
 
-  const documentElements = useMemo                  (() => {
-    const array                     = [
-      ((document.documentElement     )             ),
-    ];
+  const documentElements = useMemo(() => {
+    const array = [document.documentElement];
     if (componentsPortalContainer != null) {
-      array.push(
-        ((componentsPortalContainer.ownerDocument
-          .documentElement     )             ),
-      );
+      array.push(componentsPortalContainer.ownerDocument.documentElement);
     }
     if (profilerPortalContainer != null) {
-      array.push(
-        ((profilerPortalContainer.ownerDocument
-          .documentElement     )             ),
-      );
+      array.push(profilerPortalContainer.ownerDocument.documentElement);
     }
     return array;
   }, [componentsPortalContainer, profilerPortalContainer]);
@@ -192,21 +143,13 @@ function SettingsContextController({
   );
 }
 
-function setStyleVariable(
-  name        ,
-  value        ,
-  documentElements                  ,
-) {
-  documentElements.forEach(documentElement =>
+function setStyleVariable(name, value, documentElements) {
+  documentElements.forEach((documentElement) =>
     documentElement.style.setProperty(name, value),
   );
 }
 
-function updateStyleHelper(
-  themeKey        ,
-  style        ,
-  documentElements                  ,
-) {
+function updateStyleHelper(themeKey, style, documentElements) {
   setStyleVariable(
     `--${style}`,
     `var(--${themeKey}-${style})`,
@@ -214,10 +157,7 @@ function updateStyleHelper(
   );
 }
 
-export function updateDisplayDensity(
-  displayDensity                ,
-  documentElements                  ,
-)       {
+export function updateDisplayDensity(displayDensity, documentElements) {
   updateStyleHelper(
     displayDensity,
     'font-size-monospace-normal',
@@ -240,18 +180,15 @@ export function updateDisplayDensity(
 
   // Sizes and paddings/margins are all rem-based,
   // so update the root font-size as well when the display preference changes.
-  const computedStyle = getComputedStyle((document.body     ));
+  const computedStyle = getComputedStyle(document.body);
   const fontSize = computedStyle.getPropertyValue(
     `--${displayDensity}-root-font-size`,
   );
-  const root = ((document.querySelector(':root')     )             );
+  const root = document.querySelector(':root');
   root.style.fontSize = fontSize;
 }
 
-export function updateThemeVariables(
-  theme       ,
-  documentElements                  ,
-)       {
+export function updateThemeVariables(theme, documentElements) {
   updateStyleHelper(theme, 'color-attribute-name', documentElements);
   updateStyleHelper(
     theme,
@@ -379,7 +316,7 @@ export function updateThemeVariables(
   // this CSS property is currently only supported in Firefox,
   // but it makes a significant UI improvement in dark mode.
   // https://developer.mozilla.org/en-US/docs/Web/CSS/scrollbar-color
-  documentElements.forEach(documentElement => {
+  documentElements.forEach((documentElement) => {
     // $FlowFixMe scrollbarColor is missing in CSSStyleDeclaration
     documentElement.style.scrollbarColor = `var(${`--${theme}-color-scroll-thumb`}) var(${`--${theme}-color-scroll-track`})`;
   });

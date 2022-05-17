@@ -51,14 +51,14 @@ describe('ReactCache', () => {
                       );
                       status = 'rejected';
                       value = new Error('Failed to load: ' + text);
-                      listeners.forEach(listener => listener.reject(value));
+                      listeners.forEach((listener) => listener.reject(value));
                     } else {
                       Scheduler.unstable_yieldValue(
                         `Promise resolved [${text}]`,
                       );
                       status = 'resolved';
                       value = text;
-                      listeners.forEach(listener => listener.resolve(value));
+                      listeners.forEach((listener) => listener.resolve(value));
                     }
                   }, ms);
                 } else {
@@ -311,8 +311,8 @@ describe('ReactCache', () => {
             } else {
               if (listeners === null) {
                 listeners = [resolve];
-                resolveThenable = v => {
-                  listeners.forEach(listener => listener(v));
+                resolveThenable = (v) => {
+                  listeners.forEach((listener) => listener(v));
                 };
               } else {
                 listeners.push(resolve);

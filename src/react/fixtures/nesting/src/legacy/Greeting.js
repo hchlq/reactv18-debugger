@@ -21,7 +21,7 @@ class AboutSection extends Component {
   render() {
     return (
       <ThemeContext.Consumer>
-        {theme => (
+        {(theme) => (
           <div style={{border: '1px dashed black', padding: 20}}>
             <h3>src/legacy/Greeting.js</h3>
             <h4 style={{color: theme}}>

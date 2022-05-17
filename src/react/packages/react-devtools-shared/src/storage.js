@@ -4,10 +4,10 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
-export function localStorageGetItem(key        )      {
+export function localStorageGetItem(key) {
   try {
     return localStorage.getItem(key);
   } catch (error) {
@@ -15,19 +15,19 @@ export function localStorageGetItem(key        )      {
   }
 }
 
-export function localStorageRemoveItem(key        )       {
+export function localStorageRemoveItem(key) {
   try {
     localStorage.removeItem(key);
   } catch (error) {}
 }
 
-export function localStorageSetItem(key        , value     )       {
+export function localStorageSetItem(key, value) {
   try {
     return localStorage.setItem(key, value);
   } catch (error) {}
 }
 
-export function sessionStorageGetItem(key        )      {
+export function sessionStorageGetItem(key) {
   try {
     return sessionStorage.getItem(key);
   } catch (error) {
@@ -35,13 +35,13 @@ export function sessionStorageGetItem(key        )      {
   }
 }
 
-export function sessionStorageRemoveItem(key        )       {
+export function sessionStorageRemoveItem(key) {
   try {
     sessionStorage.removeItem(key);
   } catch (error) {}
 }
 
-export function sessionStorageSetItem(key        , value     )       {
+export function sessionStorageSetItem(key, value) {
   try {
     return sessionStorage.setItem(key, value);
   } catch (error) {}

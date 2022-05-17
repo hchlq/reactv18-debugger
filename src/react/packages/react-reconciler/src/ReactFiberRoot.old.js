@@ -4,11 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                                                
-                                             
 
 import {noTimeout, supportsHydration} from './ReactFiberHostConfig';
 import {createHostRootFiber} from './ReactFiber.old';
@@ -81,12 +78,12 @@ function FiberRootNode(containerInfo, tag, hydrate) {
 }
 
 export function createFiberRoot(
-  containerInfo     ,
-  tag         ,
-  hydrate         ,
-  hydrationCallbacks                                   ,
-)            {
-  const root            = (new FiberRootNode(containerInfo, tag, hydrate)     );
+  containerInfo,
+  tag,
+  hydrate,
+  hydrationCallbacks,
+) {
+  const root = new FiberRootNode(containerInfo, tag, hydrate);
   if (enableSuspenseCallback) {
     root.hydrationCallbacks = hydrationCallbacks;
   }

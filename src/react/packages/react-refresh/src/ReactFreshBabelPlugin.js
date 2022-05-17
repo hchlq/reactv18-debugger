@@ -7,7 +7,7 @@
 
 'use strict';
 
-export default function(babel, opts = {}) {
+export default function (babel, opts = {}) {
   if (typeof babel.env === 'function') {
     // Only available in Babel 7.
     const env = babel.env();
@@ -242,10 +242,12 @@ export default function(babel, opts = {}) {
       return null;
     }
     return {
-      key: fnHookCalls.map(call => call.name + '{' + call.key + '}').join('\n'),
+      key: fnHookCalls
+        .map((call) => call.name + '{' + call.key + '}')
+        .join('\n'),
       customHooks: fnHookCalls
-        .filter(call => !isBuiltinHook(call.name))
-        .map(call => t.cloneDeep(call.callee)),
+        .filter((call) => !isBuiltinHook(call.name))
+        .map((call) => t.cloneDeep(call.callee)),
     };
   }
 
@@ -278,7 +280,7 @@ export default function(babel, opts = {}) {
 
     let forceReset = hasForceResetComment(scope.path);
     const customHooksInScope = [];
-    customHooks.forEach(callee => {
+    customHooks.forEach((callee) => {
       // Check if a corresponding binding exists where we emit the signature.
       let bindingName;
       switch (callee.type) {
@@ -536,7 +538,7 @@ export default function(babel, opts = {}) {
           // declarations too. So we need to search for a path where
           // we can insert a statement rather than hard coding it.
           let insertAfterPath = null;
-          path.find(p => {
+          path.find((p) => {
             if (p.parentPath.isBlock()) {
               insertAfterPath = p;
               return true;
@@ -601,7 +603,7 @@ export default function(babel, opts = {}) {
 
           if (path.parent.type === 'VariableDeclarator') {
             let insertAfterPath = null;
-            path.find(p => {
+            path.find((p) => {
               if (p.parentPath.isBlock()) {
                 insertAfterPath = p;
                 return true;

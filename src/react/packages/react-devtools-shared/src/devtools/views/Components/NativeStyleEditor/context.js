@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -24,46 +24,19 @@ import {
 } from 'react-devtools-shared/src/devtools/views/context';
 import {TreeStateContext} from '../TreeContext';
 
-                                                 
-                                                                     
-                                                                  
-                                                                                                                       
-                                                                      
-                                                                                       
-             
-           
-           
-                                                  
-
-                                                                              
-
-                 
-                                       
-   
-
-const NativeStyleContext = createContext         (((null     )         ));
+const NativeStyleContext = createContext(null);
 NativeStyleContext.displayName = 'NativeStyleContext';
 
-                                                                  
-                           
-                                            
-                       
-   
-
-const inProgressRequests                                      = new WeakMap();
-const resource           
-          
-          
-                         
-  = createResource(
-  (element         ) => {
+const inProgressRequests = new WeakMap();
+const resource = createResource(
+  (element) => {
     const request = inProgressRequests.get(element);
     if (request != null) {
       return request.promise;
     }
 
-    let resolveFn = ((null     )           );
-    const promise = new Promise(resolve => {
+    let resolveFn = null;
+    const promise = new Promise((resolve) => {
       resolveFn = resolve;
     });
 
@@ -71,20 +44,16 @@ const resource
 
     return promise;
   },
-  (element         ) => element,
+  (element) => element,
   {useWeakMap: true},
 );
 
-               
-                       
-   
+function NativeStyleContextController({children}) {
+  const bridge = useContext(BridgeContext);
+  const store = useContext(StoreContext);
 
-function NativeStyleContextController({children}       ) {
-  const bridge = useContext                (BridgeContext);
-  const store = useContext       (StoreContext);
-
-  const getStyleAndLayout = useCallback                   (
-    (id        ) => {
+  const getStyleAndLayout = useCallback(
+    (id) => {
       const element = store.getElementByID(id);
       if (element !== null) {
         return resource.read(element);
@@ -98,19 +67,16 @@ function NativeStyleContextController({children}       ) {
   // It's very important that this context consumes selectedElementID and not NativeStyleID.
   // Otherwise the effect that sends the "inspect" message across the bridge-
   // would itself be blocked by the same render that suspends (waiting for the data).
-  const {selectedElementID} = useContext              (TreeStateContext);
+  const {selectedElementID} = useContext(TreeStateContext);
 
-  const [
-    currentStyleAndLayout,
-    setCurrentStyleAndLayout,
-  ] = useState                               (null);
+  const [currentStyleAndLayout, setCurrentStyleAndLayout] = useState(null);
 
   // This effect handler invalidates the suspense cache and schedules rendering updates with React.
   useEffect(() => {
-    const onStyleAndLayout = ({id, layout, style}                       ) => {
+    const onStyleAndLayout = ({id, layout, style}) => {
       const element = store.getElementByID(id);
       if (element !== null) {
-        const styleAndLayout                         = {
+        const styleAndLayout = {
           layout,
           style,
         };
@@ -148,7 +114,7 @@ function NativeStyleContextController({children}       ) {
 
     const rendererID = store.getRendererIDForElement(selectedElementID);
 
-    let timeoutID                   = null;
+    let timeoutID = null;
 
     const sendRequest = () => {
       timeoutID = null;
@@ -165,7 +131,7 @@ function NativeStyleContextController({children}       ) {
     // We'll poll for an update in the response handler below.
     sendRequest();
 
-    const onStyleAndLayout = ({id}                       ) => {
+    const onStyleAndLayout = ({id}) => {
       // If this is the element we requested, wait a little bit and then ask for another update.
       if (id === selectedElementID) {
         if (timeoutID !== null) {

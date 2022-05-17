@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import {
@@ -22,29 +22,22 @@ import {
 } from 'shared/ReactFeatureFlags';
 import {isOpaqueHydratingObject} from './ReactDOMHostConfig';
 
-                                                        
-
 /**
  * Get the value for a property on a node. Only used in DEV for SSR validation.
  * The "expected" argument is used as a hint of what the expected value is.
  * Some properties have multiple equivalent values.
  */
-export function getValueForProperty(
-  node         ,
-  name        ,
-  expected       ,
-  propertyInfo              ,
-)        {
+export function getValueForProperty(node, name, expected, propertyInfo) {
   if (__DEV__) {
     if (propertyInfo.mustUseProperty) {
       const {propertyName} = propertyInfo;
-      return (node     )[propertyName];
+      return node[propertyName];
     } else {
       if (!disableJavaScriptURLs && propertyInfo.sanitizeURL) {
         // If we haven't fully disabled javascript: URLs, and if
         // the hydration is successful of a javascript: URL, we
         // still want to warn on the client.
-        sanitizeURL('' + (expected     ));
+        sanitizeURL('' + expected);
       }
 
       const attributeName = propertyInfo.attributeName;
@@ -60,7 +53,7 @@ export function getValueForProperty(
           if (shouldRemoveAttribute(name, expected, propertyInfo, false)) {
             return value;
           }
-          if (value === '' + (expected     )) {
+          if (value === '' + expected) {
             return expected;
           }
           return value;
@@ -85,7 +78,7 @@ export function getValueForProperty(
 
       if (shouldRemoveAttribute(name, expected, propertyInfo, false)) {
         return stringValue === null ? expected : stringValue;
-      } else if (stringValue === '' + (expected     )) {
+      } else if (stringValue === '' + expected) {
         return expected;
       } else {
         return stringValue;
@@ -99,11 +92,7 @@ export function getValueForProperty(
  * The third argument is used as a hint of what the expected value is. Some
  * attributes have multiple equivalent values.
  */
-export function getValueForAttribute(
-  node         ,
-  name        ,
-  expected       ,
-)        {
+export function getValueForAttribute(node, name, expected) {
   if (__DEV__) {
     if (!isAttributeNameSafe(name)) {
       return;
@@ -119,7 +108,7 @@ export function getValueForAttribute(
       return expected === undefined ? undefined : null;
     }
     const value = node.getAttribute(name);
-    if (value === '' + (expected     )) {
+    if (value === '' + expected) {
       return expected;
     }
     return value;
@@ -133,12 +122,7 @@ export function getValueForAttribute(
  * @param {string} name
  * @param {*} value
  */
-export function setValueForProperty(
-  node         ,
-  name        ,
-  value       ,
-  isCustomComponentTag         ,
-) {
+export function setValueForProperty(node, name, value, isCustomComponentTag) {
   const propertyInfo = getPropertyInfo(name);
   if (shouldIgnoreAttribute(name, propertyInfo, isCustomComponentTag)) {
     return;
@@ -155,7 +139,7 @@ export function setValueForProperty(
       } else {
         node.setAttribute(
           attributeName,
-          enableTrustedTypesIntegration ? (value     ) : '' + (value     ),
+          enableTrustedTypesIntegration ? value : '' + value,
         );
       }
     }
@@ -166,11 +150,11 @@ export function setValueForProperty(
     const {propertyName} = propertyInfo;
     if (value === null) {
       const {type} = propertyInfo;
-      (node     )[propertyName] = type === BOOLEAN ? false : '';
+      node[propertyName] = type === BOOLEAN ? false : '';
     } else {
       // Contrary to `setAttribute`, object properties are properly
       // `toString`ed by IE8/9.
-      (node     )[propertyName] = value;
+      node[propertyName] = value;
     }
     return;
   }
@@ -189,9 +173,9 @@ export function setValueForProperty(
       // `setAttribute` with objects becomes only `[object]` in IE8/9,
       // ('' + value) makes it output the correct toString()-value.
       if (enableTrustedTypesIntegration) {
-        attributeValue = (value     );
+        attributeValue = value;
       } else {
-        attributeValue = '' + (value     );
+        attributeValue = '' + value;
       }
       if (propertyInfo.sanitizeURL) {
         sanitizeURL(attributeValue.toString());

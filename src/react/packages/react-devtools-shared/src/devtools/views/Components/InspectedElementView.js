@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import {copy} from 'clipboard-js';
@@ -29,41 +29,16 @@ import {useHighlightNativeElement} from '../hooks';
 
 import styles from './InspectedElementView.css';
 
-                                                       
-             
-                           
-                          
-                
-                                   
-                                                              
-                                                                 
-
-                                                              
-                                                                 
-
-               
-                                                     
-                   
-                                                   
-                                     
-                               
-   
-
 export default function InspectedElementView({
   copyInspectedElementPath,
   element,
   getInspectedElementPath,
   inspectedElement,
   storeAsGlobal,
-}       ) {
+}) {
   const {id} = element;
-  const {
-    owners,
-    rendererPackageName,
-    rendererVersion,
-    rootType,
-    source,
-  } = inspectedElement;
+  const {owners, rendererPackageName, rendererVersion, rootType, source} =
+    inspectedElement;
 
   const bridge = useContext(BridgeContext);
   const store = useContext(StoreContext);
@@ -71,7 +46,7 @@ export default function InspectedElementView({
   const {
     isEnabledForInspectedElement: isContextMenuEnabledForInspectedElement,
     viewAttributeSourceFunction,
-  } = useContext                        (ContextMenuContext);
+  } = useContext(ContextMenuContext);
 
   const rendererLabel =
     rendererPackageName !== null && rendererVersion !== null
@@ -126,7 +101,7 @@ export default function InspectedElementView({
           <div className={styles.Owners}>
             <div className={styles.OwnersHeader}>rendered by</div>
             {showOwnersList &&
-              ((owners     )              ).map(owner => (
+              owners.map((owner) => (
                 <OwnerView
                   key={owner.id}
                   displayName={owner.displayName || 'Anonymous'}
@@ -152,17 +127,19 @@ export default function InspectedElementView({
 
       {isContextMenuEnabledForInspectedElement && (
         <ContextMenu id="InspectedElement">
-          {data => (
+          {(data) => (
             <Fragment>
               <ContextMenuItem
                 onClick={() => copyInspectedElementPath(id, data.path)}
-                title="Copy value to clipboard">
+                title="Copy value to clipboard"
+              >
                 <Icon className={styles.ContextMenuIcon} type="copy" /> Copy
                 value to clipboard
               </ContextMenuItem>
               <ContextMenuItem
                 onClick={() => storeAsGlobal(id, data.path)}
-                title="Store as global variable">
+                title="Store as global variable"
+              >
                 <Icon
                   className={styles.ContextMenuIcon}
                   type="store-as-global-variable"
@@ -173,7 +150,8 @@ export default function InspectedElementView({
                 data.type === 'function' && (
                   <ContextMenuItem
                     onClick={() => viewAttributeSourceFunction(id, data.path)}
-                    title="Go to definition">
+                    title="Go to definition"
+                  >
                     <Icon className={styles.ContextMenuIcon} type="code" /> Go
                     to definition
                   </ContextMenuItem>
@@ -187,7 +165,7 @@ export default function InspectedElementView({
 }
 
 // This function is based on describeComponentFrame() in packages/shared/ReactComponentStackFrame
-function formatSourceForDisplay(fileName        , lineNumber        ) {
+function formatSourceForDisplay(fileName, lineNumber) {
   const BEFORE_SLASH_RE = /^(.*)[\\\/]/;
 
   let nameOnly = fileName.replace(BEFORE_SLASH_RE, '');
@@ -208,12 +186,7 @@ function formatSourceForDisplay(fileName        , lineNumber        ) {
   return `${nameOnly}:${lineNumber}`;
 }
 
-                     
-                   
-                     
-   
-
-function Source({fileName, lineNumber}             ) {
+function Source({fileName, lineNumber}) {
   const handleCopy = () => copy(`${fileName}:${lineNumber}`);
   return (
     <div className={styles.Source}>
@@ -230,26 +203,10 @@ function Source({fileName, lineNumber}             ) {
   );
 }
 
-                        
-                      
-                                        
-             
-                     
-                    
-   
-
-function OwnerView({
-  displayName,
-  hocDisplayNames,
-  id,
-  isInStore,
-  type,
-}                ) {
+function OwnerView({displayName, hocDisplayNames, id, isInStore, type}) {
   const dispatch = useContext(TreeDispatcherContext);
-  const {
-    highlightNativeElement,
-    clearHighlightNativeElement,
-  } = useHighlightNativeElement();
+  const {highlightNativeElement, clearHighlightNativeElement} =
+    useHighlightNativeElement();
 
   const handleClick = useCallback(
     () =>
@@ -271,11 +228,13 @@ function OwnerView({
       disabled={!isInStore}
       onClick={handleClick}
       onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}>
+      onMouseLeave={onMouseLeave}
+    >
       <span className={styles.OwnerContent}>
         <span
           className={`${styles.Owner} ${isInStore ? '' : styles.NotInStore}`}
-          title={displayName}>
+          title={displayName}
+        >
           {displayName}
         </span>
         <Badge hocDisplayNames={hocDisplayNames} type={type} />

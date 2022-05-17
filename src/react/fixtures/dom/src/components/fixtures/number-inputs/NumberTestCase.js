@@ -4,7 +4,7 @@ const React = window.React;
 
 class NumberTestCase extends React.Component {
   state = {value: ''};
-  onChange = event => {
+  onChange = (event) => {
     const parsed = parseFloat(event.target.value, 10);
     const value = isNaN(parsed) ? '' : parsed;
 

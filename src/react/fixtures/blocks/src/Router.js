@@ -58,7 +58,7 @@ function Router() {
   }, [isPending]);
 
   const navigate = useCallback(
-    url => {
+    (url) => {
       startTransition(() => {
         // TODO: Here, There, and Everywhere.
         // TODO: Instant Transitions, somehow.

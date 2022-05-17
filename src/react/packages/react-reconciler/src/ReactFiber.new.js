@@ -4,23 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                          
-             
-                
-              
-                            
-             
-                           
-                                                
-                                             
-                                             
-                                                  
-                                            
-                                                             
-                                                                   
 
 import invariant from 'shared/invariant';
 import {
@@ -93,8 +78,6 @@ import {
   REACT_LEGACY_HIDDEN_TYPE,
 } from 'shared/ReactSymbols';
 
-                    
-
 let hasBadMapPolyfill;
 
 if (__DEV__) {
@@ -113,12 +96,7 @@ if (__DEV__) {
 
 let debugCounter = 1;
 
-function FiberNode(
-  tag         ,
-  pendingProps       ,
-  key               ,
-  mode            ,
-) {
+function FiberNode(tag, pendingProps, key, mode) {
   // Instance
   this.tag = tag;
   this.key = key;
@@ -205,22 +183,17 @@ function FiberNode(
 //    is faster.
 // 5) It should be easy to port this to a C struct and keep a C implementation
 //    compatible.
-const createFiber = function(
-  tag         ,
-  pendingProps       ,
-  key               ,
-  mode            ,
-)        {
+const createFiber = function (tag, pendingProps, key, mode) {
   // $FlowFixMe: the shapes are exact here but Flow doesn't like constructors
   return new FiberNode(tag, pendingProps, key, mode);
 };
 
-function shouldConstruct(Component          ) {
+function shouldConstruct(Component) {
   const prototype = Component.prototype;
   return !!(prototype && prototype.isReactComponent);
 }
 
-export function isSimpleFunctionComponent(type     ) {
+export function isSimpleFunctionComponent(type) {
   return (
     typeof type === 'function' &&
     !shouldConstruct(type) &&
@@ -228,7 +201,7 @@ export function isSimpleFunctionComponent(type     ) {
   );
 }
 
-export function resolveLazyComponentTag(Component          )          {
+export function resolveLazyComponentTag(Component) {
   if (typeof Component === 'function') {
     return shouldConstruct(Component) ? ClassComponent : FunctionComponent;
   } else if (Component !== undefined && Component !== null) {
@@ -249,7 +222,7 @@ export function resolveLazyComponentTag(Component          )          {
 }
 
 // This is used to create an alternate fiber to do work on.
-export function createWorkInProgress(current       , pendingProps     )        {
+export function createWorkInProgress(current, pendingProps) {
   let workInProgress = current.alternate;
   if (workInProgress === null) {
     // We use a double buffering pooling technique because we know that we'll
@@ -351,7 +324,7 @@ export function createWorkInProgress(current       , pendingProps     )        {
 }
 
 // Used to reuse a Fiber for a second pass.
-export function resetWorkInProgress(workInProgress       , renderLanes       ) {
+export function resetWorkInProgress(workInProgress, renderLanes) {
   // This resets the Fiber to what createFiber or createWorkInProgress would
   // have set the values to before during the first pass. Ideally this wouldn't
   // be necessary but unfortunately many code paths reads from the workInProgress
@@ -422,7 +395,7 @@ export function resetWorkInProgress(workInProgress       , renderLanes       ) {
   return workInProgress;
 }
 
-export function createHostRootFiber(tag         )        {
+export function createHostRootFiber(tag) {
   let mode;
   if (tag === ConcurrentRoot) {
     mode = ConcurrentMode | BlockingMode | StrictMode;
@@ -443,13 +416,13 @@ export function createHostRootFiber(tag         )        {
 }
 
 export function createFiberFromTypeAndProps(
-  type     , // React$ElementType
-  key               ,
-  pendingProps     ,
-  owner              ,
-  mode            ,
-  lanes       ,
-)        {
+  type, // React$ElementType
+  key,
+  pendingProps,
+  owner,
+  mode,
+  lanes,
+) {
   let fiberTag = IndeterminateComponent;
   // The resolved type is set if we know what the final type will be. I.e. it's not lazy.
   let resolvedType = type;
@@ -574,11 +547,7 @@ export function createFiberFromTypeAndProps(
   return fiber;
 }
 
-export function createFiberFromElement(
-  element              ,
-  mode            ,
-  lanes       ,
-)        {
+export function createFiberFromElement(element, mode, lanes) {
   let owner = null;
   if (__DEV__) {
     owner = element._owner;
@@ -601,24 +570,19 @@ export function createFiberFromElement(
   return fiber;
 }
 
-export function createFiberFromFragment(
-  elements               ,
-  mode            ,
-  lanes       ,
-  key               ,
-)        {
+export function createFiberFromFragment(elements, mode, lanes, key) {
   const fiber = createFiber(Fragment, elements, key, mode);
   fiber.lanes = lanes;
   return fiber;
 }
 
 export function createFiberFromFundamental(
-  fundamentalComponent                                     ,
-  pendingProps     ,
-  mode            ,
-  lanes       ,
-  key               ,
-)        {
+  fundamentalComponent,
+  pendingProps,
+  mode,
+  lanes,
+  key,
+) {
   const fiber = createFiber(FundamentalComponent, pendingProps, key, mode);
   fiber.elementType = fundamentalComponent;
   fiber.type = fundamentalComponent;
@@ -626,13 +590,7 @@ export function createFiberFromFundamental(
   return fiber;
 }
 
-function createFiberFromScope(
-  scope            ,
-  pendingProps     ,
-  mode            ,
-  lanes       ,
-  key               ,
-) {
+function createFiberFromScope(scope, pendingProps, mode, lanes, key) {
   const fiber = createFiber(ScopeComponent, pendingProps, key, mode);
   fiber.type = scope;
   fiber.elementType = scope;
@@ -640,12 +598,7 @@ function createFiberFromScope(
   return fiber;
 }
 
-function createFiberFromProfiler(
-  pendingProps     ,
-  mode            ,
-  lanes       ,
-  key               ,
-)        {
+function createFiberFromProfiler(pendingProps, mode, lanes, key) {
   if (__DEV__) {
     if (typeof pendingProps.id !== 'string') {
       console.error('Profiler must specify an "id" as a prop');
@@ -668,12 +621,7 @@ function createFiberFromProfiler(
   return fiber;
 }
 
-export function createFiberFromSuspense(
-  pendingProps     ,
-  mode            ,
-  lanes       ,
-  key               ,
-) {
+export function createFiberFromSuspense(pendingProps, mode, lanes, key) {
   const fiber = createFiber(SuspenseComponent, pendingProps, key, mode);
 
   // TODO: The SuspenseComponent fiber shouldn't have a type. It has a tag.
@@ -686,12 +634,7 @@ export function createFiberFromSuspense(
   return fiber;
 }
 
-export function createFiberFromSuspenseList(
-  pendingProps     ,
-  mode            ,
-  lanes       ,
-  key               ,
-) {
+export function createFiberFromSuspenseList(pendingProps, mode, lanes, key) {
   const fiber = createFiber(SuspenseListComponent, pendingProps, key, mode);
   if (__DEV__) {
     // TODO: The SuspenseListComponent fiber shouldn't have a type. It has a tag.
@@ -704,12 +647,7 @@ export function createFiberFromSuspenseList(
   return fiber;
 }
 
-export function createFiberFromOffscreen(
-  pendingProps                ,
-  mode            ,
-  lanes       ,
-  key               ,
-) {
+export function createFiberFromOffscreen(pendingProps, mode, lanes, key) {
   const fiber = createFiber(OffscreenComponent, pendingProps, key, mode);
   // TODO: The OffscreenComponent fiber shouldn't have a type. It has a tag.
   // This needs to be fixed in getComponentName so that it relies on the tag
@@ -722,12 +660,7 @@ export function createFiberFromOffscreen(
   return fiber;
 }
 
-export function createFiberFromLegacyHidden(
-  pendingProps                ,
-  mode            ,
-  lanes       ,
-  key               ,
-) {
+export function createFiberFromLegacyHidden(pendingProps, mode, lanes, key) {
   const fiber = createFiber(LegacyHiddenComponent, pendingProps, key, mode);
   // TODO: The LegacyHidden fiber shouldn't have a type. It has a tag.
   // This needs to be fixed in getComponentName so that it relies on the tag
@@ -740,17 +673,13 @@ export function createFiberFromLegacyHidden(
   return fiber;
 }
 
-export function createFiberFromText(
-  content        ,
-  mode            ,
-  lanes       ,
-)        {
+export function createFiberFromText(content, mode, lanes) {
   const fiber = createFiber(HostText, content, null, mode);
   fiber.lanes = lanes;
   return fiber;
 }
 
-export function createFiberFromHostInstanceForDeletion()        {
+export function createFiberFromHostInstanceForDeletion() {
   const fiber = createFiber(HostComponent, null, null, NoMode);
   // TODO: These should not need a type.
   fiber.elementType = 'DELETED';
@@ -758,19 +687,13 @@ export function createFiberFromHostInstanceForDeletion()        {
   return fiber;
 }
 
-export function createFiberFromDehydratedFragment(
-  dehydratedNode                  ,
-)        {
+export function createFiberFromDehydratedFragment(dehydratedNode) {
   const fiber = createFiber(DehydratedFragment, null, null, NoMode);
   fiber.stateNode = dehydratedNode;
   return fiber;
 }
 
-export function createFiberFromPortal(
-  portal             ,
-  mode            ,
-  lanes       ,
-)        {
+export function createFiberFromPortal(portal, mode, lanes) {
   const pendingProps = portal.children !== null ? portal.children : [];
   const fiber = createFiber(HostPortal, pendingProps, portal.key, mode);
   fiber.lanes = lanes;
@@ -783,10 +706,7 @@ export function createFiberFromPortal(
 }
 
 // Used for stashing WIP properties to replay failed work in DEV.
-export function assignFiberPropertiesInDEV(
-  target              ,
-  source       ,
-)        {
+export function assignFiberPropertiesInDEV(target, source) {
   if (target === null) {
     // This Fiber's initial properties will always be overwritten.
     // We only use a Fiber to ensure the same hidden class so DEV isn't slow.

@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -15,16 +15,7 @@ import {getGradientColor} from './utils';
 import ChartNode from './ChartNode';
 import {SettingsContext} from '../Settings/SettingsContext';
 
-                                             
-
-              
-                 
-                
-                
-     
-  
-
-function CommitRankedListItem({data, index, style}       ) {
+function CommitRankedListItem({data, index, style}) {
   const {
     chartData,
     onElementMouseEnter,
@@ -40,7 +31,7 @@ function CommitRankedListItem({data, index, style}       ) {
   const {lineHeight} = useContext(SettingsContext);
 
   const handleClick = useCallback(
-    event => {
+    (event) => {
       event.stopPropagation();
       const {id, name} = node;
       selectFiber(id, name);
@@ -80,4 +71,4 @@ function CommitRankedListItem({data, index, style}       ) {
   );
 }
 
-export default memo       (CommitRankedListItem, areEqual);
+export default memo(CommitRankedListItem, areEqual);

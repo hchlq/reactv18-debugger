@@ -98,7 +98,7 @@ describe('ReactDOMFiber', () => {
 
     let instance = null;
     ReactDOM.render(
-      <Text value="foo" ref={ref => (instance = ref)} />,
+      <Text value="foo" ref={(ref) => (instance = ref)} />,
       container,
     );
 
@@ -116,7 +116,7 @@ describe('ReactDOMFiber', () => {
     }
 
     let instance = null;
-    ReactDOM.render(<Fragment ref={ref => (instance = ref)} />, container);
+    ReactDOM.render(<Fragment ref={(ref) => (instance = ref)} />, container);
 
     expect(container.childNodes.length).toBe(2);
 
@@ -144,7 +144,7 @@ describe('ReactDOMFiber', () => {
     }
 
     let instance = null;
-    ReactDOM.render(<Fragment ref={ref => (instance = ref)} />, container);
+    ReactDOM.render(<Fragment ref={(ref) => (instance = ref)} />, container);
 
     expect(container.childNodes.length).toBe(2);
 
@@ -167,7 +167,7 @@ describe('ReactDOMFiber', () => {
     }
 
     let instance = null;
-    ReactDOM.render(<Fragment ref={ref => (instance = ref)} />, container);
+    ReactDOM.render(<Fragment ref={(ref) => (instance = ref)} />, container);
 
     expect(container.childNodes.length).toBe(2);
 
@@ -202,28 +202,28 @@ describe('ReactDOMFiber', () => {
   });
 
   let svgEls, htmlEls, mathEls;
-  const expectSVG = {ref: el => svgEls.push(el)};
-  const expectHTML = {ref: el => htmlEls.push(el)};
-  const expectMath = {ref: el => mathEls.push(el)};
+  const expectSVG = {ref: (el) => svgEls.push(el)};
+  const expectHTML = {ref: (el) => htmlEls.push(el)};
+  const expectMath = {ref: (el) => mathEls.push(el)};
 
-  const usePortal = function(tree) {
+  const usePortal = function (tree) {
     return ReactDOM.createPortal(tree, document.createElement('div'));
   };
 
-  const assertNamespacesMatch = function(tree) {
+  const assertNamespacesMatch = function (tree) {
     const testContainer = document.createElement('div');
     svgEls = [];
     htmlEls = [];
     mathEls = [];
 
     ReactDOM.render(tree, testContainer);
-    svgEls.forEach(el => {
+    svgEls.forEach((el) => {
       expect(el.namespaceURI).toBe('http://www.w3.org/2000/svg');
     });
-    htmlEls.forEach(el => {
+    htmlEls.forEach((el) => {
       expect(el.namespaceURI).toBe('http://www.w3.org/1999/xhtml');
     });
-    mathEls.forEach(el => {
+    mathEls.forEach((el) => {
       expect(el.namespaceURI).toBe('http://www.w3.org/1998/Math/MathML');
     });
 
@@ -895,7 +895,8 @@ describe('ReactDOMFiber', () => {
           {ReactDOM.createPortal(
             <div
               onClick={() => ops.push('portal clicked')}
-              ref={n => (portal = n)}>
+              ref={(n) => (portal = n)}
+            >
               portal
             </div>,
             portalContainer,
@@ -949,19 +950,21 @@ describe('ReactDOMFiber', () => {
         <div>
           <div
             onMouseEnter={() => ops.push('enter parent')}
-            onMouseLeave={() => ops.push('leave parent')}>
-            <div ref={n => (firstTarget = n)} />
+            onMouseLeave={() => ops.push('leave parent')}
+          >
+            <div ref={(n) => (firstTarget = n)} />
             {ReactDOM.createPortal(
               <div
                 onMouseEnter={() => ops.push('enter portal')}
                 onMouseLeave={() => ops.push('leave portal')}
-                ref={n => (secondTarget = n)}>
+                ref={(n) => (secondTarget = n)}
+              >
                 portal
               </div>,
               portalContainer,
             )}
           </div>
-          <div ref={n => (thirdTarget = n)} />
+          <div ref={(n) => (thirdTarget = n)} />
         </div>,
         container,
       );
@@ -1017,7 +1020,7 @@ describe('ReactDOMFiber', () => {
 
     ReactDOM.render(
       <div
-        ref={n => (target = n)}
+        ref={(n) => (target = n)}
         onMouseEnter={() => ops.push('enter')}
         onMouseLeave={() => ops.push('leave')}
       />,
@@ -1139,7 +1142,7 @@ describe('ReactDOMFiber', () => {
     }
 
     let inst;
-    ReactDOM.render([<Example key="a" ref={n => (inst = n)} />], container);
+    ReactDOM.render([<Example key="a" ref={(n) => (inst = n)} />], container);
     const node = container.firstChild;
     expect(node.tagName).toEqual('DIV');
 
@@ -1242,9 +1245,7 @@ describe('ReactDOMFiber', () => {
     expect(container.innerHTML).toBe('<div>bar</div>');
     // then we mess with the DOM before an update
     container.innerHTML = '<div>MEOW.</div>';
-    expect(() =>
-      ReactDOM.render(<div>baz</div>, container),
-    ).toErrorDev(
+    expect(() => ReactDOM.render(<div>baz</div>, container)).toErrorDev(
       'render(...): ' +
         'It looks like the React-rendered content of this container was ' +
         'removed without using React. This is not supported and will ' +
@@ -1261,9 +1262,7 @@ describe('ReactDOMFiber', () => {
     expect(container.innerHTML).toBe('<div>bar</div>');
     // then we mess with the DOM before an update
     container.innerHTML = '';
-    expect(() =>
-      ReactDOM.render(<div>baz</div>, container),
-    ).toErrorDev(
+    expect(() => ReactDOM.render(<div>baz</div>, container)).toErrorDev(
       'render(...): ' +
         'It looks like the React-rendered content of this container was ' +
         'removed without using React. This is not supported and will ' +
@@ -1290,7 +1289,7 @@ describe('ReactDOMFiber', () => {
     let actualDocument;
     let textNode;
 
-    spyOnDevAndProd(iframeContainer, 'appendChild').and.callFake(node => {
+    spyOnDevAndProd(iframeContainer, 'appendChild').and.callFake((node) => {
       actualDocument = node.ownerDocument;
       textNode = node;
     });
@@ -1343,7 +1342,7 @@ describe('ReactDOMFiber', () => {
     }
 
     class Parent extends React.Component {
-      handleChange = val => {
+      handleChange = (val) => {
         didCallOnChange = true;
       };
       render() {

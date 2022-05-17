@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -33,7 +33,7 @@ const contextData = {
   undefined: undefined,
 };
 
-class LegacyContextProvider extends Component      {
+class LegacyContextProvider extends Component {
   static childContextTypes = {
     array: PropTypes.array,
     bool: PropTypes.bool,
@@ -55,7 +55,7 @@ class LegacyContextProvider extends Component      {
   }
 }
 
-class LegacyContextConsumer extends Component      {
+class LegacyContextConsumer extends Component {
   static contextTypes = {
     array: PropTypes.array,
     bool: PropTypes.bool,
@@ -92,7 +92,7 @@ NullContext.displayName = 'NullContext';
 const UndefinedContext = createContext(undefined);
 UndefinedContext.displayName = 'UndefinedContext';
 
-class ModernContextType extends Component      {
+class ModernContextType extends Component {
   static contextType = ModernContext;
 
   render() {
@@ -115,34 +115,38 @@ export default function Contexts() {
         </LegacyContextProvider>
         <ModernContext.Provider value={contextData}>
           <ModernContext.Consumer>
-            {value => formatContextForDisplay('ModernContext.Consumer', value)}
+            {(value) =>
+              formatContextForDisplay('ModernContext.Consumer', value)
+            }
           </ModernContext.Consumer>
           <ModernContextType />
         </ModernContext.Provider>
         <FunctionalContextConsumer />
         <ArrayContext.Consumer>
-          {value => formatContextForDisplay('ArrayContext.Consumer', value)}
+          {(value) => formatContextForDisplay('ArrayContext.Consumer', value)}
         </ArrayContext.Consumer>
         <BoolContext.Consumer>
-          {value => formatContextForDisplay('BoolContext.Consumer', value)}
+          {(value) => formatContextForDisplay('BoolContext.Consumer', value)}
         </BoolContext.Consumer>
         <FuncContext.Consumer>
-          {value => formatContextForDisplay('FuncContext.Consumer', value)}
+          {(value) => formatContextForDisplay('FuncContext.Consumer', value)}
         </FuncContext.Consumer>
         <NumberContext.Consumer>
-          {value => formatContextForDisplay('NumberContext.Consumer', value)}
+          {(value) => formatContextForDisplay('NumberContext.Consumer', value)}
         </NumberContext.Consumer>
         <StringContext.Consumer>
-          {value => formatContextForDisplay('StringContext.Consumer', value)}
+          {(value) => formatContextForDisplay('StringContext.Consumer', value)}
         </StringContext.Consumer>
         <SymbolContext.Consumer>
-          {value => formatContextForDisplay('SymbolContext.Consumer', value)}
+          {(value) => formatContextForDisplay('SymbolContext.Consumer', value)}
         </SymbolContext.Consumer>
         <NullContext.Consumer>
-          {value => formatContextForDisplay('NullContext.Consumer', value)}
+          {(value) => formatContextForDisplay('NullContext.Consumer', value)}
         </NullContext.Consumer>
         <UndefinedContext.Consumer>
-          {value => formatContextForDisplay('UndefinedContext.Consumer', value)}
+          {(value) =>
+            formatContextForDisplay('UndefinedContext.Consumer', value)
+          }
         </UndefinedContext.Consumer>
       </ul>
     </div>

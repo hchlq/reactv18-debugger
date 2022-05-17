@@ -4,10 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                
 
 import {
   enableProfilerTimer,
@@ -21,54 +19,42 @@ import * as Scheduler from 'scheduler';
 
 const {unstable_now: now} = Scheduler;
 
-                             
-                          
-                           
-                                         
-                                                 
-                                                               
-     
-  
+let commitTime = 0;
+let layoutEffectStartTime = -1;
+let profilerStartTime = -1;
+let passiveEffectStartTime = -1;
 
-let commitTime         = 0;
-let layoutEffectStartTime         = -1;
-let profilerStartTime         = -1;
-let passiveEffectStartTime         = -1;
-
-function getCommitTime()         {
+function getCommitTime() {
   return commitTime;
 }
 
-function recordCommitTime()       {
+function recordCommitTime() {
   if (!enableProfilerTimer) {
     return;
   }
   commitTime = now();
 }
 
-function startProfilerTimer(fiber       )       {
+function startProfilerTimer(fiber) {
   if (!enableProfilerTimer) {
     return;
   }
 
   profilerStartTime = now();
 
-  if (((fiber.actualStartTime     )        ) < 0) {
+  if (fiber.actualStartTime < 0) {
     fiber.actualStartTime = now();
   }
 }
 
-function stopProfilerTimerIfRunning(fiber       )       {
+function stopProfilerTimerIfRunning(fiber) {
   if (!enableProfilerTimer) {
     return;
   }
   profilerStartTime = -1;
 }
 
-function stopProfilerTimerIfRunningAndRecordDelta(
-  fiber       ,
-  overrideBaseTime         ,
-)       {
+function stopProfilerTimerIfRunningAndRecordDelta(fiber, overrideBaseTime) {
   if (!enableProfilerTimer) {
     return;
   }
@@ -83,7 +69,7 @@ function stopProfilerTimerIfRunningAndRecordDelta(
   }
 }
 
-function recordLayoutEffectDuration(fiber       )       {
+function recordLayoutEffectDuration(fiber) {
   if (!enableProfilerTimer || !enableProfilerCommitHooks) {
     return;
   }
@@ -106,7 +92,7 @@ function recordLayoutEffectDuration(fiber       )       {
   }
 }
 
-function recordPassiveEffectDuration(fiber       )       {
+function recordPassiveEffectDuration(fiber) {
   if (!enableProfilerTimer || !enableProfilerCommitHooks) {
     return;
   }
@@ -134,21 +120,21 @@ function recordPassiveEffectDuration(fiber       )       {
   }
 }
 
-function startLayoutEffectTimer()       {
+function startLayoutEffectTimer() {
   if (!enableProfilerTimer || !enableProfilerCommitHooks) {
     return;
   }
   layoutEffectStartTime = now();
 }
 
-function startPassiveEffectTimer()       {
+function startPassiveEffectTimer() {
   if (!enableProfilerTimer || !enableProfilerCommitHooks) {
     return;
   }
   passiveEffectStartTime = now();
 }
 
-function transferActualDuration(fiber       )       {
+function transferActualDuration(fiber) {
   // Transfer time spent rendering these children so we don't lose it
   // after we rerender. This is used as a helper in special cases
   // where we should count the work of multiple passes.

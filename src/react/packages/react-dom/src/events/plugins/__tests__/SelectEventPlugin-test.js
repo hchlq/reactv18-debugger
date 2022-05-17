@@ -31,7 +31,7 @@ describe('SelectEventPlugin', () => {
   // See https://github.com/facebook/react/pull/3639 for details.
   it('does not get confused when dependent events are registered independently', () => {
     const select = jest.fn();
-    const onSelect = event => {
+    const onSelect = (event) => {
       expect(typeof event).toBe('object');
       expect(event.type).toBe('select');
       expect(event.target).toBe(node);
@@ -40,7 +40,7 @@ describe('SelectEventPlugin', () => {
 
     // Pass `onMouseDown` so React registers a top-level listener.
     const node = ReactDOM.render(
-      <input type="text" onMouseDown={function() {}} />,
+      <input type="text" onMouseDown={function () {}} />,
       container,
     );
 
@@ -76,7 +76,7 @@ describe('SelectEventPlugin', () => {
 
   it('should fire `onSelect` when a listener is present', () => {
     const select = jest.fn();
-    const onSelect = event => {
+    const onSelect = (event) => {
       expect(typeof event).toBe('object');
       expect(event.type).toBe('select');
       expect(event.target).toBe(node);
@@ -110,7 +110,7 @@ describe('SelectEventPlugin', () => {
 
   it('should fire `onSelectCapture` when a listener is present', () => {
     const select = jest.fn();
-    const onSelectCapture = event => {
+    const onSelectCapture = (event) => {
       expect(typeof event).toBe('object');
       expect(event.type).toBe('select');
       expect(event.target).toBe(node);
@@ -145,7 +145,7 @@ describe('SelectEventPlugin', () => {
   // Regression test for https://github.com/facebook/react/issues/11379
   it('should not wait for `mouseup` after receiving `dragend`', () => {
     const select = jest.fn();
-    const onSelect = event => {
+    const onSelect = (event) => {
       expect(typeof event).toBe('object');
       expect(event.type).toBe('select');
       expect(event.target).toBe(node);
@@ -177,7 +177,7 @@ describe('SelectEventPlugin', () => {
     expect(select).toHaveBeenCalledTimes(1);
   });
 
-  it('should handle selectionchange events', function() {
+  it('should handle selectionchange events', function () {
     const onSelect = jest.fn();
     const node = ReactDOM.render(
       <input type="text" onSelect={onSelect} />,

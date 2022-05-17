@@ -8,7 +8,7 @@
 
 const invertObject = require('../invertObject');
 
-const objectValues = target => Object.keys(target).map(key => target[key]);
+const objectValues = (target) => Object.keys(target).map((key) => target[key]);
 
 describe('invertObject', () => {
   it('should return an empty object for an empty input', () => {

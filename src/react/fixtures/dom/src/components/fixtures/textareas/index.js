@@ -6,7 +6,7 @@ const React = window.React;
 
 export default class TextAreaFixtures extends React.Component {
   state = {value: ''};
-  onChange = event => {
+  onChange = (event) => {
     this.setState({value: event.target.value});
   };
   render() {
@@ -14,7 +14,8 @@ export default class TextAreaFixtures extends React.Component {
       <FixtureSet title="Textareas">
         <TestCase
           title="Kitchen Sink"
-          description="Verify that the controlled textarea displays its value under 'Controlled Output', and that both textareas can be typed in">
+          description="Verify that the controlled textarea displays its value under 'Controlled Output', and that both textareas can be typed in"
+        >
           <div>
             <form className="container">
               <fieldset>
@@ -44,7 +45,8 @@ export default class TextAreaFixtures extends React.Component {
         <TestCase
           title="Required Textareas"
           affectedBrowsers="Firefox"
-          relatedIssues="16402">
+          relatedIssues="16402"
+        >
           <TestCase.Steps>
             <li>View this test in Firefox</li>
           </TestCase.Steps>

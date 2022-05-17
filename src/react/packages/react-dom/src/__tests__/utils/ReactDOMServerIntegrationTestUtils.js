@@ -11,7 +11,7 @@
 
 const stream = require('stream');
 
-module.exports = function(initModules) {
+module.exports = function (initModules) {
   let ReactDOM;
   let ReactDOMServer;
   let ReactTestUtils;
@@ -47,7 +47,7 @@ module.exports = function(initModules) {
 
   // promisified version of ReactDOM.render()
   function asyncReactDOMRender(reactElement, domElement, forceHydrate) {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       if (forceHydrate) {
         ReactTestUtils.unstable_concurrentAct(() => {
           ReactDOM.hydrate(reactElement, domElement);
@@ -112,7 +112,7 @@ module.exports = function(initModules) {
   async function renderIntoString(reactElement, errorCount = 0) {
     return await expectErrors(
       () =>
-        new Promise(resolve =>
+        new Promise((resolve) =>
           resolve(ReactDOMServer.renderToString(reactElement)),
         ),
       errorCount,
@@ -147,7 +147,7 @@ module.exports = function(initModules) {
         new Promise((resolve, reject) => {
           const writable = new DrainWritable();
           const s = ReactDOMServer.renderToNodeStream(reactElement);
-          s.on('error', e => reject(e));
+          s.on('error', (e) => reject(e));
           s.pipe(writable);
           writable.on('finish', () => resolve(writable.buffer));
         }),
@@ -225,8 +225,10 @@ module.exports = function(initModules) {
     if (shouldUseDocument(element)) {
       // We can't render into a document during a clean render,
       // so instead, we'll render the children into the document element.
-      cleanContainer = getContainerFromMarkup(element, '<html></html>')
-        .documentElement;
+      cleanContainer = getContainerFromMarkup(
+        element,
+        '<html></html>',
+      ).documentElement;
       element = element.props.children;
     } else {
       cleanContainer = document.createElement('div');
@@ -296,7 +298,7 @@ module.exports = function(initModules) {
     it(`throws ${desc}`, () => {
       return testFn().then(
         () => expect(false).toBe('The promise resolved and should not have.'),
-        err => {
+        (err) => {
           expect(err).toBeInstanceOf(Error);
           expect(err.message).toContain(partialMessage);
         },

@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -24,7 +24,7 @@ import {
 const Context = createContext('abc');
 Context.displayName = 'ExampleContext';
 
-class ClassComponent extends Component      {
+class ClassComponent extends Component {
   render() {
     return null;
   }
@@ -58,7 +58,7 @@ export default function ElementTypes() {
     <Profiler id="test" onRender={() => {}}>
       <Fragment>
         <Context.Provider value={'def'}>
-          <Context.Consumer>{value => null}</Context.Consumer>
+          <Context.Consumer>{(value) => null}</Context.Consumer>
         </Context.Provider>
         <StrictMode>
           <Suspense fallback={<div>Loading...</div>}>

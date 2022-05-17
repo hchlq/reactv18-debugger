@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import ProfilerStore from './ProfilerStore';
@@ -25,39 +25,22 @@ import {
   invalidateChartData as invalidateRankedChartData,
 } from 'react-devtools-shared/src/devtools/views/Profiler/RankedChartBuilder';
 
-                                                                                        
-                                                                                                                               
-                                                                                                                                   
-                                                                                                                       
-
 export default class ProfilingCache {
-  _fiberCommits                             = new Map();
-  _profilerStore               ;
+  _fiberCommits = new Map();
+  _profilerStore;
 
-  constructor(profilerStore               ) {
+  constructor(profilerStore) {
     this._profilerStore = profilerStore;
   }
 
-  getCommitTree = ({
-    commitIndex,
-    rootID,
-  }    
-                        
-                   
-    ) =>
+  getCommitTree = ({commitIndex, rootID}) =>
     getCommitTree({
       commitIndex,
       profilerStore: this._profilerStore,
       rootID,
     });
 
-  getFiberCommits = ({
-    fiberID,
-    rootID,
-  }    
-                    
-                   
-    )                => {
+  getFiberCommits = ({fiberID, rootID}) => {
     const cachedFiberCommits = this._fiberCommits.get(fiberID);
     if (cachedFiberCommits != null) {
       return cachedFiberCommits;
@@ -76,15 +59,7 @@ export default class ProfilingCache {
     return fiberCommits;
   };
 
-  getFlamegraphChartData = ({
-    commitIndex,
-    commitTree,
-    rootID,
-  }    
-                        
-                           
-                   
-    )                      =>
+  getFlamegraphChartData = ({commitIndex, commitTree, rootID}) =>
     getFlamegraphChartData({
       commitIndex,
       commitTree,
@@ -92,25 +67,13 @@ export default class ProfilingCache {
       rootID,
     });
 
-  getInteractionsChartData = ({
-    rootID,
-  }    
-                   
-    )                        =>
+  getInteractionsChartData = ({rootID}) =>
     getInteractionsChartData({
       profilerStore: this._profilerStore,
       rootID,
     });
 
-  getRankedChartData = ({
-    commitIndex,
-    commitTree,
-    rootID,
-  }    
-                        
-                           
-                   
-    )                  =>
+  getRankedChartData = ({commitIndex, commitTree, rootID}) =>
     getRankedChartData({
       commitIndex,
       commitTree,

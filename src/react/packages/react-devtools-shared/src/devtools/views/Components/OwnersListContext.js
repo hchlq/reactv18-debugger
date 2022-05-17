@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -14,34 +14,19 @@ import {BridgeContext, StoreContext} from '../context';
 import {TreeStateContext} from './TreeContext';
 import {separateDisplayNameAndHOCs} from 'react-devtools-shared/src/utils';
 
-                                                                        
-             
-          
-        
-                                                                   
-                                                    
-
-                                                   
-
-const OwnersListContext = createContext         (((null     )         ));
+const OwnersListContext = createContext(null);
 OwnersListContext.displayName = 'OwnersListContext';
 
-                                                           
-                           
-                                  
-                       
-   
-
-const inProgressRequests                                      = new WeakMap();
-const resource                                           = createResource(
-  (element         ) => {
+const inProgressRequests = new WeakMap();
+const resource = createResource(
+  (element) => {
     const request = inProgressRequests.get(element);
     if (request != null) {
       return request.promise;
     }
 
-    let resolveFn = ((null     )           );
-    const promise = new Promise(resolve => {
+    let resolveFn = null;
+    const promise = new Promise((resolve) => {
       resolveFn = resolve;
     });
 
@@ -49,21 +34,17 @@ const resource                                           = createResource(
 
     return promise;
   },
-  (element         ) => element,
+  (element) => element,
   {useWeakMap: true},
 );
 
-               
-                       
-   
-
-function OwnersListContextController({children}       ) {
+function OwnersListContextController({children}) {
   const bridge = useContext(BridgeContext);
   const store = useContext(StoreContext);
   const {ownerID} = useContext(TreeStateContext);
 
   const read = useCallback(
-    (id        ) => {
+    (id) => {
       const element = store.getElementByID(id);
       if (element !== null) {
         return resource.read(element);
@@ -75,7 +56,7 @@ function OwnersListContextController({children}       ) {
   );
 
   useEffect(() => {
-    const onOwnersList = (ownersList            ) => {
+    const onOwnersList = (ownersList) => {
       const id = ownersList.id;
 
       const element = store.getElementByID(id);
@@ -87,11 +68,9 @@ function OwnersListContextController({children}       ) {
           request.resolveFn(
             ownersList.owners === null
               ? null
-              : ownersList.owners.map(owner => {
-                  const [
-                    displayNameWithoutHOCs,
-                    hocDisplayNames,
-                  ] = separateDisplayNameAndHOCs(owner.displayName, owner.type);
+              : ownersList.owners.map((owner) => {
+                  const [displayNameWithoutHOCs, hocDisplayNames] =
+                    separateDisplayNameAndHOCs(owner.displayName, owner.type);
 
                   return {
                     ...owner,

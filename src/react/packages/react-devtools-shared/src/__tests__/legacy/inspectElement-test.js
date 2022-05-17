@@ -4,31 +4,24 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                                                     
-                                                                                              
-                                                                     
-                                                                  
 
 describe('InspectedElementContext', () => {
   let React;
   let ReactDOM;
   let hydrate;
   let meta;
-  let bridge                ;
-  let store       ;
+  let bridge;
+  let store;
 
-  const act = (callback          ) => {
+  const act = (callback) => {
     callback();
 
     jest.runAllTimers(); // Flush Bridge operations
   };
 
-  function dehydrateHelper(
-    dehydratedData                       ,
-  )                {
+  function dehydrateHelper(dehydratedData) {
     if (dehydratedData !== null) {
       return hydrate(
         dehydratedData.data,
@@ -40,14 +33,11 @@ describe('InspectedElementContext', () => {
     }
   }
 
-  async function read(
-    id        ,
-    path                         ,
-  )                  {
+  async function read(id, path) {
     return new Promise((resolve, reject) => {
-      const rendererID = ((store.getRendererIDForElement(id)     )        );
+      const rendererID = store.getRendererIDForElement(id);
 
-      const onInspectedElement = (payload                         ) => {
+      const onInspectedElement = (payload) => {
         bridge.removeListener('inspectedElement', onInspectedElement);
 
         if (payload.type === 'full-data' && payload.value !== null) {
@@ -84,14 +74,14 @@ describe('InspectedElementContext', () => {
     ReactDOM = require('react-dom');
   });
 
-  it('should inspect the currently selected element', async done => {
+  it('should inspect the currently selected element', async (done) => {
     const Example = () => null;
 
     act(() =>
       ReactDOM.render(<Example a={1} b="abc" />, document.createElement('div')),
     );
 
-    const id = ((store.getElementIDAtIndex(0)     )        );
+    const id = store.getElementIDAtIndex(0);
     const inspectedElement = await read(id);
 
     expect(inspectedElement).toMatchSnapshot('1: Initial inspection');
@@ -99,7 +89,7 @@ describe('InspectedElementContext', () => {
     done();
   });
 
-  it('should support simple data types', async done => {
+  it('should support simple data types', async (done) => {
     const Example = () => null;
 
     act(() =>
@@ -121,7 +111,7 @@ describe('InspectedElementContext', () => {
       ),
     );
 
-    const id = ((store.getElementIDAtIndex(0)     )        );
+    const id = store.getElementIDAtIndex(0);
     const inspectedElement = await read(id);
 
     expect(inspectedElement).toMatchSnapshot('1: Initial inspection');
@@ -142,7 +132,7 @@ describe('InspectedElementContext', () => {
     done();
   });
 
-  it('should support complex data types', async done => {
+  it('should support complex data types', async (done) => {
     const Immutable = require('immutable');
 
     const Example = () => null;
@@ -170,7 +160,7 @@ describe('InspectedElementContext', () => {
       a: [{hello: 'there'}, 'fixed', true],
       b: 123,
       c: {
-        '1': 'xyz',
+        1: 'xyz',
         xyz: 1,
       },
     });
@@ -208,7 +198,7 @@ describe('InspectedElementContext', () => {
       ),
     );
 
-    const id = ((store.getElementIDAtIndex(0)     )        );
+    const id = store.getElementIDAtIndex(0);
     const inspectedElement = await read(id);
 
     expect(inspectedElement).toMatchSnapshot('1: Initial inspection');
@@ -342,7 +332,7 @@ describe('InspectedElementContext', () => {
     done();
   });
 
-  it('should support objects with no prototype', async done => {
+  it('should support objects with no prototype', async (done) => {
     const Example = () => null;
 
     const object = Object.create(null);
@@ -357,7 +347,7 @@ describe('InspectedElementContext', () => {
       ),
     );
 
-    const id = ((store.getElementIDAtIndex(0)     )        );
+    const id = store.getElementIDAtIndex(0);
     const inspectedElement = await read(id);
 
     expect(inspectedElement).toMatchSnapshot('1: Initial inspection');
@@ -370,7 +360,7 @@ describe('InspectedElementContext', () => {
     done();
   });
 
-  it('should support objects with overridden hasOwnProperty', async done => {
+  it('should support objects with overridden hasOwnProperty', async (done) => {
     const Example = () => null;
 
     const object = {
@@ -385,7 +375,7 @@ describe('InspectedElementContext', () => {
       ),
     );
 
-    const id = ((store.getElementIDAtIndex(0)     )        );
+    const id = store.getElementIDAtIndex(0);
     const inspectedElement = await read(id);
 
     expect(inspectedElement).toMatchSnapshot('1: Initial inspection');
@@ -397,7 +387,7 @@ describe('InspectedElementContext', () => {
     done();
   });
 
-  it('should not consume iterables while inspecting', async done => {
+  it('should not consume iterables while inspecting', async (done) => {
     const Example = () => null;
 
     function* generator() {
@@ -414,7 +404,7 @@ describe('InspectedElementContext', () => {
       ),
     );
 
-    const id = ((store.getElementIDAtIndex(0)     )        );
+    const id = store.getElementIDAtIndex(0);
     const inspectedElement = await read(id);
 
     expect(inspectedElement).toMatchSnapshot('1: Initial inspection');
@@ -427,7 +417,7 @@ describe('InspectedElementContext', () => {
     done();
   });
 
-  it('should support custom objects with enumerable properties and getters', async done => {
+  it('should support custom objects with enumerable properties and getters', async (done) => {
     class CustomData {
       _number = 42;
       get number() {
@@ -438,10 +428,10 @@ describe('InspectedElementContext', () => {
       }
     }
 
-    const descriptor = ((Object.getOwnPropertyDescriptor(
+    const descriptor = Object.getOwnPropertyDescriptor(
       CustomData.prototype,
       'number',
-    )     )                            );
+    );
     descriptor.enumerable = true;
     Object.defineProperty(CustomData.prototype, 'number', descriptor);
 
@@ -454,7 +444,7 @@ describe('InspectedElementContext', () => {
       ),
     );
 
-    const id = ((store.getElementIDAtIndex(0)     )        );
+    const id = store.getElementIDAtIndex(0);
     const inspectedElement = await read(id);
 
     expect(inspectedElement).toMatchSnapshot('1: Initial inspection');
@@ -462,7 +452,7 @@ describe('InspectedElementContext', () => {
     done();
   });
 
-  it('should support objects with with inherited keys', async done => {
+  it('should support objects with with inherited keys', async (done) => {
     const Example = () => null;
 
     const base = Object.create(Object.prototype, {
@@ -529,7 +519,7 @@ describe('InspectedElementContext', () => {
       ReactDOM.render(<Example data={object} />, document.createElement('div')),
     );
 
-    const id = ((store.getElementIDAtIndex(0)     )        );
+    const id = store.getElementIDAtIndex(0);
     const inspectedElement = await read(id);
 
     expect(inspectedElement).toMatchSnapshot('1: Initial inspection');
@@ -537,7 +527,7 @@ describe('InspectedElementContext', () => {
     done();
   });
 
-  it('should not dehydrate nested values until explicitly requested', async done => {
+  it('should not dehydrate nested values until explicitly requested', async (done) => {
     const Example = () => null;
 
     act(() =>
@@ -561,7 +551,7 @@ describe('InspectedElementContext', () => {
       ),
     );
 
-    const id = ((store.getElementIDAtIndex(0)     )        );
+    const id = store.getElementIDAtIndex(0);
 
     let inspectedElement = await read(id);
     expect(inspectedElement).toMatchSnapshot('1: Initially inspect element');
@@ -612,8 +602,8 @@ describe('InspectedElementContext', () => {
       ),
     );
 
-    const id = ((store.getElementIDAtIndex(0)     )        );
-    const rendererID = ((store.getRendererIDForElement(id)     )        );
+    const id = store.getElementIDAtIndex(0);
+    const rendererID = store.getRendererIDForElement(id);
 
     const logSpy = jest.fn();
     spyOn(console, 'log').and.callFake(logSpy);
@@ -665,8 +655,8 @@ describe('InspectedElementContext', () => {
       ),
     );
 
-    const id = ((store.getElementIDAtIndex(0)     )        );
-    const rendererID = ((store.getRendererIDForElement(id)     )        );
+    const id = store.getElementIDAtIndex(0);
+    const rendererID = store.getRendererIDForElement(id);
 
     // Should copy the whole value (not just the hydrated parts)
     bridge.send('copyElementPath', {
@@ -717,7 +707,7 @@ describe('InspectedElementContext', () => {
       a: [{hello: 'there'}, 'fixed', true],
       b: 123,
       c: {
-        '1': 'xyz',
+        1: 'xyz',
         xyz: 1,
       },
     });
@@ -741,8 +731,8 @@ describe('InspectedElementContext', () => {
       ),
     );
 
-    const id = ((store.getElementIDAtIndex(0)     )        );
-    const rendererID = ((store.getRendererIDForElement(id)     )        );
+    const id = store.getElementIDAtIndex(0);
+    const rendererID = store.getRendererIDForElement(id);
 
     // Should copy the whole value (not just the hydrated parts)
     bridge.send('copyElementPath', {

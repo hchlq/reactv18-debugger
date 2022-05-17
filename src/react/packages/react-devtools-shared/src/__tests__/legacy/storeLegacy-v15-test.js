@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 describe('Store (legacy)', () => {
@@ -12,7 +12,7 @@ describe('Store (legacy)', () => {
   let ReactDOM;
   let store;
 
-  const act = (callback          ) => {
+  const act = (callback) => {
     callback();
 
     jest.runAllTimers(); // Flush Bridge operations
@@ -440,7 +440,7 @@ describe('Store (legacy)', () => {
         );
 
       let ref = null;
-      const refSetter = value => {
+      const refSetter = (value) => {
         ref = value;
       };
 

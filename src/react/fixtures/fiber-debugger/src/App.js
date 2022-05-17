@@ -61,13 +61,13 @@ class App extends Component {
     ReactNoop.render(null);
     ReactNoop.flush();
     ReactFiberInstrumentation.debugTool = {
-      onMountContainer: root => {
+      onMountContainer: (root) => {
         currentRoot = root;
       },
-      onUpdateContainer: root => {
+      onUpdateContainer: (root) => {
         currentRoot = root;
       },
-      onBeginWork: fiber => {
+      onBeginWork: (fiber) => {
         const fibers = getFiberState(currentRoot, fiber);
         const stage = currentStage;
         this.setState(({history}) => ({
@@ -81,7 +81,7 @@ class App extends Component {
           ],
         }));
       },
-      onCompleteWork: fiber => {
+      onCompleteWork: (fiber) => {
         const fibers = getFiberState(currentRoot, fiber);
         const stage = currentStage;
         this.setState(({history}) => ({
@@ -95,7 +95,7 @@ class App extends Component {
           ],
         }));
       },
-      onCommitWork: fiber => {
+      onCommitWork: (fiber) => {
         const fibers = getFiberState(currentRoot, fiber);
         const stage = currentStage;
         this.setState(({history}) => ({
@@ -117,7 +117,7 @@ class App extends Component {
       toContain() {},
       toEqual() {},
     });
-    window.log = s => (currentStage = s);
+    window.log = (s) => (currentStage = s);
     // eslint-disable-next-line
     eval(
       window.Babel.transform(code, {
@@ -126,14 +126,14 @@ class App extends Component {
     );
   }
 
-  handleEdit = e => {
+  handleEdit = (e) => {
     e.preventDefault();
     this.setState({
       isEditing: true,
     });
   };
 
-  handleCloseEdit = nextCode => {
+  handleCloseEdit = (nextCode) => {
     localStorage.setItem('fiber-debugger-code', nextCode);
     this.setState({
       isEditing: false,
@@ -179,7 +179,8 @@ class App extends Component {
             zIndex: 1,
             backgroundColor: '#fafafa',
             border: '1px solid #ccc',
-          }}>
+          }}
+        >
           <div style={{width: '50%', float: 'left'}}>
             <input
               type="range"
@@ -187,7 +188,7 @@ class App extends Component {
               min={0}
               max={history.length - 1}
               value={currentStep}
-              onChange={e =>
+              onChange={(e) =>
                 this.setState({currentStep: Number(e.target.value)})
               }
             />
@@ -199,12 +200,12 @@ class App extends Component {
               )
             </p>
             {stage && <p>Stage: {stage}</p>}
-            {Object.keys(this.state.show).map(key => (
+            {Object.keys(this.state.show).map((key) => (
               <label style={{marginRight: '10px'}} key={key}>
                 <input
                   type="checkbox"
                   checked={this.state.show[key]}
-                  onChange={e => {
+                  onChange={(e) => {
                     this.setState(({show}) => ({
                       show: {...show, [key]: !show[key]},
                     }));
@@ -220,12 +221,13 @@ class App extends Component {
               <label style={{display: ''}}>
                 Direction:
                 <select
-                  onChange={e => {
+                  onChange={(e) => {
                     const rankdir = e.target.value;
                     this.setState(({graphSettings}) => ({
                       graphSettings: {...graphSettings, rankdir},
                     }));
-                  }}>
+                  }}
+                >
                   <option value="TB">top-down</option>
                   <option value="BT">down-top</option>
                   <option value="LR">left-right</option>
@@ -238,7 +240,7 @@ class App extends Component {
                 <input
                   type="checkbox"
                   checked={this.state.graphSettings.trackActive}
-                  onChange={e => {
+                  onChange={(e) => {
                     this.setState(({graphSettings}) => ({
                       graphSettings: {
                         ...graphSettings,

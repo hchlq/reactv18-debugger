@@ -144,7 +144,7 @@ describe('ReactElement.jsx', () => {
         const el = JSXRuntime.jsx('div', {className: 'moo'});
 
         if (__DEV__) {
-          expect(function() {
+          expect(function () {
             el.props.className = 'quack';
           }).toThrow();
           expect(el.props.className).toBe('moo');
@@ -173,7 +173,7 @@ describe('ReactElement.jsx', () => {
         const el = JSXRuntime.jsx('div', {children: this.props.sound});
 
         if (__DEV__) {
-          expect(function() {
+          expect(function () {
             el.props.className = 'quack';
           }).toThrow();
           expect(el.props.className).toBe(undefined);
@@ -252,9 +252,7 @@ describe('ReactElement.jsx', () => {
 
   it('should warn when `key` is being accessed on a host element', () => {
     const element = JSXRuntime.jsxs('div', {}, '3');
-    expect(
-      () => void element.props.key,
-    ).toErrorDev(
+    expect(() => void element.props.key).toErrorDev(
       'div: `key` is not a prop. Trying to access it will result ' +
         'in `undefined` being returned. If you need to access the same ' +
         'value within the child component, you should pass it as a different ' +
@@ -291,12 +289,12 @@ describe('ReactElement.jsx', () => {
     // Rudimentary polyfill
     // Once all jest engines support Symbols natively we can swap this to test
     // WITH native Symbols by default.
-    const REACT_ELEMENT_TYPE = function() {}; // fake Symbol
-    const OTHER_SYMBOL = function() {}; // another fake Symbol
-    global.Symbol = function(name) {
+    const REACT_ELEMENT_TYPE = function () {}; // fake Symbol
+    const OTHER_SYMBOL = function () {}; // another fake Symbol
+    global.Symbol = function (name) {
       return OTHER_SYMBOL;
     };
-    global.Symbol.for = function(key) {
+    global.Symbol.for = function (key) {
       if (key === 'react.element') {
         return REACT_ELEMENT_TYPE;
       }

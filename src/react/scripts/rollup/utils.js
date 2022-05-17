@@ -11,7 +11,7 @@ function asyncCopyTo(from, to) {
   return asyncMkDirP(path.dirname(to)).then(
     () =>
       new Promise((resolve, reject) => {
-        ncp(from, to, error => {
+        ncp(from, to, (error) => {
           if (error) {
             // Wrap to have a useful stack trace.
             reject(new Error(error));
@@ -37,7 +37,7 @@ function asyncExecuteCommand(command) {
 
 function asyncExtractTar(options) {
   return new Promise((resolve, reject) =>
-    targz.decompress(options, error => {
+    targz.decompress(options, (error) => {
       if (error) {
         reject(error);
         return;
@@ -49,7 +49,7 @@ function asyncExtractTar(options) {
 
 function asyncMkDirP(filepath) {
   return new Promise((resolve, reject) =>
-    mkdirp(filepath, error => {
+    mkdirp(filepath, (error) => {
       if (error) {
         reject(error);
         return;
@@ -61,7 +61,7 @@ function asyncMkDirP(filepath) {
 
 function asyncRimRaf(filepath) {
   return new Promise((resolve, reject) =>
-    rimraf(filepath, error => {
+    rimraf(filepath, (error) => {
       if (error) {
         reject(error);
         return;

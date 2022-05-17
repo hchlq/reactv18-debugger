@@ -7,7 +7,7 @@
 
 'use strict';
 
-process.on('unhandledRejection', err => {
+process.on('unhandledRejection', (err) => {
   throw err;
 });
 
@@ -19,7 +19,7 @@ const inlinedHostConfigs = require('../shared/inlinedHostConfigs');
 // Use it for local development.
 
 const primaryRenderer = inlinedHostConfigs.find(
-  info => info.isFlowTyped && info.shortName === process.argv[2]
+  (info) => info.isFlowTyped && info.shortName === process.argv[2]
 );
 if (!primaryRenderer) {
   console.log(
@@ -28,7 +28,7 @@ if (!primaryRenderer) {
       ' command now requires you to pick a primary renderer:'
   );
   console.log();
-  inlinedHostConfigs.forEach(rendererInfo => {
+  inlinedHostConfigs.forEach((rendererInfo) => {
     if (rendererInfo.isFlowTyped) {
       console.log('  * ' + chalk.cyan('yarn flow ' + rendererInfo.shortName));
     }

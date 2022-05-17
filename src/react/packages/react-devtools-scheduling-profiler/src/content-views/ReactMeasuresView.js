@@ -4,11 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                                         
-                                                                                
 
 import {
   durationToWidth,
@@ -29,24 +26,21 @@ import {REACT_TOTAL_NUM_LANES} from '../constants';
 
 const REACT_LANE_HEIGHT = REACT_MEASURE_HEIGHT + BORDER_SIZE;
 
-function getMeasuresForLane(
-  allMeasures                ,
-  lane           ,
-)                 {
-  return allMeasures.filter(measure => measure.lanes.includes(lane));
+function getMeasuresForLane(allMeasures, lane) {
+  return allMeasures.filter((measure) => measure.lanes.includes(lane));
 }
 
 export class ReactMeasuresView extends View {
-  _profilerData                   ;
-  _intrinsicSize      ;
+  _profilerData;
+  _intrinsicSize;
 
-  _lanesToRender             ;
-  _laneToMeasures                                ;
+  _lanesToRender;
+  _laneToMeasures;
 
-  _hoveredMeasure                      = null;
-  onHover                                                  = null;
+  _hoveredMeasure = null;
+  onHover = null;
 
-  constructor(surface         , frame      , profilerData                   ) {
+  constructor(surface, frame, profilerData) {
     super(surface, frame);
     this._profilerData = profilerData;
     this._performPreflightComputations();
@@ -54,9 +48,9 @@ export class ReactMeasuresView extends View {
 
   _performPreflightComputations() {
     this._lanesToRender = [];
-    this._laneToMeasures = new Map                           ();
+    this._laneToMeasures = new Map();
 
-    for (let lane            = 0; lane < REACT_TOTAL_NUM_LANES; lane++) {
+    for (let lane = 0; lane < REACT_TOTAL_NUM_LANES; lane++) {
       const measuresForLane = getMeasuresForLane(
         this._profilerData.measures,
         lane,
@@ -78,7 +72,7 @@ export class ReactMeasuresView extends View {
     return this._intrinsicSize;
   }
 
-  setHoveredMeasure(hoveredMeasure                     ) {
+  setHoveredMeasure(hoveredMeasure) {
     if (this._hoveredMeasure === hoveredMeasure) {
       return;
     }
@@ -90,13 +84,13 @@ export class ReactMeasuresView extends View {
    * Draw a single `ReactMeasure` as a bar in the canvas.
    */
   _drawSingleReactMeasure(
-    context                          ,
-    rect      ,
-    measure              ,
-    baseY        ,
-    scaleFactor        ,
-    showGroupHighlight         ,
-    showHoverHighlight         ,
+    context,
+    rect,
+    measure,
+    baseY,
+    scaleFactor,
+    showGroupHighlight,
+    showHoverHighlight,
   ) {
     const {frame} = this;
     const {timestamp, type, duration} = measure;
@@ -114,7 +108,7 @@ export class ReactMeasuresView extends View {
     }
 
     const x = timestampToPosition(timestamp, scaleFactor, frame);
-    const measureRect       = {
+    const measureRect = {
       origin: {x, y: baseY},
       size: {width, height: REACT_MEASURE_HEIGHT},
     };
@@ -169,7 +163,7 @@ export class ReactMeasuresView extends View {
     );
   }
 
-  draw(context                          ) {
+  draw(context) {
     const {
       frame,
       _hoveredMeasure,
@@ -221,7 +215,7 @@ export class ReactMeasuresView extends View {
       }
 
       // Render bottom border
-      const borderFrame       = {
+      const borderFrame = {
         origin: {
           x: frame.origin.x,
           y: frame.origin.y + (i + 1) * REACT_LANE_HEIGHT - BORDER_SIZE,
@@ -250,7 +244,7 @@ export class ReactMeasuresView extends View {
   /**
    * @private
    */
-  _handleMouseMove(interaction                      ) {
+  _handleMouseMove(interaction) {
     const {
       frame,
       _intrinsicSize,
@@ -308,7 +302,7 @@ export class ReactMeasuresView extends View {
     onHover(null);
   }
 
-  handleInteraction(interaction             ) {
+  handleInteraction(interaction) {
     switch (interaction.type) {
       case 'mousemove':
         this._handleMouseMove(interaction);

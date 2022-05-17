@@ -4,45 +4,19 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import {
   importFromChromeTimeline,
   Flamechart as SpeedscopeFlamechart,
 } from '@elg/speedscope';
-                                                   
-             
-               
-           
-             
-            
-                   
-                    
-                  
 
 import {REACT_TOTAL_NUM_LANES} from '../constants';
 import InvalidProfileError from './InvalidProfileError';
 
-                             
-                         
-                
-                
-                          
-                          
-   
-
-                        
-                                              
-                     
-                       
-                                      
-   
-
 // Exported for tests
-export function getLanesFromTransportDecimalBitmask(
-  laneBitmaskString        ,
-)              {
+export function getLanesFromTransportDecimalBitmask(laneBitmaskString) {
   const laneBitmask = parseInt(laneBitmaskString, 10);
 
   // As negative numbers are stored in two's complement format, our bitmask
@@ -62,7 +36,7 @@ export function getLanesFromTransportDecimalBitmask(
   return lanes;
 }
 
-function getLastType(stack                                               ) {
+function getLastType(stack) {
   if (stack.length > 0) {
     const {type} = stack[stack.length - 1];
     return type;
@@ -70,7 +44,7 @@ function getLastType(stack                                               ) {
   return null;
 }
 
-function getDepth(stack                                               ) {
+function getDepth(stack) {
   if (stack.length > 0) {
     const {depth, type} = stack[stack.length - 1];
     return type === 'render-idle' ? depth : depth + 1;
@@ -78,13 +52,7 @@ function getDepth(stack                                               ) {
   return 0;
 }
 
-function markWorkStarted(
-  type                  ,
-  startTime              ,
-  lanes             ,
-  currentProfilerData                   ,
-  state                ,
-) {
+function markWorkStarted(type, startTime, lanes, currentProfilerData, state) {
   const {batchUID, measureStack} = state;
   const index = currentProfilerData.measures.length;
   const depth = getDepth(measureStack);
@@ -101,12 +69,7 @@ function markWorkStarted(
   });
 }
 
-function markWorkCompleted(
-  type                  ,
-  stopTime              ,
-  currentProfilerData                   ,
-  stack                                               ,
-) {
+function markWorkCompleted(type, stopTime, currentProfilerData, stack) {
   if (stack.length === 0) {
     console.error(
       'Unexpected type "%s" completed at %sms while stack is empty.',
@@ -137,10 +100,7 @@ function markWorkCompleted(
   measure.duration = stopTime - startTime;
 }
 
-function throwIfIncomplete(
-  type                  ,
-  stack                                               ,
-) {
+function throwIfIncomplete(type, stack) {
   const lastIndex = stack.length - 1;
   if (lastIndex >= 0) {
     const last = stack[lastIndex];
@@ -153,11 +113,11 @@ function throwIfIncomplete(
 }
 
 function processTimelineEvent(
-  event               ,
+  event,
   /** Finalized profiler data up to `event`. May be mutated. */
-  currentProfilerData                   ,
+  currentProfilerData,
   /** Intermediate processor state. May be mutated. */
-  state                ,
+  state,
 ) {
   const {cat, name, ts, ph} = event;
   if (cat !== 'blink.user_timing') {
@@ -178,11 +138,9 @@ function processTimelineEvent(
       timestamp: startTime,
     });
   } else if (name.startsWith('--schedule-forced-update-')) {
-    const [
-      laneBitmaskString,
-      componentName,
-      ...splitComponentStack
-    ] = name.substr(25).split('-');
+    const [laneBitmaskString, componentName, ...splitComponentStack] = name
+      .substr(25)
+      .split('-');
     const isCascading = !!state.measureStack.find(
       ({type}) => type === 'commit',
     );
@@ -195,11 +153,9 @@ function processTimelineEvent(
       isCascading,
     });
   } else if (name.startsWith('--schedule-state-update-')) {
-    const [
-      laneBitmaskString,
-      componentName,
-      ...splitComponentStack
-    ] = name.substr(24).split('-');
+    const [laneBitmaskString, componentName, ...splitComponentStack] = name
+      .substr(24)
+      .split('-');
     const isCascading = !!state.measureStack.find(
       ({type}) => type === 'commit',
     );
@@ -253,7 +209,7 @@ function processTimelineEvent(
   else if (name.startsWith('--render-start-')) {
     if (state.nextRenderShouldGenerateNewBatchID) {
       state.nextRenderShouldGenerateNewBatchID = false;
-      state.batchUID = ((state.uidCounter++     )          );
+      state.batchUID = state.uidCounter++;
     }
     const laneBitmaskString = name.substr(15);
     const lanes = getLanesFromTransportDecimalBitmask(laneBitmaskString);
@@ -378,7 +334,7 @@ function processTimelineEvent(
   }
 }
 
-function preprocessFlamechart(rawData                 )             {
+function preprocessFlamechart(rawData) {
   let parsedData;
   try {
     parsedData = importFromChromeTimeline(rawData, 'react-devtools');
@@ -398,26 +354,32 @@ function preprocessFlamechart(rawData                 )             {
     getColorBucketForFrame: () => 0,
   });
 
-  const flamechart             = speedscopeFlamechart.getLayers().map(layer =>
-    layer.map(({start, end, node: {frame: {name, file, line, col}}}) => ({
-      name,
-      timestamp: start / 1000,
-      duration: (end - start) / 1000,
-      scriptUrl: file,
-      locationLine: line,
-      locationColumn: col,
-    })),
+  const flamechart = speedscopeFlamechart.getLayers().map((layer) =>
+    layer.map(
+      ({
+        start,
+        end,
+        node: {
+          frame: {name, file, line, col},
+        },
+      }) => ({
+        name,
+        timestamp: start / 1000,
+        duration: (end - start) / 1000,
+        scriptUrl: file,
+        locationLine: line,
+        locationColumn: col,
+      }),
+    ),
   );
 
   return flamechart;
 }
 
-export default function preprocessData(
-  timeline                 ,
-)                    {
+export default function preprocessData(timeline) {
   const flamechart = preprocessFlamechart(timeline);
 
-  const profilerData                    = {
+  const profilerData = {
     startTime: 0,
     duration: 0,
     events: [],
@@ -439,7 +401,7 @@ export default function preprocessData(
   // flame chart events, we can futher deduce that the data is invalid and we
   // don't bother finding React events.
   const indexOfProfileEvent = timeline.findIndex(
-    event => event.name === 'Profile',
+    (event) => event.name === 'Profile',
   );
   if (indexOfProfileEvent === -1) {
     return profilerData;
@@ -452,14 +414,14 @@ export default function preprocessData(
   profilerData.duration =
     (timeline[timeline.length - 1].ts - profilerData.startTime) / 1000;
 
-  const state                 = {
+  const state = {
     batchUID: 0,
     uidCounter: 0,
     nextRenderShouldGenerateNewBatchID: true,
     measureStack: [],
   };
 
-  timeline.forEach(event => processTimelineEvent(event, profilerData, state));
+  timeline.forEach((event) => processTimelineEvent(event, profilerData, state));
 
   // Validate that all events and measures are complete
   const {measureStack} = state;

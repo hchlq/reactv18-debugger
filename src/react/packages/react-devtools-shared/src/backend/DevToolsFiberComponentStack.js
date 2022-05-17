@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 // This is a DevTools fork of ReactFiberComponentStack.
@@ -12,20 +12,13 @@
 // while still maintaining support for multiple renderer versions
 // (which use different values for ReactTypeOfWork).
 
-                                                                   
-                                                              
-
 import {
   describeBuiltInComponentFrame,
   describeFunctionComponentFrame,
   describeClassComponentFrame,
 } from './DevToolsComponentStackFrame';
 
-function describeFiber(
-  workTagMap            ,
-  workInProgress       ,
-  currentDispatcherRef                      ,
-)         {
+function describeFiber(workTagMap, workInProgress, currentDispatcherRef) {
   const {
     HostComponent,
     LazyComponent,
@@ -39,7 +32,7 @@ function describeFiber(
     ClassComponent,
   } = workTagMap;
 
-  const owner                  = __DEV__
+  const owner = __DEV__
     ? workInProgress._debugOwner
       ? workInProgress._debugOwner.type
       : null
@@ -90,10 +83,10 @@ function describeFiber(
 }
 
 export function getStackByFiberInDevAndProd(
-  workTagMap            ,
-  workInProgress       ,
-  currentDispatcherRef                      ,
-)         {
+  workTagMap,
+  workInProgress,
+  currentDispatcherRef,
+) {
   try {
     let info = '';
     let node = workInProgress;

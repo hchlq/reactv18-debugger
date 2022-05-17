@@ -4,7 +4,7 @@ const React = window.React;
 
 class EmailAttributesTestCase extends React.Component {
   state = {value: 'a@fb.com'};
-  onChange = event => {
+  onChange = (event) => {
     this.setState({value: event.target.value});
   };
   render() {

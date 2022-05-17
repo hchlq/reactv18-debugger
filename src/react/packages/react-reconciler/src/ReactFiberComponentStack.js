@@ -4,10 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                
 
 import {
   HostComponent,
@@ -27,8 +25,8 @@ import {
   describeClassComponentFrame,
 } from 'shared/ReactComponentStackFrame';
 
-function describeFiber(fiber       )         {
-  const owner                  = __DEV__
+function describeFiber(fiber) {
+  const owner = __DEV__
     ? fiber._debugOwner
       ? fiber._debugOwner.type
       : null
@@ -58,7 +56,7 @@ function describeFiber(fiber       )         {
   }
 }
 
-export function getStackByFiberInDevAndProd(workInProgress       )         {
+export function getStackByFiberInDevAndProd(workInProgress) {
   try {
     let info = '';
     let node = workInProgress;

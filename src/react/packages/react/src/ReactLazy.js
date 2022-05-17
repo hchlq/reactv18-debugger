@@ -4,10 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                          
 
 import {REACT_LAZY_TYPE} from 'shared/ReactSymbols';
 
@@ -16,48 +14,16 @@ const Pending = 0;
 const Resolved = 1;
 const Rejected = 2;
 
-                                
-              
-                                             
-  
-
-                       
-             
-                    
-  
-
-                           
-             
-             
-  
-
-                        
-             
-                 
-  
-
-                 
-                           
-                  
-                      
-                    
-
-                                   
-                            
-              
-                           
-  
-
-function lazyInitializer   (payload            )    {
+function lazyInitializer(payload) {
   if (payload._status === Uninitialized) {
     const ctor = payload._result;
     const thenable = ctor();
     // Transition to the next state.
-    const pending                 = (payload     );
+    const pending = payload;
     pending._status = Pending;
     pending._result = thenable;
     thenable.then(
-      moduleObject => {
+      (moduleObject) => {
         if (payload._status === Pending) {
           const defaultExport = moduleObject.default;
           if (__DEV__) {
@@ -73,15 +39,15 @@ function lazyInitializer   (payload            )    {
             }
           }
           // Transition to the next state.
-          const resolved                     = (payload     );
+          const resolved = payload;
           resolved._status = Resolved;
           resolved._result = defaultExport;
         }
       },
-      error => {
+      (error) => {
         if (payload._status === Pending) {
           // Transition to the next state.
-          const rejected                  = (payload     );
+          const rejected = payload;
           rejected._status = Rejected;
           rejected._result = error;
         }
@@ -95,16 +61,14 @@ function lazyInitializer   (payload            )    {
   }
 }
 
-export function lazy   (
-  ctor                                   ,
-)                               {
-  const payload             = {
+export function lazy(ctor) {
+  const payload = {
     // We use these fields to store the result.
     _status: -1,
     _result: ctor,
   };
 
-  const lazyType                               = {
+  const lazyType = {
     $$typeof: REACT_LAZY_TYPE,
     _payload: payload,
     _init: lazyInitializer,

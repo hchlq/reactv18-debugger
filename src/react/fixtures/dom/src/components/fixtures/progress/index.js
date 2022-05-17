@@ -56,11 +56,11 @@ class ProgressFixture extends React.Component {
                 <legend>Controlled</legend>
                 <progress
                   value={this.state.value}
-                  max={this.state.max}></progress>
+                  max={this.state.max}
+                ></progress>
                 <button
-                  onClick={
-                    this.state.enabled ? this.resetTest : this.startTest
-                  }>
+                  onClick={this.state.enabled ? this.resetTest : this.startTest}
+                >
                   {this.state.enabled ? 'Reset' : 'Enable'}
                 </button>
                 <br />

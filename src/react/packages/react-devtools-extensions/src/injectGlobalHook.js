@@ -23,7 +23,7 @@ let lastDetectionResult;
 // (it will be injected directly into the page).
 // So instead, the hook will use postMessage() to pass message to us here.
 // And when this happens, we'll send a message to the "background page".
-window.addEventListener('message', function(evt) {
+window.addEventListener('message', function (evt) {
   if (evt.source !== window || !evt.data) {
     return;
   }
@@ -45,7 +45,7 @@ window.addEventListener('message', function(evt) {
 // while navigating the history to a document that has not been destroyed yet,
 // replay the last detection result if the content script is active and the
 // document has been hidden and shown again.
-window.addEventListener('pageshow', function(evt) {
+window.addEventListener('pageshow', function (evt) {
   if (!lastDetectionResult || evt.target !== window.document) {
     return;
   }
@@ -78,7 +78,7 @@ if (sessionStorageGetItem(SESSION_STORAGE_RELOAD_AND_PROFILE_KEY) === 'true') {
   // There are very few ways to actually do this.
   // This seems to be the best approach.
   const request = new XMLHttpRequest();
-  request.addEventListener('load', function() {
+  request.addEventListener('load', function () {
     rendererCode = this.responseText;
   });
   request.open('GET', rendererURL, false);
@@ -101,7 +101,7 @@ if ('text/html' === document.contentType) {
 if (typeof exportFunction === 'function') {
   // eslint-disable-next-line no-undef
   exportFunction(
-    text => {
+    (text) => {
       // Call clipboard.writeText from the extension content script
       // (as it has the clipboardWrite permission) and return a Promise
       // accessible to the webpage js code.

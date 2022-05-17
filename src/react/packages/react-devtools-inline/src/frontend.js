@@ -15,12 +15,7 @@ import {
   MESSAGE_TYPE_SAVED_PREFERENCES,
 } from './constants';
 
-                                                                     
-                                                                             
-
-export function initialize(
-  contentWindow        ,
-)                                        {
+export function initialize(contentWindow) {
   const onGetSavedPreferencesMessage = ({data, source}) => {
     if (source === 'react-devtools-content-script') {
       // Ignore messages from the DevTools browser extension.
@@ -52,7 +47,7 @@ export function initialize(
 
   window.addEventListener('message', onGetSavedPreferencesMessage);
 
-  const bridge                 = new Bridge({
+  const bridge = new Bridge({
     listen(fn) {
       const onMessage = ({data}) => {
         fn(data);
@@ -62,14 +57,14 @@ export function initialize(
         window.removeEventListener('message', onMessage);
       };
     },
-    send(event        , payload     , transferable             ) {
+    send(event, payload, transferable) {
       contentWindow.postMessage({event, payload}, '*', transferable);
     },
   });
 
-  const store        = new Store(bridge, {supportsTraceUpdates: true});
+  const store = new Store(bridge, {supportsTraceUpdates: true});
 
-  const ForwardRef = forwardRef              ((props, ref) => (
+  const ForwardRef = forwardRef((props, ref) => (
     <DevTools ref={ref} bridge={bridge} store={store} {...props} />
   ));
   ForwardRef.displayName = 'DevTools';

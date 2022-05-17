@@ -11,7 +11,8 @@
 'use strict';
 
 // Polyfills for test environment
-global.ReadableStream = require('@mattiasbuelens/web-streams-polyfill/ponyfill/es6').ReadableStream;
+global.ReadableStream =
+  require('@mattiasbuelens/web-streams-polyfill/ponyfill/es6').ReadableStream;
 global.TextEncoder = require('util').TextEncoder;
 global.TextDecoder = require('util').TextDecoder;
 

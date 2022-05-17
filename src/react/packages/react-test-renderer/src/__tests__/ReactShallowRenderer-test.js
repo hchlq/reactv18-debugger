@@ -19,7 +19,7 @@ const createRenderer = ReactShallowRenderer.createRenderer;
 describe('ReactShallowRenderer', () => {
   it('should call all of the legacy lifecycle hooks', () => {
     const logs = [];
-    const logger = message => () => logs.push(message) || true;
+    const logger = (message) => () => logs.push(message) || true;
 
     class SomeComponent extends React.Component {
       UNSAFE_componentWillMount = logger('componentWillMount');
@@ -62,7 +62,7 @@ describe('ReactShallowRenderer', () => {
 
   it('should call all of the new lifecycle hooks', () => {
     const logs = [];
-    const logger = message => () => logs.push(message) || true;
+    const logger = (message) => () => logs.push(message) || true;
 
     class SomeComponent extends React.Component {
       state = {};
@@ -323,7 +323,7 @@ describe('ReactShallowRenderer', () => {
 
     // Setting state updates the instance, but doesn't re-render
     // because sCU returned false.
-    instance.setState(state => ({count: state.count + 1}));
+    instance.setState((state) => ({count: state.count + 1}));
     expect(scuCounter).toEqual(1);
     expect(instance.state.count).toEqual(2);
     expect(shallowRenderer.getRenderOutput()).toEqual(<div>1</div>);
@@ -834,8 +834,8 @@ describe('ReactShallowRenderer', () => {
       };
 
       UNSAFE_componentWillMount() {
-        this.setState(state => ({groovy: 'doovy'}));
-        this.setState(state => ({doovy: state.groovy}));
+        this.setState((state) => ({groovy: 'doovy'}));
+        this.setState((state) => ({doovy: state.groovy}));
       }
 
       render() {
@@ -918,7 +918,7 @@ describe('ReactShallowRenderer', () => {
       }
 
       updateState = () => {
-        this.setState(state => ({value: state.value + 1}));
+        this.setState((state) => ({value: state.value + 1}));
       };
 
       render() {
@@ -1002,7 +1002,7 @@ describe('ReactShallowRenderer', () => {
     expect(result.props.children).toEqual(2);
   });
 
-  it('can access component instance from setState updater function', done => {
+  it('can access component instance from setState updater function', (done) => {
     let instance;
 
     class SimpleComponent extends React.Component {
@@ -1040,7 +1040,7 @@ describe('ReactShallowRenderer', () => {
     const result = shallowRenderer.render(<SimpleComponent />);
     expect(result.props.children).toBe(0);
 
-    const callback = jest.fn(function() {
+    const callback = jest.fn(function () {
       expect(this).toBe(instance);
     });
 
@@ -1068,7 +1068,7 @@ describe('ReactShallowRenderer', () => {
     const result = shallowRenderer.render(<SimpleComponent />);
     expect(result.props.children).toBe(0);
 
-    const callback = jest.fn(function() {
+    const callback = jest.fn(function () {
       expect(this).toBe(instance);
     });
 
@@ -1102,7 +1102,7 @@ describe('ReactShallowRenderer', () => {
     const result = shallowRenderer.render(<SimpleComponent />);
     expect(result.props.children).toBe(0);
 
-    const callback = jest.fn(function() {
+    const callback = jest.fn(function () {
       expect(this).toBe(instance);
     });
 
@@ -1302,7 +1302,7 @@ describe('ReactShallowRenderer', () => {
     expect(mockFn).toHaveBeenCalledTimes(3);
   });
 
-  it('should call the setState callback even if shouldComponentUpdate = false', done => {
+  it('should call the setState callback even if shouldComponentUpdate = false', (done) => {
     const mockFn = jest.fn().mockReturnValue(false);
 
     class Component extends React.Component {
@@ -1434,7 +1434,7 @@ describe('ReactShallowRenderer', () => {
     instance.setState(null);
     instance.setState(undefined);
     expect(log).toEqual([]);
-    instance.setState(state => ({count: state.count + 1}));
+    instance.setState((state) => ({count: state.count + 1}));
     expect(log).toEqual(['render']);
   });
 

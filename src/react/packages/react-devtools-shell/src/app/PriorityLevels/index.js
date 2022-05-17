@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -16,9 +16,9 @@ import {
 } from 'scheduler';
 
 export default function PriorityLevels() {
-  const [defaultPriority, setDefaultPriority] = useState         (false);
-  const [idlePriority, setIdlePriority] = useState         (false);
-  const [normalPriority, setLowPriority] = useState         (false);
+  const [defaultPriority, setDefaultPriority] = useState(false);
+  const [idlePriority, setIdlePriority] = useState(false);
+  const [normalPriority, setLowPriority] = useState(false);
 
   const resetSequence = useCallback(() => {
     setDefaultPriority(false);

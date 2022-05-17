@@ -56,7 +56,7 @@ describe('ReactDOMServerIntegrationLegacyContextDisabled', () => {
     resetModules();
   });
 
-  itRenders('undefined legacy context with warning', async render => {
+  itRenders('undefined legacy context with warning', async (render) => {
     class LegacyProvider extends React.Component {
       static childContextTypes = {
         foo() {},
@@ -112,7 +112,7 @@ describe('ReactDOMServerIntegrationLegacyContextDisabled', () => {
     expect(lifecycleContextLog).toEqual([]);
   });
 
-  itRenders('modern context', async render => {
+  itRenders('modern context', async (render) => {
     const Ctx = React.createContext();
 
     class Provider extends React.Component {
@@ -127,7 +127,7 @@ describe('ReactDOMServerIntegrationLegacyContextDisabled', () => {
 
     class RenderPropConsumer extends React.Component {
       render() {
-        return <Ctx.Consumer>{value => formatValue(value)}</Ctx.Consumer>;
+        return <Ctx.Consumer>{(value) => formatValue(value)}</Ctx.Consumer>;
       }
     }
 

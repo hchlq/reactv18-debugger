@@ -28,7 +28,7 @@ const babylonOptions = {
   ],
 };
 
-module.exports = function(opts) {
+module.exports = function (opts) {
   if (!opts || !('errorMapFilePath' in opts)) {
     throw new Error(
       'Missing options. Ensure you pass an object with `errorMapFilePath`.'

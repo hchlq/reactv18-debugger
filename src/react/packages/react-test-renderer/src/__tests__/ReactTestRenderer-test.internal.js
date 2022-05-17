@@ -262,7 +262,7 @@ describe('ReactTestRenderer', () => {
 
   it('gives a ref to native components', () => {
     const log = [];
-    ReactTestRenderer.create(<div ref={r => log.push(r)} />);
+    ReactTestRenderer.create(<div ref={(r) => log.push(r)} />);
     expect(log).toEqual([null]);
   });
 
@@ -319,27 +319,29 @@ describe('ReactTestRenderer', () => {
           return {};
       }
     }
-    ReactTestRenderer.create(<div ref={r => log.push(r)} />, {createNodeMock});
-    ReactTestRenderer.create(<input ref={r => log.push(r)} />, {
+    ReactTestRenderer.create(<div ref={(r) => log.push(r)} />, {
+      createNodeMock,
+    });
+    ReactTestRenderer.create(<input ref={(r) => log.push(r)} />, {
       createNodeMock,
     });
     ReactTestRenderer.create(
       <div>
         <span>
           <ul>
-            <li ref={r => log.push(r)} />
+            <li ref={(r) => log.push(r)} />
           </ul>
           <ul>
-            <li ref={r => log.push(r)} />
-            <li ref={r => log.push(r)} />
+            <li ref={(r) => log.push(r)} />
+            <li ref={(r) => log.push(r)} />
           </ul>
         </span>
       </div>,
       {createNodeMock, foobar: true},
     );
     ReactTestRenderer.create(<Foo />, {createNodeMock});
-    ReactTestRenderer.create(<div ref={r => log.push(r)} />);
-    ReactTestRenderer.create(<div ref={r => log.push(r)} />, {});
+    ReactTestRenderer.create(<div ref={(r) => log.push(r)} />);
+    ReactTestRenderer.create(<div ref={(r) => log.push(r)} />, {});
     expect(log).toEqual([
       mockDivInstance,
       mockInputInstance,
@@ -388,7 +390,7 @@ describe('ReactTestRenderer', () => {
 
   it('supports updates when using refs', () => {
     const log = [];
-    const createNodeMock = element => {
+    const createNodeMock = (element) => {
       log.push(element.type);
       return element.type;
     };
@@ -758,10 +760,10 @@ describe('ReactTestRenderer', () => {
   });
 
   it('root instance and createNodeMock ref return the same value', () => {
-    const createNodeMock = ref => ({node: ref});
+    const createNodeMock = (ref) => ({node: ref});
     let refInst = null;
     const renderer = ReactTestRenderer.create(
-      <div ref={ref => (refInst = ref)} />,
+      <div ref={(ref) => (refInst = ref)} />,
       {createNodeMock},
     );
     const root = renderer.getInstance();
@@ -868,7 +870,7 @@ describe('ReactTestRenderer', () => {
   });
 
   it('can render and update root fragments', () => {
-    const Component = props => props.children;
+    const Component = (props) => props.children;
 
     const renderer = ReactTestRenderer.create([
       <Component key="a">Hi</Component>,
@@ -902,7 +904,7 @@ describe('ReactTestRenderer', () => {
     function App() {
       return (
         <Provider value="b">
-          <Consumer>{value => <Child value={value} />}</Consumer>
+          <Consumer>{(value) => <Child value={value} />}</Consumer>
         </Provider>
       );
     }
@@ -975,7 +977,7 @@ describe('ReactTestRenderer', () => {
 
     class App extends React.Component {
       render() {
-        return <InnerRefed ref={r => (this.ref = r)} />;
+        return <InnerRefed ref={(r) => (this.ref = r)} />;
       }
     }
 

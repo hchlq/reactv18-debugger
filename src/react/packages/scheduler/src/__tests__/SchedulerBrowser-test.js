@@ -87,7 +87,7 @@ describe('SchedulerBrowser', () => {
       // TODO
       return id;
     };
-    window.clearTimeout = id => {
+    window.clearTimeout = (id) => {
       // TODO
     };
 

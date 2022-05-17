@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -19,22 +19,7 @@ import {scale} from './utils';
 
 import styles from './Interactions.css';
 
-                                                          
-                                                          
-                                             
-
-                         
-                       
-                                            
-                     
-                                                           
-                                       
-                                                 
-                                                 
-                                 
-   
-
-export default function InteractionsAutoSizer(_      ) {
+export default function InteractionsAutoSizer(_) {
   return (
     <div className={styles.Container}>
       <AutoSizer>
@@ -44,7 +29,7 @@ export default function InteractionsAutoSizer(_      ) {
   );
 }
 
-function Interactions({height, width}                                   ) {
+function Interactions({height, width}) {
   const {
     rootID,
     selectedInteractionID,
@@ -55,28 +40,28 @@ function Interactions({height, width}                                   ) {
   const {profilerStore} = useContext(StoreContext);
   const {profilingCache} = profilerStore;
 
-  const dataForRoot = profilerStore.getDataForRoot(((rootID     )        ));
+  const dataForRoot = profilerStore.getDataForRoot(rootID);
 
   const chartData = profilingCache.getInteractionsChartData({
-    rootID: ((rootID     )        ),
+    rootID: rootID,
   });
 
   const {interactions} = chartData;
 
   const handleKeyDown = useCallback(
-    event => {
+    (event) => {
       let index;
       switch (event.key) {
         case 'ArrowDown':
           index = interactions.findIndex(
-            interaction => interaction.id === selectedInteractionID,
+            (interaction) => interaction.id === selectedInteractionID,
           );
           selectInteraction(Math.min(interactions.length - 1, index + 1));
           event.stopPropagation();
           break;
         case 'ArrowUp':
           index = interactions.findIndex(
-            interaction => interaction.id === selectedInteractionID,
+            (interaction) => interaction.id === selectedInteractionID,
           );
           selectInteraction(Math.max(0, index - 1));
           event.stopPropagation();
@@ -88,15 +73,15 @@ function Interactions({height, width}                                   ) {
     [interactions, selectedInteractionID, selectInteraction],
   );
 
-  const itemData = useMemo          (() => {
+  const itemData = useMemo(() => {
     const interactionCommitSize = parseInt(
-      getComputedStyle((document.body     )).getPropertyValue(
+      getComputedStyle(document.body).getPropertyValue(
         '--interaction-commit-size',
       ),
       10,
     );
     const interactionLabelWidth = parseInt(
-      getComputedStyle((document.body     )).getPropertyValue(
+      getComputedStyle(document.body).getPropertyValue(
         '--interaction-label-width',
       ),
       10,
@@ -138,7 +123,8 @@ function Interactions({height, width}                                   ) {
         itemCount={interactions.length}
         itemData={itemData}
         itemSize={30}
-        width={width}>
+        width={width}
+      >
         {InteractionListItem}
       </FixedSizeList>
     </div>

@@ -4,10 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                               
 
 import {
   REACT_LAZY_TYPE,
@@ -16,32 +14,7 @@ import {
   REACT_FORWARD_REF_TYPE,
 } from 'shared/ReactSymbols';
 
-                                                                            
-                                                
-               
-             
-                
-
-                                                  
-                                      
-             
-                                           
-  
-
-                                           
-                            
-              
-                                            
-  
-
-                                                  
-        
-       
-                                         
-
-function lazyInitializer                                  (
-  payload                            ,
-)                              {
+function lazyInitializer(payload) {
   return {
     $$typeof: REACT_BLOCK_TYPE,
     _data: payload.load.apply(null, payload.args),
@@ -49,10 +22,7 @@ function lazyInitializer                                  (
   };
 }
 
-export function block                                  (
-  render                                  ,
-  load                                ,
-)                                  {
+export function block(render, load) {
   if (__DEV__) {
     if (load !== undefined && typeof load !== 'function') {
       console.error(
@@ -98,8 +68,8 @@ export function block                                  (
   }
 
   if (load === undefined) {
-    return function()               {
-      const blockComponent                              = {
+    return function () {
+      const blockComponent = {
         $$typeof: REACT_BLOCK_TYPE,
         _data: undefined,
         // $FlowFixMe: Data must be void in this scenario.
@@ -114,19 +84,16 @@ export function block                                  (
   // Trick to let Flow refine this.
   const loadFn = load;
 
-  return function()               {
-    const args       = arguments;
+  return function () {
+    const args = arguments;
 
-    const payload                             = {
+    const payload = {
       load: loadFn,
       args: args,
       render: render,
     };
 
-    const lazyType                
-                                  
-                                 
-      = {
+    const lazyType = {
       $$typeof: REACT_LAZY_TYPE,
       _payload: payload,
       _init: lazyInitializer,

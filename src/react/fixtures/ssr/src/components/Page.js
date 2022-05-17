@@ -12,7 +12,7 @@ const autofocusedInputs = [
 
 export default class Page extends Component {
   state = {active: false};
-  handleClick = e => {
+  handleClick = (e) => {
     this.setState({active: true});
   };
   render() {

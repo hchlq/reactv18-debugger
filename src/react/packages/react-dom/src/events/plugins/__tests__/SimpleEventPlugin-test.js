@@ -9,7 +9,7 @@
 
 'use strict';
 
-describe('SimpleEventPlugin', function() {
+describe('SimpleEventPlugin', function () {
   let React;
   let ReactDOM;
   let Scheduler;
@@ -34,7 +34,7 @@ describe('SimpleEventPlugin', function() {
     return element;
   }
 
-  beforeEach(function() {
+  beforeEach(function () {
     jest.resetModules();
     React = require('react');
     ReactDOM = require('react-dom');
@@ -50,12 +50,12 @@ describe('SimpleEventPlugin', function() {
     }
   });
 
-  it('A non-interactive tags click when disabled', function() {
+  it('A non-interactive tags click when disabled', function () {
     const element = <div onClick={onClick} />;
     expectClickThru(mounted(element));
   });
 
-  it('A non-interactive tags clicks bubble when disabled', function() {
+  it('A non-interactive tags clicks bubble when disabled', function () {
     const element = mounted(
       <div onClick={onClick}>
         <div />
@@ -66,7 +66,7 @@ describe('SimpleEventPlugin', function() {
     expect(onClick).toHaveBeenCalledTimes(1);
   });
 
-  it('does not register a click when clicking a child of a disabled element', function() {
+  it('does not register a click when clicking a child of a disabled element', function () {
     const element = mounted(
       <button onClick={onClick} disabled={true}>
         <span />
@@ -78,7 +78,7 @@ describe('SimpleEventPlugin', function() {
     expect(onClick).toHaveBeenCalledTimes(0);
   });
 
-  it('triggers click events for children of disabled elements', function() {
+  it('triggers click events for children of disabled elements', function () {
     const element = mounted(
       <button disabled={true}>
         <span onClick={onClick} />
@@ -90,7 +90,7 @@ describe('SimpleEventPlugin', function() {
     expect(onClick).toHaveBeenCalledTimes(1);
   });
 
-  it('triggers parent captured click events when target is a child of a disabled elements', function() {
+  it('triggers parent captured click events when target is a child of a disabled elements', function () {
     const element = mounted(
       <div onClickCapture={onClick}>
         <button disabled={true}>
@@ -104,7 +104,7 @@ describe('SimpleEventPlugin', function() {
     expect(onClick).toHaveBeenCalledTimes(1);
   });
 
-  it('triggers captured click events for children of disabled elements', function() {
+  it('triggers captured click events for children of disabled elements', function () {
     const element = mounted(
       <button disabled={true}>
         <span onClickCapture={onClick} />
@@ -116,8 +116,8 @@ describe('SimpleEventPlugin', function() {
     expect(onClick).toHaveBeenCalledTimes(1);
   });
 
-  ['button', 'input', 'select', 'textarea'].forEach(function(tagName) {
-    describe(tagName, function() {
+  ['button', 'input', 'select', 'textarea'].forEach(function (tagName) {
+    describe(tagName, function () {
       it('should forward clicks when it starts out not disabled', () => {
         const element = React.createElement(tagName, {
           onClick: onClick,
@@ -187,7 +187,7 @@ describe('SimpleEventPlugin', function() {
     class Button extends React.Component {
       state = {count: 0};
       increment = () =>
-        this.setState(state => ({
+        this.setState((state) => ({
           count: state.count + 1,
         }));
       componentDidUpdate() {
@@ -196,7 +196,7 @@ describe('SimpleEventPlugin', function() {
       render() {
         return (
           <button
-            ref={el => (button = el)}
+            ref={(el) => (button = el)}
             onFocus={this.increment}
             onClick={() => {
               // The focus call synchronously dispatches a nested event. All of
@@ -204,7 +204,8 @@ describe('SimpleEventPlugin', function() {
               this.increment();
               button.focus();
               this.increment();
-            }}>
+            }}
+          >
             Count: {this.state.count}
           </button>
         );
@@ -258,7 +259,7 @@ describe('SimpleEventPlugin', function() {
           );
           return (
             <button
-              ref={el => (button = el)}
+              ref={(el) => (button = el)}
               // Handler is removed after the first click
               onClick={this.state.disabled ? null : this.onClick}
             />
@@ -325,11 +326,12 @@ describe('SimpleEventPlugin', function() {
         render() {
           return (
             <button
-              ref={el => (button = el)}
+              ref={(el) => (button = el)}
               onClick={() =>
                 // Intentionally not using the updater form here
                 this.setState({count: this.state.count + 1})
-              }>
+              }
+            >
               Count: {this.state.count}
             </button>
           );
@@ -387,14 +389,15 @@ describe('SimpleEventPlugin', function() {
           Scheduler.unstable_yieldValue(text);
           return (
             <button
-              ref={el => (button = el)}
+              ref={(el) => (button = el)}
               onClick={() => {
                 React.unstable_startTransition(() => {
-                  this.setState(state => ({
+                  this.setState((state) => ({
                     lowPriCount: state.lowPriCount + 1,
                   }));
                 });
-              }}>
+              }}
+            >
               {text}
             </button>
           );
@@ -412,7 +415,8 @@ describe('SimpleEventPlugin', function() {
                 () => {
                   this.setState({highPriCount: this.state.highPriCount + 1});
                 }
-              }>
+              }
+            >
               <Button highPriCount={this.state.highPriCount} />
             </div>
           );
@@ -475,10 +479,10 @@ describe('SimpleEventPlugin', function() {
     });
   });
 
-  describe('iOS bubbling click fix', function() {
+  describe('iOS bubbling click fix', function () {
     // See http://www.quirksmode.org/blog/archives/2010/09/click_event_del.html
 
-    it('does not add a local click to interactive elements', function() {
+    it('does not add a local click to interactive elements', function () {
       container = document.createElement('div');
 
       ReactDOM.render(<button onClick={onClick} />, container);
@@ -490,7 +494,7 @@ describe('SimpleEventPlugin', function() {
       expect(onClick).toHaveBeenCalledTimes(0);
     });
 
-    it('adds a local click listener to non-interactive elements', function() {
+    it('adds a local click listener to non-interactive elements', function () {
       container = document.createElement('div');
 
       ReactDOM.render(<div onClick={onClick} />, container);
@@ -507,7 +511,7 @@ describe('SimpleEventPlugin', function() {
 
       const passiveEvents = [];
       const nativeAddEventListener = container.addEventListener;
-      container.addEventListener = function(type, fn, options) {
+      container.addEventListener = function (type, fn, options) {
         if (options !== null && typeof options === 'object') {
           if (options.passive) {
             passiveEvents.push(type);
@@ -534,7 +538,7 @@ describe('SimpleEventPlugin', function() {
         container,
       );
 
-      if (gate(flags => flags.enableEagerRootListeners)) {
+      if (gate((flags) => flags.enableEagerRootListeners)) {
         expect(passiveEvents).toEqual([
           'touchstart',
           'touchstart',

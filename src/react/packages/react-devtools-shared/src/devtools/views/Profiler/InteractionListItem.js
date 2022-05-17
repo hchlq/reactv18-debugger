@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -14,16 +14,7 @@ import {getGradientColor} from './utils';
 
 import styles from './InteractionListItem.css';
 
-                                             
-
-              
-                 
-                
-                
-     
-  
-
-function InteractionListItem({data: itemData, index, style}       ) {
+function InteractionListItem({data: itemData, index, style}) {
   const {
     chartData,
     dataForRoot,
@@ -52,7 +43,7 @@ function InteractionListItem({data: itemData, index, style}       ) {
   const startTime = interaction.timestamp;
   const stopTime = lastInteractionTime;
 
-  const viewCommit = (commitIndex        ) => {
+  const viewCommit = (commitIndex) => {
     selectTab('flame-chart');
     selectCommitIndex(commitIndex);
   };
@@ -65,11 +56,13 @@ function InteractionListItem({data: itemData, index, style}       ) {
           : styles.Interaction
       }
       onClick={handleClick}
-      style={style}>
+      style={style}
+    >
       <div
         className={styles.Name}
         style={{maxWidth: labelWidth}}
-        title={interaction.name}>
+        title={interaction.name}
+      >
         {interaction.name}
       </div>
       <div
@@ -79,7 +72,7 @@ function InteractionListItem({data: itemData, index, style}       ) {
           width: scaleX(stopTime - startTime, 0),
         }}
       />
-      {commits.map(commitIndex => (
+      {commits.map((commitIndex) => (
         <div
           className={styles.CommitBox}
           key={commitIndex}
@@ -102,4 +95,4 @@ function InteractionListItem({data: itemData, index, style}       ) {
   );
 }
 
-export default memo       (InteractionListItem, areEqual);
+export default memo(InteractionListItem, areEqual);

@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 export const TOP_TOUCH_START = 'topTouchStart';
@@ -14,15 +14,15 @@ export const TOP_TOUCH_CANCEL = 'topTouchCancel';
 export const TOP_SCROLL = 'topScroll';
 export const TOP_SELECTION_CHANGE = 'topSelectionChange';
 
-export function isStartish(topLevelType       )          {
+export function isStartish(topLevelType) {
   return topLevelType === TOP_TOUCH_START;
 }
 
-export function isMoveish(topLevelType       )          {
+export function isMoveish(topLevelType) {
   return topLevelType === TOP_TOUCH_MOVE;
 }
 
-export function isEndish(topLevelType       )          {
+export function isEndish(topLevelType) {
   return topLevelType === TOP_TOUCH_END || topLevelType === TOP_TOUCH_CANCEL;
 }
 

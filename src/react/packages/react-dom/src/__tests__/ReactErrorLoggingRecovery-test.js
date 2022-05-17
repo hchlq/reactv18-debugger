@@ -42,7 +42,7 @@ describe('ReactErrorLoggingRecovery', () => {
   const originalConsoleError = console.error;
 
   beforeEach(() => {
-    console.error = error => {
+    console.error = (error) => {
       throw new Error('Buggy console.error');
     };
   });
@@ -51,7 +51,7 @@ describe('ReactErrorLoggingRecovery', () => {
     console.error = originalConsoleError;
   });
 
-  it('should recover from errors in console.error', function() {
+  it('should recover from errors in console.error', function () {
     const div = document.createElement('div');
     let didCatch = false;
     try {

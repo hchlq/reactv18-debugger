@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 // TODO: direct imports like some-package/src/* are bad. Fix me.
@@ -18,18 +18,6 @@ import {checkControlledValueProps} from '../shared/ReactControlledValuePropTypes
 import {updateValueIfChanged} from './inputValueTracking';
 import getActiveElement from './getActiveElement';
 import {disableInputAttributeSyncing} from 'shared/ReactFeatureFlags';
-
-                                                   
-
-                                                 
-                  
-                                
-                             
-                         
-       
-    
-     
-  
 
 let didWarnValueDefaultValue = false;
 let didWarnCheckedDefaultChecked = false;
@@ -58,8 +46,8 @@ function isControlled(props) {
  * See http://www.w3.org/TR/2012/WD-html5-20121025/the-input-element.html
  */
 
-export function getHostProps(element         , props        ) {
-  const node = ((element     )                       );
+export function getHostProps(element, props) {
+  const node = element;
   const checked = props.checked;
 
   const hostProps = Object.assign({}, props, {
@@ -72,7 +60,7 @@ export function getHostProps(element         , props        ) {
   return hostProps;
 }
 
-export function initWrapperState(element         , props        ) {
+export function initWrapperState(element, props) {
   if (__DEV__) {
     checkControlledValueProps('input', props);
 
@@ -112,7 +100,7 @@ export function initWrapperState(element         , props        ) {
     }
   }
 
-  const node = ((element     )                       );
+  const node = element;
   const defaultValue = props.defaultValue == null ? '' : props.defaultValue;
 
   node._wrapperState = {
@@ -125,16 +113,16 @@ export function initWrapperState(element         , props        ) {
   };
 }
 
-export function updateChecked(element         , props        ) {
-  const node = ((element     )                       );
+export function updateChecked(element, props) {
+  const node = element;
   const checked = props.checked;
   if (checked != null) {
     setValueForProperty(node, 'checked', checked, false);
   }
 }
 
-export function updateWrapper(element         , props        ) {
-  const node = ((element     )                       );
+export function updateWrapper(element, props) {
+  const node = element;
   if (__DEV__) {
     const controlled = isControlled(props);
 
@@ -179,12 +167,12 @@ export function updateWrapper(element         , props        ) {
         (value === 0 && node.value === '') ||
         // We explicitly want to coerce to number here if possible.
         // eslint-disable-next-line
-        node.value != (value     )
+        node.value != value
       ) {
-        node.value = toString((value     ));
+        node.value = toString(value);
       }
-    } else if (node.value !== toString((value     ))) {
-      node.value = toString((value     ));
+    } else if (node.value !== toString(value)) {
+      node.value = toString(value);
     }
   } else if (type === 'submit' || type === 'reset') {
     // Submit/reset inputs need the attribute removed completely to avoid
@@ -231,12 +219,8 @@ export function updateWrapper(element         , props        ) {
   }
 }
 
-export function postMountWrapper(
-  element         ,
-  props        ,
-  isHydrating         ,
-) {
-  const node = ((element     )                       );
+export function postMountWrapper(element, props, isHydrating) {
+  const node = element;
 
   // Do not assign value if it is already set. This prevents user text input
   // from being lost during SSR hydration.
@@ -343,8 +327,8 @@ export function postMountWrapper(
   }
 }
 
-export function restoreControlledState(element         , props        ) {
-  const node = ((element     )                       );
+export function restoreControlledState(element, props) {
+  const node = element;
   updateWrapper(node, props);
   updateNamedCousins(node, props);
 }
@@ -352,10 +336,10 @@ export function restoreControlledState(element         , props        ) {
 function updateNamedCousins(rootNode, props) {
   const name = props.name;
   if (props.type === 'radio' && name != null) {
-    let queryRoot          = rootNode;
+    let queryRoot = rootNode;
 
     while (queryRoot.parentNode) {
-      queryRoot = ((queryRoot.parentNode     )         );
+      queryRoot = queryRoot.parentNode;
     }
 
     // If `rootNode.form` was non-null, then we could try `form.elements`,
@@ -370,7 +354,7 @@ function updateNamedCousins(rootNode, props) {
     );
 
     for (let i = 0; i < group.length; i++) {
-      const otherNode = ((group[i]     )                  );
+      const otherNode = group[i];
       if (otherNode === rootNode || otherNode.form !== rootNode.form) {
         continue;
       }
@@ -405,11 +389,7 @@ function updateNamedCousins(rootNode, props) {
 // when the user is inputting text
 //
 // https://github.com/facebook/react/issues/7253
-export function setDefaultValue(
-  node                       ,
-  type         ,
-  value   ,
-) {
+export function setDefaultValue(node, type, value) {
   if (
     // Focused number inputs synchronize on blur. See ChangeEventPlugin.js
     type !== 'number' ||

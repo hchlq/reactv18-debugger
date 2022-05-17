@@ -85,7 +85,7 @@ async function lint(bundle, bundleType) {
 
   const results = await eslint.lintFiles([mainOutputPath]);
   if (
-    results.some(result => result.errorCount > 0 || result.warningCount > 0)
+    results.some((result) => result.errorCount > 0 || result.warningCount > 0)
   ) {
     process.exitCode = 1;
     console.log(`Failed ${mainOutputPath}`);
@@ -108,7 +108,7 @@ async function lintEverything() {
   await Promise.all(promises);
 }
 
-lintEverything().catch(error => {
+lintEverything().catch((error) => {
   process.exitCode = 1;
   console.error(error);
 });

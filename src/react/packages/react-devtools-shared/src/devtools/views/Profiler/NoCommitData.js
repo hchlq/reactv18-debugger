@@ -4,14 +4,14 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
 
 import styles from './NoCommitData.css';
 
-export default function NoCommitData(_      ) {
+export default function NoCommitData(_) {
   return (
     <div className={styles.NoCommitData}>
       <div className={styles.Header}>

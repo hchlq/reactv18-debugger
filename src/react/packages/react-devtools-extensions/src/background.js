@@ -6,7 +6,7 @@ const ports = {};
 
 const IS_FIREFOX = navigator.userAgent.indexOf('Firefox') >= 0;
 
-chrome.runtime.onConnect.addListener(function(port) {
+chrome.runtime.onConnect.addListener(function (port) {
   let tab = null;
   let name = null;
   if (isNumeric(port.name)) {
@@ -39,7 +39,7 @@ function installContentScript(tabId: number) {
   chrome.tabs.executeScript(
     tabId,
     {file: '/build/contentScript.js'},
-    function() {},
+    function () {},
   );
 }
 
@@ -66,10 +66,10 @@ function setIconAndPopup(reactBuildType, tabId) {
   chrome.browserAction.setIcon({
     tabId: tabId,
     path: {
-      '16': 'icons/16-' + reactBuildType + '.png',
-      '32': 'icons/32-' + reactBuildType + '.png',
-      '48': 'icons/48-' + reactBuildType + '.png',
-      '128': 'icons/128-' + reactBuildType + '.png',
+      16: 'icons/16-' + reactBuildType + '.png',
+      32: 'icons/32-' + reactBuildType + '.png',
+      48: 'icons/48-' + reactBuildType + '.png',
+      128: 'icons/128-' + reactBuildType + '.png',
     },
   });
   chrome.browserAction.setPopup({

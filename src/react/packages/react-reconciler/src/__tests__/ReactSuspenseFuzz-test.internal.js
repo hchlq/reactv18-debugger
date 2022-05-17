@@ -65,7 +65,7 @@ describe('ReactSuspenseFuzz', () => {
             });
           });
           return () => {
-            cleanUps.forEach(cleanUp => cleanUp());
+            cleanUps.forEach((cleanUp) => cleanUp());
           };
         }
       }, [updates]);
@@ -95,7 +95,7 @@ describe('ReactSuspenseFuzz', () => {
             });
           });
           return () => {
-            cleanUps.forEach(cleanUp => cleanUp());
+            cleanUps.forEach((cleanUp) => cleanUp());
           };
         }
       }, [updates]);

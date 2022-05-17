@@ -11,7 +11,7 @@ let cache = new Set();
 
 function AsyncStep({text, ms}) {
   if (!cache.has(text)) {
-    throw new Promise(resolve =>
+    throw new Promise((resolve) =>
       setTimeout(() => {
         cache.add(text);
         resolve();
@@ -28,7 +28,7 @@ class SuspendyTreeChild extends React.Component {
     step: 1,
     isHidden: false,
   };
-  increment = () => this.setState(s => ({step: s.step + 1}));
+  increment = () => this.setState((s) => ({step: s.step + 1}));
 
   componentDidMount() {
     document.addEventListener('keydown', this.onKeydown);
@@ -38,7 +38,7 @@ class SuspendyTreeChild extends React.Component {
     document.removeEventListener('keydown', this.onKeydown);
   }
 
-  onKeydown = event => {
+  onKeydown = (event) => {
     if (event.metaKey && event.key === 'Enter') {
       this.increment();
     }
@@ -69,7 +69,7 @@ class SuspendyTree extends React.Component {
   componentWillUnmount() {
     document.removeEventListener('keydown', this.onKeydown);
   }
-  onKeydown = event => {
+  onKeydown = (event) => {
     if (event.metaKey && event.key === '/') {
       this.removeAndRestore();
     }
@@ -111,7 +111,8 @@ class TextInputFixtures extends React.Component {
     return (
       <FixtureSet
         title="Suspense"
-        description="Preserving the state of timed-out children">
+        description="Preserving the state of timed-out children"
+      >
         <p>
           Clicking "Hide" will hide the fixture context using{' '}
           <code>display: none</code> for 0.5 seconds, then restore. This is the

@@ -7,10 +7,10 @@ class HitBox extends React.Component {
   };
 
   static defaultProps = {
-    onMouseMove: n => n,
+    onMouseMove: (n) => n,
   };
 
-  onMove = event => {
+  onMove = (event) => {
     this.setState({x: event.clientX, y: event.clientY});
     this.props.onMouseMove(event);
   };

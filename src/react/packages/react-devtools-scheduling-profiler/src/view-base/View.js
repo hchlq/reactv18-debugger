@@ -4,12 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                        
-                                           
-                                         
 
 import {Surface} from './Surface';
 import {
@@ -28,19 +24,19 @@ import {noopLayout, viewsToLayout, collapseLayoutIntoViews} from './layouter';
  * subclasses.
  */
 export class View {
-  surface         ;
+  surface;
 
-  frame      ;
-  visibleArea      ;
+  frame;
+  visibleArea;
 
-  superview       ;
-  subviews         = [];
+  superview;
+  subviews = [];
 
   /**
    * An injected function that lays out our subviews.
    * @private
    */
-  _layouter          ;
+  _layouter;
 
   /**
    * Whether this view needs to be drawn.
@@ -62,12 +58,7 @@ export class View {
    */
   _subviewsNeedDisplay = false;
 
-  constructor(
-    surface         ,
-    frame      ,
-    layouter           = noopLayout,
-    visibleArea       = frame,
-  ) {
+  constructor(surface, frame, layouter = noopLayout, visibleArea = frame) {
     this.surface = surface;
     this.frame = frame;
     this._layouter = layouter;
@@ -85,7 +76,7 @@ export class View {
     if (this.superview) {
       this.superview._setSubviewsNeedDisplay();
     }
-    this.subviews.forEach(subview => subview.setNeedsDisplay());
+    this.subviews.forEach((subview) => subview.setNeedsDisplay());
   }
 
   /**
@@ -103,7 +94,7 @@ export class View {
     }
   }
 
-  setFrame(newFrame      ) {
+  setFrame(newFrame) {
     if (!rectEqualToRect(this.frame, newFrame)) {
       this.frame = newFrame;
       if (sizeIsValid(newFrame.size)) {
@@ -115,7 +106,7 @@ export class View {
     }
   }
 
-  setVisibleArea(newVisibleArea      ) {
+  setVisibleArea(newVisibleArea) {
     if (!rectEqualToRect(this.visibleArea, newVisibleArea)) {
       if (sizeIsValid(newVisibleArea.size)) {
         this.visibleArea = newVisibleArea;
@@ -137,18 +128,18 @@ export class View {
    *
    * Can be overridden by subclasses.
    */
-  desiredSize()        {
+  desiredSize() {
     if (this._needsDisplay) {
       this.layoutSubviews();
     }
-    const frames = this.subviews.map(subview => subview.frame);
+    const frames = this.subviews.map((subview) => subview.frame);
     return unionOfRects(...frames).size;
   }
 
   /**
    * Appends `view` to the list of this view's `subviews`.
    */
-  addSubview(view      ) {
+  addSubview(view) {
     if (this.subviews.includes(view)) {
       return;
     }
@@ -160,7 +151,7 @@ export class View {
    * Breaks the subview-superview relationship between `view` and this view, if
    * `view` is a subview of this view.
    */
-  removeSubview(view      ) {
+  removeSubview(view) {
     const subviewIndex = this.subviews.indexOf(view);
     if (subviewIndex === -1) {
       return;
@@ -173,7 +164,7 @@ export class View {
    * Removes all subviews from this view.
    */
   removeAllSubviews() {
-    this.subviews.forEach(subview => (subview.superview = undefined));
+    this.subviews.forEach((subview) => (subview.superview = undefined));
     this.subviews = [];
   }
 
@@ -183,7 +174,7 @@ export class View {
    * 1. Lays out subviews with `layoutSubviews`.
    * 2. Draws content with `draw`.
    */
-  displayIfNeeded(context                          ) {
+  displayIfNeeded(context) {
     if (
       (this._needsDisplay || this._subviewsNeedDisplay) &&
       rectIntersectsRect(this.frame, this.visibleArea) &&
@@ -236,9 +227,9 @@ export class View {
    *
    * @see displayIfNeeded
    */
-  draw(context                          ) {
+  draw(context) {
     const {subviews, visibleArea} = this;
-    subviews.forEach(subview => {
+    subviews.forEach((subview) => {
       if (rectIntersectsRect(visibleArea, subview.visibleArea)) {
         subview.displayIfNeeded(context);
       }
@@ -253,7 +244,7 @@ export class View {
   // Internal note: Do not call directly! Use
   // `handleInteractionAndPropagateToSubviews` so that interactions are
   // propagated to subviews.
-  handleInteraction(interaction             ) {}
+  handleInteraction(interaction) {}
 
   /**
    * Handle an `interaction` and propagates it to all of this view's
@@ -265,9 +256,9 @@ export class View {
    * @see handleInteraction
    * @protected
    */
-  handleInteractionAndPropagateToSubviews(interaction             ) {
+  handleInteractionAndPropagateToSubviews(interaction) {
     this.handleInteraction(interaction);
-    this.subviews.forEach(subview =>
+    this.subviews.forEach((subview) =>
       subview.handleInteractionAndPropagateToSubviews(interaction),
     );
   }

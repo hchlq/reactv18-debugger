@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -16,13 +16,11 @@ import Icon from '../Icon';
 
 import styles from './SearchInput.css';
 
-                  
-
-export default function SearchInput(props       ) {
+export default function SearchInput(props) {
   const {searchIndex, searchResults, searchText} = useContext(TreeStateContext);
   const dispatch = useContext(TreeDispatcherContext);
 
-  const inputRef = useRef                         (null);
+  const inputRef = useRef(null);
 
   const handleTextChange = useCallback(
     ({currentTarget}) =>
@@ -35,7 +33,7 @@ export default function SearchInput(props       ) {
   );
 
   const handleKeyDown = useCallback(
-    event => {
+    (event) => {
       // For convenience, let up/down arrow keys change Tree selection.
       switch (event.key) {
         case 'ArrowDown':
@@ -72,7 +70,7 @@ export default function SearchInput(props       ) {
       return () => {};
     }
 
-    const handleWindowKey = (event               ) => {
+    const handleWindowKey = (event) => {
       const {key, metaKey} = event;
       if (key === 'f' && metaKey) {
         if (inputRef.current !== null) {
@@ -115,21 +113,24 @@ export default function SearchInput(props       ) {
         className={styles.IconButton}
         disabled={!searchText}
         onClick={() => dispatch({type: 'GO_TO_PREVIOUS_SEARCH_RESULT'})}
-        title="Scroll to previous search result">
+        title="Scroll to previous search result"
+      >
         <ButtonIcon type="up" />
       </Button>
       <Button
         className={styles.IconButton}
         disabled={!searchText}
         onClick={() => dispatch({type: 'GO_TO_NEXT_SEARCH_RESULT'})}
-        title="Scroll to next search result">
+        title="Scroll to next search result"
+      >
         <ButtonIcon type="down" />
       </Button>
       <Button
         className={styles.IconButton}
         disabled={!searchText}
         onClick={resetSearch}
-        title="Reset search">
+        title="Reset search"
+      >
         <ButtonIcon type="close" />
       </Button>
     </div>

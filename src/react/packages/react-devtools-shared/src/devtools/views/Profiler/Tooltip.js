@@ -7,12 +7,12 @@ import styles from './Tooltip.css';
 
 const initialTooltipState = {height: 0, mouseX: 0, mouseY: 0, width: 0};
 
-export default function Tooltip({children, label}     ) {
+export default function Tooltip({children, label}) {
   const containerRef = useRef(null);
   const tooltipRef = useRef(null);
 
   // update the position of the tooltip based on current mouse position
-  const updateTooltipPosition = (event                        ) => {
+  const updateTooltipPosition = (event) => {
     const element = tooltipRef.current;
     if (element != null) {
       // first find the mouse position
@@ -25,7 +25,7 @@ export default function Tooltip({children, label}     ) {
     }
   };
 
-  const onMouseMove = (event                        ) => {
+  const onMouseMove = (event) => {
     updateTooltipPosition(event);
   };
 
@@ -35,7 +35,8 @@ export default function Tooltip({children, label}     ) {
     <div
       className={styles.Container}
       onMouseMove={onMouseMove}
-      ref={containerRef}>
+      ref={containerRef}
+    >
       <div ref={tooltipRef} className={`${styles.Tooltip} ${tooltipClassName}`}>
         {label}
       </div>
@@ -76,10 +77,7 @@ function getTooltipPosition(element, mousePosition) {
 }
 
 // method used to find the current mouse position inside the container
-function getMousePosition(
-  relativeContainer,
-  mouseEvent                        ,
-) {
+function getMousePosition(relativeContainer, mouseEvent) {
   if (relativeContainer !== null) {
     // Position within the nearest position:relative container.
     let targetContainer = relativeContainer;

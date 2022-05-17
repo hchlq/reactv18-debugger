@@ -16,8 +16,8 @@ import Shell from '../client/Shell';
 
 // TODO: Router component?
 const AppRoutes = {
-  '/': props => <FeedPage {...props} key="home" />,
-  '/profile/:userId/*': props => (
+  '/': (props) => <FeedPage {...props} key="home" />,
+  '/profile/:userId/*': (props) => (
     <ProfilePage {...props} key={`profile-${props.userId}`} />
   ),
 };

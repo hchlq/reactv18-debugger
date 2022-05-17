@@ -37,7 +37,7 @@ function createEvent(type, data = {}) {
   const event = document.createEvent('CustomEvent');
   event.initCustomEvent(type, true, true);
   if (data != null) {
-    Object.keys(data).forEach(key => {
+    Object.keys(data).forEach((key) => {
       const value = data[key];
       if (key === 'timeStamp' && !value) {
         return;

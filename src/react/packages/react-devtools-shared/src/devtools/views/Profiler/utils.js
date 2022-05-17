@@ -4,19 +4,10 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import {PROFILER_EXPORT_VERSION} from 'react-devtools-shared/src/constants';
-
-                                                                                  
-             
-                      
-                             
-                               
-                        
-               
-                 
 
 const commitGradient = [
   'var(--color-commit-gradient-0)',
@@ -34,13 +25,13 @@ const commitGradient = [
 // Combines info from the Store (frontend) and renderer interfaces (backend) into the format required by the Profiler UI.
 // This format can then be quickly exported (and re-imported).
 export function prepareProfilingDataFrontendFromBackendAndStore(
-  dataBackends                             ,
-  operationsByRootID                                   ,
-  snapshotsByRootID                                        ,
-)                        {
-  const dataForRoots                                            = new Map();
+  dataBackends,
+  operationsByRootID,
+  snapshotsByRootID,
+) {
+  const dataForRoots = new Map();
 
-  dataBackends.forEach(dataBackend => {
+  dataBackends.forEach((dataBackend) => {
     dataBackend.dataForRoots.forEach(
       ({
         commitData,
@@ -103,16 +94,14 @@ export function prepareProfilingDataFrontendFromBackendAndStore(
 }
 
 // Converts a Profiling data export into the format required by the Store.
-export function prepareProfilingDataFrontendFromExport(
-  profilingDataExport                     ,
-)                        {
+export function prepareProfilingDataFrontendFromExport(profilingDataExport) {
   const {version} = profilingDataExport;
 
   if (version !== PROFILER_EXPORT_VERSION) {
     throw Error(`Unsupported profiler export version "${version}"`);
   }
 
-  const dataForRoots                                            = new Map();
+  const dataForRoots = new Map();
   profilingDataExport.dataForRoots.forEach(
     ({
       commitData,
@@ -160,10 +149,8 @@ export function prepareProfilingDataFrontendFromExport(
 }
 
 // Converts a Store Profiling data into a format that can be safely (JSON) serialized for export.
-export function prepareProfilingDataExport(
-  profilingDataFrontend                       ,
-)                      {
-  const dataForRoots                                    = [];
+export function prepareProfilingDataExport(profilingDataFrontend) {
+  const dataForRoots = [];
   profilingDataFrontend.dataForRoots.forEach(
     ({
       commitData,
@@ -217,7 +204,7 @@ export function prepareProfilingDataExport(
   };
 }
 
-export const getGradientColor = (value        ) => {
+export const getGradientColor = (value) => {
   const maxIndex = commitGradient.length - 1;
   let index;
   if (Number.isNaN(value)) {
@@ -230,19 +217,14 @@ export const getGradientColor = (value        ) => {
   return commitGradient[Math.round(index)];
 };
 
-export const formatDuration = (duration        ) =>
+export const formatDuration = (duration) =>
   Math.round(duration * 10) / 10 || '<0.1';
-export const formatPercentage = (percentage        ) =>
-  Math.round(percentage * 100);
-export const formatTime = (timestamp        ) =>
+export const formatPercentage = (percentage) => Math.round(percentage * 100);
+export const formatTime = (timestamp) =>
   Math.round(Math.round(timestamp) / 100) / 10;
 
-export const scale = (
-  minValue        ,
-  maxValue        ,
-  minRange        ,
-  maxRange        ,
-) => (value        , fallbackValue        ) =>
-  maxValue - minValue === 0
-    ? fallbackValue
-    : ((value - minValue) / (maxValue - minValue)) * (maxRange - minRange);
+export const scale =
+  (minValue, maxValue, minRange, maxRange) => (value, fallbackValue) =>
+    maxValue - minValue === 0
+      ? fallbackValue
+      : ((value - minValue) / (maxValue - minValue)) * (maxRange - minRange);

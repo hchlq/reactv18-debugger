@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 // Below code forked from dom-accessibility-api
@@ -59,7 +59,7 @@ const tagToRoleMappings = {
   UL: 'list',
 };
 
-function getImplicitRole(element         )                {
+function getImplicitRole(element) {
   const mappedByTag = tagToRoleMappings[element.tagName];
   if (mappedByTag !== undefined) {
     return mappedByTag;
@@ -79,7 +79,7 @@ function getImplicitRole(element         )                {
       }
       break;
     case 'INPUT': {
-      const type = (element     ).type;
+      const type = element.type;
       switch (type) {
         case 'button':
         case 'image':
@@ -110,7 +110,7 @@ function getImplicitRole(element         )                {
     }
 
     case 'SELECT':
-      if (element.hasAttribute('multiple') || (element     ).size > 1) {
+      if (element.hasAttribute('multiple') || element.size > 1) {
         return 'listbox';
       }
       return 'combobox';
@@ -119,7 +119,7 @@ function getImplicitRole(element         )                {
   return null;
 }
 
-function getExplicitRoles(element         )                       {
+function getExplicitRoles(element) {
   const role = element.getAttribute('role');
   if (role) {
     return role.trim().split(' ');
@@ -129,7 +129,7 @@ function getExplicitRoles(element         )                       {
 }
 
 // https://w3c.github.io/html-aria/#document-conformance-requirements-for-use-of-aria-attributes-in-html
-export function hasRole(element         , role        )          {
+export function hasRole(element, role) {
   const explicitRoles = getExplicitRoles(element);
   if (explicitRoles !== null && explicitRoles.indexOf(role) >= 0) {
     return true;

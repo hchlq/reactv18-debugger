@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import invariant from 'shared/invariant';
@@ -12,15 +12,10 @@ import invariant from 'shared/invariant';
 import {checkControlledValueProps} from '../shared/ReactControlledValuePropTypes';
 import {getCurrentFiberOwnerNameInDevOrNull} from 'react-reconciler/src/ReactCurrentFiber';
 import {getToStringValue, toString} from './ToStringValue';
-                                                   
 
 import {disableTextareaChildren} from 'shared/ReactFeatureFlags';
 
 let didWarnValDefaultVal = false;
-
-                                                        
-                                                 
-   
 
 /**
  * Implements a <textarea> host component that allows setting `value`, and
@@ -38,8 +33,8 @@ let didWarnValDefaultVal = false;
  * `defaultValue` if specified, or the children content (deprecated).
  */
 
-export function getHostProps(element         , props        ) {
-  const node = ((element     )                          );
+export function getHostProps(element, props) {
+  const node = element;
   invariant(
     props.dangerouslySetInnerHTML == null,
     '`dangerouslySetInnerHTML` does not make sense on <textarea>.',
@@ -61,8 +56,8 @@ export function getHostProps(element         , props        ) {
   return hostProps;
 }
 
-export function initWrapperState(element         , props        ) {
-  const node = ((element     )                          );
+export function initWrapperState(element, props) {
+  const node = element;
   if (__DEV__) {
     checkControlledValueProps('textarea', props);
     if (
@@ -122,8 +117,8 @@ export function initWrapperState(element         , props        ) {
   };
 }
 
-export function updateWrapper(element         , props        ) {
-  const node = ((element     )                          );
+export function updateWrapper(element, props) {
+  const node = element;
   const value = getToStringValue(props.value);
   const defaultValue = getToStringValue(props.defaultValue);
   if (value != null) {
@@ -143,8 +138,8 @@ export function updateWrapper(element         , props        ) {
   }
 }
 
-export function postMountWrapper(element         , props        ) {
-  const node = ((element     )                          );
+export function postMountWrapper(element, props) {
+  const node = element;
   // This is in postMount because we need access to the DOM node, which is not
   // available until after the component has mounted.
   const textContent = node.textContent;
@@ -160,7 +155,7 @@ export function postMountWrapper(element         , props        ) {
   }
 }
 
-export function restoreControlledState(element         , props        ) {
+export function restoreControlledState(element, props) {
   // DOM component is still mounted; update
   updateWrapper(element, props);
 }

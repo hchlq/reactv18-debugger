@@ -11,11 +11,6 @@
 
 'use strict';
 
-             
-                                     
-                   
-                            
-
 import invariant from 'shared/invariant';
 
 // Event configs
@@ -30,9 +25,7 @@ exports.eventTypes = eventTypes;
 const viewConfigCallbacks = new Map();
 const viewConfigs = new Map();
 
-function processEventTypes(
-  viewConfig                                      ,
-)       {
+function processEventTypes(viewConfig) {
   const {bubblingEventTypes, directEventTypes} = viewConfig;
 
   if (__DEV__) {
@@ -72,7 +65,7 @@ function processEventTypes(
  * The callback is deferred until the view is actually rendered.
  * This is done to avoid causing Prepack deopts.
  */
-exports.register = function(name        , callback                  )         {
+exports.register = function (name, callback) {
   invariant(
     !viewConfigCallbacks.has(name),
     'Tried to register two views with the same name %s',
@@ -93,7 +86,7 @@ exports.register = function(name        , callback                  )         {
  * If this is the first time the view has been used,
  * This configuration will be lazy-loaded from UIManager.
  */
-exports.get = function(name        )                                       {
+exports.get = function (name) {
   let viewConfig;
   if (!viewConfigs.has(name)) {
     const callback = viewConfigCallbacks.get(name);

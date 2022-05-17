@@ -4,10 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                     
 
 import {Surface} from './Surface';
 import {View} from './View';
@@ -16,14 +14,14 @@ import {View} from './View';
  * View that fills its visible area with a CSS color.
  */
 export class ColorView extends View {
-  _color        ;
+  _color;
 
-  constructor(surface         , frame      , color        ) {
+  constructor(surface, frame, color) {
     super(surface, frame);
     this._color = color;
   }
 
-  setColor(color        ) {
+  setColor(color) {
     if (this._color === color) {
       return;
     }
@@ -31,7 +29,7 @@ export class ColorView extends View {
     this.setNeedsDisplay();
   }
 
-  draw(context                          ) {
+  draw(context) {
     const {_color, visibleArea} = this;
     context.fillStyle = _color;
     context.fillRect(

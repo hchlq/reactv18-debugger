@@ -88,15 +88,15 @@ describe('Scheduler', () => {
   });
 
   it('expires work', () => {
-    scheduleCallback(NormalPriority, didTimeout => {
+    scheduleCallback(NormalPriority, (didTimeout) => {
       Scheduler.unstable_advanceTime(100);
       Scheduler.unstable_yieldValue(`A (did timeout: ${didTimeout})`);
     });
-    scheduleCallback(UserBlockingPriority, didTimeout => {
+    scheduleCallback(UserBlockingPriority, (didTimeout) => {
       Scheduler.unstable_advanceTime(100);
       Scheduler.unstable_yieldValue(`B (did timeout: ${didTimeout})`);
     });
-    scheduleCallback(UserBlockingPriority, didTimeout => {
+    scheduleCallback(UserBlockingPriority, (didTimeout) => {
       Scheduler.unstable_advanceTime(100);
       Scheduler.unstable_yieldValue(`C (did timeout: ${didTimeout})`);
     });
@@ -106,11 +106,11 @@ describe('Scheduler', () => {
     expect(Scheduler).toHaveYielded([]);
 
     // Schedule a few more callbacks
-    scheduleCallback(NormalPriority, didTimeout => {
+    scheduleCallback(NormalPriority, (didTimeout) => {
       Scheduler.unstable_advanceTime(100);
       Scheduler.unstable_yieldValue(`D (did timeout: ${didTimeout})`);
     });
-    scheduleCallback(NormalPriority, didTimeout => {
+    scheduleCallback(NormalPriority, (didTimeout) => {
       Scheduler.unstable_advanceTime(100);
       Scheduler.unstable_yieldValue(`E (did timeout: ${didTimeout})`);
     });

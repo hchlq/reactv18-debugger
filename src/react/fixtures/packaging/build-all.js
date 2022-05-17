@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const child_process = require('child_process');
 
-const fixtureDirs = fs.readdirSync(__dirname).filter(file => {
+const fixtureDirs = fs.readdirSync(__dirname).filter((file) => {
   return fs.statSync(path.join(__dirname, file)).isDirectory();
 });
 
@@ -22,8 +22,8 @@ function buildFixture(cmdArg, path) {
   }
 }
 
-fixtureDirs.forEach(dir => {
-  cmdArgs.forEach(cmdArg => {
+fixtureDirs.forEach((dir) => {
+  cmdArgs.forEach((cmdArg) => {
     // we only care about directories that have DEV and PROD directories in
     // otherwise they don't need to be built
     const devPath = path.join(__dirname, dir, 'dev');

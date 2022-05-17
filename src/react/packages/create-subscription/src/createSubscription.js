@@ -4,35 +4,13 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
 import invariant from 'shared/invariant';
 
-                              
-
-export function createSubscription                 (
-  config              
-                                                                
-                                                               
-                                                                     
-                                                        
-
-                                                                                                    
-                                                                                                
-                                                                                               
-                                                                
-                                                                           
-                
-                       
-                                              
-                     
-     ,
-)                        
-                                                
-                   
-    {
+export function createSubscription(config) {
   const {getCurrentValue, subscribe} = config;
 
   if (__DEV__) {
@@ -44,18 +22,9 @@ export function createSubscription                 (
     }
   }
 
-                 
-                                                   
-                     
-     
-                 
-                     
-                        
-     
-
   // Reference: https://gist.github.com/bvaughn/d569177d70b50b58bff69c3c4a5353f3
-  class Subscription extends React.Component               {
-    state        = {
+  class Subscription extends React.Component {
+    state = {
       source: this.props.source,
       value:
         this.props.source != null
@@ -63,8 +32,8 @@ export function createSubscription                 (
           : undefined,
     };
 
-    _hasUnmounted          = false;
-    _unsubscribe                     = null;
+    _hasUnmounted = false;
+    _unsubscribe = null;
 
     static getDerivedStateFromProps(nextProps, prevState) {
       if (nextProps.source !== prevState.source) {
@@ -106,12 +75,12 @@ export function createSubscription                 (
     subscribe() {
       const {source} = this.state;
       if (source != null) {
-        const callback = (value              ) => {
+        const callback = (value) => {
           if (this._hasUnmounted) {
             return;
           }
 
-          this.setState(state => {
+          this.setState((state) => {
             // If the value is the same, skip the unnecessary state update.
             if (value === state.value) {
               return null;

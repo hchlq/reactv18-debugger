@@ -735,15 +735,15 @@ describe('BeforeInputEventPlugin', () => {
     const node = ReactDOM.render(
       <input
         type="text"
-        onBeforeInput={e => {
+        onBeforeInput={(e) => {
           spyOnBeforeInput();
           beforeInputEvent = e;
         }}
-        onCompositionStart={e => {
+        onCompositionStart={(e) => {
           spyOnCompositionStart();
           compositionStartEvent = e;
         }}
-        onCompositionUpdate={e => {
+        onCompositionUpdate={(e) => {
           spyOnCompositionUpdate();
           compositionUpdateEvent = e;
         }}
@@ -781,15 +781,15 @@ describe('BeforeInputEventPlugin', () => {
     const node = ReactDOM.render(
       <div
         contentEditable={true}
-        onBeforeInput={e => {
+        onBeforeInput={(e) => {
           spyOnBeforeInput();
           beforeInputEvent = e;
         }}
-        onCompositionStart={e => {
+        onCompositionStart={(e) => {
           spyOnCompositionStart();
           compositionStartEvent = e;
         }}
-        onCompositionUpdate={e => {
+        onCompositionUpdate={(e) => {
           spyOnCompositionUpdate();
           compositionUpdateEvent = e;
         }}

@@ -94,7 +94,7 @@ describe('ReactDOMOption', () => {
     // It's important that we toString it.
     const obj = {
       $$typeof: Symbol.for('react.element'),
-      type: props => props.content,
+      type: (props) => props.content,
       ref: null,
       key: null,
       props: {

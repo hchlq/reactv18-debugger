@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -15,24 +15,6 @@ import Icon from './Icon';
 import styles from './TabBar.css';
 import tooltipStyles from './Tooltip.css';
 
-                                     
-
-                 
-                 
-             
-                
-                 
-   
-
-                      
-                  
-                     
-             
-                                  
-                       
-                                               
-   
-
 export default function TabBar({
   currentTab,
   disabled = false,
@@ -40,8 +22,8 @@ export default function TabBar({
   selectTab,
   tabs,
   type,
-}       ) {
-  if (!tabs.some(tab => tab.id === currentTab)) {
+}) {
+  if (!tabs.some((tab) => tab.id === currentTab)) {
     selectTab(tabs[0].id);
   }
 
@@ -50,7 +32,7 @@ export default function TabBar({
     [selectTab],
   );
 
-  const handleKeyDown = useCallback(event => {
+  const handleKeyDown = useCallback((event) => {
     switch (event.key) {
       case 'ArrowDown':
       case 'ArrowLeft':
@@ -98,7 +80,8 @@ export default function TabBar({
             ].join(' ')}
             key={id}
             onKeyDown={handleKeyDown}
-            onMouseDown={() => selectTab(id)}>
+            onMouseDown={() => selectTab(id)}
+          >
             <input
               type="radio"
               className={styles.Input}

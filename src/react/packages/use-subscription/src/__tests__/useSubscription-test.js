@@ -60,7 +60,7 @@ describe('useSubscription', () => {
         React.useMemo(
           () => ({
             getCurrentValue: () => source.getValue(),
-            subscribe: callback => {
+            subscribe: (callback) => {
               const subscription = source.subscribe(callback);
               return () => subscription.unsubscribe();
             },
@@ -106,13 +106,13 @@ describe('useSubscription', () => {
             getCurrentValue: () => {
               let currentValue;
               source
-                .subscribe(tempValue => {
+                .subscribe((tempValue) => {
                   currentValue = tempValue;
                 })
                 .unsubscribe();
               return currentValue;
             },
-            subscribe: callback => {
+            subscribe: (callback) => {
               const subscription = source.subscribe(callback);
               return () => subscription.unsubscribe();
             },
@@ -156,7 +156,7 @@ describe('useSubscription', () => {
         React.useMemo(
           () => ({
             getCurrentValue: () => source.getValue(),
-            subscribe: callback => {
+            subscribe: (callback) => {
               subscriptions.push(source);
               const subscription = source.subscribe(callback);
               return () => subscription.unsubscribe();
@@ -216,7 +216,7 @@ describe('useSubscription', () => {
       const value = useSubscription({
         getCurrentValue: React.useCallback(() => source.getValue(), [source]),
         subscribe: React.useCallback(
-          callback => {
+          (callback) => {
             subscriptions.push(source);
             const subscription = source.subscribe(callback);
             return () => subscription.unsubscribe();
@@ -280,7 +280,7 @@ describe('useSubscription', () => {
         React.useMemo(
           () => ({
             getCurrentValue: () => source.getValue(),
-            subscribe: callback => {
+            subscribe: (callback) => {
               const subscription = source.subscribe(callback);
               return () => subscription.unsubscribe();
             },
@@ -380,7 +380,7 @@ describe('useSubscription', () => {
         React.useMemo(
           () => ({
             getCurrentValue: () => source.getValue(),
-            subscribe: callback => {
+            subscribe: (callback) => {
               const subscription = source.subscribe(callback);
               return () => subscription.unsubscribe();
             },
@@ -475,7 +475,7 @@ describe('useSubscription', () => {
         React.useMemo(
           () => ({
             getCurrentValue: () => source.getValue(),
-            subscribe: callback => {
+            subscribe: (callback) => {
               return source.subscribe(callback);
             },
           }),
@@ -491,7 +491,7 @@ describe('useSubscription', () => {
       change(value) {
         eventHandler._value = value;
         const _callbacks = eventHandler._callbacks.slice(0);
-        _callbacks.forEach(callback => callback(value));
+        _callbacks.forEach((callback) => callback(value));
       },
       getValue() {
         return eventHandler._value;
@@ -507,7 +507,7 @@ describe('useSubscription', () => {
       },
     };
 
-    eventHandler.subscribe(value => {
+    eventHandler.subscribe((value) => {
       if (value === false) {
         renderer.unmount();
         expect(Scheduler).toFlushAndYield([]);
@@ -564,14 +564,14 @@ describe('useSubscription', () => {
   it('should not tear if a mutation occurs during a concurrent update', () => {
     const input = document.createElement('input');
 
-    const mutate = value => {
+    const mutate = (value) => {
       input.value = value;
       input.dispatchEvent(new Event('change'));
     };
 
     const subscription = {
       getCurrentValue: () => input.value,
-      subscribe: callback => {
+      subscribe: (callback) => {
         input.addEventListener('change', callback);
         return () => input.removeEventListener('change', callback);
       },

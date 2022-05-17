@@ -19,7 +19,7 @@ let ReactDOMServer;
 // This function "Normalizes" childNodes lists to avoid the presence of comments
 // and make the child list identical in standard React and Fiber
 function filterOutComments(nodeList) {
-  return [].slice.call(nodeList).filter(node => !(node instanceof Comment));
+  return [].slice.call(nodeList).filter((node) => !(node instanceof Comment));
 }
 
 describe('ReactDOMTextComponent', () => {

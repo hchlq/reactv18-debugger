@@ -4,18 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-             
-        
-                                           
-                     
-             
-                        
-                    
-               
-                 
 
 import * as React from 'react';
 import {
@@ -61,17 +51,14 @@ import styles from './CanvasPage.css';
 
 const CONTEXT_MENU_ID = 'canvas';
 
-               
-                                  
-   
-
-function CanvasPage({profilerData}       ) {
+function CanvasPage({profilerData}) {
   return (
     <div
       className={styles.CanvasPage}
-      style={{backgroundColor: COLORS.BACKGROUND}}>
+      style={{backgroundColor: COLORS.BACKGROUND}}
+    >
       <AutoSizer>
-        {({height, width}                                 ) => (
+        {({height, width}) => (
           <AutoSizedCanvas data={profilerData} height={height} width={width} />
         )}
       </AutoSizer>
@@ -79,7 +66,7 @@ function CanvasPage({profilerData}       ) {
   );
 }
 
-const copySummary = (data                   , measure              ) => {
+const copySummary = (data, measure) => {
   const {batchUID, duration, timestamp, type} = measure;
 
   const [startTime, stopTime] = getBatchRange(batchUID, data);
@@ -94,44 +81,29 @@ const copySummary = (data                   , measure              ) => {
   );
 };
 
-const zoomToBatch = (
-  data                   ,
-  measure              ,
-  syncedHorizontalPanAndZoomViews                            ,
-) => {
+const zoomToBatch = (data, measure, syncedHorizontalPanAndZoomViews) => {
   const {batchUID} = measure;
   const [startTime, stopTime] = getBatchRange(batchUID, data);
-  syncedHorizontalPanAndZoomViews.forEach(syncedView =>
+  syncedHorizontalPanAndZoomViews.forEach((syncedView) =>
     // Using time as range works because the views' intrinsic content size is
     // based on time.
     syncedView.zoomToRange(startTime, stopTime),
   );
 };
 
-                              
-                          
-                 
-                
-   
+function AutoSizedCanvas({data, height, width}) {
+  const canvasRef = useRef(null);
 
-function AutoSizedCanvas({data, height, width}                      ) {
-  const canvasRef = useRef                          (null);
-
-  const [isContextMenuShown, setIsContextMenuShown] = useState         (false);
-  const [mouseLocation, setMouseLocation] = useState       (zeroPoint); // DOM coordinates
-  const [
-    hoveredEvent,
-    setHoveredEvent,
-  ] = useState                              (null);
+  const [isContextMenuShown, setIsContextMenuShown] = useState(false);
+  const [mouseLocation, setMouseLocation] = useState(zeroPoint); // DOM coordinates
+  const [hoveredEvent, setHoveredEvent] = useState(null);
 
   const surfaceRef = useRef(new Surface());
   const userTimingMarksViewRef = useRef(null);
   const reactEventsViewRef = useRef(null);
   const reactMeasuresViewRef = useRef(null);
   const flamechartViewRef = useRef(null);
-  const syncedHorizontalPanAndZoomViewsRef = useRef                            (
-    [],
-  );
+  const syncedHorizontalPanAndZoomViewsRef = useRef([]);
 
   useLayoutEffect(() => {
     const surface = surfaceRef.current;
@@ -140,12 +112,12 @@ function AutoSizedCanvas({data, height, width}                      ) {
     // Clear synced views
     syncedHorizontalPanAndZoomViewsRef.current = [];
 
-    const syncAllHorizontalPanAndZoomViewStates                                           = (
+    const syncAllHorizontalPanAndZoomViewStates = (
       newState,
-      triggeringView                           ,
+      triggeringView,
     ) => {
       syncedHorizontalPanAndZoomViewsRef.current.forEach(
-        syncedView =>
+        (syncedView) =>
           triggeringView !== syncedView && syncedView.setScrollState(newState),
       );
     };
@@ -265,7 +237,7 @@ function AutoSizedCanvas({data, height, width}                      ) {
     }
   }, [width, height]);
 
-  const interactor = useCallback(interaction => {
+  const interactor = useCallback((interaction) => {
     if (canvasRef.current === null) {
       return;
     }
@@ -294,7 +266,7 @@ function AutoSizedCanvas({data, height, width}                      ) {
   useEffect(() => {
     const {current: userTimingMarksView} = userTimingMarksViewRef;
     if (userTimingMarksView) {
-      userTimingMarksView.onHover = userTimingMark => {
+      userTimingMarksView.onHover = (userTimingMark) => {
         if (!hoveredEvent || hoveredEvent.userTimingMark !== userTimingMark) {
           setHoveredEvent({
             userTimingMark,
@@ -309,7 +281,7 @@ function AutoSizedCanvas({data, height, width}                      ) {
 
     const {current: reactEventsView} = reactEventsViewRef;
     if (reactEventsView) {
-      reactEventsView.onHover = event => {
+      reactEventsView.onHover = (event) => {
         if (!hoveredEvent || hoveredEvent.event !== event) {
           setHoveredEvent({
             userTimingMark: null,
@@ -324,7 +296,7 @@ function AutoSizedCanvas({data, height, width}                      ) {
 
     const {current: reactMeasuresView} = reactMeasuresViewRef;
     if (reactMeasuresView) {
-      reactMeasuresView.onHover = measure => {
+      reactMeasuresView.onHover = (measure) => {
         if (!hoveredEvent || hoveredEvent.measure !== measure) {
           setHoveredEvent({
             userTimingMark: null,
@@ -339,7 +311,7 @@ function AutoSizedCanvas({data, height, width}                      ) {
 
     const {current: flamechartView} = flamechartViewRef;
     if (flamechartView) {
-      flamechartView.setOnHover(flamechartStackFrame => {
+      flamechartView.setOnHover((flamechartStackFrame) => {
         if (
           !hoveredEvent ||
           hoveredEvent.flamechartStackFrame !== flamechartStackFrame
@@ -396,28 +368,27 @@ function AutoSizedCanvas({data, height, width}                      ) {
     <Fragment>
       <canvas ref={canvasRef} height={height} width={width} />
       <ContextMenu id={CONTEXT_MENU_ID}>
-        {contextData => {
+        {(contextData) => {
           if (contextData.hoveredEvent == null) {
             return null;
           }
-          const {
-            event,
-            flamechartStackFrame,
-            measure,
-          } = contextData.hoveredEvent;
+          const {event, flamechartStackFrame, measure} =
+            contextData.hoveredEvent;
           return (
             <Fragment>
               {event !== null && (
                 <ContextMenuItem
                   onClick={() => copy(event.componentName)}
-                  title="Copy component name">
+                  title="Copy component name"
+                >
                   Copy component name
                 </ContextMenuItem>
               )}
               {event !== null && (
                 <ContextMenuItem
                   onClick={() => copy(event.componentStack)}
-                  title="Copy component stack">
+                  title="Copy component stack"
+                >
                   Copy component stack
                 </ContextMenuItem>
               )}
@@ -430,21 +401,24 @@ function AutoSizedCanvas({data, height, width}                      ) {
                       syncedHorizontalPanAndZoomViewsRef.current,
                     )
                   }
-                  title="Zoom to batch">
+                  title="Zoom to batch"
+                >
                   Zoom to batch
                 </ContextMenuItem>
               )}
               {measure !== null && (
                 <ContextMenuItem
                   onClick={() => copySummary(contextData.data, measure)}
-                  title="Copy summary">
+                  title="Copy summary"
+                >
                   Copy summary
                 </ContextMenuItem>
               )}
               {flamechartStackFrame !== null && (
                 <ContextMenuItem
                   onClick={() => copy(flamechartStackFrame.scriptUrl)}
-                  title="Copy file path">
+                  title="Copy file path"
+                >
                   Copy file path
                 </ContextMenuItem>
               )}
@@ -452,12 +426,13 @@ function AutoSizedCanvas({data, height, width}                      ) {
                 <ContextMenuItem
                   onClick={() =>
                     copy(
-                      `line ${flamechartStackFrame.locationLine ??
-                        ''}, column ${flamechartStackFrame.locationColumn ??
-                        ''}`,
+                      `line ${
+                        flamechartStackFrame.locationLine ?? ''
+                      }, column ${flamechartStackFrame.locationColumn ?? ''}`,
                     )
                   }
-                  title="Copy location">
+                  title="Copy location"
+                >
                   Copy location
                 </ContextMenuItem>
               )}

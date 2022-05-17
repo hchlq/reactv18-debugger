@@ -4,50 +4,12 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                                         
 
 import {REACT_OPAQUE_ID_TYPE} from 'shared/ReactSymbols';
 
-                          
-                           
-                          
-                                           
-                           
-                   
-   
-                         
-               
-                
-                    
-                                           
-                                 
-                                   
-                  
-   
-                             
-               
-                    
-              
-   
-                                                         
-                                                     
-                                 
-                                   
-                             // Unused
-                                      
-                           
-                                 
-                                 
-          
-     
-                                    
-                                   
-      
-
-                                                       
+// Unused
 
 export * from 'react-reconciler/src/ReactFiberHostConfigWithNoPersistence';
 export * from 'react-reconciler/src/ReactFiberHostConfigWithNoHydration';
@@ -62,7 +24,7 @@ if (__DEV__) {
   Object.freeze(UPDATE_SIGNAL);
 }
 
-export function getPublicInstance(inst                         )    {
+export function getPublicInstance(inst) {
   switch (inst.tag) {
     case 'INSTANCE':
       const createNodeMock = inst.rootContainerInstance.createNodeMock;
@@ -79,10 +41,7 @@ export function getPublicInstance(inst                         )    {
   }
 }
 
-export function appendChild(
-  parentInstance                      ,
-  child                         ,
-)       {
+export function appendChild(parentInstance, child) {
   if (__DEV__) {
     if (!Array.isArray(parentInstance.children)) {
       console.error(
@@ -100,11 +59,7 @@ export function appendChild(
   parentInstance.children.push(child);
 }
 
-export function insertBefore(
-  parentInstance                      ,
-  child                         ,
-  beforeChild                         ,
-)       {
+export function insertBefore(parentInstance, child, beforeChild) {
   const index = parentInstance.children.indexOf(child);
   if (index !== -1) {
     parentInstance.children.splice(index, 1);
@@ -113,48 +68,43 @@ export function insertBefore(
   parentInstance.children.splice(beforeIndex, 0, child);
 }
 
-export function removeChild(
-  parentInstance                      ,
-  child                         ,
-)       {
+export function removeChild(parentInstance, child) {
   const index = parentInstance.children.indexOf(child);
   parentInstance.children.splice(index, 1);
 }
 
-export function clearContainer(container           )       {
+export function clearContainer(container) {
   container.children.splice(0);
 }
 
-export function getRootHostContext(
-  rootContainerInstance           ,
-)              {
+export function getRootHostContext(rootContainerInstance) {
   return NO_CONTEXT;
 }
 
 export function getChildHostContext(
-  parentHostContext             ,
-  type        ,
-  rootContainerInstance           ,
-)              {
+  parentHostContext,
+  type,
+  rootContainerInstance,
+) {
   return NO_CONTEXT;
 }
 
-export function prepareForCommit(containerInfo           )                {
+export function prepareForCommit(containerInfo) {
   // noop
   return null;
 }
 
-export function resetAfterCommit(containerInfo           )       {
+export function resetAfterCommit(containerInfo) {
   // noop
 }
 
 export function createInstance(
-  type        ,
-  props       ,
-  rootContainerInstance           ,
-  hostContext        ,
-  internalInstanceHandle        ,
-)           {
+  type,
+  props,
+  rootContainerInstance,
+  hostContext,
+  internalInstanceHandle,
+) {
   return {
     type,
     props,
@@ -166,10 +116,7 @@ export function createInstance(
   };
 }
 
-export function appendInitialChild(
-  parentInstance          ,
-  child                         ,
-)       {
+export function appendInitialChild(parentInstance, child) {
   const index = parentInstance.children.indexOf(child);
   if (index !== -1) {
     parentInstance.children.splice(index, 1);
@@ -178,36 +125,36 @@ export function appendInitialChild(
 }
 
 export function finalizeInitialChildren(
-  testElement          ,
-  type        ,
-  props       ,
-  rootContainerInstance           ,
-  hostContext        ,
-)          {
+  testElement,
+  type,
+  props,
+  rootContainerInstance,
+  hostContext,
+) {
   return false;
 }
 
 export function prepareUpdate(
-  testElement          ,
-  type        ,
-  oldProps       ,
-  newProps       ,
-  rootContainerInstance           ,
-  hostContext        ,
-)               {
+  testElement,
+  type,
+  oldProps,
+  newProps,
+  rootContainerInstance,
+  hostContext,
+) {
   return UPDATE_SIGNAL;
 }
 
-export function shouldSetTextContent(type        , props       )          {
+export function shouldSetTextContent(type, props) {
   return false;
 }
 
 export function createTextInstance(
-  text        ,
-  rootContainerInstance           ,
-  hostContext        ,
-  internalInstanceHandle        ,
-)               {
+  text,
+  rootContainerInstance,
+  hostContext,
+  internalInstanceHandle,
+) {
   return {
     text,
     isHidden: false,
@@ -229,35 +176,26 @@ export const noTimeout = -1;
 export const supportsMutation = true;
 
 export function commitUpdate(
-  instance          ,
-  updatePayload       ,
-  type        ,
-  oldProps       ,
-  newProps       ,
-  internalInstanceHandle        ,
-)       {
+  instance,
+  updatePayload,
+  type,
+  oldProps,
+  newProps,
+  internalInstanceHandle,
+) {
   instance.type = type;
   instance.props = newProps;
 }
 
-export function commitMount(
-  instance          ,
-  type        ,
-  newProps       ,
-  internalInstanceHandle        ,
-)       {
+export function commitMount(instance, type, newProps, internalInstanceHandle) {
   // noop
 }
 
-export function commitTextUpdate(
-  textInstance              ,
-  oldText        ,
-  newText        ,
-)       {
+export function commitTextUpdate(textInstance, oldText, newText) {
   textInstance.text = newText;
 }
 
-export function resetTextContent(testElement          )       {
+export function resetTextContent(testElement) {
   // noop
 }
 
@@ -265,35 +203,28 @@ export const appendChildToContainer = appendChild;
 export const insertInContainerBefore = insertBefore;
 export const removeChildFromContainer = removeChild;
 
-export function hideInstance(instance          )       {
+export function hideInstance(instance) {
   instance.isHidden = true;
 }
 
-export function hideTextInstance(textInstance              )       {
+export function hideTextInstance(textInstance) {
   textInstance.isHidden = true;
 }
 
-export function unhideInstance(instance          , props       )       {
+export function unhideInstance(instance, props) {
   instance.isHidden = false;
 }
 
-export function unhideTextInstance(
-  textInstance              ,
-  text        ,
-)       {
+export function unhideTextInstance(textInstance, text) {
   textInstance.isHidden = false;
 }
 
-export function getFundamentalComponentInstance(
-  fundamentalInstance                                             ,
-)           {
+export function getFundamentalComponentInstance(fundamentalInstance) {
   const {impl, props, state} = fundamentalInstance;
   return impl.getInstance(null, props, state);
 }
 
-export function mountFundamentalComponent(
-  fundamentalInstance                                             ,
-)       {
+export function mountFundamentalComponent(fundamentalInstance) {
   const {impl, instance, props, state} = fundamentalInstance;
   const onMount = impl.onMount;
   if (onMount !== undefined) {
@@ -301,9 +232,7 @@ export function mountFundamentalComponent(
   }
 }
 
-export function shouldUpdateFundamentalComponent(
-  fundamentalInstance                                             ,
-)          {
+export function shouldUpdateFundamentalComponent(fundamentalInstance) {
   const {impl, prevProps, props, state} = fundamentalInstance;
   const shouldUpdate = impl.shouldUpdate;
   if (shouldUpdate !== undefined) {
@@ -312,9 +241,7 @@ export function shouldUpdateFundamentalComponent(
   return true;
 }
 
-export function updateFundamentalComponent(
-  fundamentalInstance                                             ,
-)       {
+export function updateFundamentalComponent(fundamentalInstance) {
   const {impl, instance, prevProps, props, state} = fundamentalInstance;
   const onUpdate = impl.onUpdate;
   if (onUpdate !== undefined) {
@@ -322,9 +249,7 @@ export function updateFundamentalComponent(
   }
 }
 
-export function unmountFundamentalComponent(
-  fundamentalInstance                                             ,
-)       {
+export function unmountFundamentalComponent(fundamentalInstance) {
   const {impl, instance, props, state} = fundamentalInstance;
   const onUnmount = impl.onUnmount;
   if (onUnmount !== undefined) {
@@ -332,7 +257,7 @@ export function unmountFundamentalComponent(
   }
 }
 
-export function getInstanceFromNode(mockNode        ) {
+export function getInstanceFromNode(mockNode) {
   const instance = nodeToInstanceMap.get(mockNode);
   if (instance !== undefined) {
     return instance.internalInstanceHandle;
@@ -340,12 +265,12 @@ export function getInstanceFromNode(mockNode        ) {
   return null;
 }
 
-let clientId         = 0;
-export function makeClientId()               {
+let clientId = 0;
+export function makeClientId() {
   return 'c_' + (clientId++).toString(36);
 }
 
-export function makeClientIdInDEV(warnOnAccessInDEV            )               {
+export function makeClientIdInDEV(warnOnAccessInDEV) {
   const id = 'c_' + (clientId++).toString(36);
   return {
     toString() {
@@ -359,7 +284,7 @@ export function makeClientIdInDEV(warnOnAccessInDEV            )               {
   };
 }
 
-export function isOpaqueHydratingObject(value       )          {
+export function isOpaqueHydratingObject(value) {
   return (
     value !== null &&
     typeof value === 'object' &&
@@ -367,9 +292,7 @@ export function isOpaqueHydratingObject(value       )          {
   );
 }
 
-export function makeOpaqueHydratingObject(
-  attemptToReadValue            ,
-)               {
+export function makeOpaqueHydratingObject(attemptToReadValue) {
   return {
     $$typeof: REACT_OPAQUE_ID_TYPE,
     toString: attemptToReadValue,
@@ -385,14 +308,14 @@ export function afterActiveInstanceBlur() {
   // noop
 }
 
-export function preparePortalMount(portalInstance          )       {
+export function preparePortalMount(portalInstance) {
   // noop
 }
 
-export function prepareScopeUpdate(scopeInstance        , inst        )       {
+export function prepareScopeUpdate(scopeInstance, inst) {
   nodeToInstanceMap.set(scopeInstance, inst);
 }
 
-export function getInstanceFromScope(scopeInstance        )                {
+export function getInstanceFromScope(scopeInstance) {
   return nodeToInstanceMap.get(scopeInstance) || null;
 }

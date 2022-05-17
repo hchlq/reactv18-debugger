@@ -4,15 +4,11 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
-                                                                    
-                                                              
-                                                                              
-
 // Re-export dynamic flags from the www version.
-const dynamicFeatureFlags                      = require('ReactFeatureFlags');
+const dynamicFeatureFlags = require('ReactFeatureFlags');
 
 export const {
   debugRenderPhaseSideEffectsForStrictMode,
@@ -86,6 +82,6 @@ export const enableNewReconciler = __VARIANT__;
 
 // Flow magic to verify the exports of this file match the original version.
 // eslint-disable-next-line no-unused-vars
-                                        
+
 // eslint-disable-next-line no-unused-expressions
-(null                                      );
+null;

@@ -43,7 +43,7 @@ describe('SyntheticClipboardEvent', () => {
             items: null,
             types: null,
           };
-          const eventHandler = event => {
+          const eventHandler = (event) => {
             expect(event.clipboardData).toBe(clipboardData);
             expectedCount++;
           };
@@ -82,7 +82,7 @@ describe('SyntheticClipboardEvent', () => {
     it('is able to `preventDefault` and `stopPropagation`', () => {
       let expectedCount = 0;
 
-      const eventHandler = event => {
+      const eventHandler = (event) => {
         expect(event.isDefaultPrevented()).toBe(false);
         event.preventDefault();
         expect(event.isDefaultPrevented()).toBe(true);

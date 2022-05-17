@@ -4,22 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                         
-
-                              
-                                                 
-                
-                
- 
-
-                                                                             
-
-                      
-                              
-   
 
 import {
   ImmediatePriority,
@@ -67,18 +53,7 @@ export function unstable_requestPaint() {
   // Since we yield every frame regardless, `requestPaint` has no effect.
 }
 
-                             
-                                 
-    
-     
-                              
-                         
-
-export function unstable_scheduleCallback   (
-  priorityLevel               ,
-  callback                      ,
-  options                   ,
-)               {
+export function unstable_scheduleCallback(priorityLevel, callback, options) {
   let postTaskPriority;
   switch (priorityLevel) {
     case ImmediatePriority:
@@ -118,12 +93,7 @@ export function unstable_scheduleCallback   (
   return node;
 }
 
-function runTask   (
-  priorityLevel               ,
-  postTaskPriority                       ,
-  node              ,
-  callback                      ,
-) {
+function runTask(priorityLevel, postTaskPriority, node, callback) {
   deadline = getCurrentTime() + yieldInterval;
   try {
     currentPriorityLevel_DEPRECATED = priorityLevel;
@@ -131,7 +101,7 @@ function runTask   (
     const result = callback(didTimeout_DEPRECATED);
     if (typeof result === 'function') {
       // Assume this is a continuation
-      const continuation                       = (result     );
+      const continuation = result;
       const continuationController = new TaskController();
       const continuationOptions = {
         priority: postTaskPriority,
@@ -175,15 +145,12 @@ function handleAbortError(error) {
   // user to handle them.
 }
 
-export function unstable_cancelCallback(node              ) {
+export function unstable_cancelCallback(node) {
   const controller = node._controller;
   controller.abort();
 }
 
-export function unstable_runWithPriority   (
-  priorityLevel               ,
-  callback         ,
-)    {
+export function unstable_runWithPriority(priorityLevel, callback) {
   const previousPriorityLevel = currentPriorityLevel_DEPRECATED;
   currentPriorityLevel_DEPRECATED = priorityLevel;
   try {
@@ -197,7 +164,7 @@ export function unstable_getCurrentPriorityLevel() {
   return currentPriorityLevel_DEPRECATED;
 }
 
-export function unstable_next   (callback         )    {
+export function unstable_next(callback) {
   let priorityLevel;
   switch (currentPriorityLevel_DEPRECATED) {
     case ImmediatePriority:
@@ -221,7 +188,7 @@ export function unstable_next   (callback         )    {
   }
 }
 
-export function unstable_wrapCallback   (callback         )          {
+export function unstable_wrapCallback(callback) {
   const parentPriorityLevel = currentPriorityLevel_DEPRECATED;
   return () => {
     const previousPriorityLevel = currentPriorityLevel_DEPRECATED;

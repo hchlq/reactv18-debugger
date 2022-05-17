@@ -4,10 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                
 
 import {
   resetCurrentFiber as resetCurrentDebugFiberInDEV,
@@ -16,19 +14,16 @@ import {
 import getComponentName from 'shared/getComponentName';
 import {StrictMode} from './ReactTypeOfMode';
 
-                               
-                                                        
-
 const ReactStrictModeWarnings = {
-  recordUnsafeLifecycleWarnings(fiber       , instance     )       {},
-  flushPendingUnsafeLifecycleWarnings()       {},
-  recordLegacyContextWarning(fiber       , instance     )       {},
-  flushLegacyContextWarning()       {},
-  discardPendingWarnings()       {},
+  recordUnsafeLifecycleWarnings(fiber, instance) {},
+  flushPendingUnsafeLifecycleWarnings() {},
+  recordLegacyContextWarning(fiber, instance) {},
+  flushLegacyContextWarning() {},
+  discardPendingWarnings() {},
 };
 
 if (__DEV__) {
-  const findStrictRoot = (fiber       )               => {
+  const findStrictRoot = (fiber) => {
     let maybeStrictRoot = null;
 
     let node = fiber;
@@ -42,28 +37,25 @@ if (__DEV__) {
     return maybeStrictRoot;
   };
 
-  const setToSortedString = set => {
+  const setToSortedString = (set) => {
     const array = [];
-    set.forEach(value => {
+    set.forEach((value) => {
       array.push(value);
     });
     return array.sort().join(', ');
   };
 
-  let pendingComponentWillMountWarnings               = [];
-  let pendingUNSAFE_ComponentWillMountWarnings               = [];
-  let pendingComponentWillReceivePropsWarnings               = [];
-  let pendingUNSAFE_ComponentWillReceivePropsWarnings               = [];
-  let pendingComponentWillUpdateWarnings               = [];
-  let pendingUNSAFE_ComponentWillUpdateWarnings               = [];
+  let pendingComponentWillMountWarnings = [];
+  let pendingUNSAFE_ComponentWillMountWarnings = [];
+  let pendingComponentWillReceivePropsWarnings = [];
+  let pendingUNSAFE_ComponentWillReceivePropsWarnings = [];
+  let pendingComponentWillUpdateWarnings = [];
+  let pendingUNSAFE_ComponentWillUpdateWarnings = [];
 
   // Tracks components we have already warned about.
   const didWarnAboutUnsafeLifecycles = new Set();
 
-  ReactStrictModeWarnings.recordUnsafeLifecycleWarnings = (
-    fiber       ,
-    instance     ,
-  ) => {
+  ReactStrictModeWarnings.recordUnsafeLifecycleWarnings = (fiber, instance) => {
     // Dedup strategy: Warn once per component.
     if (didWarnAboutUnsafeLifecycles.has(fiber.type)) {
       return;
@@ -117,7 +109,7 @@ if (__DEV__) {
     // We do an initial pass to gather component names
     const componentWillMountUniqueNames = new Set();
     if (pendingComponentWillMountWarnings.length > 0) {
-      pendingComponentWillMountWarnings.forEach(fiber => {
+      pendingComponentWillMountWarnings.forEach((fiber) => {
         componentWillMountUniqueNames.add(
           getComponentName(fiber.type) || 'Component',
         );
@@ -128,7 +120,7 @@ if (__DEV__) {
 
     const UNSAFE_componentWillMountUniqueNames = new Set();
     if (pendingUNSAFE_ComponentWillMountWarnings.length > 0) {
-      pendingUNSAFE_ComponentWillMountWarnings.forEach(fiber => {
+      pendingUNSAFE_ComponentWillMountWarnings.forEach((fiber) => {
         UNSAFE_componentWillMountUniqueNames.add(
           getComponentName(fiber.type) || 'Component',
         );
@@ -139,7 +131,7 @@ if (__DEV__) {
 
     const componentWillReceivePropsUniqueNames = new Set();
     if (pendingComponentWillReceivePropsWarnings.length > 0) {
-      pendingComponentWillReceivePropsWarnings.forEach(fiber => {
+      pendingComponentWillReceivePropsWarnings.forEach((fiber) => {
         componentWillReceivePropsUniqueNames.add(
           getComponentName(fiber.type) || 'Component',
         );
@@ -151,7 +143,7 @@ if (__DEV__) {
 
     const UNSAFE_componentWillReceivePropsUniqueNames = new Set();
     if (pendingUNSAFE_ComponentWillReceivePropsWarnings.length > 0) {
-      pendingUNSAFE_ComponentWillReceivePropsWarnings.forEach(fiber => {
+      pendingUNSAFE_ComponentWillReceivePropsWarnings.forEach((fiber) => {
         UNSAFE_componentWillReceivePropsUniqueNames.add(
           getComponentName(fiber.type) || 'Component',
         );
@@ -163,7 +155,7 @@ if (__DEV__) {
 
     const componentWillUpdateUniqueNames = new Set();
     if (pendingComponentWillUpdateWarnings.length > 0) {
-      pendingComponentWillUpdateWarnings.forEach(fiber => {
+      pendingComponentWillUpdateWarnings.forEach((fiber) => {
         componentWillUpdateUniqueNames.add(
           getComponentName(fiber.type) || 'Component',
         );
@@ -175,7 +167,7 @@ if (__DEV__) {
 
     const UNSAFE_componentWillUpdateUniqueNames = new Set();
     if (pendingUNSAFE_ComponentWillUpdateWarnings.length > 0) {
-      pendingUNSAFE_ComponentWillUpdateWarnings.forEach(fiber => {
+      pendingUNSAFE_ComponentWillUpdateWarnings.forEach((fiber) => {
         UNSAFE_componentWillUpdateUniqueNames.add(
           getComponentName(fiber.type) || 'Component',
         );
@@ -285,15 +277,12 @@ if (__DEV__) {
     }
   };
 
-  let pendingLegacyContextWarning                            = new Map();
+  let pendingLegacyContextWarning = new Map();
 
   // Tracks components we have already warned about.
   const didWarnAboutLegacyContext = new Set();
 
-  ReactStrictModeWarnings.recordLegacyContextWarning = (
-    fiber       ,
-    instance     ,
-  ) => {
+  ReactStrictModeWarnings.recordLegacyContextWarning = (fiber, instance) => {
     const strictRoot = findStrictRoot(fiber);
     if (strictRoot === null) {
       console.error(
@@ -324,36 +313,34 @@ if (__DEV__) {
   };
 
   ReactStrictModeWarnings.flushLegacyContextWarning = () => {
-    ((pendingLegacyContextWarning     )                           ).forEach(
-      (fiberArray            , strictRoot) => {
-        if (fiberArray.length === 0) {
-          return;
-        }
-        const firstFiber = fiberArray[0];
+    pendingLegacyContextWarning.forEach((fiberArray, strictRoot) => {
+      if (fiberArray.length === 0) {
+        return;
+      }
+      const firstFiber = fiberArray[0];
 
-        const uniqueNames = new Set();
-        fiberArray.forEach(fiber => {
-          uniqueNames.add(getComponentName(fiber.type) || 'Component');
-          didWarnAboutLegacyContext.add(fiber.type);
-        });
+      const uniqueNames = new Set();
+      fiberArray.forEach((fiber) => {
+        uniqueNames.add(getComponentName(fiber.type) || 'Component');
+        didWarnAboutLegacyContext.add(fiber.type);
+      });
 
-        const sortedNames = setToSortedString(uniqueNames);
+      const sortedNames = setToSortedString(uniqueNames);
 
-        try {
-          setCurrentDebugFiberInDEV(firstFiber);
-          console.error(
-            'Legacy context API has been detected within a strict-mode tree.' +
-              '\n\nThe old API will be supported in all 16.x releases, but applications ' +
-              'using it should migrate to the new version.' +
-              '\n\nPlease update the following components: %s' +
-              '\n\nLearn more about this warning here: https://reactjs.org/link/legacy-context',
-            sortedNames,
-          );
-        } finally {
-          resetCurrentDebugFiberInDEV();
-        }
-      },
-    );
+      try {
+        setCurrentDebugFiberInDEV(firstFiber);
+        console.error(
+          'Legacy context API has been detected within a strict-mode tree.' +
+            '\n\nThe old API will be supported in all 16.x releases, but applications ' +
+            'using it should migrate to the new version.' +
+            '\n\nPlease update the following components: %s' +
+            '\n\nLearn more about this warning here: https://reactjs.org/link/legacy-context',
+          sortedNames,
+        );
+      } finally {
+        resetCurrentDebugFiberInDEV();
+      }
+    });
   };
 
   ReactStrictModeWarnings.discardPendingWarnings = () => {

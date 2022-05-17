@@ -36,7 +36,7 @@ function printWarning(level, format, args) {
       args = args.concat([stack]);
     }
 
-    const argsWithFormat = args.map(item => '' + item);
+    const argsWithFormat = args.map((item) => '' + item);
     // Careful: RN currently depends on this prefix
     argsWithFormat.unshift('Warning: ' + format);
     // We intentionally don't use spread (or .apply) directly because it

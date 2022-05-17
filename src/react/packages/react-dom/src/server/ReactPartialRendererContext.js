@@ -4,11 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                       
-                                                    
 
 import {disableLegacyContext} from 'shared/ReactFeatureFlags';
 import {REACT_CONTEXT_TYPE, REACT_PROVIDER_TYPE} from 'shared/ReactSymbols';
@@ -37,16 +34,13 @@ function maskContext(type, context) {
   return maskedContext;
 }
 
-function checkContextTypes(typeSpecs, values, location        ) {
+function checkContextTypes(typeSpecs, values, location) {
   if (__DEV__) {
     checkPropTypes(typeSpecs, values, location, 'Component');
   }
 }
 
-export function validateContextBounds(
-  context                   ,
-  threadID          ,
-) {
+export function validateContextBounds(context, threadID) {
   // If we don't have enough slots in this context to store this threadID,
   // fill it in without leaving any holes to ensure that the VM optimizes
   // this as non-holey index properties.
@@ -60,16 +54,11 @@ export function validateContextBounds(
   }
 }
 
-export function processContext(
-  type          ,
-  context        ,
-  threadID          ,
-  isClass         ,
-) {
+export function processContext(type, context, threadID, isClass) {
   if (isClass) {
     const contextType = type.contextType;
     if (__DEV__) {
-      if ('contextType' in (type     )) {
+      if ('contextType' in type) {
         const isValid =
           // Allow null for conditional declaration
           contextType === null ||

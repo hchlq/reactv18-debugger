@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -22,33 +22,6 @@ import {parseHookPathForEdit} from './utils';
 import styles from './KeyValue.css';
 import Button from 'react-devtools-shared/src/devtools/views/Button';
 import ButtonIcon from 'react-devtools-shared/src/devtools/views/ButtonIcon';
-
-                                              
-                                   
-                                                                     
-                                                                       
-
-                                                    
-
-                       
-                     
-                         
-                          
-                         
-                          
-                                                     
-                
-                  
-                   
-                                                   
-                                     
-                                   
-               
-                   
-                 
-               
-             
-   
 
 export default function KeyValue({
   alphaSort,
@@ -68,10 +41,10 @@ export default function KeyValue({
   pathRoot,
   store,
   value,
-}               ) {
+}) {
   const {id} = inspectedElement;
 
-  const [isOpen, setIsOpen] = useState         (false);
+  const [isOpen, setIsOpen] = useState(false);
   const prevIsOpenRef = useRef(isOpen);
   const contextMenuTriggerRef = useRef(null);
 
@@ -89,7 +62,7 @@ export default function KeyValue({
     prevIsOpenRef.current = isOpen;
   }, [getInspectedElementPath, isInspectable, isOpen, path, pathRoot]);
 
-  const toggleIsOpen = () => setIsOpen(prevIsOpen => !prevIsOpen);
+  const toggleIsOpen = () => setIsOpen((prevIsOpen) => !prevIsOpen);
 
   useContextMenu({
     data: {
@@ -134,7 +107,7 @@ export default function KeyValue({
     }
   };
 
-  const deletePath = pathToDelete => {
+  const deletePath = (pathToDelete) => {
     if (hookID != null) {
       pathToDelete = parseHookPathForEdit(pathToDelete);
     }
@@ -228,7 +201,8 @@ export default function KeyValue({
         className={styles.Item}
         hidden={hidden}
         ref={contextMenuTriggerRef}
-        style={style}>
+        style={style}
+      >
         <div className={styles.ExpandCollapseToggleSpacer} />
         {renderedName}
         <div className={styles.AfterName}>:</div>
@@ -253,7 +227,8 @@ export default function KeyValue({
         className={styles.Item}
         hidden={hidden}
         ref={contextMenuTriggerRef}
-        style={style}>
+        style={style}
+      >
         {isInspectable ? (
           <ExpandCollapseToggle isOpen={isOpen} setIsOpen={setIsOpen} />
         ) : (
@@ -263,7 +238,8 @@ export default function KeyValue({
         <div className={styles.AfterName}>:</div>
         <span
           className={styles.Value}
-          onClick={isInspectable ? toggleIsOpen : undefined}>
+          onClick={isInspectable ? toggleIsOpen : undefined}
+        >
           {getMetaValueLabel(value)}
         </span>
       </div>
@@ -320,7 +296,8 @@ export default function KeyValue({
           className={styles.Item}
           hidden={hidden}
           ref={contextMenuTriggerRef}
-          style={style}>
+          style={style}
+        >
           {hasChildren ? (
             <ExpandCollapseToggle isOpen={isOpen} setIsOpen={setIsOpen} />
           ) : (
@@ -330,7 +307,8 @@ export default function KeyValue({
           <div className={styles.AfterName}>:</div>
           <span
             className={styles.Value}
-            onClick={hasChildren ? toggleIsOpen : undefined}>
+            onClick={hasChildren ? toggleIsOpen : undefined}
+          >
             {displayName}
           </span>
         </div>,
@@ -347,7 +325,7 @@ export default function KeyValue({
       const hasChildren = entries.length > 0 || canEditValues;
       const displayName = getMetaValueLabel(value);
 
-      children = entries.map              (([key, keyValue]) => (
+      children = entries.map(([key, keyValue]) => (
         <KeyValue
           key={key}
           alphaSort={alphaSort}
@@ -392,7 +370,8 @@ export default function KeyValue({
           className={styles.Item}
           hidden={hidden}
           ref={contextMenuTriggerRef}
-          style={style}>
+          style={style}
+        >
           {hasChildren ? (
             <ExpandCollapseToggle isOpen={isOpen} setIsOpen={setIsOpen} />
           ) : (
@@ -402,7 +381,8 @@ export default function KeyValue({
           <div className={styles.AfterName}>:</div>
           <span
             className={styles.Value}
-            onClick={hasChildren ? toggleIsOpen : undefined}>
+            onClick={hasChildren ? toggleIsOpen : undefined}
+          >
             {displayName}
           </span>
         </div>,
@@ -414,7 +394,7 @@ export default function KeyValue({
 }
 
 function DeleteToggle({deletePath, name, path}) {
-  const handleClick = event => {
+  const handleClick = (event) => {
     event.stopPropagation();
     deletePath(path);
   };
@@ -424,7 +404,8 @@ function DeleteToggle({deletePath, name, path}) {
       <Button
         className={styles.DeleteArrayItemButton}
         onClick={handleClick}
-        title="Delete entry">
+        title="Delete entry"
+      >
         <ButtonIcon type="delete" />
       </Button>
       <span className={styles.Name}>{name}</span>

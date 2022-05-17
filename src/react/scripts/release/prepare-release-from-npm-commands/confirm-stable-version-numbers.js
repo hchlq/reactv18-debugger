@@ -26,11 +26,11 @@ const run = async ({skipPackages}, versionsMap) => {
   const entries = [...groupedVersionsMap.entries()];
   for (let i = 0; i < entries.length; i++) {
     const [bestGuessVersion, packages] = entries[i];
-    const packageNames = packages.map(name => theme.package(name)).join(', ');
+    const packageNames = packages.map((name) => theme.package(name)).join(', ');
 
     let version = bestGuessVersion;
     if (
-      skipPackages.some(skipPackageName =>
+      skipPackages.some((skipPackageName) =>
         packageNames.includes(skipPackageName)
       )
     ) {
@@ -52,7 +52,7 @@ const run = async ({skipPackages}, versionsMap) => {
     try {
       semver(version);
 
-      packages.forEach(packageName => {
+      packages.forEach((packageName) => {
         versionsMap.set(packageName, version);
       });
     } catch (error) {

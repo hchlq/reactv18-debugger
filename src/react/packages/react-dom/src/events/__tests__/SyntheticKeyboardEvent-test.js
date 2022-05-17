@@ -36,7 +36,7 @@ describe('SyntheticKeyboardEvent', () => {
             let charCode = null;
             const node = ReactDOM.render(
               <input
-                onKeyPress={e => {
+                onKeyPress={(e) => {
                   charCode = e.charCode;
                 }}
               />,
@@ -57,7 +57,7 @@ describe('SyntheticKeyboardEvent', () => {
             let charCode = null;
             const node = ReactDOM.render(
               <input
-                onKeyPress={e => {
+                onKeyPress={(e) => {
                   charCode = e.charCode;
                 }}
               />,
@@ -77,7 +77,7 @@ describe('SyntheticKeyboardEvent', () => {
             let charCode = null;
             const node = ReactDOM.render(
               <input
-                onKeyPress={e => {
+                onKeyPress={(e) => {
                   charCode = e.charCode;
                 }}
               />,
@@ -120,7 +120,7 @@ describe('SyntheticKeyboardEvent', () => {
             let charCode = null;
             const node = ReactDOM.render(
               <input
-                onKeyPress={e => {
+                onKeyPress={(e) => {
                   charCode = e.charCode;
                 }}
               />,
@@ -140,7 +140,7 @@ describe('SyntheticKeyboardEvent', () => {
             let charCode = null;
             const node = ReactDOM.render(
               <input
-                onKeyPress={e => {
+                onKeyPress={(e) => {
                   charCode = e.charCode;
                 }}
               />,
@@ -185,7 +185,7 @@ describe('SyntheticKeyboardEvent', () => {
             let charCode = null;
             const node = ReactDOM.render(
               <input
-                onKeyPress={e => {
+                onKeyPress={(e) => {
                   charCode = e.charCode;
                 }}
               />,
@@ -205,7 +205,7 @@ describe('SyntheticKeyboardEvent', () => {
             let charCode = null;
             const node = ReactDOM.render(
               <input
-                onKeyPress={e => {
+                onKeyPress={(e) => {
                   charCode = e.charCode;
                 }}
               />,
@@ -225,7 +225,7 @@ describe('SyntheticKeyboardEvent', () => {
             let called = false;
             const node = ReactDOM.render(
               <input
-                onKeyPress={e => {
+                onKeyPress={(e) => {
                   called = true;
                 }}
               />,
@@ -249,10 +249,10 @@ describe('SyntheticKeyboardEvent', () => {
           let charCodeUp = null;
           const node = ReactDOM.render(
             <input
-              onKeyDown={e => {
+              onKeyDown={(e) => {
                 charCodeDown = e.charCode;
               }}
-              onKeyUp={e => {
+              onKeyUp={(e) => {
                 charCodeUp = e.charCode;
               }}
             />,
@@ -281,7 +281,7 @@ describe('SyntheticKeyboardEvent', () => {
         let charCode = null;
         const node = ReactDOM.render(
           <input
-            onKeyDown={e => {
+            onKeyDown={(e) => {
               charCode = e.charCode;
             }}
           />,
@@ -305,10 +305,10 @@ describe('SyntheticKeyboardEvent', () => {
           let keyCodeUp = null;
           const node = ReactDOM.render(
             <input
-              onKeyDown={e => {
+              onKeyDown={(e) => {
                 keyCodeDown = e.keyCode;
               }}
-              onKeyUp={e => {
+              onKeyUp={(e) => {
                 keyCodeUp = e.keyCode;
               }}
             />,
@@ -338,7 +338,7 @@ describe('SyntheticKeyboardEvent', () => {
           let keyCode = null;
           const node = ReactDOM.render(
             <input
-              onKeyPress={e => {
+              onKeyPress={(e) => {
                 keyCode = e.keyCode;
               }}
             />,
@@ -362,7 +362,7 @@ describe('SyntheticKeyboardEvent', () => {
           let calls = 0;
           const node = ReactDOM.render(
             <input
-              onKeyPress={e => {
+              onKeyPress={(e) => {
                 expect(e.which).toBe(e.charCode);
                 calls++;
               }}
@@ -401,11 +401,11 @@ describe('SyntheticKeyboardEvent', () => {
           let calls = 0;
           const node = ReactDOM.render(
             <input
-              onKeyDown={e => {
+              onKeyDown={(e) => {
                 expect(e.which).toBe(e.keyCode);
                 calls++;
               }}
-              onKeyUp={e => {
+              onKeyUp={(e) => {
                 expect(e.which).toBe(e.keyCode);
                 calls++;
               }}
@@ -459,13 +459,13 @@ describe('SyntheticKeyboardEvent', () => {
         let codePress = null;
         const node = ReactDOM.render(
           <input
-            onKeyDown={e => {
+            onKeyDown={(e) => {
               codeDown = e.code;
             }}
-            onKeyUp={e => {
+            onKeyUp={(e) => {
               codeUp = e.code;
             }}
-            onKeyPress={e => {
+            onKeyPress={(e) => {
               codePress = e.code;
             }}
           />,
@@ -503,7 +503,7 @@ describe('SyntheticKeyboardEvent', () => {
   describe('EventInterface', () => {
     it('is able to `preventDefault` and `stopPropagation`', () => {
       let expectedCount = 0;
-      const eventHandler = event => {
+      const eventHandler = (event) => {
         expect(event.isDefaultPrevented()).toBe(false);
         event.preventDefault();
         expect(event.isDefaultPrevented()).toBe(true);

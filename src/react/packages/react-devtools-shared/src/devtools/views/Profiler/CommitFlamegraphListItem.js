@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -15,17 +15,7 @@ import {getGradientColor} from './utils';
 import ChartNode from './ChartNode';
 import {SettingsContext} from '../Settings/SettingsContext';
 
-                                                                         
-                                                 
-
-              
-                 
-                
-                
-     
-  
-
-function CommitFlamegraphListItem({data, index, style}       ) {
+function CommitFlamegraphListItem({data, index, style}) {
   const {
     chartData,
     onElementMouseEnter,
@@ -41,14 +31,14 @@ function CommitFlamegraphListItem({data, index, style}       ) {
   const {lineHeight} = useContext(SettingsContext);
 
   const handleClick = useCallback(
-    (event                        , id        , name        ) => {
+    (event, id, name) => {
       event.stopPropagation();
       selectFiber(id, name);
     },
     [selectFiber],
   );
 
-  const handleMouseEnter = (nodeData               ) => {
+  const handleMouseEnter = (nodeData) => {
     const {id, name} = nodeData;
     onElementMouseEnter({id, name});
   };
@@ -72,7 +62,7 @@ function CommitFlamegraphListItem({data, index, style}       ) {
 
   return (
     <Fragment>
-      {row.map(chartNode => {
+      {row.map((chartNode) => {
         const {
           didRender,
           id,
@@ -117,7 +107,7 @@ function CommitFlamegraphListItem({data, index, style}       ) {
             isDimmed={index < selectedChartNodeIndex}
             key={id}
             label={label}
-            onClick={event => handleClick(event, id, name)}
+            onClick={(event) => handleClick(event, id, name)}
             onMouseEnter={() => handleMouseEnter(chartNode)}
             onMouseLeave={handleMouseLeave}
             textStyle={{color: textColor}}
@@ -131,4 +121,4 @@ function CommitFlamegraphListItem({data, index, style}       ) {
   );
 }
 
-export default memo       (CommitFlamegraphListItem, areEqual);
+export default memo(CommitFlamegraphListItem, areEqual);

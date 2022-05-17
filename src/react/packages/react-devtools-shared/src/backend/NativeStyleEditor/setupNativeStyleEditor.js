@@ -4,46 +4,25 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import Agent from 'react-devtools-shared/src/backend/agent';
 import resolveBoxStyle from './resolveBoxStyle';
 
-                                                                    
-                                         
-                                            
-
-                                                                
-
 export default function setupNativeStyleEditor(
-  bridge               ,
-  agent       ,
-  resolveNativeStyle                    ,
-  validAttributes                                ,
+  bridge,
+  agent,
+  resolveNativeStyle,
+  validAttributes,
 ) {
-  bridge.addListener(
-    'NativeStyleEditor_measure',
-    ({id, rendererID}                                        ) => {
-      measureStyle(agent, bridge, resolveNativeStyle, id, rendererID);
-    },
-  );
+  bridge.addListener('NativeStyleEditor_measure', ({id, rendererID}) => {
+    measureStyle(agent, bridge, resolveNativeStyle, id, rendererID);
+  });
 
   bridge.addListener(
     'NativeStyleEditor_renameAttribute',
-    ({
-      id,
-      rendererID,
-      oldName,
-      newName,
-      value,
-    }    
-                 
-                             
-                      
-                      
-                    
-      ) => {
+    ({id, rendererID, oldName, newName, value}) => {
       renameStyle(agent, id, rendererID, oldName, newName, value);
       setTimeout(() =>
         measureStyle(agent, bridge, resolveNativeStyle, id, rendererID),
@@ -53,17 +32,7 @@ export default function setupNativeStyleEditor(
 
   bridge.addListener(
     'NativeStyleEditor_setValue',
-    ({
-      id,
-      rendererID,
-      name,
-      value,
-    }    
-                 
-                         
-                   
-                    
-      ) => {
+    ({id, rendererID, name, value}) => {
       setStyle(agent, id, rendererID, name, value);
       setTimeout(() =>
         measureStyle(agent, bridge, resolveNativeStyle, id, rendererID),
@@ -84,25 +53,16 @@ const EMPTY_BOX_STYLE = {
   bottom: 0,
 };
 
-const componentIDToStyleOverrides                      = new Map();
+const componentIDToStyleOverrides = new Map();
 
-function measureStyle(
-  agent       ,
-  bridge               ,
-  resolveNativeStyle                    ,
-  id        ,
-  rendererID            ,
-) {
+function measureStyle(agent, bridge, resolveNativeStyle, id, rendererID) {
   const data = agent.getInstanceAndStyle({id, rendererID});
   if (!data || !data.style) {
-    bridge.send(
-      'NativeStyleEditor_styleAndLayout',
-      ({
-        id,
-        layout: null,
-        style: null,
-      }                ),
-    );
+    bridge.send('NativeStyleEditor_styleAndLayout', {
+      id,
+      layout: null,
+      style: null,
+    });
     return;
   }
 
@@ -117,14 +77,11 @@ function measureStyle(
   }
 
   if (!instance || typeof instance.measure !== 'function') {
-    bridge.send(
-      'NativeStyleEditor_styleAndLayout',
-      ({
-        id,
-        layout: null,
-        style: resolvedStyle || null,
-      }                ),
-    );
+    bridge.send('NativeStyleEditor_styleAndLayout', {
+      id,
+      layout: null,
+      style: resolvedStyle || null,
+    });
     return;
   }
 
@@ -133,14 +90,11 @@ function measureStyle(
     // RN Android sometimes returns undefined here. Don't send measurements in this case.
     // https://github.com/jhen0409/react-native-debugger/issues/84#issuecomment-304611817
     if (typeof x !== 'number') {
-      bridge.send(
-        'NativeStyleEditor_styleAndLayout',
-        ({
-          id,
-          layout: null,
-          style: resolvedStyle || null,
-        }                ),
-      );
+      bridge.send('NativeStyleEditor_styleAndLayout', {
+        id,
+        layout: null,
+        style: resolvedStyle || null,
+      });
       return;
     }
     const margin =
@@ -149,27 +103,24 @@ function measureStyle(
     const padding =
       (resolvedStyle != null && resolveBoxStyle('padding', resolvedStyle)) ||
       EMPTY_BOX_STYLE;
-    bridge.send(
-      'NativeStyleEditor_styleAndLayout',
-      ({
-        id,
-        layout: {
-          x,
-          y,
-          width,
-          height,
-          left,
-          top,
-          margin,
-          padding,
-        },
-        style: resolvedStyle || null,
-      }                ),
-    );
+    bridge.send('NativeStyleEditor_styleAndLayout', {
+      id,
+      layout: {
+        x,
+        y,
+        width,
+        height,
+        left,
+        top,
+        margin,
+        padding,
+      },
+      style: resolvedStyle || null,
+    });
   });
 }
 
-function shallowClone(object        )         {
+function shallowClone(object) {
   const cloned = {};
   for (const n in object) {
     cloned[n] = object[n];
@@ -177,14 +128,7 @@ function shallowClone(object        )         {
   return cloned;
 }
 
-function renameStyle(
-  agent       ,
-  id        ,
-  rendererID            ,
-  oldName        ,
-  newName        ,
-  value        ,
-)       {
+function renameStyle(agent, id, rendererID, oldName, newName, value) {
   const data = agent.getInstanceAndStyle({id, rendererID});
   if (!data || !data.style) {
     return;
@@ -269,13 +213,7 @@ function renameStyle(
   agent.emit('hideNativeHighlight');
 }
 
-function setStyle(
-  agent       ,
-  id        ,
-  rendererID            ,
-  name        ,
-  value        ,
-) {
+function setStyle(agent, id, rendererID, name, value) {
   const data = agent.getInstanceAndStyle({id, rendererID});
   if (!data || !data.style) {
     return;

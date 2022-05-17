@@ -4,18 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-             
-              
-                       
-                       
-                     
-                        
-                                
-                                     
-                                                     
 
 import {Surface} from './Surface';
 import {View} from './View';
@@ -28,16 +18,16 @@ import {
 import {MOVE_WHEEL_DELTA_THRESHOLD} from './constants';
 
 export class VerticalScrollView extends View {
-  _scrollState              = {offset: 0, length: 0};
+  _scrollState = {offset: 0, length: 0};
   _isPanning = false;
 
-  constructor(surface         , frame      , contentView      ) {
+  constructor(surface, frame, contentView) {
     super(surface, frame);
     this.addSubview(contentView);
     this._setScrollState(this._scrollState);
   }
 
-  setFrame(newFrame      ) {
+  setFrame(newFrame) {
     super.setFrame(newFrame);
 
     // Revalidate scrollState
@@ -79,13 +69,13 @@ export class VerticalScrollView extends View {
     super.layoutSubviews();
   }
 
-  _handleMouseDown(interaction                      ) {
+  _handleMouseDown(interaction) {
     if (rectContainsPoint(interaction.payload.location, this.frame)) {
       this._isPanning = true;
     }
   }
 
-  _handleMouseMove(interaction                      ) {
+  _handleMouseMove(interaction) {
     if (!this._isPanning) {
       return;
     }
@@ -97,13 +87,13 @@ export class VerticalScrollView extends View {
     this._setScrollState(newState);
   }
 
-  _handleMouseUp(interaction                    ) {
+  _handleMouseUp(interaction) {
     if (this._isPanning) {
       this._isPanning = false;
     }
   }
 
-  _handleWheelPlain(interaction                       ) {
+  _handleWheelPlain(interaction) {
     const {
       location,
       delta: {deltaX, deltaY},
@@ -130,7 +120,7 @@ export class VerticalScrollView extends View {
     this._setScrollState(newState);
   }
 
-  handleInteraction(interaction             ) {
+  handleInteraction(interaction) {
     switch (interaction.type) {
       case 'mousedown':
         this._handleMouseDown(interaction);
@@ -150,7 +140,7 @@ export class VerticalScrollView extends View {
   /**
    * @private
    */
-  _setScrollState(proposedState             ) {
+  _setScrollState(proposedState) {
     const height = this._contentView.frame.size.height;
     const clampedState = clampState({
       state: proposedState,

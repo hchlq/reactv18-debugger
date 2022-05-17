@@ -4,212 +4,28 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import EventEmitter from './events';
 
-                                                   
-             
-                          
-             
-                       
-             
-                                                 
-                                                                                                                       
-
 const BATCH_DURATION = 100;
 
-                                                                   
+class Bridge extends EventEmitter {
+  _isShutdown = false;
+  _messageQueue = [];
+  _timeoutID = null;
+  _wall;
+  _wallUnlisten = null;
 
-                 
-                
-               
-   
-
-                               
-                          
-                             
-                            
-                                   
-                          
-   
-
-                       
-                          
-                               
-                         
-             
-   
-
-                           
-                   
-                 
-   
-
-                                                        
-
-                    
-                          
-                 
-                   
-                               
-   
-
-                    
-                          
-                 
-                   
-                                  
-                                  
-   
-
-                             
-                          
-                 
-                   
-                               
-             
-   
-
-                          
-                          
-                         
-   
-
-                               
-                          
-                               
-   
-
-                                   
-                          
-                               
-   
-
-                              
-                          
-                                
-   
-
-                             
-                          
-                
-                               
-   
-
-                                                 
-                          
-                  
-                  
-                
-   
-
-                                          
-                          
-               
-                
-   
-
-                                          
-                                
-                                
-   
-
-                       
-                                  
-                                              
-                                          
-                              
-                           
-                                                     
-                                        
-                             
-                            
-                        
-               
-                                  
-                                           
-                                         
-                                           
-
-                                       
-                                 
-                                                                       
-    
-                                                            
-   
-
-                        
-                                  
-                                           
-                           
-                                        
-                                                 
-                         
-                                                  
-                                         
-                                              
-                                       
-                                             
-                                        
-                              
-                           
-                        
-                                    
-               
-                            
-                            
-                                  
-                    
-                                       
-                                                   
-                                                                 
-                                                   
-                                            
-
-                                       
-                                                    
-                                                                               
-                                                                 
-
-                                                                                                 
-                                                                       
-                                                                
-    
-                                                                             
-                                                                                                       
-    
-                                                                                                       
-                                                                                 
-                                                                                                                 
-                                   
-                                         
-                                 
-                                 
-   
-
-class Bridge 
-                         
-                         
-  extends EventEmitter   
-                    
-                    
-    {
-  _isShutdown          = false;
-  _messageQueue             = [];
-  _timeoutID                   = null;
-  _wall      ;
-  _wallUnlisten                  = null;
-
-  constructor(wall      ) {
+  constructor(wall) {
     super();
 
     this._wall = wall;
 
     this._wallUnlisten =
-      wall.listen((message         ) => {
-        (this     ).emit(message.event, message.payload);
+      wall.listen((message) => {
+        this.emit(message.event, message.payload);
       }) || null;
 
     // Temporarily support older standalone front-ends sending commands to newer embedded backends.
@@ -220,14 +36,11 @@ class Bridge
 
   // Listening directly to the wall isn't advised.
   // It can be used to listen for legacy (v3) messages (since they use a different format).
-  get wall()       {
+  get wall() {
     return this._wall;
   }
 
-  send                                  (
-    event           ,
-    ...payload                                         
-  ) {
+  send(event, ...payload) {
     if (this._isShutdown) {
       console.warn(
         `Cannot send message "${event}" through a Bridge that has been shutdown.`,
@@ -263,9 +76,9 @@ class Bridge
 
     // Disable the API inherited from EventEmitter that can add more listeners and send more messages.
     // $FlowFixMe This property is not writable.
-    this.addListener = function() {};
+    this.addListener = function () {};
     // $FlowFixMe This property is not writable.
-    this.emit = function() {};
+    this.emit = function () {};
     // NOTE: There's also EventEmitter API like `on` and `prependListener` that we didn't add to our Flow type of EventEmitter.
 
     // Unsubscribe this bridge incoming message listeners to be sure, and so they don't have to do that.
@@ -315,13 +128,7 @@ class Bridge
 
   // Temporarily support older standalone backends by forwarding "overrideValueAtPath" commands
   // to the older message types they may be listening to.
-  overrideValueAtPath = ({
-    id,
-    path,
-    rendererID,
-    type,
-    value,
-  }                     ) => {
+  overrideValueAtPath = ({id, path, rendererID, type, value}) => {
     switch (type) {
       case 'context':
         this.send('overrideContext', {
@@ -362,8 +169,5 @@ class Bridge
     }
   };
 }
-
-                                                                  
-                                                                   
 
 export default Bridge;

@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -25,7 +25,8 @@ export default function ClearProfilingDataButton() {
     <Button
       disabled={isProfiling || !didRecordCommits}
       onClick={clear}
-      title="Clear profiling data">
+      title="Clear profiling data"
+    >
       <ButtonIcon type="clear" />
     </Button>
   );

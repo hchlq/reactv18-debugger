@@ -4,38 +4,23 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import {useContext, useEffect} from 'react';
 import {RegistryContext} from './Contexts';
 
-                                                    
-                                      
-
-export default function useContextMenu({
-  data,
-  id,
-  ref,
-}    
-               
-             
-                                           
-  ) {
-  const {showMenu} = useContext                     (RegistryContext);
+export default function useContextMenu({data, id, ref}) {
+  const {showMenu} = useContext(RegistryContext);
 
   useEffect(() => {
     if (ref.current !== null) {
-      const handleContextMenu = (event                         ) => {
+      const handleContextMenu = (event) => {
         event.preventDefault();
         event.stopPropagation();
 
-        const pageX =
-          (event     ).pageX ||
-          (event.touches && (event     ).touches[0].pageX);
-        const pageY =
-          (event     ).pageY ||
-          (event.touches && (event     ).touches[0].pageY);
+        const pageX = event.pageX || (event.touches && event.touches[0].pageX);
+        const pageY = event.pageY || (event.touches && event.touches[0].pageY);
 
         showMenu({data, id, pageX, pageY});
       };

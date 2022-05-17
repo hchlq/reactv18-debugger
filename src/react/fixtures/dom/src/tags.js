@@ -22,7 +22,7 @@ const fallbackTags = [
   '15.0.2',
   '0.14.8',
   '0.13.0',
-].map(version => ({
+].map((version) => ({
   name: `v${version}`,
 }));
 
@@ -43,7 +43,7 @@ try {
  * the request is async, even if its loaded from sessionStorage.
  */
 export default function getVersionTags() {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     let cachedTags;
     if (canUseSessionStorage) {
       cachedTags = sessionStorage.getItem(TAGS_CACHE_KEY);
@@ -55,8 +55,8 @@ export default function getVersionTags() {
       fetch('https://api.github.com/repos/facebook/react/tags?per_page=1000', {
         mode: 'cors',
       })
-        .then(res => res.json())
-        .then(tags => {
+        .then((res) => res.json())
+        .then((tags) => {
           // A message property indicates an error was sent from the API
           if (tags.message) {
             return resolve(fallbackTags);

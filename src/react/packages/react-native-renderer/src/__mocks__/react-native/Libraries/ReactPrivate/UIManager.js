@@ -59,7 +59,7 @@ function removeChild(parent, child) {
 }
 
 const RCTUIManager = {
-  __dumpHierarchyForJestTestsOnly: function() {
+  __dumpHierarchyForJestTestsOnly: function () {
     function dumpSubtree(tag, indent) {
       const info = views.get(tag);
       let out = '';
@@ -71,7 +71,7 @@ const RCTUIManager = {
       }
       return out;
     }
-    return roots.map(tag => dumpSubtree(tag, 0)).join('\n');
+    return roots.map((tag) => dumpSubtree(tag, 0)).join('\n');
   },
   clearJSResponder: jest.fn(),
   createView: jest.fn(function createView(reactTag, viewName, rootTag, props) {
@@ -126,14 +126,14 @@ const RCTUIManager = {
     );
     const parentInfo = views.get(parentTag);
     const permanentlyRemovedChildren = removeAtIndices.map(
-      index => parentInfo.children[index],
+      (index) => parentInfo.children[index],
     );
     const temporarilyRemovedChildren = moveFromIndices.map(
-      index => parentInfo.children[index],
+      (index) => parentInfo.children[index],
     );
-    permanentlyRemovedChildren.forEach(tag => removeChild(parentTag, tag));
-    temporarilyRemovedChildren.forEach(tag => removeChild(parentTag, tag));
-    permanentlyRemovedChildren.forEach(tag => {
+    permanentlyRemovedChildren.forEach((tag) => removeChild(parentTag, tag));
+    temporarilyRemovedChildren.forEach((tag) => removeChild(parentTag, tag));
+    permanentlyRemovedChildren.forEach((tag) => {
       views.delete(tag);
     });
     // List of [index, tag]
@@ -151,8 +151,8 @@ const RCTUIManager = {
     }
   }),
   updateView: jest.fn(),
-  removeSubviewsFromContainerWithID: jest.fn(function(parentTag) {
-    views.get(parentTag).children.forEach(tag => removeChild(parentTag, tag));
+  removeSubviewsFromContainerWithID: jest.fn(function (parentTag) {
+    views.get(parentTag).children.forEach((tag) => removeChild(parentTag, tag));
   }),
   replaceExistingNonRootView: jest.fn(),
   measure: jest.fn(function measure(tag, callback) {

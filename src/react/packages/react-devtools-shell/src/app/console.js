@@ -4,13 +4,10 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
-function ignoreStrings(
-  methodName        ,
-  stringsToIgnore               ,
-)       {
+function ignoreStrings(methodName, stringsToIgnore) {
   // HACKY In the test harness, DevTools overrides the parent window's console.
   // Our test app code uses the iframe's console though.
   // To simulate a more accurate end-to-end environment,
@@ -30,10 +27,10 @@ function ignoreStrings(
   };
 }
 
-export function ignoreErrors(errorsToIgnore               )       {
+export function ignoreErrors(errorsToIgnore) {
   ignoreStrings('error', errorsToIgnore);
 }
 
-export function ignoreWarnings(warningsToIgnore               )       {
+export function ignoreWarnings(warningsToIgnore) {
   ignoreStrings('warn', warningsToIgnore);
 }

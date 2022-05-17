@@ -19,7 +19,7 @@ const fs = require('fs');
 require('./createFlowConfigs');
 
 async function runFlow(renderer, args) {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     let cmd = __dirname + '/../../node_modules/.bin/flow';
     if (process.platform === 'win32') {
       cmd = cmd.replace(/\//g, '\\') + '.cmd';
@@ -67,7 +67,7 @@ async function runFlow(renderer, args) {
     spawn(cmd, args, {
       // Allow colors to pass through:
       stdio: 'inherit',
-    }).on('close', function(code) {
+    }).on('close', function (code) {
       if (code !== 0) {
         console.error(
           'Flow failed for the ' + chalk.red(renderer) + ' renderer',

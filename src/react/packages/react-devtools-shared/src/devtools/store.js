@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import EventEmitter from '../events';
@@ -28,10 +28,6 @@ import {__DEBUG__} from '../constants';
 import {printStore} from './utils';
 import ProfilerStore from './ProfilerStore';
 
-                                                      
-                                                           
-                                                                     
-
 const debug = (methodName, ...args) => {
   if (__DEBUG__) {
     console.log(
@@ -48,93 +44,70 @@ const LOCAL_STORAGE_COLLAPSE_ROOTS_BY_DEFAULT_KEY =
 const LOCAL_STORAGE_RECORD_CHANGE_DESCRIPTIONS_KEY =
   'React::DevTools::recordChangeDescriptions';
 
-                
-                        
-                                     
-                                     
-                              
-                                 
-   
-
-                             
-                            
-                             
-   
-
 /**
  * The store is the single source of truth for updates from the backend.
  * ContextProviders can subscribe to the Store for specific things they want to provide.
  */
-export default class Store extends EventEmitter   
-                             
-                       
-                                                  
-                               
-            
-                                
-                        
-                               
-                                         
-    {
-  _bridge                ;
+export default class Store extends EventEmitter {
+  _bridge;
 
   // Should new nodes be collapsed by default when added to the tree?
-  _collapseNodesByDefault          = true;
+  _collapseNodesByDefault = true;
 
-  _componentFilters                        ;
+  _componentFilters;
 
   // At least one of the injected renderers contains (DEV only) owner metadata.
-  _hasOwnerMetadata          = false;
+  _hasOwnerMetadata = false;
 
   // Map of ID to (mutable) Element.
   // Elements are mutated to avoid excessive cloning during tree updates.
   // The InspectedElementContext also relies on this mutability for its WeakMap usage.
-  _idToElement                       = new Map();
+  _idToElement = new Map();
 
   // Should the React Native style editor panel be shown?
-  _isNativeStyleEditorSupported          = false;
+  _isNativeStyleEditorSupported = false;
 
   // Can the backend use the Storage API (e.g. localStorage)?
   // If not, features like reload-and-profile will not work correctly and must be disabled.
-  _isBackendStorageAPISupported          = false;
+  _isBackendStorageAPISupported = false;
 
-  _nativeStyleEditorValidAttributes                                = null;
+  _nativeStyleEditorValidAttributes = null;
 
   // Map of element (id) to the set of elements (ids) it owns.
   // This map enables getOwnersListForElement() to avoid traversing the entire tree.
-  _ownersMap                           = new Map();
+  _ownersMap = new Map();
 
-  _profilerStore               ;
+  _profilerStore;
 
-  _recordChangeDescriptions          = false;
+  _recordChangeDescriptions = false;
 
   // Incremented each time the store is mutated.
   // This enables a passive effect to detect a mutation between render and commit phase.
-  _revision         = 0;
+  _revision = 0;
 
   // This Array must be treated as immutable!
   // Passive effects will check it for changes between render and mount.
-  _roots                         = [];
+  _roots = [];
 
-  _rootIDToCapabilities                            = new Map();
+  _rootIDToCapabilities = new Map();
 
   // Renderer ID is needed to support inspection fiber props, state, and hooks.
-  _rootIDToRendererID                      = new Map();
+  _rootIDToRendererID = new Map();
 
   // These options may be initially set by a confiugraiton option when constructing the Store.
   // In the case of "supportsProfiling", the option may be updated based on the injected renderers.
-  _supportsNativeInspection          = true;
-  _supportsProfiling          = false;
-  _supportsReloadAndProfile          = false;
-  _supportsTraceUpdates          = false;
+  _supportsNativeInspection = true;
+  _supportsProfiling = false;
+  _supportsReloadAndProfile = false;
+  _supportsTraceUpdates = false;
 
-  _unsupportedRendererVersionDetected          = false;
+  _unsupportedRendererVersionDetected = false;
 
   // Total number of visible elements (within all roots).
   // Used for windowing purposes.
-  _weightAcrossRoots         = 0;
+  _weightAcrossRoots = 0;
 
-  constructor(bridge                , config         ) {
+  constructor(bridge, config) {
     super();
 
     if (__DEBUG__) {
@@ -216,7 +189,7 @@ export default class Store extends EventEmitter
   }
 
   // This is only used in tests to avoid memory leaks.
-  assertMapSizeMatchesRootCount(map               , mapName        ) {
+  assertMapSizeMatchesRootCount(map, mapName) {
     const expectedSize = this.roots.length;
     if (map.size !== expectedSize) {
       throw new Error(
@@ -229,10 +202,10 @@ export default class Store extends EventEmitter
     }
   }
 
-  get collapseNodesByDefault()          {
+  get collapseNodesByDefault() {
     return this._collapseNodesByDefault;
   }
-  set collapseNodesByDefault(value         )       {
+  set collapseNodesByDefault(value) {
     this._collapseNodesByDefault = value;
 
     localStorageSetItem(
@@ -243,10 +216,10 @@ export default class Store extends EventEmitter
     this.emit('collapseNodesByDefault');
   }
 
-  get componentFilters()                         {
+  get componentFilters() {
     return this._componentFilters;
   }
-  set componentFilters(value                        )       {
+  set componentFilters(value) {
     if (this._profilerStore.isProfiling) {
       // Re-mounting a tree while profiling is in progress might break a lot of assumptions.
       // If necessary, we could support this- but it doesn't seem like a necessary use case.
@@ -256,10 +229,10 @@ export default class Store extends EventEmitter
     // Filter updates are expensive to apply (since they impact the entire tree).
     // Let's determine if they've changed and avoid doing this work if they haven't.
     const prevEnabledComponentFilters = this._componentFilters.filter(
-      filter => filter.isEnabled,
+      (filter) => filter.isEnabled,
     );
     const nextEnabledComponentFilters = value.filter(
-      filter => filter.isEnabled,
+      (filter) => filter.isEnabled,
     );
     let haveEnabledFiltersChanged =
       prevEnabledComponentFilters.length !== nextEnabledComponentFilters.length;
@@ -289,26 +262,26 @@ export default class Store extends EventEmitter
     this.emit('componentFilters');
   }
 
-  get hasOwnerMetadata()          {
+  get hasOwnerMetadata() {
     return this._hasOwnerMetadata;
   }
 
-  get nativeStyleEditorValidAttributes()                                {
+  get nativeStyleEditorValidAttributes() {
     return this._nativeStyleEditorValidAttributes;
   }
 
-  get numElements()         {
+  get numElements() {
     return this._weightAcrossRoots;
   }
 
-  get profilerStore()                {
+  get profilerStore() {
     return this._profilerStore;
   }
 
-  get recordChangeDescriptions()          {
+  get recordChangeDescriptions() {
     return this._recordChangeDescriptions;
   }
-  set recordChangeDescriptions(value         )       {
+  set recordChangeDescriptions(value) {
     this._recordChangeDescriptions = value;
 
     localStorageSetItem(
@@ -319,49 +292,49 @@ export default class Store extends EventEmitter
     this.emit('recordChangeDescriptions');
   }
 
-  get revision()         {
+  get revision() {
     return this._revision;
   }
 
-  get rootIDToRendererID()                      {
+  get rootIDToRendererID() {
     return this._rootIDToRendererID;
   }
 
-  get roots()                         {
+  get roots() {
     return this._roots;
   }
 
-  get supportsNativeInspection()          {
+  get supportsNativeInspection() {
     return this._supportsNativeInspection;
   }
 
-  get supportsNativeStyleEditor()          {
+  get supportsNativeStyleEditor() {
     return this._isNativeStyleEditorSupported;
   }
 
-  get supportsProfiling()          {
+  get supportsProfiling() {
     return this._supportsProfiling;
   }
-  get supportsReloadAndProfile()          {
+  get supportsReloadAndProfile() {
     // Does the DevTools shell support reloading and eagerly injecting the renderer interface?
     // And if so, can the backend use the localStorage API?
     // Both of these are required for the reload-and-profile feature to work.
     return this._supportsReloadAndProfile && this._isBackendStorageAPISupported;
   }
 
-  get supportsTraceUpdates()          {
+  get supportsTraceUpdates() {
     return this._supportsTraceUpdates;
   }
 
-  get unsupportedRendererVersionDetected()          {
+  get unsupportedRendererVersionDetected() {
     return this._unsupportedRendererVersionDetected;
   }
 
-  containsElement(id        )          {
+  containsElement(id) {
     return this._idToElement.get(id) != null;
   }
 
-  getElementAtIndex(index        )                 {
+  getElementAtIndex(index) {
     if (index < 0 || index >= this.numElements) {
       console.warn(
         `Invalid index ${index} specified; store contains ${this.numElements} items.`,
@@ -376,7 +349,7 @@ export default class Store extends EventEmitter
     let rootWeight = 0;
     for (let i = 0; i < this._roots.length; i++) {
       rootID = this._roots[i];
-      root = ((this._idToElement.get(rootID)     )         );
+      root = this._idToElement.get(rootID);
       if (root.children.length === 0) {
         continue;
       } else if (rootWeight + root.weight > index) {
@@ -388,13 +361,13 @@ export default class Store extends EventEmitter
 
     // Find the element in the tree using the weight of each node...
     // Skip over the root itself, because roots aren't visible in the Elements tree.
-    let currentElement = ((root     )         );
+    let currentElement = root;
     let currentWeight = rootWeight - 1;
     while (index !== currentWeight) {
       const numChildren = currentElement.children.length;
       for (let i = 0; i < numChildren; i++) {
         const childID = currentElement.children[i];
-        const child = ((this._idToElement.get(childID)     )         );
+        const child = this._idToElement.get(childID);
         const childWeight = child.isCollapsed ? 1 : child.weight;
 
         if (index <= currentWeight + childWeight) {
@@ -407,15 +380,15 @@ export default class Store extends EventEmitter
       }
     }
 
-    return ((currentElement     )         ) || null;
+    return currentElement || null;
   }
 
-  getElementIDAtIndex(index        )                {
-    const element                 = this.getElementAtIndex(index);
+  getElementIDAtIndex(index) {
+    const element = this.getElementAtIndex(index);
     return element === null ? null : element.id;
   }
 
-  getElementByID(id        )                 {
+  getElementByID(id) {
     const element = this._idToElement.get(id);
     if (element == null) {
       console.warn(`No element found with id "${id}"`);
@@ -425,7 +398,7 @@ export default class Store extends EventEmitter
     return element;
   }
 
-  getIndexOfElementID(id        )                {
+  getIndexOfElementID(id) {
     const element = this.getElementByID(id);
 
     if (element === null || element.parentID === 0) {
@@ -440,7 +413,7 @@ export default class Store extends EventEmitter
     let currentID = element.parentID;
     let index = 0;
     while (true) {
-      const current = ((this._idToElement.get(currentID)     )         );
+      const current = this._idToElement.get(currentID);
 
       const {children} = current;
       for (let i = 0; i < children.length; i++) {
@@ -448,7 +421,7 @@ export default class Store extends EventEmitter
         if (childID === previousID) {
           break;
         }
-        const child = ((this._idToElement.get(childID)     )         );
+        const child = this._idToElement.get(childID);
         index += child.isCollapsed ? 1 : child.weight;
       }
 
@@ -470,14 +443,14 @@ export default class Store extends EventEmitter
       if (rootID === currentID) {
         break;
       }
-      const root = ((this._idToElement.get(rootID)     )         );
+      const root = this._idToElement.get(rootID);
       index += root.weight;
     }
 
     return index;
   }
 
-  getOwnersListForElement(ownerID        )                 {
+  getOwnersListForElement(ownerID) {
     const list = [];
     const element = this._idToElement.get(ownerID);
     if (element != null) {
@@ -488,7 +461,7 @@ export default class Store extends EventEmitter
 
       const unsortedIDs = this._ownersMap.get(ownerID);
       if (unsortedIDs !== undefined) {
-        const depthMap                      = new Map([[ownerID, 0]]);
+        const depthMap = new Map([[ownerID, 0]]);
 
         // Items in a set are ordered based on insertion.
         // This does not correlate with their order in the tree.
@@ -498,8 +471,7 @@ export default class Store extends EventEmitter
         // Seems better to defer the cost, since the set of ids is probably pretty small.
         const sortedIDs = Array.from(unsortedIDs).sort(
           (idA, idB) =>
-            ((this.getIndexOfElementID(idA)     )        ) -
-            ((this.getIndexOfElementID(idB)     )        ),
+            this.getIndexOfElementID(idA) - this.getIndexOfElementID(idB),
         );
 
         // Next we need to determine the appropriate depth for each element in the list.
@@ -508,7 +480,7 @@ export default class Store extends EventEmitter
         // Perhaps the easiest way to do this is to walk up the tree until we reach either:
         // (1) another node that's already in the tree, or (2) the root (owner)
         // at which point, our depth is just the depth of that node plus one.
-        sortedIDs.forEach(id => {
+        sortedIDs.forEach((id) => {
           const innerElement = this._idToElement.get(id);
           if (innerElement != null) {
             let parentID = innerElement.parentID;
@@ -540,7 +512,7 @@ export default class Store extends EventEmitter
     return list;
   }
 
-  getRendererIDForElement(id        )                {
+  getRendererIDForElement(id) {
     let current = this._idToElement.get(id);
     while (current != null) {
       if (current.parentID === 0) {
@@ -553,7 +525,7 @@ export default class Store extends EventEmitter
     return null;
   }
 
-  getRootIDForElement(id        )                {
+  getRootIDForElement(id) {
     let current = this._idToElement.get(id);
     while (current != null) {
       if (current.parentID === 0) {
@@ -565,7 +537,7 @@ export default class Store extends EventEmitter
     return null;
   }
 
-  isInsideCollapsedSubTree(id        )          {
+  isInsideCollapsedSubTree(id) {
     let current = this._idToElement.get(id);
     while (current != null) {
       if (current.parentID === 0) {
@@ -581,7 +553,7 @@ export default class Store extends EventEmitter
   }
 
   // TODO Maybe split this into two methods: expand() and collapse()
-  toggleIsCollapsed(id        , isCollapsed         )       {
+  toggleIsCollapsed(id, isCollapsed) {
     let didMutate = false;
 
     const element = this.getElementByID(id);
@@ -597,9 +569,7 @@ export default class Store extends EventEmitter
 
           const weightDelta = 1 - element.weight;
 
-          let parentElement = ((this._idToElement.get(
-            element.parentID,
-          )     )         );
+          let parentElement = this._idToElement.get(element.parentID);
           while (parentElement != null) {
             // We don't need to break on a collapsed parent in the same way as the expand case below.
             // That's because collapsing a node doesn't "bubble" and affect its parents.
@@ -623,9 +593,7 @@ export default class Store extends EventEmitter
               : currentElement.weight;
             const weightDelta = newWeight - oldWeight;
 
-            let parentElement = ((this._idToElement.get(
-              currentElement.parentID,
-            )     )         );
+            let parentElement = this._idToElement.get(currentElement.parentID);
             while (parentElement != null) {
               parentElement.weight += weightDelta;
               if (parentElement.isCollapsed) {
@@ -648,8 +616,8 @@ export default class Store extends EventEmitter
       // Only re-calculate weights and emit an "update" event if the store was mutated.
       if (didMutate) {
         let weightAcrossRoots = 0;
-        this._roots.forEach(rootID => {
-          const {weight} = ((this.getElementByID(rootID)     )         );
+        this._roots.forEach((rootID) => {
+          const {weight} = this.getElementByID(rootID);
           weightAcrossRoots += weight;
         });
         this._weightAcrossRoots = weightAcrossRoots;
@@ -662,10 +630,7 @@ export default class Store extends EventEmitter
     }
   }
 
-  _adjustParentTreeWeight = (
-    parentElement                ,
-    weightDelta        ,
-  ) => {
+  _adjustParentTreeWeight = (parentElement, weightDelta) => {
     let isInsideCollapsedSubTree = false;
 
     while (parentElement != null) {
@@ -678,9 +643,7 @@ export default class Store extends EventEmitter
         break;
       }
 
-      parentElement = ((this._idToElement.get(
-        parentElement.parentID,
-      )     )         );
+      parentElement = this._idToElement.get(parentElement.parentID);
     }
 
     // Additions and deletions within a collapsed subtree should not affect the overall number of elements.
@@ -689,20 +652,14 @@ export default class Store extends EventEmitter
     }
   };
 
-  onBridgeNativeStyleEditorSupported = ({
-    isSupported,
-    validAttributes,
-  }    
-                         
-                                             
-    ) => {
+  onBridgeNativeStyleEditorSupported = ({isSupported, validAttributes}) => {
     this._isNativeStyleEditorSupported = isSupported;
     this._nativeStyleEditorValidAttributes = validAttributes || null;
 
     this.emit('supportsNativeStyleEditor');
   };
 
-  onBridgeOperations = (operations               ) => {
+  onBridgeOperations = (operations) => {
     if (__DEBUG__) {
       console.groupCollapsed('onBridgeOperations');
       debug('onBridgeOperations', operations.join(','));
@@ -713,9 +670,9 @@ export default class Store extends EventEmitter
     // The first two values are always rendererID and rootID
     const rendererID = operations[0];
 
-    const addedElementIDs                = [];
+    const addedElementIDs = [];
     // This is a mapping of removed ID -> parent ID:
-    const removedElementIDs                      = new Map();
+    const removedElementIDs = new Map();
     // We'll use the parent ID to adjust selection if it gets deleted.
 
     let i = 2;
@@ -728,9 +685,7 @@ export default class Store extends EventEmitter
     const stringTableEnd = i + stringTableSize;
     while (i < stringTableEnd) {
       const nextLength = operations[i++];
-      const nextString = utfDecodeString(
-        (operations.slice(i, i + nextLength)     ),
-      );
+      const nextString = utfDecodeString(operations.slice(i, i + nextLength));
       stringTable.push(nextString);
       i += nextLength;
     }
@@ -739,8 +694,8 @@ export default class Store extends EventEmitter
       const operation = operations[i];
       switch (operation) {
         case TREE_OPERATION_ADD: {
-          const id = ((operations[i + 1]     )        );
-          const type = ((operations[i + 2]     )             );
+          const id = operations[i + 1];
+          const type = operations[i + 2];
 
           i += 3;
 
@@ -750,8 +705,8 @@ export default class Store extends EventEmitter
             );
           }
 
-          let ownerID         = 0;
-          let parentID         = ((null     )        );
+          let ownerID = 0;
+          let parentID = null;
           if (type === ElementTypeRoot) {
             if (__DEBUG__) {
               debug('Add', `new root node ${id}`);
@@ -786,10 +741,10 @@ export default class Store extends EventEmitter
 
             haveRootsChanged = true;
           } else {
-            parentID = ((operations[i]     )        );
+            parentID = operations[i];
             i++;
 
-            ownerID = ((operations[i]     )        );
+            ownerID = operations[i];
             i++;
 
             const displayNameStringID = operations[i];
@@ -813,17 +768,13 @@ export default class Store extends EventEmitter
               );
             }
 
-            const parentElement = ((this._idToElement.get(
-              parentID,
-            )     )         );
+            const parentElement = this._idToElement.get(parentID);
             parentElement.children.push(id);
 
-            const [
-              displayNameWithoutHOCs,
-              hocDisplayNames,
-            ] = separateDisplayNameAndHOCs(displayName, type);
+            const [displayNameWithoutHOCs, hocDisplayNames] =
+              separateDisplayNameAndHOCs(displayName, type);
 
-            const element          = {
+            const element = {
               children: [],
               depth: parentElement.depth + 1,
               displayName: displayNameWithoutHOCs,
@@ -853,11 +804,11 @@ export default class Store extends EventEmitter
           break;
         }
         case TREE_OPERATION_REMOVE: {
-          const removeLength = ((operations[i + 1]     )        );
+          const removeLength = operations[i + 1];
           i += 2;
 
           for (let removeIndex = 0; removeIndex < removeLength; removeIndex++) {
-            const id = ((operations[i]     )        );
+            const id = operations[i];
 
             if (!this._idToElement.has(id)) {
               throw Error(
@@ -867,7 +818,7 @@ export default class Store extends EventEmitter
 
             i += 1;
 
-            const element = ((this._idToElement.get(id)     )         );
+            const element = this._idToElement.get(id);
             const {children, ownerID, parentID, weight} = element;
             if (children.length > 0) {
               throw new Error(`Node ${id} was removed before its children.`);
@@ -881,7 +832,7 @@ export default class Store extends EventEmitter
                 debug('Remove', `node ${id} root`);
               }
 
-              this._roots = this._roots.filter(rootID => rootID !== id);
+              this._roots = this._roots.filter((rootID) => rootID !== id);
               this._rootIDToRendererID.delete(id);
               this._rootIDToCapabilities.delete(id);
 
@@ -890,7 +841,7 @@ export default class Store extends EventEmitter
               if (__DEBUG__) {
                 debug('Remove', `node ${id} from parent ${parentID}`);
               }
-              parentElement = ((this._idToElement.get(parentID)     )         );
+              parentElement = this._idToElement.get(parentID);
               if (parentElement === undefined) {
                 throw Error(
                   `Cannot remove node ${id} from parent ${parentID} because no matching node was found in the Store.`,
@@ -914,8 +865,8 @@ export default class Store extends EventEmitter
           break;
         }
         case TREE_OPERATION_REORDER_CHILDREN: {
-          const id = ((operations[i + 1]     )        );
-          const numChildren = ((operations[i + 2]     )        );
+          const id = operations[i + 1];
+          const numChildren = operations[i + 2];
           i += 3;
 
           if (!this._idToElement.has(id)) {
@@ -924,7 +875,7 @@ export default class Store extends EventEmitter
             );
           }
 
-          const element = ((this._idToElement.get(id)     )         );
+          const element = this._idToElement.get(id);
           const children = element.children;
           if (children.length !== numChildren) {
             throw Error(
@@ -1001,9 +952,7 @@ export default class Store extends EventEmitter
   // this message enables the backend to override the frontend's current ("saved") filters.
   // This action should also override the saved filters too,
   // else reloading the frontend without reloading the backend would leave things out of sync.
-  onBridgeOverrideComponentFilters = (
-    componentFilters                        ,
-  ) => {
+  onBridgeOverrideComponentFilters = (componentFilters) => {
     this._componentFilters = componentFilters;
 
     saveComponentFilters(componentFilters);
@@ -1022,7 +971,7 @@ export default class Store extends EventEmitter
     );
   };
 
-  onBridgeStorageSupported = (isBackendStorageAPISupported         ) => {
+  onBridgeStorageSupported = (isBackendStorageAPISupported) => {
     this._isBackendStorageAPISupported = isBackendStorageAPISupported;
 
     this.emit('supportsReloadAndProfile');

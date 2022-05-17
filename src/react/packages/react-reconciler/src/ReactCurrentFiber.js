@@ -4,10 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                
 
 import ReactSharedInternals from 'shared/ReactSharedInternals';
 import {getStackByFiberInDevAndProd} from './ReactFiberComponentStack';
@@ -15,10 +13,10 @@ import getComponentName from 'shared/getComponentName';
 
 const ReactDebugCurrentFrame = ReactSharedInternals.ReactDebugCurrentFrame;
 
-export let current               = null;
-export let isRendering          = false;
+export let current = null;
+export let isRendering = false;
 
-export function getCurrentFiberOwnerNameInDevOrNull()                {
+export function getCurrentFiberOwnerNameInDevOrNull() {
   if (__DEV__) {
     if (current === null) {
       return null;
@@ -31,7 +29,7 @@ export function getCurrentFiberOwnerNameInDevOrNull()                {
   return null;
 }
 
-function getCurrentFiberStackInDev()         {
+function getCurrentFiberStackInDev() {
   if (__DEV__) {
     if (current === null) {
       return '';
@@ -51,7 +49,7 @@ export function resetCurrentFiber() {
   }
 }
 
-export function setCurrentFiber(fiber       ) {
+export function setCurrentFiber(fiber) {
   if (__DEV__) {
     ReactDebugCurrentFrame.getCurrentStack = getCurrentFiberStackInDev;
     current = fiber;
@@ -59,7 +57,7 @@ export function setCurrentFiber(fiber       ) {
   }
 }
 
-export function setIsRendering(rendering         ) {
+export function setIsRendering(rendering) {
   if (__DEV__) {
     isRendering = rendering;
   }

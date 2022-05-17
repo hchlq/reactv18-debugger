@@ -66,9 +66,9 @@ const resultsHeaders = [
 
 function generateResultsArray(current, prevResults) {
   return current.bundleSizes
-    .map(result => {
+    .map((result) => {
       const prev = prevResults.bundleSizes.filter(
-        res =>
+        (res) =>
           res.filename === result.filename &&
           res.bundleType === result.bundleType
       )[0];
@@ -97,16 +97,16 @@ function generateResultsArray(current, prevResults) {
       };
       // Strip any nulls
     })
-    .filter(f => f);
+    .filter((f) => f);
 }
 
 function printResults() {
   const table = new Table({
-    head: resultsHeaders.map(label => chalk.gray.yellow(label)),
+    head: resultsHeaders.map((label) => chalk.gray.yellow(label)),
   });
 
   const results = generateResultsArray(currentBuildResults, prevBuildResults);
-  results.forEach(result => {
+  results.forEach((result) => {
     table.push([
       chalk.white.bold(`${result.filename}  (${result.bundleType})`),
       chalk.gray.bold(result.prevSize),

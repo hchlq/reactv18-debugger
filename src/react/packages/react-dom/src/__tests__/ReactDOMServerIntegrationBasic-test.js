@@ -41,18 +41,18 @@ describe('ReactDOMServerIntegration', () => {
     resetModules();
   });
 
-  describe('basic rendering', function() {
-    itRenders('a blank div', async render => {
+  describe('basic rendering', function () {
+    itRenders('a blank div', async (render) => {
       const e = await render(<div />);
       expect(e.tagName).toBe('DIV');
     });
 
-    itRenders('a self-closing tag', async render => {
+    itRenders('a self-closing tag', async (render) => {
       const e = await render(<br />);
       expect(e.tagName).toBe('BR');
     });
 
-    itRenders('a self-closing tag as a child', async render => {
+    itRenders('a self-closing tag as a child', async (render) => {
       const e = await render(
         <div>
           <br />
@@ -62,29 +62,29 @@ describe('ReactDOMServerIntegration', () => {
       expect(e.firstChild.tagName).toBe('BR');
     });
 
-    itRenders('a string', async render => {
+    itRenders('a string', async (render) => {
       const e = await render('Hello');
       expect(e.nodeType).toBe(3);
       expect(e.nodeValue).toMatch('Hello');
     });
 
-    itRenders('a number', async render => {
+    itRenders('a number', async (render) => {
       const e = await render(42);
       expect(e.nodeType).toBe(3);
       expect(e.nodeValue).toMatch('42');
     });
 
-    itRenders('an array with one child', async render => {
+    itRenders('an array with one child', async (render) => {
       const e = await render([<div key={1}>text1</div>]);
       const parent = e.parentNode;
       expect(parent.childNodes[0].tagName).toBe('DIV');
     });
 
-    itRenders('an array with several children', async render => {
-      const Header = props => {
+    itRenders('an array with several children', async (render) => {
+      const Header = (props) => {
         return <p>header</p>;
       };
-      const Footer = props => {
+      const Footer = (props) => {
         return [<h2 key={1}>footer</h2>, <h3 key={2}>about</h3>];
       };
       const e = await render([
@@ -101,7 +101,7 @@ describe('ReactDOMServerIntegration', () => {
       expect(parent.childNodes[4].tagName).toBe('H3');
     });
 
-    itRenders('a nested array', async render => {
+    itRenders('a nested array', async (render) => {
       const e = await render([
         [<div key={1}>text1</div>],
         <span key={1}>text2</span>,
@@ -113,12 +113,12 @@ describe('ReactDOMServerIntegration', () => {
       expect(parent.childNodes[2].tagName).toBe('P');
     });
 
-    itRenders('an iterable', async render => {
+    itRenders('an iterable', async (render) => {
       const threeDivIterable = {
-        '@@iterator': function() {
+        '@@iterator': function () {
           let i = 0;
           return {
-            next: function() {
+            next: function () {
               if (i++ < 3) {
                 return {value: <div key={i} />, done: false};
               } else {
@@ -136,7 +136,7 @@ describe('ReactDOMServerIntegration', () => {
       expect(parent.childNodes[2].tagName).toBe('DIV');
     });
 
-    itRenders('emptyish values', async render => {
+    itRenders('emptyish values', async (render) => {
       const e = await render(0);
       expect(e.nodeType).toBe(TEXT_NODE_TYPE);
       expect(e.nodeValue).toMatch('0');

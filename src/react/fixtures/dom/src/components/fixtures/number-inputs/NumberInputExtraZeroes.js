@@ -9,7 +9,7 @@ class NumberInputExtraZeroes extends React.Component {
       value: '3.0000',
     });
   };
-  onChange = event => {
+  onChange = (event) => {
     this.setState({value: event.target.value});
   };
   render() {

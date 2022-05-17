@@ -29,7 +29,7 @@ function Graph(props) {
   });
 
   var edgeLabels = {};
-  React.Children.forEach(props.children, function(child) {
+  React.Children.forEach(props.children, function (child) {
     if (!child) {
       return;
     }
@@ -48,12 +48,12 @@ function Graph(props) {
     }
   });
 
-  Object.keys(edgeLabels).forEach(key => {
+  Object.keys(edgeLabels).forEach((key) => {
     const children = edgeLabels[key];
     const child = children[0];
     g.setEdge(child.props.source, child.props.target, {
       label: child,
-      allChildren: children.map(c => c.props.children),
+      allChildren: children.map((c) => c.props.children),
       weight: child.props.weight,
     });
   });
@@ -62,13 +62,13 @@ function Graph(props) {
 
   var activeNode = g
     .nodes()
-    .map(v => g.node(v))
-    .find(node => node.label.props.isActive);
+    .map((v) => g.node(v))
+    .find((node) => node.label.props.isActive);
   const [winX, winY] = [window.innerWidth / 2, window.innerHeight / 2];
   var focusDx = trackActive && activeNode ? winX - activeNode.x : 0;
   var focusDy = trackActive && activeNode ? winY - activeNode.y : 0;
 
-  var nodes = g.nodes().map(v => {
+  var nodes = g.nodes().map((v) => {
     var node = g.node(v);
     return (
       <Motion
@@ -76,8 +76,9 @@ function Graph(props) {
           x: props.isDragging ? node.x + focusDx : spring(node.x + focusDx),
           y: props.isDragging ? node.y + focusDy : spring(node.y + focusDy),
         }}
-        key={node.label.key}>
-        {interpolatingStyle =>
+        key={node.label.key}
+      >
+        {(interpolatingStyle) =>
           React.cloneElement(node.label, {
             x: interpolatingStyle.x + props.dx,
             y: interpolatingStyle.y + props.dy,
@@ -89,7 +90,7 @@ function Graph(props) {
     );
   });
 
-  var edges = g.edges().map(e => {
+  var edges = g.edges().map((e) => {
     var edge = g.edge(e);
     let idx = 0;
     return (
@@ -104,10 +105,11 @@ function Graph(props) {
           idx++;
           return bag;
         }, {})}
-        key={edge.label.key}>
-        {interpolatedStyle => {
+        key={edge.label.key}
+      >
+        {(interpolatedStyle) => {
           let points = [];
-          Object.keys(interpolatedStyle).forEach(key => {
+          Object.keys(interpolatedStyle).forEach((key) => {
             const [idx, prop] = key.split(':');
             if (!points[idx]) {
               points[idx] = {x: props.dx, y: props.dy};
@@ -129,7 +131,8 @@ function Graph(props) {
       style={{
         position: 'relative',
         height: '100%',
-      }}>
+      }}
+    >
       {edges}
       {nodes}
     </div>
@@ -153,7 +156,8 @@ function Vertex(props) {
         overflow: 'hidden',
         padding: '4px',
         wordWrap: 'break-word',
-      }}>
+      }}
+    >
       {props.children}
     </div>
   );
@@ -195,7 +199,8 @@ function Edge(props) {
         right: 0,
         top: 0,
         bottom: 0,
-      }}>
+      }}
+    >
       <defs>
         <path d={path} id={lineID} />
         <marker
@@ -203,7 +208,8 @@ function Edge(props) {
           markerWidth="8"
           markerHeight="8"
           refX="5"
-          refY="5">
+          refY="5"
+        >
           <circle cx="5" cy="5" r="3" style={{stroke: 'none', fill: 'black'}} />
         </marker>
         <marker
@@ -212,7 +218,8 @@ function Edge(props) {
           markerHeight="13"
           refX="2"
           refY="6"
-          orient="auto">
+          orient="auto"
+        >
           <path d="M2,2 L2,11 L10,6 L2,2" style={{fill: 'black'}} />
         </marker>
       </defs>
@@ -256,7 +263,7 @@ function formatPriority(priority) {
 
 export default function Fibers({fibers, show, graphSettings, ...rest}) {
   const items = Object.keys(fibers.descriptions).map(
-    id => fibers.descriptions[id]
+    (id) => fibers.descriptions[id]
   );
 
   const isDragging = rest.className.indexOf('dragging') > -1;
@@ -276,19 +283,22 @@ export default function Fibers({fibers, show, graphSettings, ...rest}) {
         left: 0,
         ...rest.style,
         transform: null,
-      }}>
+      }}
+    >
       <Graph
         className="graph"
         dx={dx}
         dy={dy}
         isDragging={isDragging}
-        settings={graphSettings}>
-        {items.map(fiber => [
+        settings={graphSettings}
+      >
+        {items.map((fiber) => [
           <Vertex
             key={fiber.id}
             width={150}
             height={100}
-            isActive={fiber.id === fibers.workInProgressID}>
+            isActive={fiber.id === fibers.workInProgressID}
+          >
             <div
               style={{
                 width: '100%',
@@ -298,7 +308,8 @@ export default function Fibers({fibers, show, graphSettings, ...rest}) {
               title={
                 /*prettyFormat(fiber, { plugins: [reactElement ]})*/
                 'todo: this was hanging last time I tried to pretty print'
-              }>
+              }
+            >
               <small>
                 {fiber.tag} #{fiber.id}
               </small>
@@ -336,7 +347,8 @@ export default function Fibers({fibers, show, graphSettings, ...rest}) {
               target={fiber.child}
               kind="child"
               weight={1000}
-              key={`${fiber.id}-${fiber.child}-child`}>
+              key={`${fiber.id}-${fiber.child}-child`}
+            >
               child
             </Edge>
           ),
@@ -346,7 +358,8 @@ export default function Fibers({fibers, show, graphSettings, ...rest}) {
               target={fiber.sibling}
               kind="sibling"
               weight={2000}
-              key={`${fiber.id}-${fiber.sibling}-sibling`}>
+              key={`${fiber.id}-${fiber.sibling}-sibling`}
+            >
               sibling
             </Edge>
           ),
@@ -356,7 +369,8 @@ export default function Fibers({fibers, show, graphSettings, ...rest}) {
               target={fiber.return}
               kind="return"
               weight={1000}
-              key={`${fiber.id}-${fiber.return}-return`}>
+              key={`${fiber.id}-${fiber.return}-return`}
+            >
               return
             </Edge>
           ),
@@ -366,7 +380,8 @@ export default function Fibers({fibers, show, graphSettings, ...rest}) {
               target={fiber.nextEffect}
               kind="fx"
               weight={100}
-              key={`${fiber.id}-${fiber.nextEffect}-nextEffect`}>
+              key={`${fiber.id}-${fiber.nextEffect}-nextEffect`}
+            >
               nextFx
             </Edge>
           ),
@@ -376,7 +391,8 @@ export default function Fibers({fibers, show, graphSettings, ...rest}) {
               target={fiber.firstEffect}
               kind="fx"
               weight={100}
-              key={`${fiber.id}-${fiber.firstEffect}-firstEffect`}>
+              key={`${fiber.id}-${fiber.firstEffect}-firstEffect`}
+            >
               firstFx
             </Edge>
           ),
@@ -386,7 +402,8 @@ export default function Fibers({fibers, show, graphSettings, ...rest}) {
               target={fiber.lastEffect}
               kind="fx"
               weight={100}
-              key={`${fiber.id}-${fiber.lastEffect}-lastEffect`}>
+              key={`${fiber.id}-${fiber.lastEffect}-lastEffect`}
+            >
               lastFx
             </Edge>
           ),
@@ -396,7 +413,8 @@ export default function Fibers({fibers, show, graphSettings, ...rest}) {
               target={fiber.alternate}
               kind="alt"
               weight={10}
-              key={`${fiber.id}-${fiber.alternate}-alt`}>
+              key={`${fiber.id}-${fiber.alternate}-alt`}
+            >
               alt
             </Edge>
           ),

@@ -32,12 +32,8 @@ function initModules() {
   };
 }
 
-const {
-  resetModules,
-  itClientRenders,
-  renderIntoDom,
-  serverRender,
-} = ReactDOMServerIntegrationUtils(initModules);
+const {resetModules, itClientRenders, renderIntoDom, serverRender} =
+  ReactDOMServerIntegrationUtils(initModules);
 
 describe('ReactDOMServerIntegrationUserInteraction', () => {
   let ControlledInput, ControlledTextArea, ControlledCheckbox, ControlledSelect;
@@ -125,7 +121,8 @@ describe('ReactDOMServerIntegrationUserInteraction', () => {
         return (
           <select
             value={this.state.value}
-            onChange={this.handleChange.bind(this)}>
+            onChange={this.handleChange.bind(this)}
+          >
             <option key="1" value="Hello">
               Hello
             </option>
@@ -138,8 +135,8 @@ describe('ReactDOMServerIntegrationUserInteraction', () => {
     };
   });
 
-  describe('user interaction with controlled inputs', function() {
-    itClientRenders('a controlled text input', async render => {
+  describe('user interaction with controlled inputs', function () {
+    itClientRenders('a controlled text input', async (render) => {
       const setUntrackedValue = Object.getOwnPropertyDescriptor(
         HTMLInputElement.prototype,
         'value',
@@ -167,7 +164,7 @@ describe('ReactDOMServerIntegrationUserInteraction', () => {
       }
     });
 
-    itClientRenders('a controlled textarea', async render => {
+    itClientRenders('a controlled textarea', async (render) => {
       const setUntrackedValue = Object.getOwnPropertyDescriptor(
         HTMLTextAreaElement.prototype,
         'value',
@@ -195,7 +192,7 @@ describe('ReactDOMServerIntegrationUserInteraction', () => {
       }
     });
 
-    itClientRenders('a controlled checkbox', async render => {
+    itClientRenders('a controlled checkbox', async (render) => {
       let changeCount = 0;
       const e = await render(
         <ControlledCheckbox onChange={() => changeCount++} />,
@@ -217,7 +214,7 @@ describe('ReactDOMServerIntegrationUserInteraction', () => {
       }
     });
 
-    itClientRenders('a controlled select', async render => {
+    itClientRenders('a controlled select', async (render) => {
       const setUntrackedValue = Object.getOwnPropertyDescriptor(
         HTMLSelectElement.prototype,
         'value',
@@ -248,7 +245,7 @@ describe('ReactDOMServerIntegrationUserInteraction', () => {
     });
   });
 
-  describe('user interaction with inputs before client render', function() {
+  describe('user interaction with inputs before client render', function () {
     // renders the element and changes the value **before** the client
     // code has a chance to render; this simulates what happens when a
     // user starts to interact with a server-rendered form before

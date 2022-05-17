@@ -4,15 +4,12 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import Agent from 'react-devtools-shared/src/backend/agent';
 import {destroy as destroyCanvas, draw} from './canvas';
 import {getNestedBoundingClientRect} from '../utils';
-
-                                            
-                                   
 
 // How long the rect should be shown for?
 const DISPLAY_DURATION = 250;
@@ -30,26 +27,19 @@ const getCurrentTime =
     ? () => performance.now()
     : () => Date.now();
 
-                     
-                
-                         
-                         
-                    
-   
+const nodeToData = new Map();
 
-const nodeToData                        = new Map();
+let agent = null;
+let drawAnimationFrameID = null;
+let isEnabled = false;
+let redrawTimeoutID = null;
 
-let agent        = ((null     )       );
-let drawAnimationFrameID                          = null;
-let isEnabled          = false;
-let redrawTimeoutID                   = null;
-
-export function initialize(injectedAgent       )       {
+export function initialize(injectedAgent) {
   agent = injectedAgent;
   agent.addListener('traceUpdates', traceUpdates);
 }
 
-export function toggleEnabled(value         )       {
+export function toggleEnabled(value) {
   isEnabled = value;
 
   if (!isEnabled) {
@@ -69,12 +59,12 @@ export function toggleEnabled(value         )       {
   }
 }
 
-function traceUpdates(nodes                 )       {
+function traceUpdates(nodes) {
   if (!isEnabled) {
     return;
   }
 
-  nodes.forEach(node => {
+  nodes.forEach((node) => {
     const data = nodeToData.get(node);
     const now = getCurrentTime();
 
@@ -109,7 +99,7 @@ function traceUpdates(nodes                 )       {
   }
 }
 
-function prepareToDraw()       {
+function prepareToDraw() {
   drawAnimationFrameID = null;
   redrawTimeoutID = null;
 
@@ -132,7 +122,7 @@ function prepareToDraw()       {
   }
 }
 
-function measureNode(node        )              {
+function measureNode(node) {
   if (!node || typeof node.getBoundingClientRect !== 'function') {
     return null;
   }

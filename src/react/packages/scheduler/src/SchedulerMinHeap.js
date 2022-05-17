@@ -7,24 +7,18 @@
  *       strict
  */
 
-                        
-              
-             
-                    
-   
-
-export function push(heap      , node      )       {
+export function push(heap, node) {
   const index = heap.length;
   heap.push(node);
   siftUp(heap, node, index);
 }
 
-export function peek(heap      )              {
+export function peek(heap) {
   const first = heap[0];
   return first === undefined ? null : first;
 }
 
-export function pop(heap      )              {
+export function pop(heap) {
   const first = heap[0];
   if (first !== undefined) {
     const last = heap.pop();

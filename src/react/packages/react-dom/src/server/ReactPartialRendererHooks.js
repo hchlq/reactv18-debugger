@@ -4,64 +4,33 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                                                          
-
-             
-                
-                             
-                           
-               
-                           
-                                                          
 
 import {validateContextBounds} from './ReactPartialRendererContext';
 
 import invariant from 'shared/invariant';
 import is from 'shared/objectIs';
 
-                                        
-                             
-
-                   
-            
-                         
-   
-
-                        
-                         
-                
-   
-
-              
-                     
-                                 
-                    
-   
-
-                           
-
-let currentlyRenderingComponent                = null;
-let firstWorkInProgressHook              = null;
-let workInProgressHook              = null;
+let currentlyRenderingComponent = null;
+let firstWorkInProgressHook = null;
+let workInProgressHook = null;
 // Whether the work-in-progress hook is a re-rendered hook
-let isReRender          = false;
+let isReRender = false;
 // Whether an update was scheduled during the currently executing render pass.
-let didScheduleRenderPhaseUpdate          = false;
+let didScheduleRenderPhaseUpdate = false;
 // Lazily created map of render-phase updates
-let renderPhaseUpdates                                            = null;
+let renderPhaseUpdates = null;
 // Counter to prevent infinite loops.
-let numberOfReRenders         = 0;
+let numberOfReRenders = 0;
 const RE_RENDER_LIMIT = 25;
 
 let isInHookUserCodeInDev = false;
 
 // In DEV, this is the name of the currently executing primitive hook
-let currentHookNameInDev         ;
+let currentHookNameInDev;
 
-function resolveCurrentlyRenderingComponent()         {
+function resolveCurrentlyRenderingComponent() {
   invariant(
     currentlyRenderingComponent !== null,
     'Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for' +
@@ -84,10 +53,7 @@ function resolveCurrentlyRenderingComponent()         {
   return currentlyRenderingComponent;
 }
 
-function areHookInputsEqual(
-  nextDeps              ,
-  prevDeps                     ,
-) {
+function areHookInputsEqual(nextDeps, prevDeps) {
   if (prevDeps === null) {
     if (__DEV__) {
       console.error(
@@ -124,7 +90,7 @@ function areHookInputsEqual(
   return true;
 }
 
-function createHook()       {
+function createHook() {
   if (numberOfReRenders > 0) {
     invariant(false, 'Rendered more hooks than during the previous render');
   }
@@ -135,7 +101,7 @@ function createHook()       {
   };
 }
 
-function createWorkInProgressHook()       {
+function createWorkInProgressHook() {
   if (workInProgressHook === null) {
     // This is the first hook in the list
     if (firstWorkInProgressHook === null) {
@@ -160,7 +126,7 @@ function createWorkInProgressHook()       {
   return workInProgressHook;
 }
 
-export function prepareToUseHooks(componentIdentity        )       {
+export function prepareToUseHooks(componentIdentity) {
   currentlyRenderingComponent = componentIdentity;
   if (__DEV__) {
     isInHookUserCodeInDev = false;
@@ -174,12 +140,7 @@ export function prepareToUseHooks(componentIdentity        )       {
   // workInProgressHook = null;
 }
 
-export function finishHooks(
-  Component     ,
-  props     ,
-  children     ,
-  refOrContext     ,
-)      {
+export function finishHooks(Component, props, children, refOrContext) {
   // This must be called after every function component to prevent hooks from
   // being used in classes.
 
@@ -201,7 +162,7 @@ export function finishHooks(
 }
 
 // Reset the internal hooks state if an error occurs while rendering a component
-export function resetHooksState()       {
+export function resetHooksState() {
   if (__DEV__) {
     isInHookUserCodeInDev = false;
   }
@@ -214,10 +175,7 @@ export function resetHooksState()       {
   workInProgressHook = null;
 }
 
-function readContext   (
-  context                 ,
-  observedBits                         ,
-)    {
+function readContext(context, observedBits) {
   const threadID = currentPartialRenderer.threadID;
   validateContextBounds(context, threadID);
   if (__DEV__) {
@@ -233,10 +191,7 @@ function readContext   (
   return context[threadID];
 }
 
-function useContext   (
-  context                 ,
-  observedBits                         ,
-)    {
+function useContext(context, observedBits) {
   if (__DEV__) {
     currentHookNameInDev = 'useContext';
   }
@@ -246,29 +201,23 @@ function useContext   (
   return context[threadID];
 }
 
-function basicStateReducer   (state   , action                     )    {
+function basicStateReducer(state, action) {
   // $FlowFixMe: Flow doesn't like mixed types
   return typeof action === 'function' ? action(state) : action;
 }
 
-export function useState   (
-  initialState               ,
-)                                     {
+export function useState(initialState) {
   if (__DEV__) {
     currentHookNameInDev = 'useState';
   }
   return useReducer(
     basicStateReducer,
     // useReducer has a special case to support lazy useState initializers
-    (initialState     ),
+    initialState,
   );
 }
 
-export function useReducer         (
-  reducer             ,
-  initialArg   ,
-  init         ,
-)                   {
+export function useReducer(reducer, initialArg, init) {
   if (__DEV__) {
     if (reducer !== basicStateReducer) {
       currentHookNameInDev = 'useReducer';
@@ -279,8 +228,8 @@ export function useReducer         (
   if (isReRender) {
     // This is a re-render. Apply the new render phase updates to the previous
     // current hook.
-    const queue                 = (workInProgressHook.queue     );
-    const dispatch              = (queue.dispatch     );
+    const queue = workInProgressHook.queue;
+    const dispatch = queue.dispatch;
     if (renderPhaseUpdates !== null) {
       // Render phase updates are stored in a map of queue -> linked list
       const firstRenderPhaseUpdate = renderPhaseUpdates.get(queue);
@@ -317,31 +266,28 @@ export function useReducer         (
     if (reducer === basicStateReducer) {
       // Special case for `useState`.
       initialState =
-        typeof initialArg === 'function'
-          ? ((initialArg     )         )()
-          : ((initialArg     )   );
+        typeof initialArg === 'function' ? initialArg() : initialArg;
     } else {
-      initialState =
-        init !== undefined ? init(initialArg) : ((initialArg     )   );
+      initialState = init !== undefined ? init(initialArg) : initialArg;
     }
     if (__DEV__) {
       isInHookUserCodeInDev = false;
     }
     workInProgressHook.memoizedState = initialState;
-    const queue                 = (workInProgressHook.queue = {
+    const queue = (workInProgressHook.queue = {
       last: null,
       dispatch: null,
     });
-    const dispatch              = (queue.dispatch = (dispatchAction.bind(
+    const dispatch = (queue.dispatch = dispatchAction.bind(
       null,
       currentlyRenderingComponent,
       queue,
-    )     ));
+    ));
     return [workInProgressHook.memoizedState, dispatch];
   }
 }
 
-function useMemo   (nextCreate         , deps                            )    {
+function useMemo(nextCreate, deps) {
   currentlyRenderingComponent = resolveCurrentlyRenderingComponent();
   workInProgressHook = createWorkInProgressHook();
 
@@ -370,7 +316,7 @@ function useMemo   (nextCreate         , deps                            )    {
   return nextValue;
 }
 
-function useRef   (initialValue   )                 {
+function useRef(initialValue) {
   currentlyRenderingComponent = resolveCurrentlyRenderingComponent();
   workInProgressHook = createWorkInProgressHook();
   const previousRef = workInProgressHook.memoizedState;
@@ -386,10 +332,7 @@ function useRef   (initialValue   )                 {
   }
 }
 
-export function useLayoutEffect(
-  create                           ,
-  inputs                            ,
-) {
+export function useLayoutEffect(create, inputs) {
   if (__DEV__) {
     currentHookNameInDev = 'useLayoutEffect';
     console.error(
@@ -403,11 +346,7 @@ export function useLayoutEffect(
   }
 }
 
-function dispatchAction   (
-  componentIdentity        ,
-  queue                ,
-  action   ,
-) {
+function dispatchAction(componentIdentity, queue, action) {
   invariant(
     numberOfReRenders < RE_RENDER_LIMIT,
     'Too many re-renders. React limits the number of renders to prevent ' +
@@ -419,7 +358,7 @@ function dispatchAction   (
     // queue -> linked list of updates. After this render pass, we'll restart
     // and apply the stashed updates on top of the work-in-progress hook.
     didScheduleRenderPhaseUpdate = true;
-    const update            = {
+    const update = {
       action,
       next: null,
     };
@@ -444,39 +383,32 @@ function dispatchAction   (
   }
 }
 
-export function useCallback   (
-  callback   ,
-  deps                            ,
-)    {
+export function useCallback(callback, deps) {
   return useMemo(() => callback, deps);
 }
 
 // TODO Decide on how to implement this hook for server rendering.
 // If a mutation occurs during render, consider triggering a Suspense boundary
 // and falling back to client rendering.
-function useMutableSource                  (
-  source                       ,
-  getSnapshot                                              ,
-  subscribe                                            ,
-)           {
+function useMutableSource(source, getSnapshot, subscribe) {
   resolveCurrentlyRenderingComponent();
   return getSnapshot(source._source);
 }
 
-function useDeferredValue   (value   )    {
+function useDeferredValue(value) {
   resolveCurrentlyRenderingComponent();
   return value;
 }
 
-function useTransition()                                            {
+function useTransition() {
   resolveCurrentlyRenderingComponent();
-  const startTransition = callback => {
+  const startTransition = (callback) => {
     callback();
   };
   return [startTransition, false];
 }
 
-function useOpaqueIdentifier()               {
+function useOpaqueIdentifier() {
   return (
     (currentPartialRenderer.identifierPrefix || '') +
     'R:' +
@@ -484,14 +416,14 @@ function useOpaqueIdentifier()               {
   );
 }
 
-function noop()       {}
+function noop() {}
 
-export let currentPartialRenderer                  = (null     );
-export function setCurrentPartialRenderer(renderer                 ) {
+export let currentPartialRenderer = null;
+export function setCurrentPartialRenderer(renderer) {
   currentPartialRenderer = renderer;
 }
 
-export const Dispatcher                 = {
+export const Dispatcher = {
   readContext,
   useContext,
   useMemo,

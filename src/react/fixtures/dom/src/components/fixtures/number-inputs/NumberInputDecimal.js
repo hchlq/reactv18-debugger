@@ -19,7 +19,7 @@ class NumberInputDecimal extends React.Component {
           <input
             type="number"
             value={value}
-            onChange={e => {
+            onChange={(e) => {
               this.setState({value: e.target.value});
             }}
           />

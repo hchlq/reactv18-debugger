@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -16,26 +16,6 @@ import {minBarWidth} from './constants';
 
 import styles from './SnapshotCommitList.css';
 
-                         
-                                 
-                             
-                                       
-                      
-                                     
-                                             
-                                             
-                                                     
-   
-
-               
-                                 
-                             
-                                       
-                                     
-                                             
-                                             
-   
-
 export default function SnapshotCommitList({
   commitDurations,
   commitTimes,
@@ -43,7 +23,7 @@ export default function SnapshotCommitList({
   selectedCommitIndex,
   selectedFilteredCommitIndex,
   selectCommitIndex,
-}       ) {
+}) {
   return (
     <AutoSizer>
       {({height, width}) => (
@@ -62,23 +42,6 @@ export default function SnapshotCommitList({
   );
 }
 
-                   
-                                 
-                             
-                 
-                                       
-                                     
-                                             
-                                             
-                
-   
-
-                  
-                      
-               
-                        
-  
-
 function List({
   commitDurations,
   selectedCommitIndex,
@@ -88,10 +51,10 @@ function List({
   selectedFilteredCommitIndex,
   selectCommitIndex,
   width,
-}           ) {
-  const listRef = useRef                                (null);
-  const divRef = useRef                       (null);
-  const prevCommitIndexRef = useRef               (null);
+}) {
+  const listRef = useRef(null);
+  const divRef = useRef(null);
+  const prevCommitIndexRef = useRef(null);
 
   // Make sure a newly selected snapshot is fully visible within the list.
   useEffect(() => {
@@ -114,9 +77,9 @@ function List({
 
   const maxCommitIndex = filteredCommitIndices.length - 1;
 
-  const [dragState, setDragState] = useState                  (null);
+  const [dragState, setDragState] = useState(null);
 
-  const handleDragCommit = ({buttons, pageX}     ) => {
+  const handleDragCommit = ({buttons, pageX}) => {
     if (buttons === 0) {
       setDragState(null);
       return;
@@ -167,7 +130,7 @@ function List({
   }, [dragState]);
 
   // Pass required contextual data down to the ListItem renderer.
-  const itemData = useMemo          (
+  const itemData = useMemo(
     () => ({
       commitDurations,
       commitTimes,
@@ -198,8 +161,9 @@ function List({
         itemCount={filteredCommitIndices.length}
         itemData={itemData}
         itemSize={itemSize}
-        ref={(listRef     ) /* Flow bug? */}
-        width={width}>
+        ref={listRef /* Flow bug? */}
+        width={width}
+      >
         {SnapshotCommitListItem}
       </FixedSizeList>
     </div>

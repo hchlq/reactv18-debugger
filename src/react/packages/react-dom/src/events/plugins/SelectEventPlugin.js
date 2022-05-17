@@ -4,13 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                        
-                                                   
-                                                           
-                                                          
 
 import {canUseDOM} from 'shared/ExecutionEnvironment';
 import {SyntheticEvent} from '../../events/SyntheticEvent';
@@ -56,7 +51,7 @@ let mouseDown = false;
  * The return value will not be consistent across nodes or browsers, but
  * two identical selections on the same node will return identical objects.
  */
-function getSelection(node     ) {
+function getSelection(node) {
   if ('selectionStart' in node && hasSelectionCapabilities(node)) {
     return {
       start: node.selectionStart,
@@ -78,7 +73,7 @@ function getSelection(node     ) {
 /**
  * Get document associated with the event target.
  */
-function getEventTargetDocument(eventTarget     ) {
+function getEventTargetDocument(eventTarget) {
   return eventTarget.window === eventTarget
     ? eventTarget.document
     : eventTarget.nodeType === DOCUMENT_NODE
@@ -146,13 +141,13 @@ function constructSelectEvent(dispatchQueue, nativeEvent, nativeEventTarget) {
  * - Fires after user input.
  */
 function extractEvents(
-  dispatchQueue               ,
-  domEventName              ,
-  targetInst              ,
-  nativeEvent                ,
-  nativeEventTarget                    ,
-  eventSystemFlags                  ,
-  targetContainer             ,
+  dispatchQueue,
+  domEventName,
+  targetInst,
+  nativeEvent,
+  nativeEventTarget,
+  eventSystemFlags,
+  targetContainer,
 ) {
   if (!enableEagerRootListeners) {
     const eventListenerSet = getEventListenerSet(targetContainer);
@@ -177,7 +172,7 @@ function extractEvents(
     // Track the input node that has focus.
     case 'focusin':
       if (
-        isTextInputElement((targetNode     )) ||
+        isTextInputElement(targetNode) ||
         targetNode.contentEditable === 'true'
       ) {
         activeElement = targetNode;

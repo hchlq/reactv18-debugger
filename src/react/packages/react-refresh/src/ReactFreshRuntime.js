@@ -4,36 +4,10 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
-                                                                        
-                                                                       
-             
-         
-                
-                  
-               
-                              
-                    
-                                                     
-                                                     
-
 import {REACT_MEMO_TYPE, REACT_FORWARD_REF_TYPE} from 'shared/ReactSymbols';
-
-                   
-                 
-                      
-                                                                            
-                                        
-   
-
-                         
-                                                           
-                                   
-                             
-                                       
-   
 
 if (!__DEV__) {
   throw new Error(
@@ -46,46 +20,42 @@ const PossiblyWeakMap = typeof WeakMap === 'function' ? WeakMap : Map;
 
 // We never remove these associations.
 // It's OK to reference families, but use WeakMap/Set for types.
-const allFamiliesByID                      = new Map();
-const allFamiliesByType               
-                                        = new PossiblyWeakMap();
-const allSignaturesByType               
-                                              = new PossiblyWeakMap();
+const allFamiliesByID = new Map();
+const allFamiliesByType = new PossiblyWeakMap();
+const allSignaturesByType = new PossiblyWeakMap();
 // This WeakMap is read by React, so we only put families
 // that have actually been edited here. This keeps checks fast.
 // $FlowIssue
-const updatedFamiliesByType               
-                                        = new PossiblyWeakMap();
+const updatedFamiliesByType = new PossiblyWeakMap();
 
 // This is cleared on every performReactRefresh() call.
 // It is an array of [Family, NextType] tuples.
-let pendingUpdates                       = [];
+let pendingUpdates = [];
 
 // This is injected by the renderer via DevTools global hook.
-const helpersByRendererID                               = new Map();
+const helpersByRendererID = new Map();
 
-const helpersByRoot                                  = new Map();
+const helpersByRoot = new Map();
 
 // We keep track of mounted roots so we can schedule updates.
-const mountedRoots                 = new Set();
+const mountedRoots = new Set();
 // If a root captures an error, we remember it so we can retry on edit.
-const failedRoots                 = new Set();
+const failedRoots = new Set();
 
 // In environments that support WeakMap, we also remember the last element for every root.
 // It needs to be weak because we do this even for roots that failed to mount.
 // If there is no WeakMap, we won't attempt to do retrying.
 // $FlowIssue
-const rootElements                                     = // $FlowIssue
-  typeof WeakMap === 'function' ? new WeakMap() : null;
+const rootElements = typeof WeakMap === 'function' ? new WeakMap() : null; // $FlowIssue
 
 let isPerformingRefresh = false;
 
-function computeFullKey(signature           )         {
+function computeFullKey(signature) {
   if (signature.fullKey !== null) {
     return signature.fullKey;
   }
 
-  let fullKey         = signature.ownKey;
+  let fullKey = signature.ownKey;
   let hooks;
   try {
     hooks = signature.getCustomHooks();
@@ -163,22 +133,22 @@ function resolveFamily(type) {
 }
 
 // If we didn't care about IE11, we could use new Map/Set(iterable).
-function cloneMap      (map           )            {
+function cloneMap(map) {
   const clone = new Map();
   map.forEach((value, key) => {
     clone.set(key, value);
   });
   return clone;
 }
-function cloneSet   (set        )         {
+function cloneSet(set) {
   const clone = new Set();
-  set.forEach(value => {
+  set.forEach((value) => {
     clone.add(value);
   });
   return clone;
 }
 
-export function performReactRefresh()                       {
+export function performReactRefresh() {
   if (!__DEV__) {
     throw new Error(
       'Unexpected call to React Refresh in a production environment.',
@@ -215,12 +185,12 @@ export function performReactRefresh()                       {
     });
 
     // TODO: rename these fields to something more meaningful.
-    const update                = {
+    const update = {
       updatedFamilies, // Families that will re-render preserving state
       staleFamilies, // Families that will be remounted
     };
 
-    helpersByRendererID.forEach(helpers => {
+    helpersByRendererID.forEach((helpers) => {
       // Even if there are no roots, set the handler on first update.
       // This ensures that if *new* roots are mounted, they'll use the resolve handler.
       helpers.setRefreshHandler(resolveFamily);
@@ -237,7 +207,7 @@ export function performReactRefresh()                       {
     const mountedRootsSnapshot = cloneSet(mountedRoots);
     const helpersByRootSnapshot = cloneMap(helpersByRoot);
 
-    failedRootsSnapshot.forEach(root => {
+    failedRootsSnapshot.forEach((root) => {
       const helpers = helpersByRootSnapshot.get(root);
       if (helpers === undefined) {
         throw new Error(
@@ -264,7 +234,7 @@ export function performReactRefresh()                       {
         // Keep trying other roots.
       }
     });
-    mountedRootsSnapshot.forEach(root => {
+    mountedRootsSnapshot.forEach((root) => {
       const helpers = helpersByRootSnapshot.get(root);
       if (helpers === undefined) {
         throw new Error(
@@ -293,7 +263,7 @@ export function performReactRefresh()                       {
   }
 }
 
-export function register(type     , id        )       {
+export function register(type, id) {
   if (__DEV__) {
     if (type === null) {
       return;
@@ -338,12 +308,7 @@ export function register(type     , id        )       {
   }
 }
 
-export function setSignature(
-  type     ,
-  key        ,
-  forceReset           = false,
-  getCustomHooks                        ,
-)       {
+export function setSignature(type, key, forceReset = false, getCustomHooks) {
   if (__DEV__) {
     allSignaturesByType.set(type, {
       forceReset,
@@ -360,7 +325,7 @@ export function setSignature(
 
 // This is lazily called during first render for a type.
 // It captures Hook list at that time so inline requires don't break comparisons.
-export function collectCustomHooksForSignature(type     ) {
+export function collectCustomHooksForSignature(type) {
   if (__DEV__) {
     const signature = allSignaturesByType.get(type);
     if (signature !== undefined) {
@@ -373,7 +338,7 @@ export function collectCustomHooksForSignature(type     ) {
   }
 }
 
-export function getFamilyByID(id        )                {
+export function getFamilyByID(id) {
   if (__DEV__) {
     return allFamiliesByID.get(id);
   } else {
@@ -383,7 +348,7 @@ export function getFamilyByID(id        )                {
   }
 }
 
-export function getFamilyByType(type     )                {
+export function getFamilyByType(type) {
   if (__DEV__) {
     return allFamiliesByType.get(type);
   } else {
@@ -393,12 +358,10 @@ export function getFamilyByType(type     )                {
   }
 }
 
-export function findAffectedHostInstances(
-  families               ,
-)                {
+export function findAffectedHostInstances(families) {
   if (__DEV__) {
     const affectedInstances = new Set();
-    mountedRoots.forEach(root => {
+    mountedRoots.forEach((root) => {
       const helpers = helpersByRoot.get(root);
       if (helpers === undefined) {
         throw new Error(
@@ -409,7 +372,7 @@ export function findAffectedHostInstances(
         root,
         families,
       );
-      instancesForRoot.forEach(inst => {
+      instancesForRoot.forEach((inst) => {
         affectedInstances.add(inst);
       });
     });
@@ -421,7 +384,7 @@ export function findAffectedHostInstances(
   }
 }
 
-export function injectIntoGlobalHook(globalObject     )       {
+export function injectIntoGlobalHook(globalObject) {
   if (__DEV__) {
     // For React Native, the global hook will be set up by require('react-devtools-core').
     // That code will run before us. So we need to monkeypatch functions on existing hook.
@@ -440,31 +403,22 @@ export function injectIntoGlobalHook(globalObject     )       {
         inject(injected) {
           return nextID++;
         },
-        onScheduleFiberRoot(
-          id        ,
-          root           ,
-          children               ,
-        ) {},
-        onCommitFiberRoot(
-          id        ,
-          root           ,
-          maybePriorityLevel       ,
-          didError         ,
-        ) {},
+        onScheduleFiberRoot(id, root, children) {},
+        onCommitFiberRoot(id, root, maybePriorityLevel, didError) {},
         onCommitFiberUnmount() {},
       };
     }
 
     // Here, we just want to get a reference to scheduleRefresh.
     const oldInject = hook.inject;
-    hook.inject = function(injected) {
+    hook.inject = function (injected) {
       const id = oldInject.apply(this, arguments);
       if (
         typeof injected.scheduleRefresh === 'function' &&
         typeof injected.setRefreshHandler === 'function'
       ) {
         // This version supports React Refresh.
-        helpersByRendererID.set(id, ((injected     )                 ));
+        helpersByRendererID.set(id, injected);
       }
       return id;
     };
@@ -478,18 +432,14 @@ export function injectIntoGlobalHook(globalObject     )       {
         typeof injected.setRefreshHandler === 'function'
       ) {
         // This version supports React Refresh.
-        helpersByRendererID.set(id, ((injected     )                 ));
+        helpersByRendererID.set(id, injected);
       }
     });
 
     // We also want to track currently mounted roots.
     const oldOnCommitFiberRoot = hook.onCommitFiberRoot;
     const oldOnScheduleFiberRoot = hook.onScheduleFiberRoot || (() => {});
-    hook.onScheduleFiberRoot = function(
-      id        ,
-      root           ,
-      children               ,
-    ) {
+    hook.onScheduleFiberRoot = function (id, root, children) {
       if (!isPerformingRefresh) {
         // If it was intentionally scheduled, don't attempt to restore.
         // This includes intentionally scheduled unmounts.
@@ -500,12 +450,7 @@ export function injectIntoGlobalHook(globalObject     )       {
       }
       return oldOnScheduleFiberRoot.apply(this, arguments);
     };
-    hook.onCommitFiberRoot = function(
-      id        ,
-      root           ,
-      maybePriorityLevel       ,
-      didError         ,
-    ) {
+    hook.onCommitFiberRoot = function (id, root, maybePriorityLevel, didError) {
       const helpers = helpersByRendererID.get(id);
       if (helpers === undefined) {
         return;
@@ -601,22 +546,17 @@ export function _getMountedRootCount() {
 //   'useState{[foo, setFoo]}(0)',
 //   () => [useCustomHook], /* Lazy to avoid triggering inline requires */
 // );
-                                                                          
+
 export function createSignatureFunctionForTransform() {
   if (__DEV__) {
     // We'll fill in the signature in two steps.
     // First, we'll know the signature itself. This happens outside the component.
     // Then, we'll know the references to custom Hooks. This happens inside the component.
     // After that, the returned function will be a fast path no-op.
-    let status                  = 'needsSignature';
+    let status = 'needsSignature';
     let savedType;
     let hasCustomHooks;
-    return function   (
-      type   ,
-      key        ,
-      forceReset          ,
-      getCustomHooks                        ,
-    )    {
+    return function (type, key, forceReset, getCustomHooks) {
       switch (status) {
         case 'needsSignature':
           if (type !== undefined) {
@@ -647,7 +587,7 @@ export function createSignatureFunctionForTransform() {
   }
 }
 
-export function isLikelyComponentType(type     )          {
+export function isLikelyComponentType(type) {
   if (__DEV__) {
     switch (typeof type) {
       case 'function': {

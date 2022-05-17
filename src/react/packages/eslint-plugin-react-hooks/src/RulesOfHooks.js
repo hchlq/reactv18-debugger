@@ -119,7 +119,7 @@ export default {
     const codePathSegmentStack = [];
     return {
       // Maintain code segment path stack as we traverse.
-      onCodePathSegmentStart: segment => codePathSegmentStack.push(segment),
+      onCodePathSegmentStart: (segment) => codePathSegmentStack.push(segment),
       onCodePathSegmentEnd: () => codePathSegmentStack.pop(),
 
       // Maintain code path stack as we traverse.
@@ -346,9 +346,8 @@ export default {
 
         // This is a valid code path for React hooks if we are directly in a React
         // function component or we are in a hook function.
-        const isSomewhereInsideComponentOrHook = isInsideComponentOrHook(
-          codePathNode,
-        );
+        const isSomewhereInsideComponentOrHook =
+          isInsideComponentOrHook(codePathNode);
         const isDirectlyInsideComponentOrHook = codePathFunctionName
           ? isComponentName(codePathFunctionName) ||
             isHook(codePathFunctionName)

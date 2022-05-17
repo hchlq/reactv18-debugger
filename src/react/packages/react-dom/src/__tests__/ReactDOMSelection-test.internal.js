@@ -141,10 +141,10 @@ describe('ReactDOMSelection', () => {
       Array.from(fixtureRoot.querySelectorAll('*')),
     );
     expect(allNodes.length).toBe(27);
-    allNodes.slice().forEach(element => {
+    allNodes.slice().forEach((element) => {
       // Add text nodes.
       allNodes.push(
-        ...Array.from(element.childNodes).filter(n => n.nodeType === 3),
+        ...Array.from(element.childNodes).filter((n) => n.nodeType === 3),
       );
     });
     expect(allNodes.length).toBe(41);

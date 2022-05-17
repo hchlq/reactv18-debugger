@@ -4,10 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                
 
 import * as ReactDOM from 'react-dom';
 import ReactSharedInternals from 'shared/ReactSharedInternals';
@@ -38,7 +36,7 @@ const {IsSomeRendererActing} = ReactSharedInternals;
 
 let actingUpdatesScopeDepth = 0;
 
-export function unstable_concurrentAct(scope                              ) {
+export function unstable_concurrentAct(scope) {
   if (Scheduler.unstable_flushAllWithoutAsserting === undefined) {
     throw Error(
       'This version of `act` requires a special mock build of Scheduler.',
@@ -86,7 +84,7 @@ export function unstable_concurrentAct(scope                              ) {
       typeof thenable.then === 'function'
     ) {
       return {
-        then(resolve            , reject                        ) {
+        then(resolve, reject) {
           thenable.then(
             () => {
               flushActWork(
@@ -94,13 +92,13 @@ export function unstable_concurrentAct(scope                              ) {
                   unwind();
                   resolve();
                 },
-                error => {
+                (error) => {
                   unwind();
                   reject(error);
                 },
               );
             },
-            error => {
+            (error) => {
               unwind();
               reject(error);
             },

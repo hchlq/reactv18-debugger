@@ -4,12 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                  
-                                   
-                                            
 
 const OUTLINE_COLOR = '#f0f0f0';
 
@@ -27,14 +23,14 @@ const COLORS = [
   '#febc38',
 ];
 
-let canvas                           = null;
+let canvas = null;
 
-export function draw(nodeToData                       )       {
+export function draw(nodeToData) {
   if (canvas === null) {
     initialize();
   }
 
-  const canvasFlow                    = ((canvas     )                   );
+  const canvasFlow = canvas;
   canvasFlow.width = window.innerWidth;
   canvasFlow.height = window.innerHeight;
 
@@ -51,11 +47,7 @@ export function draw(nodeToData                       )       {
   });
 }
 
-function drawBorder(
-  context                          ,
-  rect      ,
-  color        ,
-)       {
+function drawBorder(context, rect, color) {
   const {height, left, top, width} = rect;
 
   // outline
@@ -79,7 +71,7 @@ function drawBorder(
   context.setLineDash([0]);
 }
 
-export function destroy()       {
+export function destroy() {
   if (canvas !== null) {
     if (canvas.parentNode != null) {
       canvas.parentNode.removeChild(canvas);
@@ -88,7 +80,7 @@ export function destroy()       {
   }
 }
 
-function initialize()       {
+function initialize() {
   canvas = window.document.createElement('canvas');
   canvas.style.cssText = `
     xx-background-color: red;

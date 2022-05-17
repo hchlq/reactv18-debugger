@@ -4,20 +4,14 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
 
 import styles from './NoInteractions.css';
 
-export default function NoInteractions({
-  height,
-  width,
-}    
-                 
-                
-  ) {
+export default function NoInteractions({height, width}) {
   return (
     <div className={styles.NoInteractions} style={{height, width}}>
       <p className={styles.Header}>No interactions were recorded.</p>
@@ -26,7 +20,8 @@ export default function NoInteractions({
           className={styles.Link}
           href="https://reactjs.org/link/interaction-tracing"
           rel="noopener noreferrer"
-          target="_blank">
+          target="_blank"
+        >
           Learn more about the interaction tracing API here.
         </a>
       </p>

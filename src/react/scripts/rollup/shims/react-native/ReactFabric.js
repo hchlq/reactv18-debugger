@@ -5,7 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  *
  * @format
- *      
+ *
  */
 
 'use strict';
@@ -13,7 +13,6 @@
 import {BatchedBridge} from 'react-native/Libraries/ReactPrivate/ReactNativePrivateInterface';
 
 // TODO @sema: Adjust types
-                                                        
 
 let ReactFabric;
 
@@ -29,4 +28,4 @@ if (global.RN$Bridgeless) {
   BatchedBridge.registerCallableModule('ReactFabric', ReactFabric);
 }
 
-module.exports = (ReactFabric                 );
+module.exports = ReactFabric;

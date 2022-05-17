@@ -4,11 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                                   
-                                                                              
 
 import {
   findCurrentHostFiber,
@@ -31,20 +28,20 @@ let getInspectorDataForViewTag;
 let getInspectorDataForViewAtPoint;
 
 if (__DEV__) {
-  const traverseOwnerTreeUp = function(hierarchy, instance     ) {
+  const traverseOwnerTreeUp = function (hierarchy, instance) {
     if (instance) {
       hierarchy.unshift(instance);
       traverseOwnerTreeUp(hierarchy, instance._debugOwner);
     }
   };
 
-  const getOwnerHierarchy = function(instance     ) {
+  const getOwnerHierarchy = function (instance) {
     const hierarchy = [];
     traverseOwnerTreeUp(hierarchy, instance);
     return hierarchy;
   };
 
-  const lastNonHostInstance = function(hierarchy) {
+  const lastNonHostInstance = function (hierarchy) {
     for (let i = hierarchy.length - 1; i > 1; i--) {
       const instance = hierarchy[i];
 
@@ -55,7 +52,7 @@ if (__DEV__) {
     return hierarchy[0];
   };
 
-  const getHostProps = function(fiber) {
+  const getHostProps = function (fiber) {
     const host = findCurrentHostFiber(fiber);
     if (host) {
       return host.memoizedProps || emptyObject;
@@ -63,7 +60,7 @@ if (__DEV__) {
     return emptyObject;
   };
 
-  const getHostNode = function(fiber              , findNodeHandle) {
+  const getHostNode = function (fiber, findNodeHandle) {
     let hostNode;
     // look for children first for the hostNode
     // as composite fibers do not have a hostNode
@@ -79,14 +76,14 @@ if (__DEV__) {
     return null;
   };
 
-  const createHierarchy = function(fiberHierarchy) {
-    return fiberHierarchy.map(fiber => ({
+  const createHierarchy = function (fiberHierarchy) {
+    return fiberHierarchy.map((fiber) => ({
       name: getComponentName(fiber.type),
-      getInspectorData: findNodeHandle => {
+      getInspectorData: (findNodeHandle) => {
         return {
           props: getHostProps(fiber),
           source: fiber._debugSource,
-          measure: callback => {
+          measure: (callback) => {
             // If this is Fabric, we'll find a ShadowNode and use that to measure.
             const hostFiber = findCurrentHostFiber(fiber);
             const shadowNode =
@@ -108,7 +105,7 @@ if (__DEV__) {
     }));
   };
 
-  const getInspectorDataForInstance = function(closestInstance)                {
+  const getInspectorDataForInstance = function (closestInstance) {
     // Handle case where user clicks outside of ReactNative
     if (!closestInstance) {
       return {
@@ -135,7 +132,7 @@ if (__DEV__) {
     };
   };
 
-  getInspectorDataForViewTag = function(viewTag        )         {
+  getInspectorDataForViewTag = function (viewTag) {
     const closestInstance = getClosestInstanceFromNode(viewTag);
 
     // Handle case where user clicks outside of ReactNative
@@ -164,13 +161,13 @@ if (__DEV__) {
     };
   };
 
-  getInspectorDataForViewAtPoint = function(
-    findNodeHandle                                     ,
-    inspectedView        ,
-    locationX        ,
-    locationY        ,
-    callback                                             ,
-  )       {
+  getInspectorDataForViewAtPoint = function (
+    findNodeHandle,
+    inspectedView,
+    locationX,
+    locationY,
+    callback,
+  ) {
     let closestInstance = null;
 
     if (inspectedView._internalInstanceHandle != null) {
@@ -179,7 +176,7 @@ if (__DEV__) {
         inspectedView._internalInstanceHandle.stateNode.node,
         locationX,
         locationY,
-        internalInstanceHandle => {
+        (internalInstanceHandle) => {
           if (internalInstanceHandle == null) {
             callback({
               pointerY: locationY,
@@ -236,12 +233,12 @@ if (__DEV__) {
   };
 
   getInspectorDataForViewAtPoint = (
-    findNodeHandle                                     ,
-    inspectedView        ,
-    locationX        ,
-    locationY        ,
-    callback                                             ,
-  )       => {
+    findNodeHandle,
+    inspectedView,
+    locationX,
+    locationY,
+    callback,
+  ) => {
     invariant(
       false,
       'getInspectorDataForViewAtPoint() is not available in production.',

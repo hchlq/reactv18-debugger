@@ -4,38 +4,15 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                
 
 import * as http from 'http';
 import * as https from 'https';
 
 import {readCache} from 'react/unstable-cache';
 
-                       
-               
-               
-              
-                      
-                 
-                     
-                
-              
-            
-                             
-              
-              
-                 
-   
-
-function nodeFetch(
-  url        ,
-  options       ,
-  onResolve             ,
-  onReject             ,
-)       {
+function nodeFetch(url, options, onResolve, onReject) {
   const {hostname, pathname, search, port, protocol} = new URL(url);
   const nodeOptions = {
     hostname,
@@ -44,11 +21,11 @@ function nodeFetch(
     // TODO: cherry-pick supported user-passed options.
   };
   const nodeImpl = protocol === 'https:' ? https : http;
-  const request = nodeImpl.request(nodeOptions, response => {
+  const request = nodeImpl.request(nodeOptions, (response) => {
     // TODO: support redirects.
     onResolve(new Response(response));
   });
-  request.on('error', error => {
+  request.on('error', (error) => {
     onReject(error);
   });
   request.end();
@@ -58,26 +35,9 @@ const Pending = 0;
 const Resolved = 1;
 const Rejected = 2;
 
-                       
-            
-                  
-   
-
-                           
-            
-           
-   
-
-                        
-            
-               
-   
-
-                                                                    
-
 const fetchKey = {};
 
-function readResultMap()                                     {
+function readResultMap() {
   const resources = readCache().resources;
   let map = resources.get(fetchKey);
   if (map === undefined) {
@@ -87,7 +47,7 @@ function readResultMap()                                     {
   return map;
 }
 
-function readResult   (result           )    {
+function readResult(result) {
   if (result.status === Resolved) {
     return result.value;
   } else {
@@ -117,7 +77,7 @@ function Response(nativeResponse) {
       cb();
     }
   }
-  const result                = (this._result = {
+  const result = (this._result = {
     status: Pending,
     value: {
       then(cb) {
@@ -126,18 +86,18 @@ function Response(nativeResponse) {
     },
   });
   const data = [];
-  nativeResponse.on('data', chunk => data.push(chunk));
+  nativeResponse.on('data', (chunk) => data.push(chunk));
   nativeResponse.on('end', () => {
     if (result.status === Pending) {
-      const resolvedResult = ((result     )                        );
+      const resolvedResult = result;
       resolvedResult.status = Resolved;
       resolvedResult.value = Buffer.concat(data);
       wake();
     }
   });
-  nativeResponse.on('error', err => {
+  nativeResponse.on('error', (err) => {
     if (result.status === Pending) {
-      const rejectedResult = ((result     )                );
+      const rejectedResult = result;
       rejectedResult.status = Rejected;
       rejectedResult.value = err;
       wake();
@@ -165,7 +125,7 @@ Response.prototype = {
   },
 };
 
-function preloadResult(url        , options       )                        {
+function preloadResult(url, options) {
   const map = readResultMap();
   let entry = map.get(url);
   if (!entry) {
@@ -189,24 +149,24 @@ function preloadResult(url        , options       )                        {
         cb();
       }
     };
-    const result                        = (entry = {
+    const result = (entry = {
       status: Pending,
       value: wakeable,
     });
     nodeFetch(
       url,
       options,
-      response => {
+      (response) => {
         if (result.status === Pending) {
-          const resolvedResult = ((result     )                               );
+          const resolvedResult = result;
           resolvedResult.status = Resolved;
           resolvedResult.value = response;
           wake();
         }
       },
-      err => {
+      (err) => {
         if (result.status === Pending) {
-          const rejectedResult = ((result     )                );
+          const rejectedResult = result;
           rejectedResult.status = Rejected;
           rejectedResult.value = err;
           wake();
@@ -218,12 +178,12 @@ function preloadResult(url        , options       )                        {
   return entry;
 }
 
-export function preload(url        , options       )       {
+export function preload(url, options) {
   preloadResult(url, options);
   // Don't return anything.
 }
 
-export function fetch(url        , options       )                {
+export function fetch(url, options) {
   const result = preloadResult(url, options);
   return readResult(result);
 }

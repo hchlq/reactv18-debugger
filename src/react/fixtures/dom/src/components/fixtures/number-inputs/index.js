@@ -11,10 +11,12 @@ function NumberInputs() {
     <FixtureSet
       title="Number inputs"
       description="Number inputs inconsistently assign and report the value
-                     property depending on the browser.">
+                     property depending on the browser."
+    >
       <TestCase
         title="Backspacing"
-        description="The decimal place should not be lost">
+        description="The decimal place should not be lost"
+      >
         <TestCase.Steps>
           <li>Type "3.1"</li>
           <li>Press backspace, eliminating the "1"</li>
@@ -35,7 +37,8 @@ function NumberInputs() {
 
       <TestCase
         title="Decimal precision"
-        description="Supports decimal precision greater than 2 places">
+        description="Supports decimal precision greater than 2 places"
+      >
         <TestCase.Steps>
           <li>Type "0.01"</li>
         </TestCase.Steps>
@@ -49,7 +52,8 @@ function NumberInputs() {
 
       <TestCase
         title="Exponent form"
-        description="Supports exponent form ('2e4')">
+        description="Supports exponent form ('2e4')"
+      >
         <TestCase.Steps>
           <li>Type "2e"</li>
           <li>Type 4, to read "2e4"</li>
@@ -77,7 +81,8 @@ function NumberInputs() {
 
       <TestCase
         title="Exponent Form"
-        description="Supports pressing 'ee' in the middle of a number">
+        description="Supports pressing 'ee' in the middle of a number"
+      >
         <TestCase.Steps>
           <li>Type "3.14"</li>
           <li>Move the text cursor to after the decimal place</li>
@@ -93,7 +98,8 @@ function NumberInputs() {
 
       <TestCase
         title="Trailing Zeroes"
-        description="Typing '3.0' preserves the trailing zero">
+        description="Typing '3.0' preserves the trailing zero"
+      >
         <TestCase.Steps>
           <li>Type "3.0"</li>
         </TestCase.Steps>
@@ -107,7 +113,8 @@ function NumberInputs() {
 
       <TestCase
         title="Inserting decimals precision"
-        description="Inserting '.' in to '300' maintains the trailing zeroes">
+        description="Inserting '.' in to '300' maintains the trailing zeroes"
+      >
         <TestCase.Steps>
           <li>Type "300"</li>
           <li>Move the cursor to after the "3"</li>
@@ -122,7 +129,8 @@ function NumberInputs() {
 
       <TestCase
         title="Replacing numbers with -"
-        description="Replacing a number with the '-' sign should not clear the value">
+        description="Replacing a number with the '-' sign should not clear the value"
+      >
         <TestCase.Steps>
           <li>Type "3"</li>
           <li>Select the entire value"</li>
@@ -137,7 +145,8 @@ function NumberInputs() {
 
       <TestCase
         title="Negative numbers"
-        description="Typing minus when inserting a negative number should work">
+        description="Typing minus when inserting a negative number should work"
+      >
         <TestCase.Steps>
           <li>Type "-"</li>
           <li>Type '3'</li>
@@ -150,7 +159,8 @@ function NumberInputs() {
       </TestCase>
       <TestCase
         title="Decimal numbers"
-        description="eg: initial value is '.98', when format to '0.98', should change to '0.98' ">
+        description="eg: initial value is '.98', when format to '0.98', should change to '0.98' "
+      >
         <TestCase.Steps>
           <li>initial value is '.98'</li>
           <li>setState to '0.98'</li>
@@ -164,7 +174,8 @@ function NumberInputs() {
 
       <TestCase
         title="Trailing zeroes"
-        description="Extraneous zeroes should be retained when changing the value via setState">
+        description="Extraneous zeroes should be retained when changing the value via setState"
+      >
         <TestCase.Steps>
           <li>Change the text to 4.0000</li>
           <li>Click "Reset to 3.0000"</li>

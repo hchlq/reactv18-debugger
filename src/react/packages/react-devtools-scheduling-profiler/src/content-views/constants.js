@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 export const LABEL_SIZE = 80;
@@ -16,18 +16,7 @@ export const MARKER_TEXT_PADDING = 8;
 export const COLOR_HOVER_DIM_DELTA = 5;
 
 export const INTERVAL_TIMES = [
-  1,
-  2,
-  5,
-  10,
-  20,
-  50,
-  100,
-  200,
-  500,
-  1000,
-  2000,
-  5000,
+  1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000,
 ];
 export const MIN_INTERVAL_SIZE_PX = 70;
 

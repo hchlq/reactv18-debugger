@@ -21,7 +21,7 @@ describe('ReactSuspenseWithNoopRenderer', () => {
 
     textCache = new Map();
 
-    readText = text => {
+    readText = (text) => {
       const record = textCache.get(text);
       if (record !== undefined) {
         switch (record.status) {
@@ -34,7 +34,7 @@ describe('ReactSuspenseWithNoopRenderer', () => {
         }
       } else {
         let ping;
-        const promise = new Promise(resolve => (ping = resolve));
+        const promise = new Promise((resolve) => (ping = resolve));
         const newRecord = {
           status: 'pending',
           ping: ping,
@@ -45,7 +45,7 @@ describe('ReactSuspenseWithNoopRenderer', () => {
       }
     };
 
-    resolveText = text => {
+    resolveText = (text) => {
       const record = textCache.get(text);
       if (record !== undefined) {
         if (record.status === 'pending') {
@@ -114,7 +114,8 @@ describe('ReactSuspenseWithNoopRenderer', () => {
           <div>
             <Suspense
               unstable_expectedLoadTime={2000}
-              fallback={<Text text="Loading..." />}>
+              fallback={<Text text="Loading..." />}
+            >
               <Text text="Inner" />
             </Suspense>
           </div>
@@ -155,7 +156,8 @@ describe('ReactSuspenseWithNoopRenderer', () => {
           <div>
             <Suspense
               unstable_expectedLoadTime={2000}
-              fallback={<Text text="Loading..." />}>
+              fallback={<Text text="Loading..." />}
+            >
               <Text text={`Inner [${count}]`} />
             </Suspense>
           </div>
@@ -199,7 +201,8 @@ describe('ReactSuspenseWithNoopRenderer', () => {
           <div>
             <Suspense
               unstable_expectedLoadTime={2000}
-              fallback={<Text text="Loading..." />}>
+              fallback={<Text text="Loading..." />}
+            >
               <AsyncText text="Inner" />
             </Suspense>
           </div>
@@ -248,12 +251,14 @@ describe('ReactSuspenseWithNoopRenderer', () => {
           <div>
             <Suspense
               unstable_expectedLoadTime={2000}
-              fallback={<Text text="Loading B..." />}>
+              fallback={<Text text="Loading B..." />}
+            >
               <Text text="B" />
               <div>
                 <Suspense
                   unstable_expectedLoadTime={2000}
-                  fallback={<Text text="Loading C..." />}>
+                  fallback={<Text text="Loading C..." />}
+                >
                   <Text text="C" />
                 </Suspense>
               </div>

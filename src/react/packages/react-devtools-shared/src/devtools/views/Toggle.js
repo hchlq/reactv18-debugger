@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -14,16 +14,6 @@ import Tooltip from '@reach/tooltip';
 import styles from './Toggle.css';
 import tooltipStyles from './Tooltip.css';
 
-              
-                       
-                     
-                     
-                       
-                                         
-                 
-     
-  
-
 export default function Toggle({
   children,
   className = '',
@@ -31,7 +21,7 @@ export default function Toggle({
   isChecked,
   onChange,
   title,
-}       ) {
+}) {
   let defaultClassName;
   if (isDisabled) {
     defaultClassName = styles.ToggleDisabled;
@@ -41,16 +31,17 @@ export default function Toggle({
     defaultClassName = styles.ToggleOff;
   }
 
-  const handleClick = useCallback(() => onChange(!isChecked), [
-    isChecked,
-    onChange,
-  ]);
+  const handleClick = useCallback(
+    () => onChange(!isChecked),
+    [isChecked, onChange],
+  );
 
   let toggle = (
     <button
       className={`${defaultClassName} ${className}`}
       disabled={isDisabled}
-      onClick={handleClick}>
+      onClick={handleClick}
+    >
       <span className={styles.ToggleContent} tabIndex={-1}>
         {children}
       </span>

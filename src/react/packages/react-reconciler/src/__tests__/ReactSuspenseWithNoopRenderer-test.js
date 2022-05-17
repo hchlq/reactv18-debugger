@@ -21,7 +21,7 @@ describe('ReactSuspenseWithNoopRenderer', () => {
 
     textCache = new Map();
 
-    readText = text => {
+    readText = (text) => {
       const record = textCache.get(text);
       if (record !== undefined) {
         switch (record.status) {
@@ -34,7 +34,7 @@ describe('ReactSuspenseWithNoopRenderer', () => {
         }
       } else {
         let ping;
-        const promise = new Promise(resolve => (ping = resolve));
+        const promise = new Promise((resolve) => (ping = resolve));
         const newRecord = {
           status: 'pending',
           ping: ping,
@@ -45,7 +45,7 @@ describe('ReactSuspenseWithNoopRenderer', () => {
       }
     };
 
-    resolveText = text => {
+    resolveText = (text) => {
       const record = textCache.get(text);
       if (record !== undefined) {
         if (record.status === 'pending') {
@@ -66,7 +66,7 @@ describe('ReactSuspenseWithNoopRenderer', () => {
       }
     };
 
-    rejectText = text => {
+    rejectText = (text) => {
       const record = textCache.get(text);
       if (record !== undefined) {
         if (record.status === 'pending') {
@@ -146,7 +146,8 @@ describe('ReactSuspenseWithNoopRenderer', () => {
     return (
       <div hidden={mode === 'hidden'}>
         <React.unstable_LegacyHidden
-          mode={mode === 'hidden' ? 'unstable-defer-without-hiding' : mode}>
+          mode={mode === 'hidden' ? 'unstable-defer-without-hiding' : mode}
+        >
           {children}
         </React.unstable_LegacyHidden>
       </div>
@@ -2128,7 +2129,8 @@ describe('ReactSuspenseWithNoopRenderer', () => {
         <Suspense fallback={<Text text="Initial load..." />}>
           <Suspense
             unstable_avoidThisFallback={true}
-            fallback={<Text text="Updating..." />}>
+            fallback={<Text text="Updating..." />}
+          >
             <AsyncText text="A" ms={5000} />
             {showC ? <AsyncText text="C" ms={5000} /> : null}
           </Suspense>
@@ -2187,11 +2189,13 @@ describe('ReactSuspenseWithNoopRenderer', () => {
       return (
         <Suspense
           unstable_avoidThisFallback={true}
-          fallback={<Text text="Loading A..." />}>
+          fallback={<Text text="Loading A..." />}
+        >
           <Text text="A" />
           <Suspense
             unstable_avoidThisFallback={true}
-            fallback={<Text text="Loading B..." />}>
+            fallback={<Text text="Loading B..." />}
+          >
             <AsyncText text="B" ms={5000} />
           </Suspense>
         </Suspense>
@@ -2219,12 +2223,14 @@ describe('ReactSuspenseWithNoopRenderer', () => {
         <Suspense fallback={<Text text="Initial load..." />}>
           <Suspense
             unstable_avoidThisFallback={true}
-            fallback={<Text text="Loading A..." />}>
+            fallback={<Text text="Loading A..." />}
+          >
             <Text text="A" />
             {showB ? (
               <Suspense
                 unstable_avoidThisFallback={true}
-                fallback={<Text text="Loading B..." />}>
+                fallback={<Text text="Loading B..." />}
+              >
                 <AsyncText text="B" ms={5000} />
               </Suspense>
             ) : null}
@@ -2408,7 +2414,7 @@ describe('ReactSuspenseWithNoopRenderer', () => {
       class App extends React.Component {
         state = {page: 'none'};
         render() {
-          transitionToPage = page => this.setState({page});
+          transitionToPage = (page) => this.setState({page});
           const page = this.state.page;
           if (page === 'none') {
             return null;
@@ -2588,7 +2594,7 @@ describe('ReactSuspenseWithNoopRenderer', () => {
       class App extends React.Component {
         state = {page: 'none'};
         render() {
-          transitionToPage = page => this.setState({page});
+          transitionToPage = (page) => this.setState({page});
           const page = this.state.page;
           if (page === 'none') {
             return null;
@@ -2662,7 +2668,8 @@ describe('ReactSuspenseWithNoopRenderer', () => {
           <Text text="Hi!" />
           <Suspense
             fallback={<Text text={'Loading ' + page + '...'} />}
-            unstable_avoidThisFallback={true}>
+            unstable_avoidThisFallback={true}
+          >
             <AsyncText text={page} />
           </Suspense>
         </Suspense>
@@ -2711,7 +2718,8 @@ describe('ReactSuspenseWithNoopRenderer', () => {
           ) : (
             <Suspense
               fallback={<Text text={'Loading ' + page + '...'} />}
-              unstable_avoidThisFallback={true}>
+              unstable_avoidThisFallback={true}
+            >
               <AsyncText text={page} />
             </Suspense>
           )}
@@ -3752,12 +3760,12 @@ describe('ReactSuspenseWithNoopRenderer', () => {
         setMirror(text);
       }
 
-      setTextWithShortTransition = value => {
+      setTextWithShortTransition = (value) => {
         startShortTransition(() => {
           setText(value);
         });
       };
-      setTextWithLongTransition = value => {
+      setTextWithLongTransition = (value) => {
         startLongTransition(() => {
           setText(value);
         });

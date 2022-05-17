@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import throttle from 'lodash.throttle';
@@ -22,26 +22,6 @@ import {
 } from 'react-devtools-shared/src/storage';
 import {StoreContext, BridgeContext} from './context';
 import {sanitizeForParse, smartParse, smartStringify} from '../utils';
-
-                      
-                
-                     
-   
-                       
-                 
-                     
-                     
-   
-
-                                                           
-                                                                         
-                               
-                     
-                     
-                             
-                   
-                   
-   
 
 function useEditableValueReducer(state, action) {
   switch (action.type) {
@@ -76,14 +56,8 @@ function useEditableValueReducer(state, action) {
 }
 
 // Convenience hook for working with an editable value that is validated via JSON.parse.
-export function useEditableValue(
-  externalValue     ,
-)                                                    {
-  const [state, dispatch] = useReducer 
-                          
-                          
-                           
-   (useEditableValueReducer, {
+export function useEditableValue(externalValue) {
+  const [state, dispatch] = useReducer(useEditableValueReducer, {
     editableValue: smartStringify(externalValue),
     externalValue,
     hasPendingChanges: false,
@@ -108,11 +82,8 @@ export function useEditableValue(
   return [state, dispatch];
 }
 
-export function useIsOverflowing(
-  containerRef                                       ,
-  totalChildWidth        ,
-)          {
-  const [isOverflowing, setIsOverflowing] = useState         (false);
+export function useIsOverflowing(containerRef, totalChildWidth) {
+  const [isOverflowing, setIsOverflowing] = useState(false);
 
   // It's important to use a layout effect, so that we avoid showing a flash of overflowed content.
   useLayoutEffect(() => {
@@ -120,7 +91,7 @@ export function useIsOverflowing(
       return () => {};
     }
 
-    const container = ((containerRef.current     )                );
+    const container = containerRef.current;
 
     const handleResize = throttle(
       () => setIsOverflowing(container.clientWidth <= totalChildWidth),
@@ -141,10 +112,7 @@ export function useIsOverflowing(
 }
 
 // Forked from https://usehooks.com/useLocalStorage/
-export function useLocalStorage   (
-  key        ,
-  initialValue               ,
-)                                      {
+export function useLocalStorage(key, initialValue) {
   const getValueFromLocalStorage = useCallback(() => {
     try {
       const item = localStorageGetItem(key);
@@ -155,19 +123,19 @@ export function useLocalStorage   (
       console.log(error);
     }
     if (typeof initialValue === 'function') {
-      return ((initialValue     )         )();
+      return initialValue();
     } else {
       return initialValue;
     }
   }, [initialValue, key]);
 
-  const [storedValue, setStoredValue] = useState     (getValueFromLocalStorage);
+  const [storedValue, setStoredValue] = useState(getValueFromLocalStorage);
 
   const setValue = useCallback(
-    value => {
+    (value) => {
       try {
         const valueToStore =
-          value instanceof Function ? (value     )(storedValue) : value;
+          value instanceof Function ? value(storedValue) : value;
         setStoredValue(valueToStore);
         localStorageSetItem(key, JSON.stringify(valueToStore));
       } catch (error) {
@@ -180,7 +148,7 @@ export function useLocalStorage   (
   // Listen for changes to this local storage value made from other windows.
   // This enables the e.g. "⚛️ Elements" tab to update in response to changes from "⚛️ Settings".
   useLayoutEffect(() => {
-    const onStorage = event => {
+    const onStorage = (event) => {
       const newValue = getValueFromLocalStorage();
       if (key === event.key && storedValue !== newValue) {
         setValue(newValue);
@@ -198,22 +166,22 @@ export function useLocalStorage   (
 }
 
 export function useModalDismissSignal(
-  modalRef                                       ,
-  dismissCallback            ,
-  dismissOnClickOutside           = true,
-)       {
+  modalRef,
+  dismissCallback,
+  dismissOnClickOutside = true,
+) {
   useEffect(() => {
     if (modalRef.current === null) {
       return () => {};
     }
 
-    const handleDocumentKeyDown = ({key}     ) => {
+    const handleDocumentKeyDown = ({key}) => {
       if (key === 'Escape') {
         dismissCallback();
       }
     };
 
-    const handleDocumentClick = (event     ) => {
+    const handleDocumentClick = (event) => {
       // $FlowFixMe
       if (
         modalRef.current !== null &&
@@ -243,13 +211,7 @@ export function useModalDismissSignal(
 }
 
 // Copied from https://github.com/facebook/react/pull/15022
-export function useSubscription       ({
-  getCurrentValue,
-  subscribe,
-}    
-                               
-                                                
-  )        {
+export function useSubscription({getCurrentValue, subscribe}) {
   const [state, setState] = useState({
     getCurrentValue,
     subscribe,
@@ -275,7 +237,7 @@ export function useSubscription       ({
         return;
       }
 
-      setState(prevState => {
+      setState((prevState) => {
         if (
           prevState.getCurrentValue !== getCurrentValue ||
           prevState.subscribe !== subscribe
@@ -309,7 +271,7 @@ export function useHighlightNativeElement() {
   const store = useContext(StoreContext);
 
   const highlightNativeElement = useCallback(
-    (id        ) => {
+    (id) => {
       const element = store.getElementByID(id);
       const rendererID = store.getRendererIDForElement(id);
       if (element !== null && rendererID !== null) {

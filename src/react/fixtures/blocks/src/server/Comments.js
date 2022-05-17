@@ -18,7 +18,7 @@ export default function Comments({postId}) {
     <>
       <h5>Comments</h5>
       <ul>
-        {comments.slice(0, 5).map(comment => (
+        {comments.slice(0, 5).map((comment) => (
           <li key={comment.id}>
             {comment.body}
             {' • '}

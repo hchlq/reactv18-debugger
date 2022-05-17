@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
 import * as React from 'react';
@@ -16,12 +16,10 @@ import {UNSUPPORTED_VERSION_URL} from 'react-devtools-shared/src/constants';
 
 import styles from './UnsupportedVersionDialog.css';
 
-                                                                        
-
-export default function UnsupportedVersionDialog(_      ) {
+export default function UnsupportedVersionDialog(_) {
   const {dispatch} = useContext(ModalDialogContext);
   const store = useContext(StoreContext);
-  const [state, setState] = useState              ('dialog-not-shown');
+  const [state, setState] = useState('dialog-not-shown');
 
   useEffect(() => {
     if (state === 'dialog-not-shown') {
@@ -53,7 +51,7 @@ export default function UnsupportedVersionDialog(_      ) {
   return null;
 }
 
-function DialogContent(_      ) {
+function DialogContent(_) {
   return (
     <Fragment>
       <div className={styles.Row}>
@@ -70,7 +68,8 @@ function DialogContent(_      ) {
               className={styles.ReleaseNotesLink}
               target="_blank"
               rel="noopener noreferrer"
-              href={UNSUPPORTED_VERSION_URL}>
+              href={UNSUPPORTED_VERSION_URL}
+            >
               install an older version of the extension
             </a>
             .

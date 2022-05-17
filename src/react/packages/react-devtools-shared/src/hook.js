@@ -4,7 +4,7 @@
  * we are evaling this function by inserting a script tag.
  * That's why we have to inline the whole event emitter implementation here.
  *
- *      
+ *
  */
 
 import {
@@ -12,11 +12,7 @@ import {
   registerRenderer as registerRendererWithConsole,
 } from './backend/console';
 
-                                                                          
-
-                        
-
-export function installHook(target     )                      {
+export function installHook(target) {
   if (target.hasOwnProperty('__REACT_DEVTOOLS_GLOBAL_HOOK__')) {
     return null;
   }
@@ -124,7 +120,7 @@ export function installHook(target     )                      {
     return 'production';
   }
 
-  function checkDCE(fn          ) {
+  function checkDCE(fn) {
     // This runs for production versions of React.
     // Needs to be super safe.
     try {
@@ -140,7 +136,7 @@ export function installHook(target     )                      {
 
         // Bonus: throw an exception hoping that it gets picked up by a reporting system.
         // Not synchronously so that it doesn't break the calling code.
-        setTimeout(function() {
+        setTimeout(function () {
           throw new Error(
             'React is running in production mode, but dead code ' +
               'elimination has not been applied. Read how to correctly ' +
@@ -238,7 +234,7 @@ export function installHook(target     )                      {
 
   function emit(event, data) {
     if (listeners[event]) {
-      listeners[event].map(fn => fn(data));
+      listeners[event].map((fn) => fn(data));
     }
   }
 
@@ -282,7 +278,7 @@ export function installHook(target     )                      {
   const listeners = {};
   const renderers = new Map();
 
-  const hook               = {
+  const hook = {
     rendererInterfaces,
     listeners,
 
@@ -306,19 +302,15 @@ export function installHook(target     )                      {
     onCommitFiberRoot,
   };
 
-  Object.defineProperty(
-    target,
-    '__REACT_DEVTOOLS_GLOBAL_HOOK__',
-    ({
-      // This property needs to be configurable for the test environment,
-      // else we won't be able to delete and recreate it beween tests.
-      configurable: __DEV__,
-      enumerable: false,
-      get() {
-        return hook;
-      },
-    }        ),
-  );
+  Object.defineProperty(target, '__REACT_DEVTOOLS_GLOBAL_HOOK__', {
+    // This property needs to be configurable for the test environment,
+    // else we won't be able to delete and recreate it beween tests.
+    configurable: __DEV__,
+    enumerable: false,
+    get() {
+      return hook;
+    },
+  });
 
   return hook;
 }

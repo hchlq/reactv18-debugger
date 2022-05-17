@@ -4,11 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                             
-                                                                                
 
 import {
   positioningScaleFactor,
@@ -34,18 +31,13 @@ const ROW_HEIGHT_FIXED =
   EVENT_ROW_PADDING + USER_TIMING_MARK_SIZE + EVENT_ROW_PADDING;
 
 export class UserTimingMarksView extends View {
-  _marks                  ;
-  _intrinsicSize      ;
+  _marks;
+  _intrinsicSize;
 
-  _hoveredMark                        = null;
-  onHover                                                 = null;
+  _hoveredMark = null;
+  onHover = null;
 
-  constructor(
-    surface         ,
-    frame      ,
-    marks                  ,
-    duration        ,
-  ) {
+  constructor(surface, frame, marks, duration) {
     super(surface, frame);
     this._marks = marks;
 
@@ -59,7 +51,7 @@ export class UserTimingMarksView extends View {
     return this._intrinsicSize;
   }
 
-  setHoveredMark(hoveredMark                       ) {
+  setHoveredMark(hoveredMark) {
     if (this._hoveredMark === hoveredMark) {
       return;
     }
@@ -70,14 +62,7 @@ export class UserTimingMarksView extends View {
   /**
    * Draw a single `UserTimingMark` as a circle in the canvas.
    */
-  _drawSingleMark(
-    context                          ,
-    rect      ,
-    mark                ,
-    baseY        ,
-    scaleFactor        ,
-    showHoverHighlight         ,
-  ) {
+  _drawSingleMark(context, rect, mark, baseY, scaleFactor, showHoverHighlight) {
     const {frame} = this;
     const {timestamp} = mark;
 
@@ -85,7 +70,7 @@ export class UserTimingMarksView extends View {
     const size = USER_TIMING_MARK_SIZE;
     const halfSize = size / 2;
 
-    const markRect       = {
+    const markRect = {
       origin: {
         x: x - halfSize,
         y: baseY,
@@ -113,7 +98,7 @@ export class UserTimingMarksView extends View {
     }
   }
 
-  draw(context                          ) {
+  draw(context) {
     const {frame, _marks, _hoveredMark, visibleArea} = this;
 
     context.fillStyle = COLORS.BACKGROUND;
@@ -131,7 +116,7 @@ export class UserTimingMarksView extends View {
       frame,
     );
 
-    _marks.forEach(mark => {
+    _marks.forEach((mark) => {
       if (mark === _hoveredMark) {
         return;
       }
@@ -160,7 +145,7 @@ export class UserTimingMarksView extends View {
 
     // Render bottom border.
     // Propose border rect, check if intersects with `rect`, draw intersection.
-    const borderFrame       = {
+    const borderFrame = {
       origin: {
         x: frame.origin.x,
         y: frame.origin.y + ROW_HEIGHT_FIXED - BORDER_SIZE,
@@ -185,7 +170,7 @@ export class UserTimingMarksView extends View {
   /**
    * @private
    */
-  _handleMouseMove(interaction                      ) {
+  _handleMouseMove(interaction) {
     const {frame, onHover, visibleArea} = this;
     if (!onHover) {
       return;
@@ -226,7 +211,7 @@ export class UserTimingMarksView extends View {
     onHover(null);
   }
 
-  handleInteraction(interaction             ) {
+  handleInteraction(interaction) {
     switch (interaction.type) {
       case 'mousemove':
         this._handleMouseMove(interaction);

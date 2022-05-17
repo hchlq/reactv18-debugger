@@ -25,7 +25,7 @@ const logger = createLogger({
   storagePath: join(__dirname, '.progress-estimator'),
 });
 
-const confirm = async message => {
+const confirm = async (message) => {
   const confirmation = await prompt(theme`\n{caution ${message}} (y/N) `);
   prompt.done();
   if (confirmation !== 'y' && confirmation !== 'Y') {
@@ -40,7 +40,7 @@ const execRead = async (command, options) => {
   return stdout.trim();
 };
 
-const getArtifactsList = async buildID => {
+const getArtifactsList = async (buildID) => {
   const buildMetadataURL = `https://circleci.com/api/v1.1/project/github/facebook/react/${buildID}?circle-token=${process.env.CIRCLE_CI_API_TOKEN}`;
   const buildMetadata = await http.get(buildMetadataURL, true);
   if (!buildMetadata.workflows || !buildMetadata.workflows.workflow_id) {
@@ -103,7 +103,7 @@ const getBuildInfo = async () => {
   return {branch, buildNumber, checksum, commit, reactVersion, version};
 };
 
-const getChecksumForCurrentRevision = async cwd => {
+const getChecksumForCurrentRevision = async (cwd) => {
   const packagesDir = join(cwd, 'packages');
   const hashedPackages = await hashElement(packagesDir, {
     encoding: 'hex',
@@ -115,7 +115,7 @@ const getChecksumForCurrentRevision = async cwd => {
 const getPublicPackages = () => {
   const packagesRoot = join(__dirname, '..', '..', 'packages');
 
-  return readdirSync(packagesRoot).filter(dir => {
+  return readdirSync(packagesRoot).filter((dir) => {
     if (RELEASE_SCRIPT_PACKAGE_SKIPLIST.includes(dir)) {
       return false;
     }
@@ -139,7 +139,7 @@ const getPublicPackages = () => {
   });
 };
 
-const handleError = error => {
+const handleError = (error) => {
   logUpdate.clear();
 
   const message = error.message.trim().replace(/\n +/g, '\n');
@@ -174,14 +174,14 @@ const printDiff = (path, beforeContents, afterContents) => {
           return null;
       }
     })
-    .filter(line => line);
+    .filter((line) => line);
   console.log(coloredLines.join('\n'));
   return patch;
 };
 
 // Convert an array param (expected format "--foo bar baz")
 // to also accept comma input (e.g. "--foo bar,baz")
-const splitCommaParams = array => {
+const splitCommaParams = (array) => {
   for (let i = array.length - 1; i >= 0; i--) {
     const param = array[i];
     if (param.includes(',')) {

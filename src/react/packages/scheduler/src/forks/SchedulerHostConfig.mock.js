@@ -4,39 +4,39 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
 
-let currentTime         = 0;
-let scheduledCallback                                     = null;
-let scheduledTimeout                          = null;
-let timeoutTime         = -1;
-let yieldedValues                      = null;
-let expectedNumberOfYields         = -1;
-let didStop          = false;
-let isFlushing          = false;
-let needsPaint          = false;
-let shouldYieldForPaint          = false;
+let currentTime = 0;
+let scheduledCallback = null;
+let scheduledTimeout = null;
+let timeoutTime = -1;
+let yieldedValues = null;
+let expectedNumberOfYields = -1;
+let didStop = false;
+let isFlushing = false;
+let needsPaint = false;
+let shouldYieldForPaint = false;
 
-export function requestHostCallback(callback                 ) {
+export function requestHostCallback(callback) {
   scheduledCallback = callback;
 }
 
-export function cancelHostCallback()       {
+export function cancelHostCallback() {
   scheduledCallback = null;
 }
 
-export function requestHostTimeout(callback                , ms        ) {
+export function requestHostTimeout(callback, ms) {
   scheduledTimeout = callback;
   timeoutTime = currentTime + ms;
 }
 
-export function cancelHostTimeout()       {
+export function cancelHostTimeout() {
   scheduledTimeout = null;
   timeoutTime = -1;
 }
 
-export function shouldYieldToHost()          {
+export function shouldYieldToHost() {
   if (
     (expectedNumberOfYields !== -1 &&
       yieldedValues !== null &&
@@ -50,7 +50,7 @@ export function shouldYieldToHost()          {
   return false;
 }
 
-export function getCurrentTime()         {
+export function getCurrentTime() {
   return currentTime;
 }
 
@@ -74,7 +74,7 @@ export function reset() {
 }
 
 // Should only be used via an assertion helper that inspects the yielded values.
-export function unstable_flushNumberOfYields(count        )       {
+export function unstable_flushNumberOfYields(count) {
   if (isFlushing) {
     throw new Error('Already flushing work.');
   }
@@ -98,7 +98,7 @@ export function unstable_flushNumberOfYields(count        )       {
   }
 }
 
-export function unstable_flushUntilNextPaint()       {
+export function unstable_flushUntilNextPaint() {
   if (isFlushing) {
     throw new Error('Already flushing work.');
   }
@@ -140,7 +140,7 @@ export function unstable_flushExpired() {
   }
 }
 
-export function unstable_flushAllWithoutAsserting()          {
+export function unstable_flushAllWithoutAsserting() {
   // Returns false if no work was flushed.
   if (isFlushing) {
     throw new Error('Already flushing work.');
@@ -165,7 +165,7 @@ export function unstable_flushAllWithoutAsserting()          {
   }
 }
 
-export function unstable_clearYields()               {
+export function unstable_clearYields() {
   if (yieldedValues === null) {
     return [];
   }
@@ -174,7 +174,7 @@ export function unstable_clearYields()               {
   return values;
 }
 
-export function unstable_flushAll()       {
+export function unstable_flushAll() {
   if (yieldedValues !== null) {
     throw new Error(
       'Log is not empty. Assert on the log of yielded values before ' +
@@ -191,7 +191,7 @@ export function unstable_flushAll()       {
   }
 }
 
-export function unstable_yieldValue(value       )       {
+export function unstable_yieldValue(value) {
   // eslint-disable-next-line react-internal/no-production-logging
   if (console.log.name === 'disabledLog') {
     // If console.log has been patched, we assume we're in render
@@ -205,7 +205,7 @@ export function unstable_yieldValue(value       )       {
   }
 }
 
-export function unstable_advanceTime(ms        ) {
+export function unstable_advanceTime(ms) {
   // eslint-disable-next-line react-internal/no-production-logging
   if (console.log.name === 'disabledLog') {
     // If console.log has been patched, we assume we're in render

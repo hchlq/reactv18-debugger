@@ -4,13 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *      
+ *
  */
-
-                                                               
-                                                                       
-                                                                              
-                                                          
 
 // Intentionally not named imports because Rollup would use dynamic dispatch for
 // CommonJS interop named imports.
@@ -29,11 +24,7 @@ import {
   getSuspenseInstanceFromFiber,
 } from 'react-reconciler/src/ReactFiberTreeReflection';
 import {HostRoot, SuspenseComponent} from 'react-reconciler/src/ReactWorkTags';
-import {
-                        
-  IS_CAPTURE_PHASE,
-  IS_LEGACY_FB_SUPPORT_MODE,
-} from './EventSystemFlags';
+import {IS_CAPTURE_PHASE, IS_LEGACY_FB_SUPPORT_MODE} from './EventSystemFlags';
 
 import getEventTarget from './getEventTarget';
 import {getClosestInstanceFromNode} from '../client/ReactDOMComponentTree';
@@ -70,7 +61,7 @@ export let _enabled = true;
 
 // This is exported in FB builds for use by legacy FB layer infra.
 // We'd like to remove this but it's not clear if this is safe.
-export function setEnabled(enabled          ) {
+export function setEnabled(enabled) {
   _enabled = !!enabled;
 }
 
@@ -79,10 +70,10 @@ export function isEnabled() {
 }
 
 export function createEventListenerWrapper(
-  targetContainer             ,
-  domEventName              ,
-  eventSystemFlags                  ,
-)           {
+  targetContainer,
+  domEventName,
+  eventSystemFlags,
+) {
   return dispatchEvent.bind(
     null,
     domEventName,
@@ -92,10 +83,10 @@ export function createEventListenerWrapper(
 }
 
 export function createEventListenerWrapperWithPriority(
-  targetContainer             ,
-  domEventName              ,
-  eventSystemFlags                  ,
-)           {
+  targetContainer,
+  domEventName,
+  eventSystemFlags,
+) {
   const eventPriority = getEventPriorityForPluginSystem(domEventName);
   let listenerWrapper;
   switch (eventPriority) {
@@ -180,11 +171,11 @@ function dispatchUserBlockingUpdate(
 }
 
 export function dispatchEvent(
-  domEventName              ,
-  eventSystemFlags                  ,
-  targetContainer             ,
-  nativeEvent                ,
-)       {
+  domEventName,
+  eventSystemFlags,
+  targetContainer,
+  nativeEvent,
+) {
   if (!_enabled) {
     return;
   }
@@ -272,11 +263,11 @@ export function dispatchEvent(
 
 // Attempt dispatching an event. Returns a SuspenseInstance or Container if it's blocked.
 export function attemptToDispatchEvent(
-  domEventName              ,
-  eventSystemFlags                  ,
-  targetContainer             ,
-  nativeEvent                ,
-)                                      {
+  domEventName,
+  eventSystemFlags,
+  targetContainer,
+  nativeEvent,
+) {
   // TODO: Warn if _enabled is false.
 
   const nativeEventTarget = getEventTarget(nativeEvent);
@@ -303,7 +294,7 @@ export function attemptToDispatchEvent(
         // TODO: Warn.
         targetInst = null;
       } else if (tag === HostRoot) {
-        const root            = nearestMounted.stateNode;
+        const root = nearestMounted.stateNode;
         if (root.hydrate) {
           // If this happens during a replay something went wrong and it might block
           // the whole system.

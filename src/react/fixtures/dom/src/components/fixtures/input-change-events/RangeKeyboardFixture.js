@@ -27,7 +27,7 @@ class RangeKeyboardFixture extends React.Component {
     });
   };
 
-  handleKeydown = e => {
+  handleKeydown = (e) => {
     // only interesting in arrow key events
     if ([37, 38, 39, 40].indexOf(e.keyCode) < 0) {
       return;
@@ -56,7 +56,7 @@ class RangeKeyboardFixture extends React.Component {
         <div>
           <input
             type="range"
-            ref={r => (this.input = r)}
+            ref={(r) => (this.input = r)}
             onChange={this.handleChange}
           />
           <button onClick={() => this.input.focus()}>Focus Knob</button>
