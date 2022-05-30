@@ -158,6 +158,9 @@ export function beforeActiveInstanceBlur(internalInstanceHandle) {
   }
 }
 
+/**
+ * 触发 afterBlur 事件
+ */
 export function afterActiveInstanceBlur() {
   if (enableCreateEventHandleAPI) {
     ReactBrowserEventEmitterSetEnabled(true);
@@ -166,6 +169,9 @@ export function afterActiveInstanceBlur() {
   }
 }
 
+/**
+ * afterCommit 后重置变量
+ */
 export function resetAfterCommit(containerInfo) {
   restoreSelection(selectionInformation);
   ReactBrowserEventEmitterSetEnabled(eventsEnabled);
@@ -173,6 +179,9 @@ export function resetAfterCommit(containerInfo) {
   selectionInformation = null;
 }
 
+/**
+ * 创建元素实例
+ */
 export function createInstance(
   type,
   props,
@@ -181,40 +190,57 @@ export function createInstance(
   internalInstanceHandle,
 ) {
   let parentNamespace;
-  if (__DEV__) {
-    // TODO: take namespace into account when validating.
-    const hostContextDev = hostContext;
-    validateDOMNesting(type, null, hostContextDev.ancestorInfo);
-    if (
-      typeof props.children === 'string' ||
-      typeof props.children === 'number'
-    ) {
-      const string = '' + props.children;
-      const ownAncestorInfo = updatedAncestorInfo(
-        hostContextDev.ancestorInfo,
-        type,
-      );
-      validateDOMNesting(null, string, ownAncestorInfo);
-    }
-    parentNamespace = hostContextDev.namespace;
-  } else {
-    parentNamespace = hostContext;
-  }
+  // if (__DEV__) {
+  //   // TODO: take namespace into account when validating.
+  //   const hostContextDev = hostContext;
+
+  //   validateDOMNesting(type, null, hostContextDev.ancestorInfo);
+  //   if (
+  //     typeof props.children === 'string' ||
+  //     typeof props.children === 'number'
+  //   ) {
+  //     const string = '' + props.children;
+  //     const ownAncestorInfo = updatedAncestorInfo(
+  //       hostContextDev.ancestorInfo,
+  //       type,
+  //     );
+  //     validateDOMNesting(null, string, ownAncestorInfo);
+  //   }
+
+  //   parentNamespace = hostContextDev.namespace;
+  // } else {
+  parentNamespace = hostContext.namespace;
+  // }
+
   const domElement = createElement(
     type,
     props,
     rootContainerInstance,
     parentNamespace,
   );
+
+  // 预先缓存 fiber 节点
+  // domElement[internalContainerInstanceKey] = internalInstanceHandle;
   precacheFiberNode(internalInstanceHandle, domElement);
+
+  // 预先缓存 props
+  // node[internalPropsKey] = props;
   updateFiberProps(domElement, props);
+
   return domElement;
 }
 
+/**
+ * appendChild
+ */
 export function appendInitialChild(parentInstance, child) {
   parentInstance.appendChild(child);
 }
 
+/**
+ *
+ * @returns 返回值为 true, 那么 workInProgress 就增加 Update 的 effect, 即 workInProgress.flags = Update
+ */
 export function finalizeInitialChildren(
   domElement,
   type,
@@ -222,7 +248,9 @@ export function finalizeInitialChildren(
   rootContainerInstance,
   hostContext,
 ) {
+  // 初始化 props
   setInitialProperties(domElement, type, props, rootContainerInstance);
+
   switch (type) {
     case 'button':
     case 'input':
@@ -236,6 +264,9 @@ export function finalizeInitialChildren(
   }
 }
 
+/**
+ * 准备更新，比较前后的 props
+ */
 export function prepareUpdate(
   domElement,
   type,
@@ -244,21 +275,6 @@ export function prepareUpdate(
   rootContainerInstance,
   hostContext,
 ) {
-  if (__DEV__) {
-    const hostContextDev = hostContext;
-    if (
-      typeof newProps.children !== typeof oldProps.children &&
-      (typeof newProps.children === 'string' ||
-        typeof newProps.children === 'number')
-    ) {
-      const string = '' + newProps.children;
-      const ownAncestorInfo = updatedAncestorInfo(
-        hostContextDev.ancestorInfo,
-        type,
-      );
-      validateDOMNesting(null, string, ownAncestorInfo);
-    }
-  }
   return diffProperties(
     domElement,
     type,
@@ -268,6 +284,9 @@ export function prepareUpdate(
   );
 }
 
+/**
+ * 是否应该使用 textContent
+ */
 export function shouldSetTextContent(type, props) {
   return (
     type === 'textarea' ||
@@ -280,16 +299,15 @@ export function shouldSetTextContent(type, props) {
   );
 }
 
+/**
+ * 创建文本节点
+ */
 export function createTextInstance(
   text,
   rootContainerInstance,
   hostContext,
   internalInstanceHandle,
 ) {
-  if (__DEV__) {
-    const hostContextDev = hostContext;
-    validateDOMNesting(null, text, hostContextDev.ancestorInfo);
-  }
   const textNode = createTextNode(text, rootContainerInstance);
   precacheFiberNode(internalInstanceHandle, textNode);
   return textNode;

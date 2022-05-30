@@ -372,39 +372,17 @@ export function createElement(
   const ownerDocument = getOwnerDocumentFromRootContainer(rootContainerElement);
   let domElement;
   let namespaceURI = parentNamespace;
+  
   if (namespaceURI === HTML_NAMESPACE) {
     namespaceURI = getIntrinsicNamespace(type);
   }
+
   if (namespaceURI === HTML_NAMESPACE) {
-    if (__DEV__) {
-      isCustomComponentTag = isCustomComponent(type, props);
-      // Should this check be gated by parent namespace? Not sure we want to
-      // allow <SVG> or <mATH>.
-      if (!isCustomComponentTag && type !== type.toLowerCase()) {
-        console.error(
-          '<%s /> is using incorrect casing. ' +
-            'Use PascalCase for React components, ' +
-            'or lowercase for HTML elements.',
-          type,
-        );
-      }
-    }
 
     if (type === 'script') {
       // Create the script via .innerHTML so its "parser-inserted" flag is
       // set to true and it does not execute
       const div = ownerDocument.createElement('div');
-      if (__DEV__) {
-        if (enableTrustedTypesIntegration && !didWarnScriptTags) {
-          console.error(
-            'Encountered a script tag while rendering React component. ' +
-              'Scripts inside React components are never executed when rendering ' +
-              'on the client. Consider using template tag instead ' +
-              '(https://developer.mozilla.org/en-US/docs/Web/HTML/Element/template).',
-          );
-          didWarnScriptTags = true;
-        }
-      }
       div.innerHTML = '<script><' + '/script>'; // eslint-disable-line
       // This is guaranteed to yield a script element.
       const firstChild = div.firstChild;
@@ -440,25 +418,6 @@ export function createElement(
     }
   } else {
     domElement = ownerDocument.createElementNS(namespaceURI, type);
-  }
-
-  if (__DEV__) {
-    if (namespaceURI === HTML_NAMESPACE) {
-      if (
-        !isCustomComponentTag &&
-        Object.prototype.toString.call(domElement) ===
-          '[object HTMLUnknownElement]' &&
-        !hasOwnProperty.call(warnedUnknownTags, type)
-      ) {
-        warnedUnknownTags[type] = true;
-        console.error(
-          'The tag <%s> is unrecognized in this browser. ' +
-            'If you meant to render a React component, start its name with ' +
-            'an uppercase letter.',
-          type,
-        );
-      }
-    }
   }
 
   return domElement;
