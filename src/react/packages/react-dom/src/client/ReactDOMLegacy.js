@@ -10,10 +10,11 @@
 import {
   getInstanceFromNode,
   isContainerMarkedAsRoot,
+  markContainerAsRoot,
   unmarkContainerAsRoot,
 } from './ReactDOMComponentTree';
-import {createLegacyRoot, isValidContainer} from './ReactDOMRoot';
-import {ROOT_ATTRIBUTE_NAME} from '../shared/DOMProperty';
+import {listenToAllSupportedEvents} from '../events/DOMPluginEventSystem';
+import {isValidContainerLegacy} from './ReactDOMRoot';
 import {
   DOCUMENT_NODE,
   ELEMENT_NODE,
@@ -21,28 +22,29 @@ import {
 } from '../shared/HTMLNodeType';
 
 import {
+  createContainer,
+  createHydrationContainer,
   findHostInstanceWithNoPortals,
   updateContainer,
-  unbatchedUpdates,
+  flushSync,
   getPublicRootInstance,
   findHostInstance,
   findHostInstanceWithWarning,
 } from 'react-reconciler/src/ReactFiberReconciler';
-import getComponentName from 'shared/getComponentName';
-import invariant from 'shared/invariant';
+import {LegacyRoot} from 'react-reconciler/src/ReactRootTags';
+import getComponentNameFromType from 'shared/getComponentNameFromType';
 import ReactSharedInternals from 'shared/ReactSharedInternals';
 import {has as hasInstance} from 'shared/ReactInstanceMap';
 
 const ReactCurrentOwner = ReactSharedInternals.ReactCurrentOwner;
 
 let topLevelUpdateWarnings;
-let warnedAboutHydrateAPI = false;
 
 if (__DEV__) {
   topLevelUpdateWarnings = (container) => {
     if (container._reactRootContainer && container.nodeType !== COMMENT_NODE) {
       const hostInstance = findHostInstanceWithNoPortals(
-        container._reactRootContainer._internalRoot.current,
+        container._reactRootContainer.current,
       );
       if (hostInstance) {
         if (hostInstance.parentNode !== container) {
@@ -97,59 +99,88 @@ function getReactRootElementInContainer(container) {
   }
 }
 
-function shouldHydrateDueToLegacyHeuristic(container) {
-  const rootElement = getReactRootElementInContainer(container);
-  return !!(
-    rootElement &&
-    rootElement.nodeType === ELEMENT_NODE &&
-    rootElement.hasAttribute(ROOT_ATTRIBUTE_NAME)
-  );
+function noopOnRecoverableError() {
+  // This isn't reachable because onRecoverableError isn't called in the
+  // legacy API.
 }
 
-function legacyCreateRootFromDOMContainer(container, forceHydrate) {
-  const shouldHydrate =
-    forceHydrate || shouldHydrateDueToLegacyHeuristic(container);
-  // First clear any existing content.
-  if (!shouldHydrate) {
-    let warned = false;
+function legacyCreateRootFromDOMContainer(
+  container,
+  initialChildren,
+  parentComponent,
+  callback,
+  isHydrationContainer,
+) {
+  if (isHydrationContainer) {
+    if (typeof callback === 'function') {
+      const originalCallback = callback;
+      callback = function () {
+        const instance = getPublicRootInstance(root);
+        originalCallback.call(instance);
+      };
+    }
+
+    const root = createHydrationContainer(
+      initialChildren,
+      callback,
+      container,
+      LegacyRoot,
+      null, // hydrationCallbacks
+      false, // isStrictMode
+      false, // concurrentUpdatesByDefaultOverride,
+      '', // identifierPrefix
+      noopOnRecoverableError,
+      // TODO(luna) Support hydration later
+      null,
+    );
+    container._reactRootContainer = root;
+    markContainerAsRoot(root.current, container);
+
+    const rootContainerElement =
+      container.nodeType === COMMENT_NODE ? container.parentNode : container;
+    listenToAllSupportedEvents(rootContainerElement);
+
+    flushSync();
+    return root;
+  } else {
+    // First clear any existing content.
     let rootSibling;
     while ((rootSibling = container.lastChild)) {
-      if (__DEV__) {
-        if (
-          !warned &&
-          rootSibling.nodeType === ELEMENT_NODE &&
-          rootSibling.hasAttribute(ROOT_ATTRIBUTE_NAME)
-        ) {
-          warned = true;
-          console.error(
-            'render(): Target node has markup rendered by React, but there ' +
-              'are unrelated nodes as well. This is most commonly caused by ' +
-              'white-space inserted around server-rendered markup.',
-          );
-        }
-      }
       container.removeChild(rootSibling);
     }
-  }
-  if (__DEV__) {
-    if (shouldHydrate && !forceHydrate && !warnedAboutHydrateAPI) {
-      warnedAboutHydrateAPI = true;
-      console.warn(
-        'render(): Calling ReactDOM.render() to hydrate server-rendered markup ' +
-          'will stop working in React v18. Replace the ReactDOM.render() call ' +
-          'with ReactDOM.hydrate() if you want React to attach to the server HTML.',
-      );
-    }
-  }
 
-  return createLegacyRoot(
-    container,
-    shouldHydrate
-      ? {
-          hydrate: true,
-        }
-      : undefined,
-  );
+    if (typeof callback === 'function') {
+      const originalCallback = callback;
+      callback = function () {
+        const instance = getPublicRootInstance(root);
+        originalCallback.call(instance);
+      };
+    }
+
+    const root = createContainer(
+      container,
+      LegacyRoot,
+      null, // hydrationCallbacks
+      false, // isStrictMode
+      false, // concurrentUpdatesByDefaultOverride,
+      '', // identifierPrefix
+      noopOnRecoverableError, // onRecoverableError
+      null, // transitionCallbacks
+    );
+    container._reactRootContainer = root;
+    markContainerAsRoot(root.current, container);
+
+    const rootContainerElement =
+      container.nodeType === COMMENT_NODE ? container.parentNode : container;
+    listenToAllSupportedEvents(rootContainerElement);
+
+    // Initial mount should not be batched.
+    flushSync(() => {
+      updateContainer(initialChildren, root, parentComponent, callback);
+    });
+
+    return root;
+  }
 }
 
 function warnOnInvalidCallback(callback, callerName) {
@@ -177,41 +208,30 @@ function legacyRenderSubtreeIntoContainer(
     warnOnInvalidCallback(callback === undefined ? null : callback, 'render');
   }
 
-  // TODO: Without `any` type, Flow says "Property cannot be accessed on any
-  // member of intersection type." Whyyyyyy.
-  let root = container._reactRootContainer;
-  let fiberRoot;
-  if (!root) {
+  const maybeRoot = container._reactRootContainer;
+  let root;
+  if (!maybeRoot) {
     // Initial mount
-    root = container._reactRootContainer = legacyCreateRootFromDOMContainer(
+    root = legacyCreateRootFromDOMContainer(
       container,
+      children,
+      parentComponent,
+      callback,
       forceHydrate,
     );
-    fiberRoot = root._internalRoot;
-    if (typeof callback === 'function') {
-      const originalCallback = callback;
-      callback = function () {
-        const instance = getPublicRootInstance(fiberRoot);
-        originalCallback.call(instance);
-      };
-    }
-    // Initial mount should not be batched.
-    unbatchedUpdates(() => {
-      updateContainer(children, fiberRoot, parentComponent, callback);
-    });
   } else {
-    fiberRoot = root._internalRoot;
+    root = maybeRoot;
     if (typeof callback === 'function') {
       const originalCallback = callback;
       callback = function () {
-        const instance = getPublicRootInstance(fiberRoot);
+        const instance = getPublicRootInstance(root);
         originalCallback.call(instance);
       };
     }
     // Update
-    updateContainer(children, fiberRoot, parentComponent, callback);
+    updateContainer(children, root, parentComponent, callback);
   }
-  return getPublicRootInstance(fiberRoot);
+  return getPublicRootInstance(root);
 }
 
 export function findDOMNode(componentOrElement) {
@@ -226,7 +246,7 @@ export function findDOMNode(componentOrElement) {
             'never access something that requires stale data from the previous ' +
             'render, such as refs. Move this logic to componentDidMount and ' +
             'componentDidUpdate instead.',
-          getComponentName(owner.type) || 'A component',
+          getComponentNameFromType(owner.type) || 'A component',
         );
       }
       owner.stateNode._warnedAboutRefsInRender = true;
@@ -245,10 +265,19 @@ export function findDOMNode(componentOrElement) {
 }
 
 export function hydrate(element, container, callback) {
-  invariant(
-    isValidContainer(container),
-    'Target container is not a DOM element.',
-  );
+  if (__DEV__) {
+    console.error(
+      'ReactDOM.hydrate is no longer supported in React 18. Use hydrateRoot ' +
+        'instead. Until you switch to the new API, your app will behave as ' +
+        "if it's running React 17. Learn " +
+        'more: https://reactjs.org/link/switch-to-createroot',
+    );
+  }
+
+  if (!isValidContainerLegacy(container)) {
+    throw new Error('Target container is not a DOM element.');
+  }
+
   if (__DEV__) {
     const isModernRoot =
       isContainerMarkedAsRoot(container) &&
@@ -256,8 +285,8 @@ export function hydrate(element, container, callback) {
     if (isModernRoot) {
       console.error(
         'You are calling ReactDOM.hydrate() on a container that was previously ' +
-          'passed to ReactDOM.createRoot(). This is not supported. ' +
-          'Did you mean to call createRoot(container, {hydrate: true}).render(element)?',
+          'passed to ReactDOMClient.createRoot(). This is not supported. ' +
+          'Did you mean to call hydrateRoot(container, element)?',
       );
     }
   }
@@ -272,10 +301,19 @@ export function hydrate(element, container, callback) {
 }
 
 export function render(element, container, callback) {
-  invariant(
-    isValidContainer(container),
-    'Target container is not a DOM element.',
-  );
+  if (__DEV__) {
+    console.error(
+      'ReactDOM.render is no longer supported in React 18. Use createRoot ' +
+        'instead. Until you switch to the new API, your app will behave as ' +
+        "if it's running React 17. Learn " +
+        'more: https://reactjs.org/link/switch-to-createroot',
+    );
+  }
+
+  if (!isValidContainerLegacy(container)) {
+    throw new Error('Target container is not a DOM element.');
+  }
+
   if (__DEV__) {
     const isModernRoot =
       isContainerMarkedAsRoot(container) &&
@@ -283,7 +321,7 @@ export function render(element, container, callback) {
     if (isModernRoot) {
       console.error(
         'You are calling ReactDOM.render() on a container that was previously ' +
-          'passed to ReactDOM.createRoot(). This is not supported. ' +
+          'passed to ReactDOMClient.createRoot(). This is not supported. ' +
           'Did you mean to call root.render(element)?',
       );
     }
@@ -303,14 +341,23 @@ export function unstable_renderSubtreeIntoContainer(
   containerNode,
   callback,
 ) {
-  invariant(
-    isValidContainer(containerNode),
-    'Target container is not a DOM element.',
-  );
-  invariant(
-    parentComponent != null && hasInstance(parentComponent),
-    'parentComponent must be a valid React Component',
-  );
+  if (__DEV__) {
+    console.error(
+      'ReactDOM.unstable_renderSubtreeIntoContainer() is no longer supported ' +
+        'in React 18. Consider using a portal instead. Until you switch to ' +
+        "the createRoot API, your app will behave as if it's running React " +
+        '17. Learn more: https://reactjs.org/link/switch-to-createroot',
+    );
+  }
+
+  if (!isValidContainerLegacy(containerNode)) {
+    throw new Error('Target container is not a DOM element.');
+  }
+
+  if (parentComponent == null || !hasInstance(parentComponent)) {
+    throw new Error('parentComponent must be a valid React Component');
+  }
+
   return legacyRenderSubtreeIntoContainer(
     parentComponent,
     element,
@@ -321,10 +368,11 @@ export function unstable_renderSubtreeIntoContainer(
 }
 
 export function unmountComponentAtNode(container) {
-  invariant(
-    isValidContainer(container),
-    'unmountComponentAtNode(...): Target container is not a DOM element.',
-  );
+  if (!isValidContainerLegacy(container)) {
+    throw new Error(
+      'unmountComponentAtNode(...): Target container is not a DOM element.',
+    );
+  }
 
   if (__DEV__) {
     const isModernRoot =
@@ -333,7 +381,7 @@ export function unmountComponentAtNode(container) {
     if (isModernRoot) {
       console.error(
         'You are calling ReactDOM.unmountComponentAtNode() on a container that was previously ' +
-          'passed to ReactDOM.createRoot(). This is not supported. Did you mean to call root.unmount()?',
+          'passed to ReactDOMClient.createRoot(). This is not supported. Did you mean to call root.unmount()?',
       );
     }
   }
@@ -351,7 +399,7 @@ export function unmountComponentAtNode(container) {
     }
 
     // Unmount should not be batched.
-    unbatchedUpdates(() => {
+    flushSync(() => {
       legacyRenderSubtreeIntoContainer(null, null, container, false, () => {
         // $FlowFixMe This should probably use `delete container._reactRootContainer`
         container._reactRootContainer = null;
@@ -369,7 +417,7 @@ export function unmountComponentAtNode(container) {
       // Check if the container itself is a React root node.
       const isContainerReactRoot =
         container.nodeType === ELEMENT_NODE &&
-        isValidContainer(container.parentNode) &&
+        isValidContainerLegacy(container.parentNode) &&
         !!container.parentNode._reactRootContainer;
 
       if (hasNonRootReactChild) {

@@ -10,4 +10,7 @@
 // eslint-disable-line no-undef
 // eslint-disable-line no-undef
 // eslint-disable-line no-undef
+// eslint-disable-line no-undef
+export const isModuleReference = $$$hostConfig.isModuleReference;
+export const getModuleKey = $$$hostConfig.getModuleKey;
 export const resolveModuleMetaData = $$$hostConfig.resolveModuleMetaData;

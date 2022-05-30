@@ -7,7 +7,7 @@
  *
  */
 
-import invariant from 'shared/invariant';
+import isArray from 'shared/isArray';
 
 /**
  * Accumulates items that must not be null or undefined into the first one. This
@@ -23,10 +23,11 @@ import invariant from 'shared/invariant';
  */
 
 function accumulateInto(current, next) {
-  invariant(
-    next != null,
-    'accumulateInto(...): Accumulated items must not be null or undefined.',
-  );
+  if (next == null) {
+    throw new Error(
+      'accumulateInto(...): Accumulated items must not be null or undefined.',
+    );
+  }
 
   if (current == null) {
     return next;
@@ -34,8 +35,8 @@ function accumulateInto(current, next) {
 
   // Both are not empty. Warning: Never call x.concat(y) when you are not
   // certain that x is an Array (x could be a string with concat method).
-  if (Array.isArray(current)) {
-    if (Array.isArray(next)) {
+  if (isArray(current)) {
+    if (isArray(next)) {
       current.push.apply(current, next);
       return current;
     }
@@ -43,7 +44,7 @@ function accumulateInto(current, next) {
     return current;
   }
 
-  if (Array.isArray(next)) {
+  if (isArray(next)) {
     // A bit too dangerous to mutate `next`.
     return [current].concat(next);
   }

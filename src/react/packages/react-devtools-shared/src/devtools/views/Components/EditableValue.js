@@ -85,6 +85,7 @@ export default function EditableValue({
       <input
         autoComplete="new-password"
         className={`${isValid ? styles.Input : styles.Invalid} ${className}`}
+        data-testname="EditableValue"
         onBlur={applyChanges}
         onChange={handleChange}
         onKeyDown={handleKeyDown}

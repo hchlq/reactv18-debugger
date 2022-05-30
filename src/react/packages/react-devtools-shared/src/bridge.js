@@ -11,6 +11,49 @@ import EventEmitter from './events';
 
 const BATCH_DURATION = 100;
 
+// This message specifies the version of the DevTools protocol currently supported by the backend,
+// as well as the earliest NPM version (e.g. "4.13.0") that protocol is supported by on the frontend.
+// This enables an older frontend to display an upgrade message to users for a newer, unsupported backend.
+
+// Bump protocol version whenever a backwards breaking change is made
+// in the messages sent between BackendBridge and FrontendBridge.
+// This mapping is embedded in both frontend and backend builds.
+//
+// The backend protocol will always be the latest entry in the BRIDGE_PROTOCOL array.
+//
+// When an older frontend connects to a newer backend,
+// the backend can send the minNpmVersion and the frontend can display an NPM upgrade prompt.
+//
+// When a newer frontend connects with an older protocol version,
+// the frontend can use the embedded minNpmVersion/maxNpmVersion values to display a downgrade prompt.
+export const BRIDGE_PROTOCOL = [
+  // This version technically never existed,
+  // but a backwards breaking change was added in 4.11,
+  // so the safest guess to downgrade the frontend would be to version 4.10.
+  {
+    version: 0,
+    minNpmVersion: '"<4.11.0"',
+    maxNpmVersion: '"<4.11.0"',
+  },
+  // Versions 4.11.x – 4.12.x contained the backwards breaking change,
+  // but we didn't add the "fix" of checking the protocol version until 4.13,
+  // so we don't recommend downgrading to 4.11 or 4.12.
+  {
+    version: 1,
+    minNpmVersion: '4.13.0',
+    maxNpmVersion: '4.21.0',
+  },
+  // Version 2 adds a StrictMode-enabled and supports-StrictMode bits to add-root operation.
+  {
+    version: 2,
+    minNpmVersion: '4.22.0',
+    maxNpmVersion: null,
+  },
+];
+
+export const currentBridgeProtocol =
+  BRIDGE_PROTOCOL[BRIDGE_PROTOCOL.length - 1];
+
 class Bridge extends EventEmitter {
   _isShutdown = false;
   _messageQueue = [];
@@ -25,7 +68,9 @@ class Bridge extends EventEmitter {
 
     this._wallUnlisten =
       wall.listen((message) => {
-        this.emit(message.event, message.payload);
+        if (message && message.event) {
+          this.emit(message.event, message.payload);
+        }
       }) || null;
 
     // Temporarily support older standalone front-ends sending commands to newer embedded backends.

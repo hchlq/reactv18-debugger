@@ -7,41 +7,43 @@
  *
  */
 
-import invariant from 'shared/invariant';
-
 import ReactCurrentDispatcher from './ReactCurrentDispatcher';
 
 function resolveDispatcher() {
   const dispatcher = ReactCurrentDispatcher.current;
-  invariant(
-    dispatcher !== null,
-    'Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for' +
-      ' one of the following reasons:\n' +
-      '1. You might have mismatching versions of React and the renderer (such as React DOM)\n' +
-      '2. You might be breaking the Rules of Hooks\n' +
-      '3. You might have more than one copy of React in the same app\n' +
-      'See https://reactjs.org/link/invalid-hook-call for tips about how to debug and fix this problem.',
-  );
+  if (__DEV__) {
+    if (dispatcher === null) {
+      console.error(
+        'Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for' +
+          ' one of the following reasons:\n' +
+          '1. You might have mismatching versions of React and the renderer (such as React DOM)\n' +
+          '2. You might be breaking the Rules of Hooks\n' +
+          '3. You might have more than one copy of React in the same app\n' +
+          'See https://reactjs.org/link/invalid-hook-call for tips about how to debug and fix this problem.',
+      );
+    }
+  }
+  // Will result in a null access error if accessed outside render phase. We
+  // intentionally don't throw our own error because this is in a hot path.
+  // Also helps ensure this is inlined.
   return dispatcher;
 }
 
-export function useContext(Context, unstable_observedBits) {
+export function getCacheSignal() {
+  const dispatcher = resolveDispatcher();
+  // $FlowFixMe This is unstable, thus optional
+  return dispatcher.getCacheSignal();
+}
+
+export function getCacheForType(resourceType) {
+  const dispatcher = resolveDispatcher();
+  // $FlowFixMe This is unstable, thus optional
+  return dispatcher.getCacheForType(resourceType);
+}
+
+export function useContext(Context) {
   const dispatcher = resolveDispatcher();
   if (__DEV__) {
-    if (unstable_observedBits !== undefined) {
-      console.error(
-        'useContext() second argument is reserved for future ' +
-          'use in React. Passing it is not supported. ' +
-          'You passed: %s.%s',
-        unstable_observedBits,
-        typeof unstable_observedBits === 'number' && Array.isArray(arguments[2])
-          ? '\n\nDid you call array.map(useContext)? ' +
-              'Calling Hooks inside a loop is not supported. ' +
-              'Learn more at https://reactjs.org/link/rules-of-hooks'
-          : '',
-      );
-    }
-
     // TODO: add a more generic warning for invalid values.
     if (Context._context !== undefined) {
       const realContext = Context._context;
@@ -60,7 +62,7 @@ export function useContext(Context, unstable_observedBits) {
       }
     }
   }
-  return dispatcher.useContext(Context, unstable_observedBits);
+  return dispatcher.useContext(Context);
 }
 
 export function useState(initialState) {
@@ -81,6 +83,11 @@ export function useRef(initialValue) {
 export function useEffect(create, deps) {
   const dispatcher = resolveDispatcher();
   return dispatcher.useEffect(create, deps);
+}
+
+export function useInsertionEffect(create, deps) {
+  const dispatcher = resolveDispatcher();
+  return dispatcher.useInsertionEffect(create, deps);
 }
 
 export function useLayoutEffect(create, deps) {
@@ -122,12 +129,31 @@ export function useDeferredValue(value) {
   return dispatcher.useDeferredValue(value);
 }
 
-export function useOpaqueIdentifier() {
+export function useId() {
   const dispatcher = resolveDispatcher();
-  return dispatcher.useOpaqueIdentifier();
+  return dispatcher.useId();
 }
 
 export function useMutableSource(source, getSnapshot, subscribe) {
   const dispatcher = resolveDispatcher();
   return dispatcher.useMutableSource(source, getSnapshot, subscribe);
+}
+
+export function useSyncExternalStore(
+  subscribe,
+  getSnapshot,
+  getServerSnapshot,
+) {
+  const dispatcher = resolveDispatcher();
+  return dispatcher.useSyncExternalStore(
+    subscribe,
+    getSnapshot,
+    getServerSnapshot,
+  );
+}
+
+export function useCacheRefresh() {
+  const dispatcher = resolveDispatcher();
+  // $FlowFixMe This is unstable, thus optional
+  return dispatcher.useCacheRefresh();
 }

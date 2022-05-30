@@ -7,13 +7,15 @@
  *
  */
 
-import {REACT_OPAQUE_ID_TYPE} from 'shared/ReactSymbols';
+import isArray from 'shared/isArray';
+import {DefaultEventPriority} from 'react-reconciler/src/ReactEventPriorities';
 
 // Unused
 
 export * from 'react-reconciler/src/ReactFiberHostConfigWithNoPersistence';
 export * from 'react-reconciler/src/ReactFiberHostConfigWithNoHydration';
 export * from 'react-reconciler/src/ReactFiberHostConfigWithNoTestSelectors';
+export * from 'react-reconciler/src/ReactFiberHostConfigWithNoMicrotasks';
 
 const NO_CONTEXT = {};
 const UPDATE_SIGNAL = {};
@@ -43,7 +45,7 @@ export function getPublicInstance(inst) {
 
 export function appendChild(parentInstance, child) {
   if (__DEV__) {
-    if (!Array.isArray(parentInstance.children)) {
+    if (!isArray(parentInstance.children)) {
       console.error(
         'An invalid container has been provided. ' +
           'This may indicate that another renderer is being used in addition to the test renderer. ' +
@@ -162,11 +164,16 @@ export function createTextInstance(
   };
 }
 
+export function getCurrentEventPriority() {
+  return DefaultEventPriority;
+}
+
 export const isPrimaryRenderer = false;
 export const warnsIfNotActing = true;
 
 export const scheduleTimeout = setTimeout;
 export const cancelTimeout = clearTimeout;
+
 export const noTimeout = -1;
 
 // -------------------
@@ -219,44 +226,6 @@ export function unhideTextInstance(textInstance, text) {
   textInstance.isHidden = false;
 }
 
-export function getFundamentalComponentInstance(fundamentalInstance) {
-  const {impl, props, state} = fundamentalInstance;
-  return impl.getInstance(null, props, state);
-}
-
-export function mountFundamentalComponent(fundamentalInstance) {
-  const {impl, instance, props, state} = fundamentalInstance;
-  const onMount = impl.onMount;
-  if (onMount !== undefined) {
-    onMount(null, instance, props, state);
-  }
-}
-
-export function shouldUpdateFundamentalComponent(fundamentalInstance) {
-  const {impl, prevProps, props, state} = fundamentalInstance;
-  const shouldUpdate = impl.shouldUpdate;
-  if (shouldUpdate !== undefined) {
-    return shouldUpdate(null, prevProps, props, state);
-  }
-  return true;
-}
-
-export function updateFundamentalComponent(fundamentalInstance) {
-  const {impl, instance, prevProps, props, state} = fundamentalInstance;
-  const onUpdate = impl.onUpdate;
-  if (onUpdate !== undefined) {
-    onUpdate(null, instance, prevProps, props, state);
-  }
-}
-
-export function unmountFundamentalComponent(fundamentalInstance) {
-  const {impl, instance, props, state} = fundamentalInstance;
-  const onUnmount = impl.onUnmount;
-  if (onUnmount !== undefined) {
-    onUnmount(null, instance, props, state);
-  }
-}
-
 export function getInstanceFromNode(mockNode) {
   const instance = nodeToInstanceMap.get(mockNode);
   if (instance !== undefined) {
@@ -265,42 +234,7 @@ export function getInstanceFromNode(mockNode) {
   return null;
 }
 
-let clientId = 0;
-export function makeClientId() {
-  return 'c_' + (clientId++).toString(36);
-}
-
-export function makeClientIdInDEV(warnOnAccessInDEV) {
-  const id = 'c_' + (clientId++).toString(36);
-  return {
-    toString() {
-      warnOnAccessInDEV();
-      return id;
-    },
-    valueOf() {
-      warnOnAccessInDEV();
-      return id;
-    },
-  };
-}
-
-export function isOpaqueHydratingObject(value) {
-  return (
-    value !== null &&
-    typeof value === 'object' &&
-    value.$$typeof === REACT_OPAQUE_ID_TYPE
-  );
-}
-
-export function makeOpaqueHydratingObject(attemptToReadValue) {
-  return {
-    $$typeof: REACT_OPAQUE_ID_TYPE,
-    toString: attemptToReadValue,
-    valueOf: attemptToReadValue,
-  };
-}
-
-export function beforeActiveInstanceBlur() {
+export function beforeActiveInstanceBlur(internalInstanceHandle) {
   // noop
 }
 
@@ -318,4 +252,12 @@ export function prepareScopeUpdate(scopeInstance, inst) {
 
 export function getInstanceFromScope(scopeInstance) {
   return nodeToInstanceMap.get(scopeInstance) || null;
+}
+
+export function detachDeletedInstance(node) {
+  // noop
+}
+
+export function logRecoverableError(error) {
+  // noop
 }

@@ -13,15 +13,15 @@
 let React;
 let ReactFabric;
 let createReactNativeComponentClass;
-let UIManager;
 let StrictMode;
-let TextInputState;
-
-const SET_NATIVE_PROPS_NOT_SUPPORTED_MESSAGE =
-  'Warning: setNativeProps is not currently supported in Fabric';
+let act;
 
 const DISPATCH_COMMAND_REQUIRES_HOST_COMPONENT =
   "Warning: dispatchCommand was called with a ref that isn't a " +
+  'native component. Use React.forwardRef to get access to the underlying native component';
+
+const SEND_ACCESSIBILITY_EVENT_REQUIRES_HOST_COMPONENT =
+  "sendAccessibilityEvent was called with a ref that isn't a " +
   'native component. Use React.forwardRef to get access to the underlying native component';
 
 jest.mock('shared/ReactFeatureFlags', () =>
@@ -37,13 +37,11 @@ describe('ReactFabric', () => {
     React = require('react');
     StrictMode = React.StrictMode;
     ReactFabric = require('react-native-renderer/fabric');
-    UIManager =
-      require('react-native/Libraries/ReactPrivate/ReactNativePrivateInterface').UIManager;
     createReactNativeComponentClass =
       require('react-native/Libraries/ReactPrivate/ReactNativePrivateInterface')
         .ReactNativeViewConfigRegistry.register;
-    TextInputState =
-      require('react-native/Libraries/ReactPrivate/ReactNativePrivateInterface').TextInputState;
+
+    act = require('jest-react').act;
   });
 
   it('should be able to create and render a native component', () => {
@@ -52,7 +50,9 @@ describe('ReactFabric', () => {
       uiViewClassName: 'RCTView',
     }));
 
-    ReactFabric.render(<View foo="test" />, 1);
+    act(() => {
+      ReactFabric.render(<View foo="test" />, 1);
+    });
     expect(nativeFabricUIManager.createNode).toBeCalled();
     expect(nativeFabricUIManager.appendChild).not.toBeCalled();
     expect(nativeFabricUIManager.completeRoot).toBeCalled();
@@ -68,11 +68,15 @@ describe('ReactFabric', () => {
 
     nativeFabricUIManager.createNode.mockReturnValue(firstNode);
 
-    ReactFabric.render(<View foo="foo" />, 11);
+    act(() => {
+      ReactFabric.render(<View foo="foo" />, 11);
+    });
 
     expect(nativeFabricUIManager.createNode).toHaveBeenCalledTimes(1);
 
-    ReactFabric.render(<View foo="bar" />, 11);
+    act(() => {
+      ReactFabric.render(<View foo="bar" />, 11);
+    });
 
     expect(nativeFabricUIManager.createNode).toHaveBeenCalledTimes(1);
     expect(nativeFabricUIManager.cloneNodeWithNewProps).toHaveBeenCalledTimes(
@@ -94,7 +98,9 @@ describe('ReactFabric', () => {
       uiViewClassName: 'RCTText',
     }));
 
-    ReactFabric.render(<Text foo="a">1</Text>, 11);
+    act(() => {
+      ReactFabric.render(<Text foo="a">1</Text>, 11);
+    });
     expect(nativeFabricUIManager.cloneNode).not.toBeCalled();
     expect(nativeFabricUIManager.cloneNodeWithNewChildren).not.toBeCalled();
     expect(nativeFabricUIManager.cloneNodeWithNewProps).not.toBeCalled();
@@ -103,7 +109,9 @@ describe('ReactFabric', () => {
     ).not.toBeCalled();
 
     // If no properties have changed, we shouldn't call cloneNode.
-    ReactFabric.render(<Text foo="a">1</Text>, 11);
+    act(() => {
+      ReactFabric.render(<Text foo="a">1</Text>, 11);
+    });
     expect(nativeFabricUIManager.cloneNode).not.toBeCalled();
     expect(nativeFabricUIManager.cloneNodeWithNewChildren).not.toBeCalled();
     expect(nativeFabricUIManager.cloneNodeWithNewProps).not.toBeCalled();
@@ -112,7 +120,9 @@ describe('ReactFabric', () => {
     ).not.toBeCalled();
 
     // Only call cloneNode for the changed property (and not for text).
-    ReactFabric.render(<Text foo="b">1</Text>, 11);
+    act(() => {
+      ReactFabric.render(<Text foo="b">1</Text>, 11);
+    });
     expect(nativeFabricUIManager.cloneNode).not.toBeCalled();
     expect(nativeFabricUIManager.cloneNodeWithNewChildren).not.toBeCalled();
     expect(nativeFabricUIManager.cloneNodeWithNewProps).toHaveBeenCalledTimes(
@@ -123,7 +133,9 @@ describe('ReactFabric', () => {
     ).not.toBeCalled();
 
     // Only call cloneNode for the changed text (and no other properties).
-    ReactFabric.render(<Text foo="b">2</Text>, 11);
+    act(() => {
+      ReactFabric.render(<Text foo="b">2</Text>, 11);
+    });
     expect(nativeFabricUIManager.cloneNode).not.toBeCalled();
     expect(
       nativeFabricUIManager.cloneNodeWithNewChildren,
@@ -136,7 +148,9 @@ describe('ReactFabric', () => {
     ).not.toBeCalled();
 
     // Call cloneNode for both changed text and properties.
-    ReactFabric.render(<Text foo="c">3</Text>, 11);
+    act(() => {
+      ReactFabric.render(<Text foo="c">3</Text>, 11);
+    });
     expect(nativeFabricUIManager.cloneNode).not.toBeCalled();
     expect(
       nativeFabricUIManager.cloneNodeWithNewChildren,
@@ -155,12 +169,14 @@ describe('ReactFabric', () => {
       uiViewClassName: 'RCTText',
     }));
 
-    ReactFabric.render(
-      <Text foo="a" bar="a">
-        1
-      </Text>,
-      11,
-    );
+    act(() => {
+      ReactFabric.render(
+        <Text foo="a" bar="a">
+          1
+        </Text>,
+        11,
+      );
+    });
     expect(nativeFabricUIManager.cloneNode).not.toBeCalled();
     expect(nativeFabricUIManager.cloneNodeWithNewChildren).not.toBeCalled();
     expect(nativeFabricUIManager.cloneNodeWithNewProps).not.toBeCalled();
@@ -168,12 +184,14 @@ describe('ReactFabric', () => {
       nativeFabricUIManager.cloneNodeWithNewChildrenAndProps,
     ).not.toBeCalled();
 
-    ReactFabric.render(
-      <Text foo="a" bar="b">
-        1
-      </Text>,
-      11,
-    );
+    act(() => {
+      ReactFabric.render(
+        <Text foo="a" bar="b">
+          1
+        </Text>,
+        11,
+      );
+    });
     expect(
       nativeFabricUIManager.cloneNodeWithNewProps.mock.calls[0][1],
     ).toEqual({
@@ -183,12 +201,14 @@ describe('ReactFabric', () => {
       nativeFabricUIManager.__dumpHierarchyForJestTestsOnly(),
     ).toMatchSnapshot();
 
-    ReactFabric.render(
-      <Text foo="b" bar="b">
-        2
-      </Text>,
-      11,
-    );
+    act(() => {
+      ReactFabric.render(
+        <Text foo="b" bar="b">
+          2
+        </Text>,
+        11,
+      );
+    });
     expect(
       nativeFabricUIManager.cloneNodeWithNewChildrenAndProps.mock.calls[0][1],
     ).toEqual({
@@ -197,42 +217,6 @@ describe('ReactFabric', () => {
     expect(
       nativeFabricUIManager.__dumpHierarchyForJestTestsOnly(),
     ).toMatchSnapshot();
-  });
-
-  it('should not call UIManager.updateView from ref.setNativeProps', () => {
-    const View = createReactNativeComponentClass('RCTView', () => ({
-      validAttributes: {foo: true},
-      uiViewClassName: 'RCTView',
-    }));
-
-    UIManager.updateView.mockReset();
-
-    let viewRef;
-    ReactFabric.render(
-      <View
-        foo="bar"
-        ref={(ref) => {
-          viewRef = ref;
-        }}
-      />,
-      11,
-    );
-    expect(UIManager.updateView).not.toBeCalled();
-
-    expect(() => {
-      viewRef.setNativeProps({});
-    }).toErrorDev([SET_NATIVE_PROPS_NOT_SUPPORTED_MESSAGE], {
-      withoutStack: true,
-    });
-
-    expect(UIManager.updateView).not.toBeCalled();
-
-    expect(() => {
-      viewRef.setNativeProps({foo: 'baz'});
-    }).toErrorDev([SET_NATIVE_PROPS_NOT_SUPPORTED_MESSAGE], {
-      withoutStack: true,
-    });
-    expect(UIManager.updateView).not.toBeCalled();
   });
 
   it('should call dispatchCommand for native refs', () => {
@@ -244,14 +228,16 @@ describe('ReactFabric', () => {
     nativeFabricUIManager.dispatchCommand.mockClear();
 
     let viewRef;
-    ReactFabric.render(
-      <View
-        ref={(ref) => {
-          viewRef = ref;
-        }}
-      />,
-      11,
-    );
+    act(() => {
+      ReactFabric.render(
+        <View
+          ref={(ref) => {
+            viewRef = ref;
+          }}
+        />,
+        11,
+      );
+    });
 
     expect(nativeFabricUIManager.dispatchCommand).not.toBeCalled();
     ReactFabric.dispatchCommand(viewRef, 'updateCommand', [10, 20]);
@@ -273,14 +259,16 @@ describe('ReactFabric', () => {
     nativeFabricUIManager.dispatchCommand.mockReset();
 
     let viewRef;
-    ReactFabric.render(
-      <BasicClass
-        ref={(ref) => {
-          viewRef = ref;
-        }}
-      />,
-      11,
-    );
+    act(() => {
+      ReactFabric.render(
+        <BasicClass
+          ref={(ref) => {
+            viewRef = ref;
+          }}
+        />,
+        11,
+      );
+    });
 
     expect(nativeFabricUIManager.dispatchCommand).not.toBeCalled();
     expect(() => {
@@ -292,92 +280,66 @@ describe('ReactFabric', () => {
     expect(nativeFabricUIManager.dispatchCommand).not.toBeCalled();
   });
 
-  it('should call FabricUIManager.measure on ref.measure', () => {
+  it('should call sendAccessibilityEvent for native refs', () => {
     const View = createReactNativeComponentClass('RCTView', () => ({
       validAttributes: {foo: true},
       uiViewClassName: 'RCTView',
     }));
 
-    nativeFabricUIManager.measure.mockClear();
+    nativeFabricUIManager.sendAccessibilityEvent.mockClear();
 
     let viewRef;
-    ReactFabric.render(
-      <View
-        ref={(ref) => {
-          viewRef = ref;
-        }}
-      />,
-      11,
-    );
-
-    expect(nativeFabricUIManager.measure).not.toBeCalled();
-    const successCallback = jest.fn();
-    viewRef.measure(successCallback);
-    expect(nativeFabricUIManager.measure).toHaveBeenCalledTimes(1);
-    expect(successCallback).toHaveBeenCalledTimes(1);
-    expect(successCallback).toHaveBeenCalledWith(10, 10, 100, 100, 0, 0);
-  });
-
-  it('should call FabricUIManager.measureInWindow on ref.measureInWindow', () => {
-    const View = createReactNativeComponentClass('RCTView', () => ({
-      validAttributes: {foo: true},
-      uiViewClassName: 'RCTView',
-    }));
-
-    nativeFabricUIManager.measureInWindow.mockClear();
-
-    let viewRef;
-    ReactFabric.render(
-      <View
-        ref={(ref) => {
-          viewRef = ref;
-        }}
-      />,
-      11,
-    );
-
-    expect(nativeFabricUIManager.measureInWindow).not.toBeCalled();
-    const successCallback = jest.fn();
-    viewRef.measureInWindow(successCallback);
-    expect(nativeFabricUIManager.measureInWindow).toHaveBeenCalledTimes(1);
-    expect(successCallback).toHaveBeenCalledTimes(1);
-    expect(successCallback).toHaveBeenCalledWith(10, 10, 100, 100);
-  });
-
-  it('should support ref in ref.measureLayout', () => {
-    const View = createReactNativeComponentClass('RCTView', () => ({
-      validAttributes: {foo: true},
-      uiViewClassName: 'RCTView',
-    }));
-
-    nativeFabricUIManager.measureLayout.mockClear();
-
-    let viewRef;
-    let otherRef;
-    ReactFabric.render(
-      <View>
+    act(() => {
+      ReactFabric.render(
         <View
-          foo="bar"
           ref={(ref) => {
             viewRef = ref;
           }}
-        />
-        <View
-          ref={(ref) => {
-            otherRef = ref;
-          }}
-        />
-      </View>,
-      11,
-    );
+        />,
+        11,
+      );
+    });
 
-    expect(nativeFabricUIManager.measureLayout).not.toBeCalled();
-    const successCallback = jest.fn();
-    const failureCallback = jest.fn();
-    viewRef.measureLayout(otherRef, successCallback, failureCallback);
-    expect(nativeFabricUIManager.measureLayout).toHaveBeenCalledTimes(1);
-    expect(successCallback).toHaveBeenCalledTimes(1);
-    expect(successCallback).toHaveBeenCalledWith(1, 1, 100, 100);
+    expect(nativeFabricUIManager.sendAccessibilityEvent).not.toBeCalled();
+    ReactFabric.sendAccessibilityEvent(viewRef, 'focus');
+    expect(nativeFabricUIManager.sendAccessibilityEvent).toHaveBeenCalledTimes(
+      1,
+    );
+    expect(nativeFabricUIManager.sendAccessibilityEvent).toHaveBeenCalledWith(
+      expect.any(Object),
+      'focus',
+    );
+  });
+
+  it('should warn and no-op if calling sendAccessibilityEvent on non native refs', () => {
+    class BasicClass extends React.Component {
+      render() {
+        return <React.Fragment />;
+      }
+    }
+
+    nativeFabricUIManager.sendAccessibilityEvent.mockReset();
+
+    let viewRef;
+    act(() => {
+      ReactFabric.render(
+        <BasicClass
+          ref={(ref) => {
+            viewRef = ref;
+          }}
+        />,
+        11,
+      );
+    });
+
+    expect(nativeFabricUIManager.sendAccessibilityEvent).not.toBeCalled();
+    expect(() => {
+      ReactFabric.sendAccessibilityEvent(viewRef, 'eventTypeName');
+    }).toErrorDev([SEND_ACCESSIBILITY_EVENT_REQUIRES_HOST_COMPONENT], {
+      withoutStack: true,
+    });
+
+    expect(nativeFabricUIManager.sendAccessibilityEvent).not.toBeCalled();
   });
 
   it('returns the correct instance and calls it in the callback', () => {
@@ -424,12 +386,16 @@ describe('ReactFabric', () => {
     const before = 'abcdefghijklmnopqrst';
     const after = 'mxhpgwfralkeoivcstzy';
 
-    ReactFabric.render(<Component chars={before} />, 11);
+    act(() => {
+      ReactFabric.render(<Component chars={before} />, 11);
+    });
     expect(
       nativeFabricUIManager.__dumpHierarchyForJestTestsOnly(),
     ).toMatchSnapshot();
 
-    ReactFabric.render(<Component chars={after} />, 11);
+    act(() => {
+      ReactFabric.render(<Component chars={after} />, 11);
+    });
     expect(
       nativeFabricUIManager.__dumpHierarchyForJestTestsOnly(),
     ).toMatchSnapshot();
@@ -462,12 +428,14 @@ describe('ReactFabric', () => {
 
     const ref = React.createRef();
     // Wrap in a host node.
-    ReactFabric.render(
-      <View>
-        <Component ref={ref} />
-      </View>,
-      11,
-    );
+    act(() => {
+      ReactFabric.render(
+        <View>
+          <Component ref={ref} />
+        </View>,
+        11,
+      );
+    });
     expect(
       nativeFabricUIManager.__dumpHierarchyForJestTestsOnly(),
     ).toMatchSnapshot();
@@ -493,7 +461,9 @@ describe('ReactFabric', () => {
       }
     }
 
-    ReactFabric.render(<Component />, 11);
+    act(() => {
+      ReactFabric.render(<Component />, 11);
+    });
     expect(mockArgs.length).toEqual(0);
   });
 
@@ -513,12 +483,14 @@ describe('ReactFabric', () => {
       );
     });
 
-    ReactFabric.render(
-      <View foo="a">
-        <View foo="b" />
-      </View>,
-      22,
-    );
+    act(() => {
+      ReactFabric.render(
+        <View foo="a">
+          <View foo="b" />
+        </View>,
+        22,
+      );
+    });
     expect(snapshots).toMatchSnapshot();
   });
 
@@ -536,22 +508,26 @@ describe('ReactFabric', () => {
       uiViewClassName: 'RCTView',
     }));
 
-    ReactFabric.render(
-      <Text>
-        <View />
-      </Text>,
-      11,
-    );
+    act(() => {
+      ReactFabric.render(
+        <Text>
+          <View />
+        </Text>,
+        11,
+      );
+    });
 
-    ReactFabric.render(
-      <Text>
-        <Image />
-      </Text>,
-      11,
-    );
+    act(() => {
+      ReactFabric.render(
+        <Text>
+          <Image />
+        </Text>,
+        11,
+      );
+    });
   });
 
-  it('should throw for text not inside of a <Text> ancestor', () => {
+  it('should console error for text not inside of a <Text> ancestor', () => {
     const ScrollView = createReactNativeComponentClass('RCTScrollView', () => ({
       validAttributes: {},
       uiViewClassName: 'RCTScrollView',
@@ -565,18 +541,22 @@ describe('ReactFabric', () => {
       uiViewClassName: 'RCTView',
     }));
 
-    expect(() => ReactFabric.render(<View>this should warn</View>, 11)).toThrow(
-      'Text strings must be rendered within a <Text> component.',
-    );
+    expect(() => {
+      act(() => {
+        ReactFabric.render(<View>this should warn</View>, 11);
+      });
+    }).toErrorDev(['Text strings must be rendered within a <Text> component.']);
 
-    expect(() =>
-      ReactFabric.render(
-        <Text>
-          <ScrollView>hi hello hi</ScrollView>
-        </Text>,
-        11,
-      ),
-    ).toThrow('Text strings must be rendered within a <Text> component.');
+    expect(() => {
+      act(() => {
+        ReactFabric.render(
+          <Text>
+            <ScrollView>hi hello hi</ScrollView>
+          </Text>,
+          11,
+        );
+      });
+    }).toErrorDev(['Text strings must be rendered within a <Text> component.']);
   });
 
   it('should not throw for text inside of an indirect <Text> ancestor', () => {
@@ -587,12 +567,14 @@ describe('ReactFabric', () => {
 
     const Indirection = () => 'Hi';
 
-    ReactFabric.render(
-      <Text>
-        <Indirection />
-      </Text>,
-      11,
-    );
+    act(() => {
+      ReactFabric.render(
+        <Text>
+          <Indirection />
+        </Text>,
+        11,
+      );
+    });
   });
 
   it('dispatches events to the last committed props', () => {
@@ -609,7 +591,9 @@ describe('ReactFabric', () => {
     const touchStart = jest.fn();
     const touchStart2 = jest.fn();
 
-    ReactFabric.render(<View onTouchStart={touchStart} />, 11);
+    act(() => {
+      ReactFabric.render(<View onTouchStart={touchStart} />, 11);
+    });
 
     expect(nativeFabricUIManager.createNode.mock.calls.length).toBe(1);
     expect(nativeFabricUIManager.registerEventHandler.mock.calls.length).toBe(
@@ -633,7 +617,9 @@ describe('ReactFabric', () => {
     expect(touchStart).toBeCalled();
     expect(touchStart2).not.toBeCalled();
 
-    ReactFabric.render(<View onTouchStart={touchStart2} />, 11);
+    act(() => {
+      ReactFabric.render(<View onTouchStart={touchStart2} />, 11);
+    });
 
     // Intentionally dispatch to the same instanceHandle again.
     dispatchEvent(instanceHandle, 'topTouchStart', touchEvent);
@@ -642,6 +628,101 @@ describe('ReactFabric', () => {
     // props even though the actual scheduling of the event could have happened earlier.
     // This could change in the future.
     expect(touchStart2).toBeCalled();
+  });
+
+  describe('skipBubbling', () => {
+    it('should skip bubbling to ancestor if specified', () => {
+      const View = createReactNativeComponentClass('RCTView', () => ({
+        validAttributes: {},
+        uiViewClassName: 'RCTView',
+        bubblingEventTypes: {
+          topDefaultBubblingEvent: {
+            phasedRegistrationNames: {
+              captured: 'onDefaultBubblingEventCapture',
+              bubbled: 'onDefaultBubblingEvent',
+            },
+          },
+          topBubblingEvent: {
+            phasedRegistrationNames: {
+              captured: 'onBubblingEventCapture',
+              bubbled: 'onBubblingEvent',
+              skipBubbling: false,
+            },
+          },
+          topSkipBubblingEvent: {
+            phasedRegistrationNames: {
+              captured: 'onSkippedBubblingEventCapture',
+              bubbled: 'onSkippedBubblingEvent',
+              skipBubbling: true,
+            },
+          },
+        },
+      }));
+      const ancestorBubble = jest.fn();
+      const ancestorCapture = jest.fn();
+      const targetBubble = jest.fn();
+      const targetCapture = jest.fn();
+
+      const event = {};
+
+      act(() => {
+        ReactFabric.render(
+          <View
+            onSkippedBubblingEventCapture={ancestorCapture}
+            onDefaultBubblingEventCapture={ancestorCapture}
+            onBubblingEventCapture={ancestorCapture}
+            onSkippedBubblingEvent={ancestorBubble}
+            onDefaultBubblingEvent={ancestorBubble}
+            onBubblingEvent={ancestorBubble}
+          >
+            <View
+              onSkippedBubblingEventCapture={targetCapture}
+              onDefaultBubblingEventCapture={targetCapture}
+              onBubblingEventCapture={targetCapture}
+              onSkippedBubblingEvent={targetBubble}
+              onDefaultBubblingEvent={targetBubble}
+              onBubblingEvent={targetBubble}
+            />
+          </View>,
+          11,
+        );
+      });
+
+      expect(nativeFabricUIManager.createNode.mock.calls.length).toBe(2);
+      expect(nativeFabricUIManager.registerEventHandler.mock.calls.length).toBe(
+        1,
+      );
+      const [, , , , childInstance] =
+        nativeFabricUIManager.createNode.mock.calls[0];
+      const [dispatchEvent] =
+        nativeFabricUIManager.registerEventHandler.mock.calls[0];
+
+      dispatchEvent(childInstance, 'topDefaultBubblingEvent', event);
+      expect(targetBubble).toHaveBeenCalledTimes(1);
+      expect(targetCapture).toHaveBeenCalledTimes(1);
+      expect(ancestorCapture).toHaveBeenCalledTimes(1);
+      expect(ancestorBubble).toHaveBeenCalledTimes(1);
+      ancestorBubble.mockReset();
+      ancestorCapture.mockReset();
+      targetBubble.mockReset();
+      targetCapture.mockReset();
+
+      dispatchEvent(childInstance, 'topBubblingEvent', event);
+      expect(targetBubble).toHaveBeenCalledTimes(1);
+      expect(targetCapture).toHaveBeenCalledTimes(1);
+      expect(ancestorCapture).toHaveBeenCalledTimes(1);
+      expect(ancestorBubble).toHaveBeenCalledTimes(1);
+      ancestorBubble.mockReset();
+      ancestorCapture.mockReset();
+      targetBubble.mockReset();
+      targetCapture.mockReset();
+
+      dispatchEvent(childInstance, 'topSkipBubblingEvent', event);
+      expect(targetBubble).toHaveBeenCalledTimes(1);
+      expect(targetCapture).toHaveBeenCalledTimes(1);
+      expect(ancestorCapture).toHaveBeenCalledTimes(1);
+      expect(ancestorBubble).not.toBeCalled();
+    });
   });
 
   it('dispatches event with target as instance', () => {
@@ -672,33 +753,35 @@ describe('ReactFabric', () => {
     const ref1 = React.createRef();
     const ref2 = React.createRef();
 
-    ReactFabric.render(
-      <View id="parent">
-        <View
-          ref={ref1}
-          id="one"
-          onResponderStart={(event) => {
-            expect(ref1.current).not.toBeNull();
-            // Check for referential equality
-            expect(ref1.current).toBe(event.target);
-            expect(ref1.current).toBe(event.currentTarget);
-          }}
-          onStartShouldSetResponder={() => true}
-        />
-        <View
-          ref={ref2}
-          id="two"
-          onResponderStart={(event) => {
-            expect(ref2.current).not.toBeNull();
-            // Check for referential equality
-            expect(ref2.current).toBe(event.target);
-            expect(ref2.current).toBe(event.currentTarget);
-          }}
-          onStartShouldSetResponder={() => true}
-        />
-      </View>,
-      1,
-    );
+    act(() => {
+      ReactFabric.render(
+        <View id="parent">
+          <View
+            ref={ref1}
+            id="one"
+            onResponderStart={(event) => {
+              expect(ref1.current).not.toBeNull();
+              // Check for referential equality
+              expect(ref1.current).toBe(event.target);
+              expect(ref1.current).toBe(event.currentTarget);
+            }}
+            onStartShouldSetResponder={() => true}
+          />
+          <View
+            ref={ref2}
+            id="two"
+            onResponderStart={(event) => {
+              expect(ref2.current).not.toBeNull();
+              // Check for referential equality
+              expect(ref2.current).toBe(event.target);
+              expect(ref2.current).toBe(event.currentTarget);
+            }}
+            onStartShouldSetResponder={() => true}
+          />
+        </View>,
+        1,
+      );
+    });
 
     const [dispatchEvent] =
       nativeFabricUIManager.registerEventHandler.mock.calls[0];
@@ -752,10 +835,12 @@ describe('ReactFabric', () => {
       }
     }
 
-    ReactFabric.render(
-      <ContainsStrictModeChild ref={(n) => (parent = n)} />,
-      11,
-    );
+    act(() => {
+      ReactFabric.render(
+        <ContainsStrictModeChild ref={(n) => (parent = n)} />,
+        11,
+      );
+    });
 
     let match;
     expect(
@@ -787,12 +872,14 @@ describe('ReactFabric', () => {
       }
     }
 
-    ReactFabric.render(
-      <StrictMode>
-        <IsInStrictMode ref={(n) => (parent = n)} />
-      </StrictMode>,
-      11,
-    );
+    act(() => {
+      ReactFabric.render(
+        <StrictMode>
+          <IsInStrictMode ref={(n) => (parent = n)} />
+        </StrictMode>,
+        11,
+      );
+    });
 
     let match;
     expect(
@@ -828,10 +915,12 @@ describe('ReactFabric', () => {
       }
     }
 
-    ReactFabric.render(
-      <ContainsStrictModeChild ref={(n) => (parent = n)} />,
-      11,
-    );
+    act(() => {
+      ReactFabric.render(
+        <ContainsStrictModeChild ref={(n) => (parent = n)} />,
+        11,
+      );
+    });
 
     let match;
     expect(() => (match = ReactFabric.findNodeHandle(parent))).toErrorDev([
@@ -861,12 +950,14 @@ describe('ReactFabric', () => {
       }
     }
 
-    ReactFabric.render(
-      <StrictMode>
-        <IsInStrictMode ref={(n) => (parent = n)} />
-      </StrictMode>,
-      11,
-    );
+    act(() => {
+      ReactFabric.render(
+        <StrictMode>
+          <IsInStrictMode ref={(n) => (parent = n)} />
+        </StrictMode>,
+        11,
+      );
+    });
 
     let match;
     expect(() => (match = ReactFabric.findNodeHandle(parent))).toErrorDev([
@@ -881,37 +972,35 @@ describe('ReactFabric', () => {
     expect(match).toBe(child._nativeTag);
   });
 
-  it('blur on host component calls TextInputState', () => {
+  it('should no-op if calling sendAccessibilityEvent on unmounted refs', () => {
     const View = createReactNativeComponentClass('RCTView', () => ({
       validAttributes: {foo: true},
       uiViewClassName: 'RCTView',
     }));
 
-    const viewRef = React.createRef();
-    ReactFabric.render(<View ref={viewRef} />, 11);
+    nativeFabricUIManager.sendAccessibilityEvent.mockReset();
 
-    expect(TextInputState.blurTextInput).not.toBeCalled();
+    let viewRef;
+    act(() => {
+      ReactFabric.render(
+        <View
+          ref={(ref) => {
+            viewRef = ref;
+          }}
+        />,
+        11,
+      );
+    });
+    const dangerouslyRetainedViewRef = viewRef;
+    act(() => {
+      ReactFabric.stopSurface(11);
+    });
 
-    viewRef.current.blur();
+    ReactFabric.sendAccessibilityEvent(
+      dangerouslyRetainedViewRef,
+      'eventTypeName',
+    );
 
-    expect(TextInputState.blurTextInput).toHaveBeenCalledTimes(1);
-    expect(TextInputState.blurTextInput).toHaveBeenCalledWith(viewRef.current);
-  });
-
-  it('focus on host component calls TextInputState', () => {
-    const View = createReactNativeComponentClass('RCTView', () => ({
-      validAttributes: {foo: true},
-      uiViewClassName: 'RCTView',
-    }));
-
-    const viewRef = React.createRef();
-    ReactFabric.render(<View ref={viewRef} />, 11);
-
-    expect(TextInputState.focusTextInput).not.toBeCalled();
-
-    viewRef.current.focus();
-
-    expect(TextInputState.focusTextInput).toHaveBeenCalledTimes(1);
-    expect(TextInputState.focusTextInput).toHaveBeenCalledWith(viewRef.current);
+    expect(nativeFabricUIManager.sendAccessibilityEvent).not.toBeCalled();
   });
 });

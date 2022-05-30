@@ -9,6 +9,7 @@
 
 import {copy} from 'clipboard-js';
 import * as React from 'react';
+import {OptionsContext} from '../context';
 import Button from '../Button';
 import ButtonIcon from '../ButtonIcon';
 import KeyValue from './KeyValue';
@@ -20,10 +21,12 @@ import {ElementTypeClass} from 'react-devtools-shared/src/types';
 
 export default function InspectedElementPropsTree({
   bridge,
-  getInspectedElementPath,
+  element,
   inspectedElement,
   store,
 }) {
+  const {readOnly} = React.useContext(OptionsContext);
+
   const {
     canEditFunctionProps,
     canEditFunctionPropsDeletePaths,
@@ -34,7 +37,8 @@ export default function InspectedElementPropsTree({
 
   const canDeletePaths =
     type === ElementTypeClass || canEditFunctionPropsDeletePaths;
-  const canEditValues = type === ElementTypeClass || canEditFunctionProps;
+  const canEditValues =
+    !readOnly && (type === ElementTypeClass || canEditFunctionProps);
   const canRenamePaths =
     type === ElementTypeClass || canEditFunctionPropsRenamePaths;
 
@@ -48,7 +52,10 @@ export default function InspectedElementPropsTree({
   const handleCopy = () => copy(serializeDataForCopy(props));
 
   return (
-    <div className={styles.InspectedElementTree}>
+    <div
+      className={styles.InspectedElementTree}
+      data-testname="InspectedElementPropsTree"
+    >
       <div className={styles.HeaderRow}>
         <div className={styles.Header}>props</div>
         {!isEmpty && (
@@ -67,7 +74,7 @@ export default function InspectedElementPropsTree({
             canEditValues={canEditValues}
             canRenamePaths={canRenamePaths}
             depth={1}
-            getInspectedElementPath={getInspectedElementPath}
+            element={element}
             hidden={false}
             inspectedElement={inspectedElement}
             name={name}

@@ -10,8 +10,10 @@
 import * as React from 'react';
 import {createContext} from 'react';
 
+// TODO (cache) Remove this cache; it is outdated and will not work with newer APIs like startTransition.
+
 // Cache implementation was forked from the React repo:
-// https://github.com/facebook/react/blob/master/packages/react-cache/src/ReactCache.js
+// https://github.com/facebook/react/blob/main/packages/react-cache/src/ReactCache.js
 //
 // This cache is simpler than react-cache in that:
 // 1. Individual items don't need to be invalidated.
@@ -28,7 +30,7 @@ const ReactCurrentDispatcher =
   React.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED
     .ReactCurrentDispatcher;
 
-function readContext(Context, observedBits) {
+function readContext(Context) {
   const dispatcher = ReactCurrentDispatcher.current;
   if (dispatcher === null) {
     throw new Error(
@@ -37,7 +39,7 @@ function readContext(Context, observedBits) {
         'lifecycle methods.',
     );
   }
-  return dispatcher.readContext(Context, observedBits);
+  return dispatcher.readContext(Context);
 }
 
 const CacheContext = createContext(null);

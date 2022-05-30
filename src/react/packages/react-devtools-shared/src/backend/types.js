@@ -16,7 +16,10 @@
 // Profiling data collected by the renderer interface.
 // This information will be passed to the frontend and combined with info it collects.
 
+export const InspectElementErrorType = 'error';
 export const InspectElementFullDataType = 'full-data';
 export const InspectElementNoChangeType = 'no-change';
 export const InspectElementNotFoundType = 'not-found';
-export const InspectElementHydratedPathType = 'hydrated-path';
+
+// Renderers use these APIs to report profiling data to DevTools at runtime.
+// They get passed from the DevTools backend to the reconciler during injection.

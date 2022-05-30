@@ -12,7 +12,7 @@ import {Fragment} from 'react';
 import styles from './Badge.css';
 
 export default function Badge({className, hocDisplayNames, type, children}) {
-  if (hocDisplayNames === null) {
+  if (hocDisplayNames === null || hocDisplayNames.length === 0) {
     return null;
   }
 

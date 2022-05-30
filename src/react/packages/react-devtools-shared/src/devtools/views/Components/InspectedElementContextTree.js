@@ -22,7 +22,7 @@ import {
 
 export default function InspectedElementContextTree({
   bridge,
-  getInspectedElementPath,
+  element,
   inspectedElement,
   store,
 }) {
@@ -70,15 +70,15 @@ export default function InspectedElementContextTree({
               canEditValues={!isReadOnly}
               canRenamePaths={!isReadOnly}
               canRenamePathsAtDepth={canRenamePathsAtDepth}
-              type="context"
               depth={1}
-              getInspectedElementPath={getInspectedElementPath}
+              element={element}
               hidden={false}
               inspectedElement={inspectedElement}
               name={name}
               path={[name]}
               pathRoot="context"
               store={store}
+              type="context"
               value={value}
             />
           ))}

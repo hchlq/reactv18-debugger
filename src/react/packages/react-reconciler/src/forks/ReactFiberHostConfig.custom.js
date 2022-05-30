@@ -58,23 +58,21 @@ export const warnsIfNotActing = $$$hostConfig.warnsIfNotActing;
 export const supportsMutation = $$$hostConfig.supportsMutation;
 export const supportsPersistence = $$$hostConfig.supportsPersistence;
 export const supportsHydration = $$$hostConfig.supportsHydration;
-export const getFundamentalComponentInstance =
-  $$$hostConfig.getFundamentalComponentInstance;
-export const mountFundamentalComponent =
-  $$$hostConfig.mountFundamentalComponent;
-export const shouldUpdateFundamentalComponent =
-  $$$hostConfig.shouldUpdateFundamentalComponent;
 export const getInstanceFromNode = $$$hostConfig.getInstanceFromNode;
-export const isOpaqueHydratingObject = $$$hostConfig.isOpaqueHydratingObject;
-export const makeOpaqueHydratingObject =
-  $$$hostConfig.makeOpaqueHydratingObject;
-export const makeClientId = $$$hostConfig.makeClientId;
-export const makeClientIdInDEV = $$$hostConfig.makeClientIdInDEV;
 export const beforeActiveInstanceBlur = $$$hostConfig.beforeActiveInstanceBlur;
 export const afterActiveInstanceBlur = $$$hostConfig.afterActiveInstanceBlur;
 export const preparePortalMount = $$$hostConfig.preparePortalMount;
-export const prepareScopeUpdate = $$$hostConfig.preparePortalMount;
+export const prepareScopeUpdate = $$$hostConfig.prepareScopeUpdate;
 export const getInstanceFromScope = $$$hostConfig.getInstanceFromScope;
+export const getCurrentEventPriority = $$$hostConfig.getCurrentEventPriority;
+export const detachDeletedInstance = $$$hostConfig.detachDeletedInstance;
+
+// -------------------
+//      Microtasks
+//     (optional)
+// -------------------
+export const supportsMicrotasks = $$$hostConfig.supportsMicrotasks;
+export const scheduleMicrotask = $$$hostConfig.scheduleMicrotask;
 
 // -------------------
 //      Test selectors
@@ -108,10 +106,6 @@ export const hideInstance = $$$hostConfig.hideInstance;
 export const hideTextInstance = $$$hostConfig.hideTextInstance;
 export const unhideInstance = $$$hostConfig.unhideInstance;
 export const unhideTextInstance = $$$hostConfig.unhideTextInstance;
-export const updateFundamentalComponent =
-  $$$hostConfig.updateFundamentalComponent;
-export const unmountFundamentalComponent =
-  $$$hostConfig.unmountFundamentalComponent;
 export const clearContainer = $$$hostConfig.clearContainer;
 
 // -------------------
@@ -127,7 +121,6 @@ export const finalizeContainerChildren =
 export const replaceContainerChildren = $$$hostConfig.replaceContainerChildren;
 export const cloneHiddenInstance = $$$hostConfig.cloneHiddenInstance;
 export const cloneHiddenTextInstance = $$$hostConfig.cloneHiddenTextInstance;
-export const cloneFundamentalInstance = $$$hostConfig.cloneInstance;
 
 // -------------------
 //     Hydration
@@ -145,6 +138,10 @@ export const registerSuspenseInstanceRetry =
   $$$hostConfig.registerSuspenseInstanceRetry;
 export const getNextHydratableSibling = $$$hostConfig.getNextHydratableSibling;
 export const getFirstHydratableChild = $$$hostConfig.getFirstHydratableChild;
+export const getFirstHydratableChildWithinContainer =
+  $$$hostConfig.getFirstHydratableChildWithinContainer;
+export const getFirstHydratableChildWithinSuspenseInstance =
+  $$$hostConfig.getFirstHydratableChildWithinSuspenseInstance;
 export const hydrateInstance = $$$hostConfig.hydrateInstance;
 export const hydrateTextInstance = $$$hostConfig.hydrateTextInstance;
 export const hydrateSuspenseInstance = $$$hostConfig.hydrateSuspenseInstance;
@@ -156,22 +153,33 @@ export const commitHydratedSuspenseInstance =
 export const clearSuspenseBoundary = $$$hostConfig.clearSuspenseBoundary;
 export const clearSuspenseBoundaryFromContainer =
   $$$hostConfig.clearSuspenseBoundaryFromContainer;
+export const shouldDeleteUnhydratedTailInstances =
+  $$$hostConfig.shouldDeleteUnhydratedTailInstances;
 export const didNotMatchHydratedContainerTextInstance =
   $$$hostConfig.didNotMatchHydratedContainerTextInstance;
 export const didNotMatchHydratedTextInstance =
   $$$hostConfig.didNotMatchHydratedTextInstance;
-export const didNotHydrateContainerInstance =
-  $$$hostConfig.didNotHydrateContainerInstance;
+export const didNotHydrateInstanceWithinContainer =
+  $$$hostConfig.didNotHydrateInstanceWithinContainer;
+export const didNotHydrateInstanceWithinSuspenseInstance =
+  $$$hostConfig.didNotHydrateInstanceWithinSuspenseInstance;
 export const didNotHydrateInstance = $$$hostConfig.didNotHydrateInstance;
-export const didNotFindHydratableContainerInstance =
-  $$$hostConfig.didNotFindHydratableContainerInstance;
-export const didNotFindHydratableContainerTextInstance =
-  $$$hostConfig.didNotFindHydratableContainerTextInstance;
-export const didNotFindHydratableContainerSuspenseInstance =
-  $$$hostConfig.didNotFindHydratableContainerSuspenseInstance;
+export const didNotFindHydratableInstanceWithinContainer =
+  $$$hostConfig.didNotFindHydratableInstanceWithinContainer;
+export const didNotFindHydratableTextInstanceWithinContainer =
+  $$$hostConfig.didNotFindHydratableTextInstanceWithinContainer;
+export const didNotFindHydratableSuspenseInstanceWithinContainer =
+  $$$hostConfig.didNotFindHydratableSuspenseInstanceWithinContainer;
+export const didNotFindHydratableInstanceWithinSuspenseInstance =
+  $$$hostConfig.didNotFindHydratableInstanceWithinSuspenseInstance;
+export const didNotFindHydratableTextInstanceWithinSuspenseInstance =
+  $$$hostConfig.didNotFindHydratableTextInstanceWithinSuspenseInstance;
+export const didNotFindHydratableSuspenseInstanceWithinSuspenseInstance =
+  $$$hostConfig.didNotFindHydratableSuspenseInstanceWithinSuspenseInstance;
 export const didNotFindHydratableInstance =
   $$$hostConfig.didNotFindHydratableInstance;
 export const didNotFindHydratableTextInstance =
   $$$hostConfig.didNotFindHydratableTextInstance;
 export const didNotFindHydratableSuspenseInstance =
   $$$hostConfig.didNotFindHydratableSuspenseInstance;
+export const errorHydratingContainer = $$$hostConfig.errorHydratingContainer;

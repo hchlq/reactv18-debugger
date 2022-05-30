@@ -14,8 +14,7 @@
 FLIGHT PROTOCOL GRAMMAR
 
 Response
-- JSONData RowSequence
-- JSONData
+- RowSequence
 
 RowSequence
 - Row RowSequence
@@ -23,6 +22,7 @@ RowSequence
 
 Row
 - "J" RowID JSONData
+- "M" RowID JSONModuleData
 - "H" RowID HTMLData
 - "B" RowID BlobData
 - "U" RowID URLData
@@ -64,7 +64,7 @@ ByteSize
 
 // TODO: Implement HTMLData, BlobData and URLData.
 
-import {convertStringToBuffer} from './ReactServerStreamConfig';
+import {stringToChunk} from './ReactServerStreamConfig';
 
 const stringify = JSON.stringify;
 
@@ -75,18 +75,30 @@ function serializeRowHeader(tag, id) {
 export function processErrorChunk(request, id, message, stack) {
   const errorInfo = {message, stack};
   const row = serializeRowHeader('E', id) + stringify(errorInfo) + '\n';
-  return convertStringToBuffer(row);
+  return stringToChunk(row);
 }
 
 export function processModelChunk(request, id, model) {
   const json = stringify(model, request.toJSON);
-  let row;
-  if (id === 0) {
-    row = json + '\n';
-  } else {
-    row = serializeRowHeader('J', id) + json + '\n';
-  }
-  return convertStringToBuffer(row);
+  const row = serializeRowHeader('J', id) + json + '\n';
+  return stringToChunk(row);
+}
+
+export function processModuleChunk(request, id, moduleMetaData) {
+  const json = stringify(moduleMetaData);
+  const row = serializeRowHeader('M', id) + json + '\n';
+  return stringToChunk(row);
+}
+
+export function processProviderChunk(request, id, contextName) {
+  const row = serializeRowHeader('P', id) + contextName + '\n';
+  return stringToChunk(row);
+}
+
+export function processSymbolChunk(request, id, name) {
+  const json = stringify(name);
+  const row = serializeRowHeader('S', id) + json + '\n';
+  return stringToChunk(row);
 }
 
 export {
@@ -94,6 +106,8 @@ export {
   flushBuffered,
   beginWriting,
   writeChunk,
+  writeChunkAndReturn,
   completeWriting,
   close,
+  closeWithError,
 } from './ReactServerStreamConfig';

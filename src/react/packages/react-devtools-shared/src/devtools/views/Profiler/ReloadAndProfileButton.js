@@ -14,7 +14,7 @@ import ButtonIcon from '../ButtonIcon';
 import {BridgeContext, StoreContext} from '../context';
 import {useSubscription} from '../hooks';
 
-export default function ReloadAndProfileButton() {
+export default function ReloadAndProfileButton({disabled}) {
   const bridge = useContext(BridgeContext);
   const store = useContext(StoreContext);
 
@@ -54,7 +54,7 @@ export default function ReloadAndProfileButton() {
 
   return (
     <Button
-      disabled={!store.supportsProfiling}
+      disabled={disabled}
       onClick={reloadAndProfile}
       title="Reload and start profiling"
     >

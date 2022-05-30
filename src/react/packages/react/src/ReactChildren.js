@@ -7,12 +7,13 @@
  *
  */
 
-import invariant from 'shared/invariant';
+import isArray from 'shared/isArray';
 import {
   getIteratorFn,
   REACT_ELEMENT_TYPE,
   REACT_PORTAL_TYPE,
 } from 'shared/ReactSymbols';
+import {checkKeyStringCoercion} from 'shared/CheckStringCoercion';
 
 import {isValidElement, cloneAndReplaceKey} from './ReactElement';
 
@@ -62,6 +63,9 @@ function getElementKey(element, index) {
   // that we don't block potential future ES APIs.
   if (typeof element === 'object' && element !== null && element.key != null) {
     // Explicit key
+    if (__DEV__) {
+      checkKeyStringCoercion(element.key);
+    }
     return escape('' + element.key);
   }
   // Implicit key determined by the index in the set
@@ -102,7 +106,7 @@ function mapIntoArray(children, array, escapedPrefix, nameSoFar, callback) {
     // so that it's consistent if the number of children grows:
     const childKey =
       nameSoFar === '' ? SEPARATOR + getElementKey(child, 0) : nameSoFar;
-    if (Array.isArray(mappedChild)) {
+    if (isArray(mappedChild)) {
       let escapedChildKey = '';
       if (childKey != null) {
         escapedChildKey = escapeUserProvidedKey(childKey) + '/';
@@ -110,6 +114,14 @@ function mapIntoArray(children, array, escapedPrefix, nameSoFar, callback) {
       mapIntoArray(mappedChild, array, escapedChildKey, '', (c) => c);
     } else if (mappedChild != null) {
       if (isValidElement(mappedChild)) {
+        if (__DEV__) {
+          // The `if` statement here prevents auto-disabling of the safe
+          // coercion ESLint rule, so we must manually disable it below.
+          // $FlowFixMe Flow incorrectly thinks React.Portal doesn't have a key
+          if (mappedChild.key && (!child || child.key !== mappedChild.key)) {
+            checkKeyStringCoercion(mappedChild.key);
+          }
+        }
         mappedChild = cloneAndReplaceKey(
           mappedChild,
           // Keep both the (mapped) and old keys if they differ, just as
@@ -118,6 +130,7 @@ function mapIntoArray(children, array, escapedPrefix, nameSoFar, callback) {
             // $FlowFixMe Flow incorrectly thinks React.Portal doesn't have a key
             (mappedChild.key && (!child || child.key !== mappedChild.key)
               ? // $FlowFixMe Flow incorrectly thinks existing element's key can be a number
+                // eslint-disable-next-line react-internal/safe-string-coercion
                 escapeUserProvidedKey('' + mappedChild.key) + '/'
               : '') +
             childKey,
@@ -134,7 +147,7 @@ function mapIntoArray(children, array, escapedPrefix, nameSoFar, callback) {
   const nextNamePrefix =
     nameSoFar === '' ? SEPARATOR : nameSoFar + SUBSEPARATOR;
 
-  if (Array.isArray(children)) {
+  if (isArray(children)) {
     for (let i = 0; i < children.length; i++) {
       child = children[i];
       nextName = nextNamePrefix + getElementKey(child, i);
@@ -179,15 +192,17 @@ function mapIntoArray(children, array, escapedPrefix, nameSoFar, callback) {
         );
       }
     } else if (type === 'object') {
-      const childrenString = '' + children;
-      invariant(
-        false,
-        'Objects are not valid as a React child (found: %s). ' +
+      // eslint-disable-next-line react-internal/safe-string-coercion
+      const childrenString = String(children);
+
+      throw new Error(
+        `Objects are not valid as a React child (found: ${
+          childrenString === '[object Object]'
+            ? 'object with keys {' + Object.keys(children).join(', ') + '}'
+            : childrenString
+        }). ` +
           'If you meant to render a collection of children, use an array ' +
           'instead.',
-        childrenString === '[object Object]'
-          ? 'object with keys {' + Object.keys(children).join(', ') + '}'
-          : childrenString,
       );
     }
   }
@@ -286,10 +301,12 @@ function toArray(children) {
  * structure.
  */
 function onlyChild(children) {
-  invariant(
-    isValidElement(children),
-    'React.Children.only expected to receive a single React element child.',
-  );
+  if (!isValidElement(children)) {
+    throw new Error(
+      'React.Children.only expected to receive a single React element child.',
+    );
+  }
+
   return children;
 }
 

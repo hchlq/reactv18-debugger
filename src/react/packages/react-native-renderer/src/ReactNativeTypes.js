@@ -5,8 +5,11 @@
  * LICENSE file in the root directory of this source tree.
  *
  * @format
- *
+ *       strict
  */
+
+// We either force that `diff` and `process` always use mixed,
+// or we allow them to define specific types and use this hack
 
 /**
  * Flat ReactNative renderer bundles are too big for Flow to parse efficiently.

@@ -8,7 +8,7 @@
  */
 
 import {registerDirectEvent} from '../EventRegistry';
-import {IS_REPLAYED} from 'react-dom/src/events/EventSystemFlags';
+import {isReplayingEvent} from '../CurrentReplayingEvent';
 import {SyntheticMouseEvent, SyntheticPointerEvent} from '../SyntheticEvent';
 import {
   getClosestInstanceFromNode,
@@ -48,7 +48,7 @@ function extractEvents(
   const isOutEvent =
     domEventName === 'mouseout' || domEventName === 'pointerout';
 
-  if (isOverEvent && (eventSystemFlags & IS_REPLAYED) === 0) {
+  if (isOverEvent && !isReplayingEvent(nativeEvent)) {
     // If this is an over event with a target, we might have already dispatched
     // the event in the out event of the other target. If this is replayed,
     // then it's because we couldn't dispatch against this target previously

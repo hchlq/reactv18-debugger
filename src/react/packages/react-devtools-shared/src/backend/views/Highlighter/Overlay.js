@@ -7,8 +7,9 @@
  *
  */
 
-import assign from 'object-assign';
 import {getElementDimensions, getNestedBoundingClientRect} from '../utils';
+
+const assign = Object.assign;
 
 // Note that the Overlay components are not affected by the active Theme,
 // because they highlight elements in the main Chrome window (outside of devtools).

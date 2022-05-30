@@ -26,6 +26,7 @@ export const ElementTypeProfiler = 10;
 export const ElementTypeRoot = 11;
 export const ElementTypeSuspense = 12;
 export const ElementTypeSuspenseList = 13;
+export const ElementTypeTracingMarker = 14;
 
 // Different types of elements displayed in the Elements tree.
 // These types may be used to visually distinguish types,
@@ -45,3 +46,9 @@ export const ComponentFilterHOC = 4;
 
 // Hide all elements with displayNames or paths matching one or more of the RegExps in this Set.
 // Path filters are only used when elements include debug source location.
+
+// Map of hook source ("<filename>:<line-number>:<column-number>") to name.
+// Hook source is used instead of the hook itself because the latter is not stable between element inspections.
+// We use a Map rather than an Array because of nested hooks and traversal ordering.
+
+export const StrictMode = 1;

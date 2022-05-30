@@ -12,7 +12,7 @@
  * should suspend for if it needs to.
  */
 const ReactCurrentBatchConfig = {
-  transition: 0,
+  transition: null,
 };
 
 export default ReactCurrentBatchConfig;

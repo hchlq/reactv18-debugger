@@ -25,7 +25,10 @@ import {
   initialize as setupTraceUpdates,
   toggleEnabled as setTraceUpdatesEnabled,
 } from './views/TraceUpdates';
-import {patch as patchConsole, unpatch as unpatchConsole} from './console';
+import {patch as patchConsole} from './console';
+import {currentBridgeProtocol} from 'react-devtools-shared/src/bridge';
+
+import {isSynchronousXHRSupported} from './utils';
 
 const debug = (methodName, ...args) => {
   if (__DEBUG__) {
@@ -72,13 +75,19 @@ export default class Agent extends EventEmitter {
 
     this._bridge = bridge;
 
+    bridge.addListener('clearErrorsAndWarnings', this.clearErrorsAndWarnings);
+    bridge.addListener('clearErrorsForFiberID', this.clearErrorsForFiberID);
+    bridge.addListener('clearWarningsForFiberID', this.clearWarningsForFiberID);
     bridge.addListener('copyElementPath', this.copyElementPath);
     bridge.addListener('deletePath', this.deletePath);
+    bridge.addListener('getBackendVersion', this.getBackendVersion);
+    bridge.addListener('getBridgeProtocol', this.getBridgeProtocol);
     bridge.addListener('getProfilingData', this.getProfilingData);
     bridge.addListener('getProfilingStatus', this.getProfilingStatus);
     bridge.addListener('getOwnersList', this.getOwnersList);
     bridge.addListener('inspectElement', this.inspectElement);
     bridge.addListener('logElementToConsole', this.logElementToConsole);
+    bridge.addListener('overrideError', this.overrideError);
     bridge.addListener('overrideSuspense', this.overrideSuspense);
     bridge.addListener('overrideValueAtPath', this.overrideValueAtPath);
     bridge.addListener('reloadAndProfile', this.reloadAndProfile);
@@ -112,6 +121,14 @@ export default class Agent extends EventEmitter {
       bridge.send('profilingStatus', true);
     }
 
+    // Send the Bridge protocol and backend versions, after initialization, in case the frontend has already requested it.
+    // The Store may be instantiated beore the agent.
+    const version = process.env.DEVTOOLS_VERSION;
+    if (version) {
+      this._bridge.send('backendVersion', version);
+    }
+    this._bridge.send('bridgeProtocol', currentBridgeProtocol);
+
     // Notify the frontend if the backend supports the Storage API (e.g. localStorage).
     // If not, features like reload-and-profile will not work correctly and must be disabled.
     let isBackendStorageAPISupported = false;
@@ -120,6 +137,7 @@ export default class Agent extends EventEmitter {
       isBackendStorageAPISupported = true;
     } catch (error) {}
     bridge.send('isBackendStorageAPISupported', isBackendStorageAPISupported);
+    bridge.send('isSynchronousXHRSupported', isSynchronousXHRSupported());
 
     setupHighlighter(bridge, this);
     setupTraceUpdates(this);
@@ -128,6 +146,33 @@ export default class Agent extends EventEmitter {
   get rendererInterfaces() {
     return this._rendererInterfaces;
   }
+
+  clearErrorsAndWarnings = ({rendererID}) => {
+    const renderer = this._rendererInterfaces[rendererID];
+    if (renderer == null) {
+      console.warn(`Invalid renderer id "${rendererID}"`);
+    } else {
+      renderer.clearErrorsAndWarnings();
+    }
+  };
+
+  clearErrorsForFiberID = ({id, rendererID}) => {
+    const renderer = this._rendererInterfaces[rendererID];
+    if (renderer == null) {
+      console.warn(`Invalid renderer id "${rendererID}"`);
+    } else {
+      renderer.clearErrorsForFiberID(id);
+    }
+  };
+
+  clearWarningsForFiberID = ({id, rendererID}) => {
+    const renderer = this._rendererInterfaces[rendererID];
+    if (renderer == null) {
+      console.warn(`Invalid renderer id "${rendererID}"`);
+    } else {
+      renderer.clearWarningsForFiberID(id);
+    }
+  };
 
   copyElementPath = ({id, path, rendererID}) => {
     const renderer = this._rendererInterfaces[rendererID];
@@ -173,6 +218,17 @@ export default class Agent extends EventEmitter {
     return null;
   }
 
+  getBackendVersion = () => {
+    const version = process.env.DEVTOOLS_VERSION;
+    if (version) {
+      this._bridge.send('backendVersion', version);
+    }
+  };
+
+  getBridgeProtocol = () => {
+    this._bridge.send('bridgeProtocol', currentBridgeProtocol);
+  };
+
   getProfilingData = ({rendererID}) => {
     const renderer = this._rendererInterfaces[rendererID];
     if (renderer == null) {
@@ -196,12 +252,15 @@ export default class Agent extends EventEmitter {
     }
   };
 
-  inspectElement = ({id, path, rendererID}) => {
+  inspectElement = ({forceFullData, id, path, rendererID, requestID}) => {
     const renderer = this._rendererInterfaces[rendererID];
     if (renderer == null) {
       console.warn(`Invalid renderer id "${rendererID}" for element "${id}"`);
     } else {
-      this._bridge.send('inspectedElement', renderer.inspectElement(id, path));
+      this._bridge.send(
+        'inspectedElement',
+        renderer.inspectElement(requestID, id, path, forceFullData),
+      );
 
       // When user selects an element, stop trying to restore the selection,
       // and instead remember the current selection for the next reload.
@@ -229,6 +288,15 @@ export default class Agent extends EventEmitter {
       console.warn(`Invalid renderer id "${rendererID}" for element "${id}"`);
     } else {
       renderer.logElementToConsole(id);
+    }
+  };
+
+  overrideError = ({id, rendererID, forceError}) => {
+    const renderer = this._rendererInterfaces[rendererID];
+    if (renderer == null) {
+      console.warn(`Invalid renderer id "${rendererID}" for element "${id}"`);
+    } else {
+      renderer.overrideError(id, forceError);
     }
   };
 
@@ -417,16 +485,21 @@ export default class Agent extends EventEmitter {
   updateConsolePatchSettings = ({
     appendComponentStack,
     breakOnConsoleErrors,
+    showInlineWarningsAndErrors,
+    hideConsoleLogsInStrictMode,
+    browserTheme,
   }) => {
     // If the frontend preference has change,
     // or in the case of React Native- if the backend is just finding out the preference-
-    // then install or uninstall the console overrides.
+    // then reinstall the console overrides.
     // It's safe to call these methods multiple times, so we don't need to worry about that.
-    if (appendComponentStack || breakOnConsoleErrors) {
-      patchConsole({appendComponentStack, breakOnConsoleErrors});
-    } else {
-      unpatchConsole();
-    }
+    patchConsole({
+      appendComponentStack,
+      breakOnConsoleErrors,
+      showInlineWarningsAndErrors,
+      hideConsoleLogsInStrictMode,
+      browserTheme,
+    });
   };
 
   updateComponentFilters = (componentFilters) => {
@@ -458,9 +531,20 @@ export default class Agent extends EventEmitter {
     this.emit('traceUpdates', nodes);
   };
 
+  onFastRefreshScheduled = () => {
+    if (__DEBUG__) {
+      debug('onFastRefreshScheduled');
+    }
+
+    this._bridge.send('fastRefreshScheduled');
+  };
+
   onHookOperations = (operations) => {
     if (__DEBUG__) {
-      debug('onHookOperations', operations);
+      debug(
+        'onHookOperations',
+        `(${operations.length}) [${operations.join(', ')}]`,
+      );
     }
 
     // TODO:

@@ -13,7 +13,7 @@ import Agent from 'react-devtools-shared/src/backend/agent';
 import {hideOverlay, showOverlay} from './Highlighter';
 
 // This plug-in provides in-page highlighting of the selected element.
-// It is used by the browser extension nad the standalone DevTools shell (when connected to a browser).
+// It is used by the browser extension and the standalone DevTools shell (when connected to a browser).
 // It is not currently the mechanism used to highlight React Native views.
 // That is done by the React Native Inspector component.
 
@@ -90,7 +90,7 @@ export default function setupHighlighter(bridge, agent) {
     }
 
     let nodes = null;
-    if (renderer !== null) {
+    if (renderer != null) {
       nodes = renderer.findNativeNodesForFiberID(id);
     }
 

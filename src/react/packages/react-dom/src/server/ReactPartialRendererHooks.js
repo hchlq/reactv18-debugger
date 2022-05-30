@@ -9,7 +9,7 @@
 
 import {validateContextBounds} from './ReactPartialRendererContext';
 
-import invariant from 'shared/invariant';
+import {enableCache} from 'shared/ReactFeatureFlags';
 import is from 'shared/objectIs';
 
 let currentlyRenderingComponent = null;
@@ -31,15 +31,17 @@ let isInHookUserCodeInDev = false;
 let currentHookNameInDev;
 
 function resolveCurrentlyRenderingComponent() {
-  invariant(
-    currentlyRenderingComponent !== null,
-    'Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for' +
-      ' one of the following reasons:\n' +
-      '1. You might have mismatching versions of React and the renderer (such as React DOM)\n' +
-      '2. You might be breaking the Rules of Hooks\n' +
-      '3. You might have more than one copy of React in the same app\n' +
-      'See https://reactjs.org/link/invalid-hook-call for tips about how to debug and fix this problem.',
-  );
+  if (currentlyRenderingComponent === null) {
+    throw new Error(
+      'Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for' +
+        ' one of the following reasons:\n' +
+        '1. You might have mismatching versions of React and the renderer (such as React DOM)\n' +
+        '2. You might be breaking the Rules of Hooks\n' +
+        '3. You might have more than one copy of React in the same app\n' +
+        'See https://reactjs.org/link/invalid-hook-call for tips about how to debug and fix this problem.',
+    );
+  }
+
   if (__DEV__) {
     if (isInHookUserCodeInDev) {
       console.error(
@@ -92,7 +94,7 @@ function areHookInputsEqual(nextDeps, prevDeps) {
 
 function createHook() {
   if (numberOfReRenders > 0) {
-    invariant(false, 'Rendered more hooks than during the previous render');
+    throw new Error('Rendered more hooks than during the previous render');
   }
   return {
     memoizedState: null,
@@ -175,7 +177,15 @@ export function resetHooksState() {
   workInProgressHook = null;
 }
 
-function readContext(context, observedBits) {
+function getCacheSignal() {
+  throw new Error('Not implemented.');
+}
+
+function getCacheForType(resourceType) {
+  throw new Error('Not implemented.');
+}
+
+function readContext(context) {
   const threadID = currentPartialRenderer.threadID;
   validateContextBounds(context, threadID);
   if (__DEV__) {
@@ -191,7 +201,7 @@ function readContext(context, observedBits) {
   return context[threadID];
 }
 
-function useContext(context, observedBits) {
+function useContext(context) {
   if (__DEV__) {
     currentHookNameInDev = 'useContext';
   }
@@ -332,6 +342,19 @@ function useRef(initialValue) {
   }
 }
 
+function useInsertionEffect(create, inputs) {
+  if (__DEV__) {
+    currentHookNameInDev = 'useInsertionEffect';
+    console.error(
+      'useInsertionEffect does nothing on the server, because its effect cannot ' +
+        "be encoded into the server renderer's output format. This will lead " +
+        'to a mismatch between the initial, non-hydrated UI and the intended ' +
+        'UI. To avoid this, useInsertionEffect should only be used in ' +
+        'components that render exclusively on the client.',
+    );
+  }
+}
+
 export function useLayoutEffect(create, inputs) {
   if (__DEV__) {
     currentHookNameInDev = 'useLayoutEffect';
@@ -347,11 +370,12 @@ export function useLayoutEffect(create, inputs) {
 }
 
 function dispatchAction(componentIdentity, queue, action) {
-  invariant(
-    numberOfReRenders < RE_RENDER_LIMIT,
-    'Too many re-renders. React limits the number of renders to prevent ' +
-      'an infinite loop.',
-  );
+  if (numberOfReRenders >= RE_RENDER_LIMIT) {
+    throw new Error(
+      'Too many re-renders. React limits the number of renders to prevent ' +
+        'an infinite loop.',
+    );
+  }
 
   if (componentIdentity === currentlyRenderingComponent) {
     // This is a render phase update. Stash it in a lazily-created map of
@@ -395,6 +419,16 @@ function useMutableSource(source, getSnapshot, subscribe) {
   return getSnapshot(source._source);
 }
 
+function useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot) {
+  if (getServerSnapshot === undefined) {
+    throw new Error(
+      'Missing getServerSnapshot, which is required for ' +
+        'server-rendered content. Will revert to client rendering.',
+    );
+  }
+  return getServerSnapshot();
+}
+
 function useDeferredValue(value) {
   resolveCurrentlyRenderingComponent();
   return value;
@@ -405,15 +439,15 @@ function useTransition() {
   const startTransition = (callback) => {
     callback();
   };
-  return [startTransition, false];
+  return [false, startTransition];
 }
 
-function useOpaqueIdentifier() {
-  return (
-    (currentPartialRenderer.identifierPrefix || '') +
-    'R:' +
-    (currentPartialRenderer.uniqueID++).toString(36)
-  );
+function useId() {
+  throw new Error('Not implemented.');
+}
+
+function useCacheRefresh() {
+  throw new Error('Not implemented.');
 }
 
 function noop() {}
@@ -430,6 +464,7 @@ export const Dispatcher = {
   useReducer,
   useRef,
   useState,
+  useInsertionEffect,
   useLayoutEffect,
   useCallback,
   // useImperativeHandle is not run in the server environment
@@ -440,7 +475,14 @@ export const Dispatcher = {
   useDebugValue: noop,
   useDeferredValue,
   useTransition,
-  useOpaqueIdentifier,
+  useId,
   // Subscriptions are not setup in a server environment.
   useMutableSource,
+  useSyncExternalStore,
 };
+
+if (enableCache) {
+  Dispatcher.getCacheSignal = getCacheSignal;
+  Dispatcher.getCacheForType = getCacheForType;
+  Dispatcher.useCacheRefresh = useCacheRefresh;
+}

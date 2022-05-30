@@ -7,8 +7,6 @@
  *
  */
 
-import invariant from 'shared/invariant';
-
 function invokeGuardedCallbackProd(name, func, context, a, b, c, d, e, f) {
   const funcArgs = Array.prototype.slice.call(arguments, 3);
   try {
@@ -63,18 +61,20 @@ if (__DEV__) {
     ) {
       // If document doesn't exist we know for sure we will crash in this method
       // when we call document.createEvent(). However this can cause confusing
-      // errors: https://github.com/facebookincubator/create-react-app/issues/3482
+      // errors: https://github.com/facebook/create-react-app/issues/3482
       // So we preemptively throw with a better message instead.
-      invariant(
-        typeof document !== 'undefined',
-        'The `document` global was defined when React was initialized, but is not ' +
-          'defined anymore. This can happen in a test environment if a component ' +
-          'schedules an update from an asynchronous callback, but the test has already ' +
-          'finished running. To solve this, you can either unmount the component at ' +
-          'the end of your test (and ensure that any asynchronous operations get ' +
-          'canceled in `componentWillUnmount`), or you can change the test itself ' +
-          'to be asynchronous.',
-      );
+      if (typeof document === 'undefined' || document === null) {
+        throw new Error(
+          'The `document` global was defined when React was initialized, but is not ' +
+            'defined anymore. This can happen in a test environment if a component ' +
+            'schedules an update from an asynchronous callback, but the test has already ' +
+            'finished running. To solve this, you can either unmount the component at ' +
+            'the end of your test (and ensure that any asynchronous operations get ' +
+            'canceled in `componentWillUnmount`), or you can change the test itself ' +
+            'to be asynchronous.',
+        );
+      }
+
       const evt = document.createEvent('Event');
 
       let didCall = false;
@@ -183,6 +183,7 @@ if (__DEV__) {
       if (didCall && didError) {
         if (!didSetError) {
           // The callback errored, but the error event never fired.
+          // eslint-disable-next-line react-internal/prod-error-codes
           error = new Error(
             'An error was thrown inside one of your components, but React ' +
               "doesn't know what it was. This is likely due to browser " +
@@ -194,6 +195,7 @@ if (__DEV__) {
               'actually an issue with React, please file an issue.',
           );
         } else if (isCrossOriginError) {
+          // eslint-disable-next-line react-internal/prod-error-codes
           error = new Error(
             "A cross-origin error was thrown. React doesn't have access to " +
               'the actual error object in development. ' +

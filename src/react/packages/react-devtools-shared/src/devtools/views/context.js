@@ -21,3 +21,12 @@ export const ContextMenuContext = createContext({
   viewAttributeSourceFunction: null,
 });
 ContextMenuContext.displayName = 'ContextMenuContext';
+
+export const OptionsContext = createContext({
+  readOnly: false,
+  hideSettings: false,
+  hideToggleErrorAction: false,
+  hideToggleSuspenseAction: false,
+  hideLogAction: false,
+  hideViewSourceAction: false,
+});

@@ -44,7 +44,7 @@ function getData(internalInstance) {
   // != used deliberately here to catch undefined and null
   if (internalInstance._currentElement != null) {
     if (internalInstance._currentElement.key) {
-      key = '' + internalInstance._currentElement.key;
+      key = String(internalInstance._currentElement.key);
     }
 
     const elementType = internalInstance._currentElement.type;
@@ -351,7 +351,9 @@ export function attach(hook, rendererID, renderer, global) {
       pushOperation(TREE_OPERATION_ADD);
       pushOperation(id);
       pushOperation(ElementTypeRoot);
-      pushOperation(0); // isProfilingSupported?
+      pushOperation(0); // StrictMode compliant?
+      pushOperation(0); // Profiling flag
+      pushOperation(0); // StrictMode supported?
       pushOperation(hasOwnerMetadata ? 1 : 0);
     } else {
       const type = getElementType(internalInstance);
@@ -643,8 +645,8 @@ export function attach(hook, rendererID, renderer, global) {
     }
   }
 
-  function inspectElement(id, path) {
-    if (currentlyInspectedElementID !== id) {
+  function inspectElement(requestID, id, path, forceFullData) {
+    if (forceFullData || currentlyInspectedElementID !== id) {
       currentlyInspectedElementID = id;
       currentlyInspectedPaths = {};
     }
@@ -653,17 +655,18 @@ export function attach(hook, rendererID, renderer, global) {
     if (inspectedElement === null) {
       return {
         id,
+        responseID: requestID,
         type: 'not-found',
       };
     }
 
-    if (path != null) {
+    if (path !== null) {
       mergeInspectedPaths(path);
     }
 
     // Any time an inspected element has an update,
     // we should update the selected $r value as wel.
-    // Do this before dehyration (cleanForBridge).
+    // Do this before dehydration (cleanForBridge).
     updateSelectedElement(id);
 
     inspectedElement.context = cleanForBridge(
@@ -681,6 +684,7 @@ export function attach(hook, rendererID, renderer, global) {
 
     return {
       id,
+      responseID: requestID,
       type: 'full-data',
       value: inspectedElement,
     };
@@ -714,6 +718,7 @@ export function attach(hook, rendererID, renderer, global) {
           owners.push({
             displayName: getData(owner).displayName || 'Unknown',
             id: getID(owner),
+            key: element.key,
             type: getElementType(owner),
           });
           if (owner._currentElement) {
@@ -729,6 +734,10 @@ export function attach(hook, rendererID, renderer, global) {
       state = publicInstance.state || null;
     }
 
+    // Not implemented
+    const errors = [];
+    const warnings = [];
+
     return {
       id,
 
@@ -741,6 +750,11 @@ export function attach(hook, rendererID, renderer, global) {
       canEditHooksAndRenamePaths: false,
       canEditFunctionPropsDeletePaths: false,
       canEditFunctionPropsRenamePaths: false,
+
+      // Toggle error boundary did not exist in legacy versions
+      canToggleError: false,
+      isErrored: false,
+      targetErrorBoundaryID: null,
 
       // Suspense did not exist in legacy versions
       canToggleSuspense: false,
@@ -762,6 +776,8 @@ export function attach(hook, rendererID, renderer, global) {
       hooks: null,
       props,
       state,
+      errors,
+      warnings,
 
       // List of owners
       owners,
@@ -772,6 +788,10 @@ export function attach(hook, rendererID, renderer, global) {
       rootType: null,
       rendererPackageName: null,
       rendererVersion: null,
+
+      plugins: {
+        stylex: null,
+      },
     };
   }
 
@@ -933,6 +953,12 @@ export function attach(hook, rendererID, renderer, global) {
   const handleCommitFiberUnmount = () => {
     throw new Error('handleCommitFiberUnmount not supported by this renderer');
   };
+  const handlePostCommitFiberRoot = () => {
+    throw new Error('handlePostCommitFiberRoot not supported by this renderer');
+  };
+  const overrideError = () => {
+    throw new Error('overrideError not supported by this renderer');
+  };
   const overrideSuspense = () => {
     throw new Error('overrideSuspense not supported by this renderer');
   };
@@ -970,7 +996,26 @@ export function attach(hook, rendererID, renderer, global) {
     return null;
   }
 
+  function clearErrorsAndWarnings() {
+    // Not implemented
+  }
+
+  function clearErrorsForFiberID(id) {
+    // Not implemented
+  }
+
+  function clearWarningsForFiberID(id) {
+    // Not implemented
+  }
+
+  function patchConsoleForStrictMode() {}
+
+  function unpatchConsoleForStrictMode() {}
+
   return {
+    clearErrorsAndWarnings,
+    clearErrorsForFiberID,
+    clearWarningsForFiberID,
     cleanup,
     copyElementPath,
     deletePath,
@@ -988,11 +1033,14 @@ export function attach(hook, rendererID, renderer, global) {
     getProfilingData,
     handleCommitFiberRoot,
     handleCommitFiberUnmount,
+    handlePostCommitFiberRoot,
     inspectElement,
     logElementToConsole,
+    overrideError,
     overrideSuspense,
     overrideValueAtPath,
     renamePath,
+    patchConsoleForStrictMode,
     prepareViewAttributeSource,
     prepareViewElementSource,
     renderer,
@@ -1001,6 +1049,7 @@ export function attach(hook, rendererID, renderer, global) {
     startProfiling,
     stopProfiling,
     storeAsGlobal,
+    unpatchConsoleForStrictMode,
     updateComponentFilters,
   };
 }

@@ -7,7 +7,7 @@ import styles from './Tooltip.css';
 
 const initialTooltipState = {height: 0, mouseX: 0, mouseY: 0, width: 0};
 
-export default function Tooltip({children, label}) {
+export default function Tooltip({children, className, label, style}) {
   const containerRef = useRef(null);
   const tooltipRef = useRef(null);
 
@@ -37,7 +37,11 @@ export default function Tooltip({children, label}) {
       onMouseMove={onMouseMove}
       ref={containerRef}
     >
-      <div ref={tooltipRef} className={`${styles.Tooltip} ${tooltipClassName}`}>
+      <div
+        className={`${styles.Tooltip} ${tooltipClassName} ${className || ''}`}
+        ref={tooltipRef}
+        style={style}
+      >
         {label}
       </div>
       {children}

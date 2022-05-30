@@ -7,22 +7,18 @@
  *
  */
 
-import invariant from 'shared/invariant';
-
 import {get as getInstance} from 'shared/ReactInstanceMap';
 import ReactSharedInternals from 'shared/ReactSharedInternals';
-import getComponentName from 'shared/getComponentName';
+import getComponentNameFromFiber from 'react-reconciler/src/getComponentNameFromFiber';
 import {
   ClassComponent,
   HostComponent,
   HostRoot,
   HostPortal,
   HostText,
-  FundamentalComponent,
   SuspenseComponent,
 } from './ReactWorkTags';
 import {NoFlags, Placement, Hydrating} from './ReactFiberFlags';
-import {enableFundamentalAPI} from 'shared/ReactFeatureFlags';
 
 const ReactCurrentOwner = ReactSharedInternals.ReactCurrentOwner;
 
@@ -95,7 +91,7 @@ export function isMounted(component) {
             'never access something that requires stale data from the previous ' +
             'render, such as refs. Move this logic to componentDidMount and ' +
             'componentDidUpdate instead.',
-          getComponentName(ownerFiber.type) || 'A component',
+          getComponentNameFromFiber(ownerFiber) || 'A component',
         );
       }
       instance._warnedAboutRefsInRender = true;
@@ -110,10 +106,9 @@ export function isMounted(component) {
 }
 
 function assertIsMounted(fiber) {
-  invariant(
-    getNearestMountedFiber(fiber) === fiber,
-    'Unable to find node on an unmounted component.',
-  );
+  if (getNearestMountedFiber(fiber) !== fiber) {
+    throw new Error('Unable to find node on an unmounted component.');
+  }
 }
 
 export function findCurrentFiberUsingSlowPath(fiber) {
@@ -121,10 +116,11 @@ export function findCurrentFiberUsingSlowPath(fiber) {
   if (!alternate) {
     // If there is no alternate, then we only need to check if it is mounted.
     const nearestMounted = getNearestMountedFiber(fiber);
-    invariant(
-      nearestMounted !== null,
-      'Unable to find node on an unmounted component.',
-    );
+
+    if (nearestMounted === null) {
+      throw new Error('Unable to find node on an unmounted component.');
+    }
+
     if (nearestMounted !== fiber) {
       return null;
     }
@@ -174,9 +170,10 @@ export function findCurrentFiberUsingSlowPath(fiber) {
         }
         child = child.sibling;
       }
+
       // We should never have an alternate for any mounting node. So the only
       // way this could possibly happen is if this was unmounted, if at all.
-      invariant(false, 'Unable to find node on an unmounted component.');
+      throw new Error('Unable to find node on an unmounted component.');
     }
 
     if (a.return !== b.return) {
@@ -227,26 +224,30 @@ export function findCurrentFiberUsingSlowPath(fiber) {
           }
           child = child.sibling;
         }
-        invariant(
-          didFindChild,
-          'Child was not found in either parent set. This indicates a bug ' +
-            'in React related to the return pointer. Please file an issue.',
-        );
+
+        if (!didFindChild) {
+          throw new Error(
+            'Child was not found in either parent set. This indicates a bug ' +
+              'in React related to the return pointer. Please file an issue.',
+          );
+        }
       }
     }
 
-    invariant(
-      a.alternate === b,
-      "Return fibers should always be each others' alternates. " +
-        'This error is likely caused by a bug in React. Please file an issue.',
-    );
+    if (a.alternate !== b) {
+      throw new Error(
+        "Return fibers should always be each others' alternates. " +
+          'This error is likely caused by a bug in React. Please file an issue.',
+      );
+    }
   }
+
   // If the root is not a host container, we're in a disconnected tree. I.e.
   // unmounted.
-  invariant(
-    a.tag === HostRoot,
-    'Unable to find node on an unmounted component.',
-  );
+  if (a.tag !== HostRoot) {
+    throw new Error('Unable to find node on an unmounted component.');
+  }
+
   if (a.stateNode.current === a) {
     // We've determined that A is the current branch.
     return fiber;
@@ -257,71 +258,53 @@ export function findCurrentFiberUsingSlowPath(fiber) {
 
 export function findCurrentHostFiber(parent) {
   const currentParent = findCurrentFiberUsingSlowPath(parent);
-  if (!currentParent) {
-    return null;
+  return currentParent !== null
+    ? findCurrentHostFiberImpl(currentParent)
+    : null;
+}
+
+function findCurrentHostFiberImpl(node) {
+  // Next we'll drill down this component to find the first HostComponent/Text.
+  if (node.tag === HostComponent || node.tag === HostText) {
+    return node;
   }
 
-  // Next we'll drill down this component to find the first HostComponent/Text.
-  let node = currentParent;
-  while (true) {
-    if (node.tag === HostComponent || node.tag === HostText) {
-      return node;
-    } else if (node.child) {
-      node.child.return = node;
-      node = node.child;
-      continue;
+  let child = node.child;
+  while (child !== null) {
+    const match = findCurrentHostFiberImpl(child);
+    if (match !== null) {
+      return match;
     }
-    if (node === currentParent) {
-      return null;
-    }
-    while (!node.sibling) {
-      if (!node.return || node.return === currentParent) {
-        return null;
-      }
-      node = node.return;
-    }
-    node.sibling.return = node.return;
-    node = node.sibling;
+    child = child.sibling;
   }
-  // Flow needs the return null here, but ESLint complains about it.
-  // eslint-disable-next-line no-unreachable
+
   return null;
 }
 
 export function findCurrentHostFiberWithNoPortals(parent) {
   const currentParent = findCurrentFiberUsingSlowPath(parent);
-  if (!currentParent) {
-    return null;
+  return currentParent !== null
+    ? findCurrentHostFiberWithNoPortalsImpl(currentParent)
+    : null;
+}
+
+function findCurrentHostFiberWithNoPortalsImpl(node) {
+  // Next we'll drill down this component to find the first HostComponent/Text.
+  if (node.tag === HostComponent || node.tag === HostText) {
+    return node;
   }
 
-  // Next we'll drill down this component to find the first HostComponent/Text.
-  let node = currentParent;
-  while (true) {
-    if (
-      node.tag === HostComponent ||
-      node.tag === HostText ||
-      (enableFundamentalAPI && node.tag === FundamentalComponent)
-    ) {
-      return node;
-    } else if (node.child && node.tag !== HostPortal) {
-      node.child.return = node;
-      node = node.child;
-      continue;
-    }
-    if (node === currentParent) {
-      return null;
-    }
-    while (!node.sibling) {
-      if (!node.return || node.return === currentParent) {
-        return null;
+  let child = node.child;
+  while (child !== null) {
+    if (child.tag !== HostPortal) {
+      const match = findCurrentHostFiberWithNoPortalsImpl(child);
+      if (match !== null) {
+        return match;
       }
-      node = node.return;
     }
-    node.sibling.return = node.return;
-    node = node.sibling;
+    child = child.sibling;
   }
-  // Flow needs the return null here, but ESLint complains about it.
-  // eslint-disable-next-line no-unreachable
+
   return null;
 }
 

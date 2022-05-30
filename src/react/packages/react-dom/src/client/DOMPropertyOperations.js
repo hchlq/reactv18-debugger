@@ -19,8 +19,10 @@ import sanitizeURL from '../shared/sanitizeURL';
 import {
   disableJavaScriptURLs,
   enableTrustedTypesIntegration,
+  enableCustomElementPropertySupport,
 } from 'shared/ReactFeatureFlags';
-import {isOpaqueHydratingObject} from './ReactDOMHostConfig';
+import {checkAttributeStringCoercion} from 'shared/CheckStringCoercion';
+import {getFiberCurrentPropsFromNode} from './ReactDOMComponentTree';
 
 /**
  * Get the value for a property on a node. Only used in DEV for SSR validation.
@@ -33,10 +35,18 @@ export function getValueForProperty(node, name, expected, propertyInfo) {
       const {propertyName} = propertyInfo;
       return node[propertyName];
     } else {
+      // This check protects multiple uses of `expected`, which is why the
+      // react-internal/safe-string-coercion rule is disabled in several spots
+      // below.
+      if (__DEV__) {
+        checkAttributeStringCoercion(expected, name);
+      }
+
       if (!disableJavaScriptURLs && propertyInfo.sanitizeURL) {
         // If we haven't fully disabled javascript: URLs, and if
         // the hydration is successful of a javascript: URL, we
         // still want to warn on the client.
+        // eslint-disable-next-line react-internal/safe-string-coercion
         sanitizeURL('' + expected);
       }
 
@@ -53,6 +63,7 @@ export function getValueForProperty(node, name, expected, propertyInfo) {
           if (shouldRemoveAttribute(name, expected, propertyInfo, false)) {
             return value;
           }
+          // eslint-disable-next-line react-internal/safe-string-coercion
           if (value === '' + expected) {
             return expected;
           }
@@ -78,6 +89,7 @@ export function getValueForProperty(node, name, expected, propertyInfo) {
 
       if (shouldRemoveAttribute(name, expected, propertyInfo, false)) {
         return stringValue === null ? expected : stringValue;
+        // eslint-disable-next-line react-internal/safe-string-coercion
       } else if (stringValue === '' + expected) {
         return expected;
       } else {
@@ -97,17 +109,13 @@ export function getValueForAttribute(node, name, expected) {
     if (!isAttributeNameSafe(name)) {
       return;
     }
-
-    // If the object is an opaque reference ID, it's expected that
-    // the next prop is different than the server value, so just return
-    // expected
-    if (isOpaqueHydratingObject(expected)) {
-      return expected;
-    }
     if (!node.hasAttribute(name)) {
       return expected === undefined ? undefined : null;
     }
     const value = node.getAttribute(name);
+    if (__DEV__) {
+      checkAttributeStringCoercion(expected, name);
+    }
     if (value === '' + expected) {
       return expected;
     }
@@ -127,9 +135,52 @@ export function setValueForProperty(node, name, value, isCustomComponentTag) {
   if (shouldIgnoreAttribute(name, propertyInfo, isCustomComponentTag)) {
     return;
   }
+
+  if (
+    enableCustomElementPropertySupport &&
+    isCustomComponentTag &&
+    name[0] === 'o' &&
+    name[1] === 'n'
+  ) {
+    let eventName = name.replace(/Capture$/, '');
+    const useCapture = name !== eventName;
+    eventName = eventName.slice(2);
+
+    const prevProps = getFiberCurrentPropsFromNode(node);
+    const prevValue = prevProps != null ? prevProps[name] : null;
+    if (typeof prevValue === 'function') {
+      node.removeEventListener(eventName, prevValue, useCapture);
+    }
+    if (typeof value === 'function') {
+      if (typeof prevValue !== 'function' && prevValue !== null) {
+        // If we previously assigned a non-function type into this node, then
+        // remove it when switching to event listener mode.
+        if (name in node) {
+          node[name] = null;
+        } else if (node.hasAttribute(name)) {
+          node.removeAttribute(name);
+        }
+      }
+
+      // $FlowFixMe value can't be casted to EventListener.
+      node.addEventListener(eventName, value, useCapture);
+      return;
+    }
+  }
+
+  if (
+    enableCustomElementPropertySupport &&
+    isCustomComponentTag &&
+    name in node
+  ) {
+    node[name] = value;
+    return;
+  }
+
   if (shouldRemoveAttribute(name, value, propertyInfo, isCustomComponentTag)) {
     value = null;
   }
+
   // If the prop isn't in the special list, treat it as a simple attribute.
   if (isCustomComponentTag || propertyInfo === null) {
     if (isAttributeNameSafe(name)) {
@@ -137,6 +188,9 @@ export function setValueForProperty(node, name, value, isCustomComponentTag) {
       if (value === null) {
         node.removeAttribute(attributeName);
       } else {
+        if (__DEV__) {
+          checkAttributeStringCoercion(value, name);
+        }
         node.setAttribute(
           attributeName,
           enableTrustedTypesIntegration ? value : '' + value,
@@ -175,6 +229,9 @@ export function setValueForProperty(node, name, value, isCustomComponentTag) {
       if (enableTrustedTypesIntegration) {
         attributeValue = value;
       } else {
+        if (__DEV__) {
+          checkAttributeStringCoercion(value, attributeName);
+        }
         attributeValue = '' + value;
       }
       if (propertyInfo.sanitizeURL) {

@@ -389,6 +389,7 @@ describe('ReactDOMEventListener', () => {
       onPlaying() {},
       onProgress() {},
       onRateChange() {},
+      onResize() {},
       onSeeked() {},
       onSeeking() {},
       onStalled() {},
@@ -431,6 +432,7 @@ describe('ReactDOMEventListener', () => {
         case 'playing':
         case 'progress':
         case 'ratechange':
+        case 'resize':
         case 'seeked':
         case 'seeking':
         case 'stalled':
@@ -825,21 +827,23 @@ describe('ReactDOMEventListener', () => {
         </div>,
         container,
       );
+
+      // Update to attach.
       ReactDOM.render(
         <div
           className="grand"
-          onScroll={onScroll}
-          onScrollCapture={onScrollCapture}
+          onScroll={(e) => onScroll(e)}
+          onScrollCapture={(e) => onScrollCapture(e)}
         >
           <div
             className="parent"
-            onScroll={onScroll}
-            onScrollCapture={onScrollCapture}
+            onScroll={(e) => onScroll(e)}
+            onScrollCapture={(e) => onScrollCapture(e)}
           >
             <div
               className="child"
-              onScroll={onScroll}
-              onScrollCapture={onScrollCapture}
+              onScroll={(e) => onScroll(e)}
+              onScrollCapture={(e) => onScrollCapture(e)}
               ref={ref}
             />
           </div>
@@ -857,6 +861,60 @@ describe('ReactDOMEventListener', () => {
         ['capture', 'child'],
         ['bubble', 'child'],
       ]);
+
+      // Update to verify deduplication.
+      log.length = 0;
+      ReactDOM.render(
+        <div
+          className="grand"
+          // Note: these are intentionally inline functions so that
+          // we hit the reattachment codepath instead of bailing out.
+          onScroll={(e) => onScroll(e)}
+          onScrollCapture={(e) => onScrollCapture(e)}
+        >
+          <div
+            className="parent"
+            onScroll={(e) => onScroll(e)}
+            onScrollCapture={(e) => onScrollCapture(e)}
+          >
+            <div
+              className="child"
+              onScroll={(e) => onScroll(e)}
+              onScrollCapture={(e) => onScrollCapture(e)}
+              ref={ref}
+            />
+          </div>
+        </div>,
+        container,
+      );
+      ref.current.dispatchEvent(
+        new Event('scroll', {
+          bubbles: false,
+        }),
+      );
+      expect(log).toEqual([
+        ['capture', 'grand'],
+        ['capture', 'parent'],
+        ['capture', 'child'],
+        ['bubble', 'child'],
+      ]);
+
+      // Update to detach.
+      log.length = 0;
+      ReactDOM.render(
+        <div>
+          <div>
+            <div ref={ref} />
+          </div>
+        </div>,
+        container,
+      );
+      ref.current.dispatchEvent(
+        new Event('scroll', {
+          bubbles: false,
+        }),
+      );
+      expect(log).toEqual([]);
     } finally {
       document.body.removeChild(container);
     }
@@ -908,8 +966,49 @@ describe('ReactDOMEventListener', () => {
         ['capture', 'child'],
         ['bubble', 'child'],
       ]);
+
+      log.length = 0;
+      ReactDOM.render(
+        <div>
+          <div>
+            <div ref={ref} />
+          </div>
+        </div>,
+        container,
+      );
+      ref.current.dispatchEvent(
+        new Event('scroll', {
+          bubbles: false,
+        }),
+      );
+      expect(log).toEqual([]);
     } finally {
       document.body.removeChild(container);
     }
+  });
+
+  it('should not subscribe to selectionchange twice', () => {
+    const log = [];
+
+    const originalDocAddEventListener = document.addEventListener;
+    document.addEventListener = function (type, fn, options) {
+      switch (type) {
+        case 'selectionchange':
+          log.push(options);
+          break;
+        default:
+          throw new Error(
+            `Did not expect to add a document-level listener for the "${type}" event.`,
+          );
+      }
+    };
+    try {
+      ReactDOM.render(<input />, document.createElement('div'));
+      ReactDOM.render(<input />, document.createElement('div'));
+    } finally {
+      document.addEventListener = originalDocAddEventListener;
+    }
+
+    expect(log).toEqual([false]);
   });
 });

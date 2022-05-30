@@ -7,55 +7,53 @@
  *
  */
 
-import {readCache} from 'react/unstable-cache';
+import {unstable_getCacheForType} from 'react';
 
 const Pending = 0;
 const Resolved = 1;
 const Rejected = 2;
 
 // TODO: this is a browser-only version. Add a separate Node entry point.
-const nativeFetch = window.fetch;
-const fetchKey = {};
+const nativeFetch = (typeof globalThis !== 'undefined' ? globalThis : window)
+  .fetch;
 
-function readResultMap() {
-  const resources = readCache().resources;
-  let map = resources.get(fetchKey);
-  if (map === undefined) {
-    map = new Map();
-    resources.set(fetchKey, map);
-  }
-  return map;
+function getRecordMap() {
+  return unstable_getCacheForType(createRecordMap);
 }
 
-function toResult(thenable) {
-  const result = {
+function createRecordMap() {
+  return new Map();
+}
+
+function createRecordFromThenable(thenable) {
+  const record = {
     status: Pending,
     value: thenable,
   };
   thenable.then(
     (value) => {
-      if (result.status === Pending) {
-        const resolvedResult = result;
-        resolvedResult.status = Resolved;
-        resolvedResult.value = value;
+      if (record.status === Pending) {
+        const resolvedRecord = record;
+        resolvedRecord.status = Resolved;
+        resolvedRecord.value = value;
       }
     },
     (err) => {
-      if (result.status === Pending) {
-        const rejectedResult = result;
-        rejectedResult.status = Rejected;
-        rejectedResult.value = err;
+      if (record.status === Pending) {
+        const rejectedRecord = record;
+        rejectedRecord.status = Rejected;
+        rejectedRecord.value = err;
       }
     },
   );
-  return result;
+  return record;
 }
 
-function readResult(result) {
-  if (result.status === Resolved) {
-    return result.value;
+function readRecordValue(record) {
+  if (record.status === Resolved) {
+    return record.value;
   } else {
-    throw result.value;
+    throw record.value;
   }
 }
 
@@ -78,54 +76,60 @@ function Response(nativeResponse) {
 Response.prototype = {
   constructor: Response,
   arrayBuffer() {
-    return readResult(
+    return readRecordValue(
       this._arrayBuffer ||
-        (this._arrayBuffer = toResult(this._response.arrayBuffer())),
+        (this._arrayBuffer = createRecordFromThenable(
+          this._response.arrayBuffer(),
+        )),
     );
   },
   blob() {
-    return readResult(
-      this._blob || (this._blob = toResult(this._response.blob())),
+    return readRecordValue(
+      this._blob ||
+        (this._blob = createRecordFromThenable(this._response.blob())),
     );
   },
   json() {
-    return readResult(
-      this._json || (this._json = toResult(this._response.json())),
+    return readRecordValue(
+      this._json ||
+        (this._json = createRecordFromThenable(this._response.json())),
     );
   },
   text() {
-    return readResult(
-      this._text || (this._text = toResult(this._response.text())),
+    return readRecordValue(
+      this._text ||
+        (this._text = createRecordFromThenable(this._response.text())),
     );
   },
 };
 
-function preloadResult(url, options) {
-  const map = readResultMap();
-  let entry = map.get(url);
-  if (!entry) {
+function preloadRecord(url, options) {
+  const map = getRecordMap();
+  let record = map.get(url);
+  if (!record) {
     if (options) {
       if (options.method || options.body || options.signal) {
         // TODO: wire up our own cancellation mechanism.
         // TODO: figure out what to do with POST.
+        // eslint-disable-next-line react-internal/prod-error-codes
         throw Error('Unsupported option');
       }
     }
     const thenable = nativeFetch(url, options);
-    entry = toResult(thenable);
-    map.set(url, entry);
+    record = createRecordFromThenable(thenable);
+    map.set(url, record);
   }
-  return entry;
+  return record;
 }
 
 export function preload(url, options) {
-  preloadResult(url, options);
+  preloadRecord(url, options);
   // Don't return anything.
 }
 
 export function fetch(url, options) {
-  const result = preloadResult(url, options);
-  const nativeResponse = readResult(result);
+  const record = preloadRecord(url, options);
+  const nativeResponse = readRecordValue(record);
   if (nativeResponse._reactResponse) {
     return nativeResponse._reactResponse;
   } else {

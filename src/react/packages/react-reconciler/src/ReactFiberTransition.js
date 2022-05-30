@@ -11,7 +11,7 @@ import ReactSharedInternals from 'shared/ReactSharedInternals';
 
 const {ReactCurrentBatchConfig} = ReactSharedInternals;
 
-export const NoTransition = 0;
+export const NoTransition = null;
 
 export function requestCurrentTransition() {
   return ReactCurrentBatchConfig.transition;

@@ -14,6 +14,7 @@ export default function AutoSizeInput({
   className,
   onFocus,
   placeholder = '',
+  testName,
   value,
   ...rest
 }) {
@@ -34,6 +35,7 @@ export default function AutoSizeInput({
   return (
     <input
       className={[styles.Input, className].join(' ')}
+      data-testname={testName}
       onFocus={onFocusWrapper}
       placeholder={placeholder}
       style={{

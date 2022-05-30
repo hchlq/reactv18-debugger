@@ -9,7 +9,7 @@
 
 import ReactSharedInternals from 'shared/ReactSharedInternals';
 import {getStackByFiberInDevAndProd} from './ReactFiberComponentStack';
-import getComponentName from 'shared/getComponentName';
+import getComponentNameFromFiber from 'react-reconciler/src/getComponentNameFromFiber';
 
 const ReactDebugCurrentFrame = ReactSharedInternals.ReactDebugCurrentFrame;
 
@@ -23,7 +23,7 @@ export function getCurrentFiberOwnerNameInDevOrNull() {
     }
     const owner = current._debugOwner;
     if (owner !== null && typeof owner !== 'undefined') {
-      return getComponentName(owner.type);
+      return getComponentNameFromFiber(owner);
     }
   }
   return null;
@@ -51,10 +51,18 @@ export function resetCurrentFiber() {
 
 export function setCurrentFiber(fiber) {
   if (__DEV__) {
-    ReactDebugCurrentFrame.getCurrentStack = getCurrentFiberStackInDev;
+    ReactDebugCurrentFrame.getCurrentStack =
+      fiber === null ? null : getCurrentFiberStackInDev;
     current = fiber;
     isRendering = false;
   }
+}
+
+export function getCurrentFiber() {
+  if (__DEV__) {
+    return current;
+  }
+  return null;
 }
 
 export function setIsRendering(rendering) {

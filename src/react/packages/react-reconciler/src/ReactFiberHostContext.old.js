@@ -7,8 +7,6 @@
  *
  */
 
-import invariant from 'shared/invariant';
-
 import {getChildHostContext, getRootHostContext} from './ReactFiberHostConfig';
 import {createCursor, push, pop} from './ReactFiberStack.old';
 
@@ -19,11 +17,13 @@ const contextFiberStackCursor = createCursor(NO_CONTEXT);
 const rootInstanceStackCursor = createCursor(NO_CONTEXT);
 
 function requiredContext(c) {
-  invariant(
-    c !== NO_CONTEXT,
-    'Expected host context to exist. This error is likely caused by a bug ' +
-      'in React. Please file an issue.',
-  );
+  if (c === NO_CONTEXT) {
+    throw new Error(
+      'Expected host context to exist. This error is likely caused by a bug ' +
+        'in React. Please file an issue.',
+    );
+  }
+
   return c;
 }
 

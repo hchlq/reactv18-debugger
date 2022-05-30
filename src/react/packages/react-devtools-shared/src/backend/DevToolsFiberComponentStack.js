@@ -28,7 +28,6 @@ function describeFiber(workTagMap, workInProgress, currentDispatcherRef) {
     IndeterminateComponent,
     SimpleMemoComponent,
     ForwardRef,
-    Block,
     ClassComponent,
   } = workTagMap;
 
@@ -59,13 +58,6 @@ function describeFiber(workTagMap, workInProgress, currentDispatcherRef) {
     case ForwardRef:
       return describeFunctionComponentFrame(
         workInProgress.type.render,
-        source,
-        owner,
-        currentDispatcherRef,
-      );
-    case Block:
-      return describeFunctionComponentFrame(
-        workInProgress.type._render,
         source,
         owner,
         currentDispatcherRef,

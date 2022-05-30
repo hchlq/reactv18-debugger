@@ -8,6 +8,7 @@
  */
 
 import * as React from 'react';
+import {OptionsContext} from '../context';
 import EditableValue from './EditableValue';
 import Store from '../../store';
 import {ElementTypeSuspense} from 'react-devtools-shared/src/types';
@@ -18,7 +19,10 @@ export default function InspectedElementSuspenseToggle({
   inspectedElement,
   store,
 }) {
-  const {canToggleSuspense, id, state, type} = inspectedElement;
+  const {readOnly} = React.useContext(OptionsContext);
+
+  const {id, state, type} = inspectedElement;
+  const canToggleSuspense = !readOnly && inspectedElement.canToggleSuspense;
 
   if (type !== ElementTypeSuspense) {
     return null;

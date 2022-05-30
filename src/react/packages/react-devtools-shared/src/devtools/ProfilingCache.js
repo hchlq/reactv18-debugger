@@ -17,10 +17,6 @@ import {
   invalidateChartData as invalidateFlamegraphChartData,
 } from 'react-devtools-shared/src/devtools/views/Profiler/FlamegraphChartBuilder';
 import {
-  getChartData as getInteractionsChartData,
-  invalidateChartData as invalidateInteractionsChartData,
-} from 'react-devtools-shared/src/devtools/views/Profiler/InteractionsChartBuilder';
-import {
   getChartData as getRankedChartData,
   invalidateChartData as invalidateRankedChartData,
 } from 'react-devtools-shared/src/devtools/views/Profiler/RankedChartBuilder';
@@ -67,12 +63,6 @@ export default class ProfilingCache {
       rootID,
     });
 
-  getInteractionsChartData = ({rootID}) =>
-    getInteractionsChartData({
-      profilerStore: this._profilerStore,
-      rootID,
-    });
-
   getRankedChartData = ({commitIndex, commitTree, rootID}) =>
     getRankedChartData({
       commitIndex,
@@ -86,7 +76,6 @@ export default class ProfilingCache {
 
     invalidateCommitTrees();
     invalidateFlamegraphChartData();
-    invalidateInteractionsChartData();
     invalidateRankedChartData();
   }
 }

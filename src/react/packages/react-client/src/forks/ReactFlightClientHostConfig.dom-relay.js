@@ -7,5 +7,5 @@
  *
  */
 
-export * from 'react-transport-dom-relay/src/ReactFlightDOMRelayClientHostConfig';
+export * from 'react-server-dom-relay/src/ReactFlightDOMRelayClientHostConfig';
 export * from '../ReactFlightClientHostConfigNoStream';

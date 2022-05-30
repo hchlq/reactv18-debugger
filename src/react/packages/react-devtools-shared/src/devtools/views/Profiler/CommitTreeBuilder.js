@@ -11,8 +11,11 @@ import {
   __DEBUG__,
   TREE_OPERATION_ADD,
   TREE_OPERATION_REMOVE,
+  TREE_OPERATION_REMOVE_ROOT,
   TREE_OPERATION_REORDER_CHILDREN,
+  TREE_OPERATION_SET_SUBTREE_MODE,
   TREE_OPERATION_UPDATE_TREE_BASE_DURATION,
+  TREE_OPERATION_UPDATE_ERRORS_OR_WARNINGS,
 } from 'react-devtools-shared/src/constants';
 import {utfDecodeString} from 'react-devtools-shared/src/utils';
 import {ElementTypeRoot} from 'react-devtools-shared/src/types';
@@ -37,7 +40,6 @@ export function getCommitTree({commitIndex, profilerStore, rootID}) {
   }
 
   const commitTrees = rootToCommitTreeMap.get(rootID);
-
   if (commitIndex < commitTrees.length) {
     return commitTrees[commitIndex];
   }
@@ -53,52 +55,46 @@ export function getCommitTree({commitIndex, profilerStore, rootID}) {
   }
 
   const {operations} = dataForRoot;
+  if (operations.length <= commitIndex) {
+    throw Error(
+      `getCommitTree(): Invalid commit "${commitIndex}" for root "${rootID}". There are only "${operations.length}" commits.`,
+    );
+  }
 
-  // Commits are generated sequentially and cached.
-  // If this is the very first commit, start with the cached snapshot and apply the first mutation.
-  // Otherwise load (or generate) the previous commit and append a mutation to it.
-  if (commitIndex === 0) {
-    const nodes = new Map();
+  let commitTree = null;
+  for (let index = commitTrees.length; index <= commitIndex; index++) {
+    // Commits are generated sequentially and cached.
+    // If this is the very first commit, start with the cached snapshot and apply the first mutation.
+    // Otherwise load (or generate) the previous commit and append a mutation to it.
+    if (index === 0) {
+      const nodes = new Map();
 
-    // Construct the initial tree.
-    recursivelyInitializeTree(rootID, 0, nodes, dataForRoot);
+      // Construct the initial tree.
+      recursivelyInitializeTree(rootID, 0, nodes, dataForRoot);
 
-    // Mutate the tree
-    if (operations != null && commitIndex < operations.length) {
-      const commitTree = updateTree({nodes, rootID}, operations[commitIndex]);
+      // Mutate the tree
+      if (operations != null && index < operations.length) {
+        commitTree = updateTree({nodes, rootID}, operations[index]);
+
+        if (__DEBUG__) {
+          __printTree(commitTree);
+        }
+
+        commitTrees.push(commitTree);
+      }
+    } else {
+      const previousCommitTree = commitTrees[index - 1];
+      commitTree = updateTree(previousCommitTree, operations[index]);
 
       if (__DEBUG__) {
         __printTree(commitTree);
       }
 
       commitTrees.push(commitTree);
-      return commitTree;
-    }
-  } else {
-    const previousCommitTree = getCommitTree({
-      commitIndex: commitIndex - 1,
-      profilerStore,
-      rootID,
-    });
-
-    if (operations != null && commitIndex < operations.length) {
-      const commitTree = updateTree(
-        previousCommitTree,
-        operations[commitIndex],
-      );
-
-      if (__DEBUG__) {
-        __printTree(commitTree);
-      }
-
-      commitTrees.push(commitTree);
-      return commitTree;
     }
   }
 
-  throw Error(
-    `getCommitTree(): Unable to reconstruct tree for root "${rootID}" and commit ${commitIndex}`,
-  );
+  return commitTree;
 }
 
 function recursivelyInitializeTree(id, parentID, nodes, dataForRoot) {
@@ -152,7 +148,7 @@ function updateTree(commitTree, operations) {
     const operation = operations[i];
 
     switch (operation) {
-      case TREE_OPERATION_ADD:
+      case TREE_OPERATION_ADD: {
         id = operations[i + 1];
         const type = operations[i + 2];
 
@@ -160,14 +156,14 @@ function updateTree(commitTree, operations) {
 
         if (nodes.has(id)) {
           throw new Error(
-            'Commit tree already contains fiber ' +
-              id +
-              '. This is a bug in React DevTools.',
+            `Commit tree already contains fiber "${id}". This is a bug in React DevTools.`,
           );
         }
 
         if (type === ElementTypeRoot) {
-          i++; // supportsProfiling flag
+          i++; // isStrictModeCompliant
+          i++; // Profiling flag
+          i++; // supportsStrictMode flag
           i++; // hasOwnerMetadata flag
 
           if (__DEBUG__) {
@@ -225,6 +221,7 @@ function updateTree(commitTree, operations) {
         }
 
         break;
+      }
       case TREE_OPERATION_REMOVE: {
         const removeLength = operations[i + 1];
         i += 2;
@@ -235,9 +232,7 @@ function updateTree(commitTree, operations) {
 
           if (!nodes.has(id)) {
             throw new Error(
-              'Commit tree does not contain fiber ' +
-                id +
-                '. This is a bug in React DevTools.',
+              `Commit tree does not contain fiber "${id}". This is a bug in React DevTools.`,
             );
           }
 
@@ -262,6 +257,9 @@ function updateTree(commitTree, operations) {
         }
         break;
       }
+      case TREE_OPERATION_REMOVE_ROOT: {
+        throw Error('Operation REMOVE_ROOT is not supported while profiling.');
+      }
       case TREE_OPERATION_REORDER_CHILDREN: {
         id = operations[i + 1];
         const numChildren = operations[i + 2];
@@ -276,6 +274,17 @@ function updateTree(commitTree, operations) {
         const node = getClonedNode(id);
         node.children = Array.from(children);
 
+        break;
+      }
+      case TREE_OPERATION_SET_SUBTREE_MODE: {
+        id = operations[i + 1];
+        const mode = operations[i + 1];
+
+        i += 3;
+
+        if (__DEBUG__) {
+          debug('Subtree mode', `Subtree with root ${id} set to mode ${mode}`);
+        }
         break;
       }
       case TREE_OPERATION_UPDATE_TREE_BASE_DURATION: {
@@ -294,8 +303,24 @@ function updateTree(commitTree, operations) {
         i += 3;
         break;
       }
+      case TREE_OPERATION_UPDATE_ERRORS_OR_WARNINGS: {
+        id = operations[i + 1];
+        const numErrors = operations[i + 2];
+        const numWarnings = operations[i + 3];
+
+        i += 4;
+
+        if (__DEBUG__) {
+          debug(
+            'Warnings and Errors update',
+            `fiber ${id} has ${numErrors} errors and ${numWarnings} warnings`,
+          );
+        }
+        break;
+      }
+
       default:
-        throw Error(`Unsupported Bridge operation ${operation}`);
+        throw Error(`Unsupported Bridge operation "${operation}"`);
     }
   }
 

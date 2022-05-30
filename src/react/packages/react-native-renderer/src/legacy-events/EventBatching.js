@@ -6,7 +6,6 @@
  *
  */
 
-import invariant from 'shared/invariant';
 import {rethrowCaughtError} from 'shared/ReactErrorUtils';
 
 import accumulateInto from './accumulateInto';
@@ -53,11 +52,14 @@ export function runEventsInBatch(events) {
   }
 
   forEachAccumulated(processingEventQueue, executeDispatchesAndReleaseTopLevel);
-  invariant(
-    !eventQueue,
-    'processEventQueue(): Additional events were enqueued while processing ' +
-      'an event queue. Support for this has not yet been implemented.',
-  );
+
+  if (eventQueue) {
+    throw new Error(
+      'processEventQueue(): Additional events were enqueued while processing ' +
+        'an event queue. Support for this has not yet been implemented.',
+    );
+  }
+
   // This would be a good time to rethrow if any of the event handlers threw.
   rethrowCaughtError();
 }

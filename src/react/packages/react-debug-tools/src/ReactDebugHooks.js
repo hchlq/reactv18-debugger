@@ -7,17 +7,14 @@
  *
  */
 
-import {NoMode} from 'react-reconciler/src/ReactTypeOfMode';
-
 import ErrorStackParser from 'error-stack-parser';
+import assign from 'shared/assign';
 import ReactSharedInternals from 'shared/ReactSharedInternals';
-import {REACT_OPAQUE_ID_TYPE} from 'shared/ReactSymbols';
 import {
   FunctionComponent,
   SimpleMemoComponent,
   ContextProvider,
   ForwardRef,
-  Block,
 } from 'react-reconciler/src/ReactWorkTags';
 
 // Used to track hooks called during a render
@@ -27,8 +24,6 @@ let hookLog = [];
 // Primitives
 
 let primitiveStackCache = null;
-
-let currentFiber = null;
 
 function getPrimitiveStackCache() {
   // This initializes a cache of all primitive hooks so that the top
@@ -42,7 +37,12 @@ function getPrimitiveStackCache() {
       Dispatcher.useState(null);
       Dispatcher.useReducer((s, a) => s, null);
       Dispatcher.useRef(null);
+      if (typeof Dispatcher.useCacheRefresh === 'function') {
+        // This type check is for Flow only.
+        Dispatcher.useCacheRefresh();
+      }
       Dispatcher.useLayoutEffect(() => {});
+      Dispatcher.useInsertionEffect(() => {});
       Dispatcher.useEffect(() => {});
       Dispatcher.useImperativeHandle(undefined, () => null);
       Dispatcher.useDebugValue(null);
@@ -70,12 +70,16 @@ function nextHook() {
   return hook;
 }
 
-function readContext(context, observedBits) {
+function getCacheForType(resourceType) {
+  throw new Error('Not implemented.');
+}
+
+function readContext(context) {
   // For now we don't expose readContext usage in the hooks debugging info.
   return context._currentValue;
 }
 
-function useContext(context, observedBits) {
+function useContext(context) {
   hookLog.push({
     primitive: 'Context',
     stackError: new Error(),
@@ -124,10 +128,29 @@ function useRef(initialValue) {
   return ref;
 }
 
+function useCacheRefresh() {
+  const hook = nextHook();
+  hookLog.push({
+    primitive: 'CacheRefresh',
+    stackError: new Error(),
+    value: hook !== null ? hook.memoizedState : function refresh() {},
+  });
+  return () => {};
+}
+
 function useLayoutEffect(create, inputs) {
   nextHook();
   hookLog.push({
     primitive: 'LayoutEffect',
+    stackError: new Error(),
+    value: create,
+  });
+}
+
+function useInsertionEffect(create, inputs) {
+  nextHook();
+  hookLog.push({
+    primitive: 'InsertionEffect',
     stackError: new Error(),
     value: create,
   });
@@ -193,6 +216,21 @@ function useMutableSource(source, getSnapshot, subscribe) {
   return value;
 }
 
+function useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot) {
+  // useSyncExternalStore() composes multiple hooks internally.
+  // Advance the current hook index the same number of times
+  // so that subsequent hooks have the right memoized state.
+  nextHook(); // SyncExternalStore
+  nextHook(); // Effect
+  const value = getSnapshot();
+  hookLog.push({
+    primitive: 'SyncExternalStore',
+    stackError: new Error(),
+    value,
+  });
+  return value;
+}
+
 function useTransition() {
   // useTransition() composes multiple hooks internally.
   // Advance the current hook index the same number of times
@@ -204,7 +242,7 @@ function useTransition() {
     stackError: new Error(),
     value: undefined,
   });
-  return [(callback) => {}, false];
+  return [false, (callback) => {}];
 }
 
 function useDeferredValue(value) {
@@ -221,40 +259,55 @@ function useDeferredValue(value) {
   return value;
 }
 
-function useOpaqueIdentifier() {
-  const hook = nextHook(); // State
-  if (currentFiber && currentFiber.mode === NoMode) {
-    nextHook(); // Effect
-  }
-  let value = hook === null ? undefined : hook.memoizedState;
-  if (value && value.$$typeof === REACT_OPAQUE_ID_TYPE) {
-    value = undefined;
-  }
+function useId() {
+  const hook = nextHook();
+  const id = hook !== null ? hook.memoizedState : '';
   hookLog.push({
-    primitive: 'OpaqueIdentifier',
+    primitive: 'Id',
     stackError: new Error(),
-    value,
+    value: id,
   });
-  return value;
+  return id;
 }
 
 const Dispatcher = {
+  getCacheForType,
   readContext,
+  useCacheRefresh,
   useCallback,
   useContext,
   useEffect,
   useImperativeHandle,
   useDebugValue,
   useLayoutEffect,
+  useInsertionEffect,
   useMemo,
   useReducer,
   useRef,
   useState,
   useTransition,
   useMutableSource,
+  useSyncExternalStore,
   useDeferredValue,
-  useOpaqueIdentifier,
+  useId,
 };
+
+// create a proxy to throw a custom error
+// in case future versions of React adds more hooks
+const DispatcherProxyHandler = {
+  get(target, prop) {
+    if (target.hasOwnProperty(prop)) {
+      return target[prop];
+    }
+    const error = new Error('Missing method in Dispatcher: ' + prop);
+    // Note: This error name needs to stay in sync with react-devtools-shared
+    // TODO: refactor this if we ever combine the devtools and debug tools packages
+    error.name = 'ReactDebugToolsUnsupportedHookError';
+    throw error;
+  },
+};
+
+const DispatcherProxy = new Proxy(Dispatcher, DispatcherProxyHandler);
 
 // Inspect
 
@@ -389,7 +442,7 @@ function parseCustomHookName(functionName) {
   return functionName.substr(startIndex);
 }
 
-function buildTree(rootStack, readHookLog) {
+function buildTree(rootStack, readHookLog, includeHooksSource) {
   const rootChildren = [];
   let prevStack = null;
   let levelChildren = rootChildren;
@@ -424,13 +477,25 @@ function buildTree(rootStack, readHookLog) {
       // to the tree.
       for (let j = stack.length - commonSteps - 1; j >= 1; j--) {
         const children = [];
-        levelChildren.push({
+        const stackFrame = stack[j];
+        const levelChild = {
           id: null,
           isStateEditable: false,
           name: parseCustomHookName(stack[j - 1].functionName),
           value: undefined,
           subHooks: children,
-        });
+        };
+
+        if (includeHooksSource) {
+          levelChild.hookSource = {
+            lineNumber: stackFrame.lineNumber,
+            columnNumber: stackFrame.columnNumber,
+            functionName: stackFrame.functionName,
+            fileName: stackFrame.fileName,
+          };
+        }
+
+        levelChildren.push(levelChild);
         stackOfChildren.push(levelChildren);
         levelChildren = children;
       }
@@ -447,14 +512,33 @@ function buildTree(rootStack, readHookLog) {
 
     // For the time being, only State and Reducer hooks support runtime overrides.
     const isStateEditable = primitive === 'Reducer' || primitive === 'State';
-
-    levelChildren.push({
+    const levelChild = {
       id,
       isStateEditable,
       name: primitive,
       value: hook.value,
       subHooks: [],
-    });
+    };
+
+    if (includeHooksSource) {
+      const hookSource = {
+        lineNumber: null,
+        functionName: null,
+        fileName: null,
+        columnNumber: null,
+      };
+      if (stack && stack.length >= 1) {
+        const stackFrame = stack[0];
+        hookSource.lineNumber = stackFrame.lineNumber;
+        hookSource.functionName = stackFrame.functionName;
+        hookSource.fileName = stackFrame.fileName;
+        hookSource.columnNumber = stackFrame.columnNumber;
+      }
+
+      levelChild.hookSource = hookSource;
+    }
+
+    levelChildren.push(levelChild);
   }
 
   // Associate custom hook values (useDebugValue() hook entries) with the correct hooks.
@@ -494,7 +578,36 @@ function processDebugValues(hooksTree, parentHooksNode) {
   }
 }
 
-export function inspectHooks(renderFunction, props, currentDispatcher) {
+function handleRenderFunctionError(error) {
+  // original error might be any type.
+  if (
+    error instanceof Error &&
+    error.name === 'ReactDebugToolsUnsupportedHookError'
+  ) {
+    throw error;
+  }
+  // If the error is not caused by an unsupported feature, it means
+  // that the error is caused by user's code in renderFunction.
+  // In this case, we should wrap the original error inside a custom error
+  // so that devtools can give a clear message about it.
+  // $FlowFixMe: Flow doesn't know about 2nd argument of Error constructor
+  const wrapperError = new Error('Error rendering inspected component', {
+    cause: error,
+  });
+  // Note: This error name needs to stay in sync with react-devtools-shared
+  // TODO: refactor this if we ever combine the devtools and debug tools packages
+  wrapperError.name = 'ReactDebugToolsRenderError';
+  // this stage-4 proposal is not supported by all environments yet.
+  wrapperError.cause = error;
+  throw wrapperError;
+}
+
+export function inspectHooks(
+  renderFunction,
+  props,
+  currentDispatcher,
+  includeHooksSource = false,
+) {
   // DevTools will pass the current renderer's injected dispatcher.
   // Other apps might compile debug hooks as part of their app though.
   if (currentDispatcher == null) {
@@ -503,18 +616,20 @@ export function inspectHooks(renderFunction, props, currentDispatcher) {
 
   const previousDispatcher = currentDispatcher.current;
   let readHookLog;
-  currentDispatcher.current = Dispatcher;
+  currentDispatcher.current = DispatcherProxy;
   let ancestorStackError;
   try {
     ancestorStackError = new Error();
     renderFunction(props);
+  } catch (error) {
+    handleRenderFunctionError(error);
   } finally {
     readHookLog = hookLog;
     hookLog = [];
     currentDispatcher.current = previousDispatcher;
   }
   const rootStack = ErrorStackParser.parse(ancestorStackError);
-  return buildTree(rootStack, readHookLog);
+  return buildTree(rootStack, readHookLog, includeHooksSource);
 }
 
 function setupContexts(contextMap, fiber) {
@@ -543,27 +658,30 @@ function inspectHooksOfForwardRef(
   props,
   ref,
   currentDispatcher,
+  includeHooksSource,
 ) {
   const previousDispatcher = currentDispatcher.current;
   let readHookLog;
-  currentDispatcher.current = Dispatcher;
+  currentDispatcher.current = DispatcherProxy;
   let ancestorStackError;
   try {
     ancestorStackError = new Error();
     renderFunction(props, ref);
+  } catch (error) {
+    handleRenderFunctionError(error);
   } finally {
     readHookLog = hookLog;
     hookLog = [];
     currentDispatcher.current = previousDispatcher;
   }
   const rootStack = ErrorStackParser.parse(ancestorStackError);
-  return buildTree(rootStack, readHookLog);
+  return buildTree(rootStack, readHookLog, includeHooksSource);
 }
 
 function resolveDefaultProps(Component, baseProps) {
   if (Component && Component.defaultProps) {
     // Resolve default props. Taken from ReactElement
-    const props = Object.assign({}, baseProps);
+    const props = assign({}, baseProps);
     const defaultProps = Component.defaultProps;
     for (const propName in defaultProps) {
       if (props[propName] === undefined) {
@@ -575,20 +693,21 @@ function resolveDefaultProps(Component, baseProps) {
   return baseProps;
 }
 
-export function inspectHooksOfFiber(fiber, currentDispatcher) {
+export function inspectHooksOfFiber(
+  fiber,
+  currentDispatcher,
+  includeHooksSource = false,
+) {
   // DevTools will pass the current renderer's injected dispatcher.
   // Other apps might compile debug hooks as part of their app though.
   if (currentDispatcher == null) {
     currentDispatcher = ReactSharedInternals.ReactCurrentDispatcher;
   }
 
-  currentFiber = fiber;
-
   if (
     fiber.tag !== FunctionComponent &&
     fiber.tag !== SimpleMemoComponent &&
-    fiber.tag !== ForwardRef &&
-    fiber.tag !== Block
+    fiber.tag !== ForwardRef
   ) {
     throw new Error(
       'Unknown Fiber. Needs to be a function component to inspect hooks.',
@@ -613,9 +732,10 @@ export function inspectHooksOfFiber(fiber, currentDispatcher) {
         props,
         fiber.ref,
         currentDispatcher,
+        includeHooksSource,
       );
     }
-    return inspectHooks(type, props, currentDispatcher);
+    return inspectHooks(type, props, currentDispatcher, includeHooksSource);
   } finally {
     currentHook = null;
     restoreContexts(contextMap);

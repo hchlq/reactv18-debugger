@@ -7,6 +7,8 @@
  *
  */
 
+/* eslint-disable react-internal/prod-error-codes */
+
 import {
   flushSync,
   scheduleUpdateOnFiber,
@@ -14,7 +16,7 @@ import {
 } from './ReactFiberWorkLoop.old';
 import {updateContainer} from './ReactFiberReconciler.old';
 import {emptyContextObject} from './ReactFiberContext.old';
-import {SyncLane, NoTimestamp} from './ReactFiberLane';
+import {SyncLane, NoTimestamp} from './ReactFiberLane.old';
 import {
   ClassComponent,
   FunctionComponent,

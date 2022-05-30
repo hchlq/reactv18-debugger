@@ -9,10 +9,9 @@
 
 import * as React from 'react';
 import {useCallback} from 'react';
-import Tooltip from '@reach/tooltip';
 
 import styles from './Toggle.css';
-import tooltipStyles from './Tooltip.css';
+import Tooltip from './Components/reach-ui/tooltip';
 
 export default function Toggle({
   children,
@@ -20,6 +19,7 @@ export default function Toggle({
   isDisabled = false,
   isChecked,
   onChange,
+  testName,
   title,
 }) {
   let defaultClassName;
@@ -39,6 +39,7 @@ export default function Toggle({
   let toggle = (
     <button
       className={`${defaultClassName} ${className}`}
+      data-testname={testName}
       disabled={isDisabled}
       onClick={handleClick}
     >
@@ -49,11 +50,7 @@ export default function Toggle({
   );
 
   if (title) {
-    toggle = (
-      <Tooltip className={tooltipStyles.Tooltip} label={title}>
-        {toggle}
-      </Tooltip>
-    );
+    toggle = <Tooltip label={title}>{toggle}</Tooltip>;
   }
 
   return toggle;

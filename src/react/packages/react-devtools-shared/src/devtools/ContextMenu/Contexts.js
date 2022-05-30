@@ -12,19 +12,36 @@ import {createContext} from 'react';
 const idToShowFnMap = new Map();
 const idToHideFnMap = new Map();
 
-let currentHideFn = null;
+let currentHide = null;
+let currentOnChange = null;
 
 function hideMenu() {
-  if (typeof currentHideFn === 'function') {
-    currentHideFn();
+  if (typeof currentHide === 'function') {
+    currentHide();
+
+    if (typeof currentOnChange === 'function') {
+      currentOnChange(false);
+    }
   }
+
+  currentHide = null;
+  currentOnChange = null;
 }
 
-function showMenu({data, id, pageX, pageY}) {
+function showMenu({data, id, onChange, pageX, pageY}) {
   const showFn = idToShowFnMap.get(id);
   if (typeof showFn === 'function') {
-    currentHideFn = idToHideFnMap.get(id);
+    // Prevent open menus from being left hanging.
+    hideMenu();
+
+    currentHide = idToHideFnMap.get(id);
+
     showFn({data, pageX, pageY});
+
+    if (typeof onChange === 'function') {
+      currentOnChange = onChange;
+      onChange(true);
+    }
   }
 }
 

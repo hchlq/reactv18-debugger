@@ -7,14 +7,16 @@
  *
  */
 
-import {enableComponentStackLocations} from 'shared/ReactFeatureFlags';
+import {
+  enableComponentStackLocations,
+  disableNativeComponentFrames,
+} from 'shared/ReactFeatureFlags';
 
 import {
   REACT_SUSPENSE_TYPE,
   REACT_SUSPENSE_LIST_TYPE,
   REACT_FORWARD_REF_TYPE,
   REACT_MEMO_TYPE,
-  REACT_BLOCK_TYPE,
   REACT_LAZY_TYPE,
 } from 'shared/ReactSymbols';
 
@@ -56,7 +58,7 @@ if (__DEV__) {
 
 export function describeNativeComponentFrame(fn, construct) {
   // If something asked for a stack inside a fake render, it should get ignored.
-  if (!fn || reentry) {
+  if (disableNativeComponentFrames || !fn || reentry) {
     return '';
   }
 
@@ -156,7 +158,15 @@ export function describeNativeComponentFrame(fn, construct) {
               // The next one that isn't the same should be our match though.
               if (c < 0 || sampleLines[s] !== controlLines[c]) {
                 // V8 adds a "new" prefix for native classes. Let's remove it to make it prettier.
-                const frame = '\n' + sampleLines[s].replace(' at new ', ' at ');
+                let frame = '\n' + sampleLines[s].replace(' at new ', ' at ');
+
+                // If our component frame is labeled "<anonymous>"
+                // but we have a user-provided "displayName"
+                // splice it in to make the stack more readable.
+                if (fn.displayName && frame.includes('<anonymous>')) {
+                  frame = frame.replace('<anonymous>', fn.displayName);
+                }
+
                 if (__DEV__) {
                   if (typeof fn === 'function') {
                     componentFrameCache.set(fn, frame);
@@ -275,8 +285,6 @@ export function describeUnknownElementTypeFrameInDEV(type, source, ownerFn) {
       case REACT_MEMO_TYPE:
         // Memo may contain any component type so we recursively resolve it.
         return describeUnknownElementTypeFrameInDEV(type.type, source, ownerFn);
-      case REACT_BLOCK_TYPE:
-        return describeFunctionComponentFrame(type._render, source, ownerFn);
       case REACT_LAZY_TYPE: {
         const lazyComponent = type;
         const payload = lazyComponent._payload;

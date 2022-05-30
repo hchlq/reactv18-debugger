@@ -9,8 +9,7 @@
 
 import * as http from 'http';
 import * as https from 'https';
-
-import {readCache} from 'react/unstable-cache';
+import {unstable_getCacheForType} from 'react';
 
 function nodeFetch(url, options, onResolve, onReject) {
   const {hostname, pathname, search, port, protocol} = new URL(url);
@@ -35,23 +34,19 @@ const Pending = 0;
 const Resolved = 1;
 const Rejected = 2;
 
-const fetchKey = {};
-
-function readResultMap() {
-  const resources = readCache().resources;
-  let map = resources.get(fetchKey);
-  if (map === undefined) {
-    map = new Map();
-    resources.set(fetchKey, map);
-  }
-  return map;
+function getRecordMap() {
+  return unstable_getCacheForType(createRecordMap);
 }
 
-function readResult(result) {
-  if (result.status === Resolved) {
-    return result.value;
+function createRecordMap() {
+  return new Map();
+}
+
+function readRecordValue(record) {
+  if (record.status === Resolved) {
+    return record.value;
   } else {
-    throw result.value;
+    throw record.value;
   }
 }
 
@@ -65,7 +60,6 @@ function Response(nativeResponse) {
   this.url = nativeResponse.url;
 
   this._response = nativeResponse;
-  this._blob = null;
   this._json = null;
   this._text = null;
 
@@ -77,7 +71,7 @@ function Response(nativeResponse) {
       cb();
     }
   }
-  const result = (this._result = {
+  const bufferRecord = (this._bufferRecord = {
     status: Pending,
     value: {
       then(cb) {
@@ -88,18 +82,18 @@ function Response(nativeResponse) {
   const data = [];
   nativeResponse.on('data', (chunk) => data.push(chunk));
   nativeResponse.on('end', () => {
-    if (result.status === Pending) {
-      const resolvedResult = result;
-      resolvedResult.status = Resolved;
-      resolvedResult.value = Buffer.concat(data);
+    if (bufferRecord.status === Pending) {
+      const resolvedRecord = bufferRecord;
+      resolvedRecord.status = Resolved;
+      resolvedRecord.value = Buffer.concat(data);
       wake();
     }
   });
   nativeResponse.on('error', (err) => {
-    if (result.status === Pending) {
-      const rejectedResult = result;
-      rejectedResult.status = Rejected;
-      rejectedResult.value = err;
+    if (bufferRecord.status === Pending) {
+      const rejectedRecord = bufferRecord;
+      rejectedRecord.status = Rejected;
+      rejectedRecord.value = err;
       wake();
     }
   });
@@ -108,7 +102,7 @@ function Response(nativeResponse) {
 Response.prototype = {
   constructor: Response,
   arrayBuffer() {
-    const buffer = readResult(this._result);
+    const buffer = readRecordValue(this._bufferRecord);
     return buffer;
   },
   blob() {
@@ -116,23 +110,34 @@ Response.prototype = {
     throw new Error('Not implemented.');
   },
   json() {
-    const buffer = readResult(this._result);
-    return JSON.parse(buffer.toString());
+    if (this._json !== null) {
+      return this._json;
+    }
+    const buffer = readRecordValue(this._bufferRecord);
+    const json = JSON.parse(buffer.toString());
+    this._json = json;
+    return json;
   },
   text() {
-    const buffer = readResult(this._result);
-    return buffer.toString();
+    if (this._text !== null) {
+      return this._text;
+    }
+    const buffer = readRecordValue(this._bufferRecord);
+    const text = buffer.toString();
+    this._text = text;
+    return text;
   },
 };
 
-function preloadResult(url, options) {
-  const map = readResultMap();
-  let entry = map.get(url);
-  if (!entry) {
+function preloadRecord(url, options) {
+  const map = getRecordMap();
+  let record = map.get(url);
+  if (!record) {
     if (options) {
       if (options.method || options.body || options.signal) {
         // TODO: wire up our own cancellation mechanism.
         // TODO: figure out what to do with POST.
+        // eslint-disable-next-line react-internal/prod-error-codes
         throw Error('Unsupported option');
       }
     }
@@ -149,7 +154,7 @@ function preloadResult(url, options) {
         cb();
       }
     };
-    const result = (entry = {
+    const newRecord = (record = {
       status: Pending,
       value: wakeable,
     });
@@ -157,33 +162,34 @@ function preloadResult(url, options) {
       url,
       options,
       (response) => {
-        if (result.status === Pending) {
-          const resolvedResult = result;
-          resolvedResult.status = Resolved;
-          resolvedResult.value = response;
+        if (newRecord.status === Pending) {
+          const resolvedRecord = newRecord;
+          resolvedRecord.status = Resolved;
+          resolvedRecord.value = response;
           wake();
         }
       },
       (err) => {
-        if (result.status === Pending) {
-          const rejectedResult = result;
-          rejectedResult.status = Rejected;
-          rejectedResult.value = err;
+        if (newRecord.status === Pending) {
+          const rejectedRecord = newRecord;
+          rejectedRecord.status = Rejected;
+          rejectedRecord.value = err;
           wake();
         }
       },
     );
-    map.set(url, entry);
+    map.set(url, record);
   }
-  return entry;
+  return record;
 }
 
 export function preload(url, options) {
-  preloadResult(url, options);
+  preloadRecord(url, options);
   // Don't return anything.
 }
 
 export function fetch(url, options) {
-  const result = preloadResult(url, options);
-  return readResult(result);
+  const record = preloadRecord(url, options);
+  const response = readRecordValue(record);
+  return response;
 }

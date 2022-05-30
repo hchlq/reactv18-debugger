@@ -34,18 +34,18 @@ function ProfilerContextController({children}) {
         isProcessingData: profilerStore.isProcessingData,
         isProfiling: profilerStore.isProfiling,
         profilingData: profilerStore.profilingData,
-        supportsProfiling: store.supportsProfiling,
+        supportsProfiling: store.rootSupportsBasicProfiling,
       }),
       subscribe: (callback) => {
         profilerStore.addListener('profilingData', callback);
         profilerStore.addListener('isProcessingData', callback);
         profilerStore.addListener('isProfiling', callback);
-        store.addListener('supportsProfiling', callback);
+        store.addListener('rootSupportsBasicProfiling', callback);
         return () => {
           profilerStore.removeListener('profilingData', callback);
           profilerStore.removeListener('isProcessingData', callback);
           profilerStore.removeListener('isProfiling', callback);
-          store.removeListener('supportsProfiling', callback);
+          store.removeListener('rootSupportsBasicProfiling', callback);
         };
       },
     }),
@@ -145,8 +145,10 @@ function ProfilerContextController({children}) {
   );
 
   const [selectedCommitIndex, selectCommitIndex] = useState(null);
-  const [selectedTabID, selectTab] = useState('flame-chart');
-  const [selectedInteractionID, selectInteraction] = useState(null);
+  const [selectedTabID, selectTab] = useLocalStorage(
+    'React::DevTools::Profiler::defaultTab',
+    'flame-chart',
+  );
 
   if (isProfiling) {
     batchedUpdates(() => {
@@ -156,9 +158,6 @@ function ProfilerContextController({children}) {
       if (selectedFiberID !== null) {
         selectFiberID(null);
         selectFiberName(null);
-      }
-      if (selectedInteractionID !== null) {
-        selectInteraction(null);
       }
     });
   }
@@ -190,9 +189,6 @@ function ProfilerContextController({children}) {
       selectedFiberID,
       selectedFiberName,
       selectFiber,
-
-      selectedInteractionID,
-      selectInteraction,
     }),
     [
       selectedTabID,
@@ -221,9 +217,6 @@ function ProfilerContextController({children}) {
       selectedFiberID,
       selectedFiberName,
       selectFiber,
-
-      selectedInteractionID,
-      selectInteraction,
     ],
   );
 

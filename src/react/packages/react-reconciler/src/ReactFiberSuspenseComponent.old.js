@@ -7,6 +7,7 @@
  *
  */
 
+import {enableSuspenseAvoidThisFallback} from 'shared/ReactFeatureFlags';
 import {SuspenseComponent, SuspenseListComponent} from './ReactWorkTags';
 import {NoFlags, DidCapture} from './ReactFiberFlags';
 import {
@@ -34,12 +35,11 @@ export function shouldCaptureSuspense(workInProgress, hasInvisibleParent) {
     return false;
   }
   const props = workInProgress.memoizedProps;
-  // In order to capture, the Suspense component must have a fallback prop.
-  if (props.fallback === undefined) {
-    return false;
-  }
   // Regular boundaries always capture.
-  if (props.unstable_avoidThisFallback !== true) {
+  if (
+    !enableSuspenseAvoidThisFallback ||
+    props.unstable_avoidThisFallback !== true
+  ) {
     return true;
   }
   // If it's a boundary we should avoid, then we prefer to bubble up to the

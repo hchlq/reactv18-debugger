@@ -44,6 +44,7 @@ export function connectToDevTools(options) {
     port = 8097,
     websocket,
     resolveRNStyle = null,
+    retryConnectionDelay = 2000,
     isAppActive = () => true,
   } = options || {};
 
@@ -53,7 +54,10 @@ export function connectToDevTools(options) {
   function scheduleRetry() {
     if (retryTimeoutID === null) {
       // Two seconds because RN had issues with quick retries.
-      retryTimeoutID = setTimeout(() => connectToDevTools(options), 2000);
+      retryTimeoutID = setTimeout(
+        () => connectToDevTools(options),
+        retryConnectionDelay,
+      );
     }
   }
 

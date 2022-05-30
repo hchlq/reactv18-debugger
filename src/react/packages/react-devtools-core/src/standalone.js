@@ -8,33 +8,44 @@
  */
 
 import {createElement} from 'react';
-import {
-  // $FlowFixMe Flow does not yet know about flushSync()
-  flushSync,
-  // $FlowFixMe Flow does not yet know about createRoot()
-  unstable_createRoot as createRoot,
-} from 'react-dom';
+import {flushSync} from 'react-dom';
+import {createRoot} from 'react-dom/client';
 import Bridge from 'react-devtools-shared/src/bridge';
 import Store from 'react-devtools-shared/src/devtools/store';
 import {
   getAppendComponentStack,
   getBreakOnConsoleErrors,
   getSavedComponentFilters,
+  getShowInlineWarningsAndErrors,
+  getHideConsoleLogsInStrictMode,
 } from 'react-devtools-shared/src/utils';
+import {registerDevToolsEventLogger} from 'react-devtools-shared/src/registerDevToolsEventLogger';
 import {Server} from 'ws';
 import {join} from 'path';
 import {readFileSync} from 'fs';
 import {installHook} from 'react-devtools-shared/src/hook';
 import DevTools from 'react-devtools-shared/src/devtools/views/DevTools';
 import {doesFilePathExist, launchEditor} from './editor';
-import {__DEBUG__} from 'react-devtools-shared/src/constants';
+import {
+  __DEBUG__,
+  LOCAL_STORAGE_DEFAULT_TAB_KEY,
+} from 'react-devtools-shared/src/constants';
+import {localStorageSetItem} from '../../react-devtools-shared/src/storage';
 
 installHook(window);
 
 let node = null;
 let nodeWaitingToConnectHTML = '';
 let projectRoots = [];
-let statusListener = (message) => {};
+let statusListener = (message, status) => {};
+let disconnectedCallback = () => {};
+
+// TODO (Webpack 5) Hopefully we can remove this prop after the Webpack 5 migration.
+function hookNamesModuleLoaderFunction() {
+  return import(
+    /* webpackChunkName: 'parseHookNames' */ 'react-devtools-shared/src/hooks/parseHookNames'
+  );
+}
 
 function setContentDOMNode(value) {
   node = value;
@@ -51,6 +62,11 @@ function setProjectRoots(value) {
 
 function setStatusListener(value) {
   statusListener = value;
+  return DevtoolsUI;
+}
+
+function setDisconnectedCallback(value) {
+  disconnectedCallback = value;
   return DevtoolsUI;
 }
 
@@ -77,9 +93,9 @@ function safeUnmount() {
   flushSync(() => {
     if (root !== null) {
       root.unmount();
+      root = null;
     }
   });
-  root = null;
 }
 
 function reload() {
@@ -93,6 +109,7 @@ function reload() {
       createElement(DevTools, {
         bridge: bridge,
         canViewElementSourceFunction,
+        hookNamesModuleLoaderFunction,
         showTabBar: true,
         store: store,
         warnIfLegacyBackendDetected: true,
@@ -128,6 +145,8 @@ function onDisconnected() {
   safeUnmount();
 
   node.innerHTML = nodeWaitingToConnectHTML;
+
+  disconnectedCallback();
 }
 
 function onError({code, message}) {
@@ -156,6 +175,20 @@ function onError({code, message}) {
       </div>
     `;
   }
+}
+
+function openProfiler() {
+  // Mocked up bridge and store to allow the DevTools to be rendered
+  bridge = new Bridge({listen: () => {}, send: () => {}});
+  store = new Store(bridge, {});
+
+  // Ensure the Profiler tab is shown initially.
+  localStorageSetItem(
+    LOCAL_STORAGE_DEFAULT_TAB_KEY,
+    JSON.stringify('profiler'),
+  );
+
+  reload();
 }
 
 function initialize(socket) {
@@ -206,9 +239,13 @@ function initialize(socket) {
     socket.close();
   });
 
-  store = new Store(bridge, {supportsNativeInspection: false});
+  store = new Store(bridge, {
+    checkBridgeProtocolCompatibility: true,
+    supportsNativeInspection: false,
+  });
 
   log('Connected');
+  statusListener('DevTools initialized.', 'devtools-connected');
   reload();
 }
 
@@ -232,7 +269,14 @@ function connectToSocket(socket) {
   };
 }
 
-function startServer(port = 8097, host = 'localhost', httpsOptions) {
+function startServer(
+  port = 8097,
+  host = 'localhost',
+  httpsOptions,
+  loggerOptions,
+) {
+  registerDevToolsEventLogger(loggerOptions?.surface ?? 'standalone');
+
   const useHttps = !!httpsOptions;
   const httpServer = useHttps
     ? require('https').createServer(httpsOptions)
@@ -284,6 +328,12 @@ function startServer(port = 8097, host = 'localhost', httpsOptions) {
       )};
       window.__REACT_DEVTOOLS_COMPONENT_FILTERS__ = ${JSON.stringify(
         getSavedComponentFilters(),
+      )};
+      window.__REACT_DEVTOOLS_SHOW_INLINE_WARNINGS_AND_ERRORS__ = ${JSON.stringify(
+        getShowInlineWarningsAndErrors(),
+      )};
+      window.__REACT_DEVTOOLS_HIDE_CONSOLE_LOGS_IN_STRICT_MODE__ = ${JSON.stringify(
+        getHideConsoleLogsInStrictMode(),
       )};`;
 
     response.end(
@@ -299,12 +349,15 @@ function startServer(port = 8097, host = 'localhost', httpsOptions) {
 
   httpServer.on('error', (event) => {
     onError(event);
-    statusListener('Failed to start the server.');
+    statusListener('Failed to start the server.', 'error');
     startServerTimeoutID = setTimeout(() => startServer(port), 1000);
   });
 
   httpServer.listen(port, () => {
-    statusListener('The server is listening on the port ' + port + '.');
+    statusListener(
+      'The server is listening on the port ' + port + '.',
+      'server-connected',
+    );
   });
 
   return {
@@ -325,7 +378,9 @@ const DevtoolsUI = {
   setContentDOMNode,
   setProjectRoots,
   setStatusListener,
+  setDisconnectedCallback,
   startServer,
+  openProfiler,
 };
 
 export default DevtoolsUI;

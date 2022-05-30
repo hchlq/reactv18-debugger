@@ -10,7 +10,7 @@
 import {useContext, useEffect} from 'react';
 import {RegistryContext} from './Contexts';
 
-export default function useContextMenu({data, id, ref}) {
+export default function useContextMenu({data, id, onChange, ref}) {
   const {showMenu} = useContext(RegistryContext);
 
   useEffect(() => {
@@ -22,7 +22,7 @@ export default function useContextMenu({data, id, ref}) {
         const pageX = event.pageX || (event.touches && event.touches[0].pageX);
         const pageY = event.pageY || (event.touches && event.touches[0].pageY);
 
-        showMenu({data, id, pageX, pageY});
+        showMenu({data, id, onChange, pageX, pageY});
       };
 
       const trigger = ref.current;

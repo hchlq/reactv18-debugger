@@ -18,6 +18,11 @@ export function createMutableSource(source, getVersion) {
   if (__DEV__) {
     mutableSource._currentPrimaryRenderer = null;
     mutableSource._currentSecondaryRenderer = null;
+
+    // Used to detect side effects that update a mutable source during render.
+    // See https://github.com/facebook/react/issues/19948
+    mutableSource._currentlyRenderingFiber = null;
+    mutableSource._initialVersionAsOfFirstRender = null;
   }
 
   return mutableSource;

@@ -7,8 +7,8 @@
  *
  */
 
-import {Namespaces} from '../shared/DOMNamespaces';
-import createMicrosoftUnsafeLocalFunction from '../shared/createMicrosoftUnsafeLocalFunction';
+import {SVG_NAMESPACE} from '../shared/DOMNamespaces';
+import createMicrosoftUnsafeLocalFunction from './createMicrosoftUnsafeLocalFunction';
 import {enableTrustedTypesIntegration} from 'shared/ReactFeatureFlags';
 
 // SVG temp container for IE lacking innerHTML
@@ -22,7 +22,7 @@ let reusableSVGContainer;
  * @internal
  */
 const setInnerHTML = createMicrosoftUnsafeLocalFunction(function (node, html) {
-  if (node.namespaceURI === Namespaces.svg) {
+  if (node.namespaceURI === SVG_NAMESPACE) {
     if (__DEV__) {
       if (enableTrustedTypesIntegration) {
         // TODO: reconsider the text of this warning and when it should show

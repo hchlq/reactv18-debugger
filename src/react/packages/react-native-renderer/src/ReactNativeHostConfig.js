@@ -7,8 +7,6 @@
  *
  */
 
-import invariant from 'shared/invariant';
-
 // Modules provided by RN:
 import {
   ReactNativeViewConfigRegistry,
@@ -23,6 +21,8 @@ import {
   updateFiberProps,
 } from './ReactNativeComponentTree';
 import ReactNativeFiberHostComponent from './ReactNativeFiberHostComponent';
+
+import {DefaultEventPriority} from 'react-reconciler/src/ReactEventPriorities';
 
 const {get: getViewConfigForType} = ReactNativeViewConfigRegistry;
 
@@ -62,6 +62,7 @@ export * from 'react-reconciler/src/ReactFiberHostConfigWithNoPersistence';
 export * from 'react-reconciler/src/ReactFiberHostConfigWithNoHydration';
 export * from 'react-reconciler/src/ReactFiberHostConfigWithNoScopes';
 export * from 'react-reconciler/src/ReactFiberHostConfigWithNoTestSelectors';
+export * from 'react-reconciler/src/ReactFiberHostConfigWithNoMicrotasks';
 
 export function appendInitialChild(parentInstance, child) {
   parentInstance._children.push(child);
@@ -114,10 +115,9 @@ export function createTextInstance(
   hostContext,
   internalInstanceHandle,
 ) {
-  invariant(
-    hostContext.isInAParentText,
-    'Text strings must be rendered within a <Text> component.',
-  );
+  if (!hostContext.isInAParentText) {
+    throw new Error('Text strings must be rendered within a <Text> component.');
+  }
 
   const tag = allocateTag();
 
@@ -224,6 +224,10 @@ export function shouldSetTextContent(type, props) {
   // It's not clear to me which is better so I'm deferring for now.
   // More context @ github.com/facebook/react/pull/8560#discussion_r92111303
   return false;
+}
+
+export function getCurrentEventPriority() {
+  return DefaultEventPriority;
 }
 
 // -------------------
@@ -349,10 +353,9 @@ export function insertInContainerBefore(parentInstance, child, beforeChild) {
   // We create a wrapper object for the container in ReactNative render()
   // Or we refactor to remove wrapper objects entirely.
   // For more info on pros/cons see PR #8560 description.
-  invariant(
-    typeof parentInstance !== 'number',
-    'Container does not support insertBefore operation',
-  );
+  if (typeof parentInstance === 'number') {
+    throw new Error('Container does not support insertBefore operation');
+  }
 }
 
 export function removeChild(parentInstance, child) {
@@ -428,47 +431,11 @@ export function unhideTextInstance(textInstance, text) {
   throw new Error('Not yet implemented.');
 }
 
-export function getFundamentalComponentInstance(fundamentalInstance) {
-  throw new Error('Not yet implemented.');
-}
-
-export function mountFundamentalComponent(fundamentalInstance) {
-  throw new Error('Not yet implemented.');
-}
-
-export function shouldUpdateFundamentalComponent(fundamentalInstance) {
-  throw new Error('Not yet implemented.');
-}
-
-export function updateFundamentalComponent(fundamentalInstance) {
-  throw new Error('Not yet implemented.');
-}
-
-export function unmountFundamentalComponent(fundamentalInstance) {
-  throw new Error('Not yet implemented.');
-}
-
 export function getInstanceFromNode(node) {
   throw new Error('Not yet implemented.');
 }
 
-export function isOpaqueHydratingObject(value) {
-  throw new Error('Not yet implemented');
-}
-
-export function makeOpaqueHydratingObject(attemptToReadValue) {
-  throw new Error('Not yet implemented.');
-}
-
-export function makeClientId() {
-  throw new Error('Not yet implemented');
-}
-
-export function makeClientIdInDEV(warnOnAccessInDEV) {
-  throw new Error('Not yet implemented');
-}
-
-export function beforeActiveInstanceBlur() {
+export function beforeActiveInstanceBlur(internalInstanceHandle) {
   // noop
 }
 
@@ -477,5 +444,9 @@ export function afterActiveInstanceBlur() {
 }
 
 export function preparePortalMount(portalInstance) {
+  // noop
+}
+
+export function detachDeletedInstance(node) {
   // noop
 }

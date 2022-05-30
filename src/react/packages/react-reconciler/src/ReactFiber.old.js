@@ -7,15 +7,20 @@
  *
  */
 
-import invariant from 'shared/invariant';
 import {
+  createRootStrictEffectsByDefault,
+  enableCache,
+  enableStrictEffects,
   enableProfilerTimer,
-  enableFundamentalAPI,
   enableScopeAPI,
-  enableBlocksAPI,
+  enableLegacyHidden,
+  enableSyncDefaultUpdates,
+  allowConcurrentByDefault,
+  enableTransitionTracing,
+  enableDebugTracing,
 } from 'shared/ReactFeatureFlags';
-import {NoFlags, Placement} from './ReactFiberFlags';
-import {ConcurrentRoot, BlockingRoot} from './ReactRootTags';
+import {NoFlags, Placement, StaticMask} from './ReactFiberFlags';
+import {ConcurrentRoot} from './ReactRootTags';
 import {
   IndeterminateComponent,
   ClassComponent,
@@ -36,13 +41,13 @@ import {
   MemoComponent,
   SimpleMemoComponent,
   LazyComponent,
-  FundamentalComponent,
   ScopeComponent,
-  Block,
   OffscreenComponent,
   LegacyHiddenComponent,
+  CacheComponent,
+  TracingMarkerComponent,
 } from './ReactWorkTags';
-import getComponentName from 'shared/getComponentName';
+import getComponentNameFromFiber from 'react-reconciler/src/getComponentNameFromFiber';
 
 import {isDevToolsPresent} from './ReactFiberDevToolsHook.old';
 import {
@@ -50,14 +55,15 @@ import {
   resolveFunctionForHotReloading,
   resolveForwardRefForHotReloading,
 } from './ReactFiberHotReloading.old';
-import {NoLanes} from './ReactFiberLane';
+import {NoLanes} from './ReactFiberLane.old';
 import {
   NoMode,
   ConcurrentMode,
   DebugTracingMode,
   ProfileMode,
-  StrictMode,
-  BlockingMode,
+  StrictLegacyMode,
+  StrictEffectsMode,
+  ConcurrentUpdatesByDefaultMode,
 } from './ReactTypeOfMode';
 import {
   REACT_FORWARD_REF_TYPE,
@@ -71,11 +77,11 @@ import {
   REACT_SUSPENSE_LIST_TYPE,
   REACT_MEMO_TYPE,
   REACT_LAZY_TYPE,
-  REACT_FUNDAMENTAL_TYPE,
   REACT_SCOPE_TYPE,
-  REACT_BLOCK_TYPE,
   REACT_OFFSCREEN_TYPE,
   REACT_LEGACY_HIDDEN_TYPE,
+  REACT_CACHE_TYPE,
+  REACT_TRACING_MARKER_TYPE,
 } from 'shared/ReactSymbols';
 
 let hasBadMapPolyfill;
@@ -94,8 +100,7 @@ if (__DEV__) {
   }
 }
 
-let debugCounter = 1;
-
+// fiber 节点实例
 function FiberNode(tag, pendingProps, key, mode) {
   // Instance
   this.tag = tag;
@@ -118,58 +123,62 @@ function FiberNode(tag, pendingProps, key, mode) {
   this.memoizedState = null;
   this.dependencies = null;
 
+  // LegacyRoot 或者 ConcurrentRoot
   this.mode = mode;
 
   // Effects
-  this.flags = NoFlags;
-  this.nextEffect = null;
+  this.flags = NoFlags; // 自己身上的 effects
+  this.subtreeFlags = NoFlags; // 子元素的 effects
+  this.deletions = null; // 被删除的节点的 effect
 
-  this.firstEffect = null;
-  this.lastEffect = null;
+  this.lanes = NoLanes; // 自己的更新任务
+  this.childLanes = NoLanes; // 孩子的更新任务
 
-  this.lanes = NoLanes;
-  this.childLanes = NoLanes;
+  // flags 和 lanes 的区别
+  // flags 是 reconciler 中发现的节点的增删改 effect
+  // lanes 是更新任务对应的车道
 
+  // 自己在另外一个 fiber 树的一个映射，在第一次更新之后如果复用了该节点，那么这个值就会被赋值
   this.alternate = null;
 
-  if (enableProfilerTimer) {
-    // Note: The following is done to avoid a v8 performance cliff.
-    //
-    // Initializing the fields below to smis and later updating them with
-    // double values will cause Fibers to end up having separate shapes.
-    // This behavior/bug has something to do with Object.preventExtension().
-    // Fortunately this only impacts DEV builds.
-    // Unfortunately it makes React unusably slow for some applications.
-    // To work around this, initialize the fields below with doubles.
-    //
-    // Learn more about this here:
-    // https://github.com/facebook/react/issues/14365
-    // https://bugs.chromium.org/p/v8/issues/detail?id=8538
-    this.actualDuration = Number.NaN;
-    this.actualStartTime = Number.NaN;
-    this.selfBaseDuration = Number.NaN;
-    this.treeBaseDuration = Number.NaN;
+  // if (enableProfilerTimer) {
+  //   // Note: The following is done to avoid a v8 performance cliff.
+  //   //
+  //   // Initializing the fields below to smis and later updating them with
+  //   // double values will cause Fibers to end up having separate shapes.
+  //   // This behavior/bug has something to do with Object.preventExtension().
+  //   // Fortunately this only impacts DEV builds.
+  //   // Unfortunately it makes React unusably slow for some applications.
+  //   // To work around this, initialize the fields below with doubles.
+  //   //
+  //   // Learn more about this here:
+  //   // https://github.com/facebook/react/issues/14365
+  //   // https://bugs.chromium.org/p/v8/issues/detail?id=8538
+  //   this.actualDuration = Number.NaN;
+  //   this.actualStartTime = Number.NaN;
+  //   this.selfBaseDuration = Number.NaN;
+  //   this.treeBaseDuration = Number.NaN;
 
-    // It's okay to replace the initial doubles with smis after initialization.
-    // This won't trigger the performance cliff mentioned above,
-    // and it simplifies other profiler code (including DevTools).
-    this.actualDuration = 0;
-    this.actualStartTime = -1;
-    this.selfBaseDuration = 0;
-    this.treeBaseDuration = 0;
-  }
+  //   // It's okay to replace the initial doubles with smis after initialization.
+  //   // This won't trigger the performance cliff mentioned above,
+  //   // and it simplifies other profiler code (including DevTools).
+  //   this.actualDuration = 0;
+  //   this.actualStartTime = -1;
+  //   this.selfBaseDuration = 0;
+  //   this.treeBaseDuration = 0;
+  // }
 
-  if (__DEV__) {
-    // This isn't directly used but is handy for debugging internals:
-    this._debugID = debugCounter++;
-    this._debugSource = null;
-    this._debugOwner = null;
-    this._debugNeedsRemount = false;
-    this._debugHookTypes = null;
-    if (!hasBadMapPolyfill && typeof Object.preventExtensions === 'function') {
-      Object.preventExtensions(this);
-    }
-  }
+  // if (__DEV__) {
+  //   // This isn't directly used but is handy for debugging internals:
+
+  //   this._debugSource = null;
+  //   this._debugOwner = null;
+  //   this._debugNeedsRemount = false;
+  //   this._debugHookTypes = null;
+  //   if (!hasBadMapPolyfill && typeof Object.preventExtensions === 'function') {
+  //     Object.preventExtensions(this);
+  //   }
+  // }
 }
 
 // This is a constructor function, rather than a POJO constructor, still
@@ -185,17 +194,29 @@ function FiberNode(tag, pendingProps, key, mode) {
 //    is faster.
 // 5) It should be easy to port this to a C struct and keep a C implementation
 //    compatible.
+// 创建 fiber 实例
 const createFiber = function (tag, pendingProps, key, mode) {
   // $FlowFixMe: the shapes are exact here but Flow doesn't like constructors
   return new FiberNode(tag, pendingProps, key, mode);
 };
 
+/**
+ * 判断是不是类组件
+ *
+ * 区别函数组件和类组件
+ */
 function shouldConstruct(Component) {
   const prototype = Component.prototype;
   return !!(prototype && prototype.isReactComponent);
 }
 
+/**
+ * 判断是不是简单的函数组件
+ */
 export function isSimpleFunctionComponent(type) {
+  // 1. 类型是函数
+  // 2. 不是类组件
+  // 3. defaultProps 是 undefined
   return (
     typeof type === 'function' &&
     !shouldConstruct(type) &&
@@ -203,89 +224,108 @@ export function isSimpleFunctionComponent(type) {
   );
 }
 
+/**
+ * 解析 React.lazy 懒加载的 JSX 类型
+ */
 export function resolveLazyComponentTag(Component) {
   if (typeof Component === 'function') {
     return shouldConstruct(Component) ? ClassComponent : FunctionComponent;
   } else if (Component !== undefined && Component !== null) {
+    // 对象类型
+
     const $$typeof = Component.$$typeof;
     if ($$typeof === REACT_FORWARD_REF_TYPE) {
+      // React.forwardRef
       return ForwardRef;
     }
+
     if ($$typeof === REACT_MEMO_TYPE) {
+      // React.memo
       return MemoComponent;
     }
-    if (enableBlocksAPI) {
-      if ($$typeof === REACT_BLOCK_TYPE) {
-        return Block;
-      }
-    }
   }
+
+  // 其他的类型返回 IndeterminateComponent，即不确定的组件
   return IndeterminateComponent;
 }
 
 // This is used to create an alternate fiber to do work on.
+// 创建一个 alternate fiber，即复用 current 的 fiber
 export function createWorkInProgress(current, pendingProps) {
   let workInProgress = current.alternate;
+
+  // alternate 为空，首次复用
   if (workInProgress === null) {
     // We use a double buffering pooling technique because we know that we'll
     // only ever need at most two versions of a tree. We pool the "other" unused
     // node that we're free to reuse. This is lazily created to avoid allocating
     // extra objects for things that are never updated. It also allow us to
     // reclaim the extra memory if needed.
+
+    // 复用 current 的信息去创建 fiber
     workInProgress = createFiber(
       current.tag,
       pendingProps,
       current.key,
       current.mode,
     );
+
+    // 复用 current 的 elementType, type, stateNode
+
+    // 一般情况下，elementType 和 type 一样
     workInProgress.elementType = current.elementType;
     workInProgress.type = current.type;
+    // fiber 对应的节点. e.g.
+    // 普通元素：元素 dom 本身，类组件：类实例，函数组件：null
     workInProgress.stateNode = current.stateNode;
 
-    if (__DEV__) {
-      // DEV-only fields
-      workInProgress._debugID = current._debugID;
-      workInProgress._debugSource = current._debugSource;
-      workInProgress._debugOwner = current._debugOwner;
-      workInProgress._debugHookTypes = current._debugHookTypes;
-    }
-
+    //! workInProgress 和 current 建立关系
+    // 通过 alternate 指向对方
     workInProgress.alternate = current;
     current.alternate = workInProgress;
   } else {
+    // alternate 不为空，说明是第二次更新阶段
+
+    // 复用 props
     workInProgress.pendingProps = pendingProps;
+
     // Needed because Blocks store data on type.
+    // 复用 type
     workInProgress.type = current.type;
 
     // We already have an alternate.
     // Reset the effect tag.
+    // 重置该 fiber 本身的 effect
     workInProgress.flags = NoFlags;
 
-    // The effect list is no longer valid.
-    workInProgress.nextEffect = null;
-    workInProgress.firstEffect = null;
-    workInProgress.lastEffect = null;
-
-    if (enableProfilerTimer) {
-      // We intentionally reset, rather than copy, actualDuration & actualStartTime.
-      // This prevents time from endlessly accumulating in new commits.
-      // This has the downside of resetting values for different priority renders,
-      // But works for yielding (the common case) and should support resuming.
-      workInProgress.actualDuration = 0;
-      workInProgress.actualStartTime = -1;
-    }
+    // The effects are no longer valid.
+    // 重置 subtreeFlags 和 deletions
+    workInProgress.subtreeFlags = NoFlags;
+    workInProgress.deletions = null;
   }
 
+  // Reset all effects except static ones.
+  // Static effects are not specific to a render.
+  // 排除所有的 effect，除了 static之外
+  workInProgress.flags = current.flags & StaticMask;
+
+  // 复用 childLanes 和 lanes
   workInProgress.childLanes = current.childLanes;
   workInProgress.lanes = current.lanes;
 
+  // 复用孩子
   workInProgress.child = current.child;
+
+  // 复用老的 props
   workInProgress.memoizedProps = current.memoizedProps;
+  // 复用老的 state
   workInProgress.memoizedState = current.memoizedState;
+  // 复用 updateQueue
   workInProgress.updateQueue = current.updateQueue;
 
   // Clone the dependencies object. This is mutated during the render phase, so
   // it cannot be shared with the current fiber.
+  // 克隆 Context 的依赖项
   const currentDependencies = current.dependencies;
   workInProgress.dependencies =
     currentDependencies === null
@@ -300,34 +340,12 @@ export function createWorkInProgress(current, pendingProps) {
   workInProgress.index = current.index;
   workInProgress.ref = current.ref;
 
-  if (enableProfilerTimer) {
-    workInProgress.selfBaseDuration = current.selfBaseDuration;
-    workInProgress.treeBaseDuration = current.treeBaseDuration;
-  }
-
-  if (__DEV__) {
-    workInProgress._debugNeedsRemount = current._debugNeedsRemount;
-    switch (workInProgress.tag) {
-      case IndeterminateComponent:
-      case FunctionComponent:
-      case SimpleMemoComponent:
-        workInProgress.type = resolveFunctionForHotReloading(current.type);
-        break;
-      case ClassComponent:
-        workInProgress.type = resolveClassForHotReloading(current.type);
-        break;
-      case ForwardRef:
-        workInProgress.type = resolveForwardRefForHotReloading(current.type);
-        break;
-      default:
-        break;
-    }
-  }
 
   return workInProgress;
 }
 
 // Used to reuse a Fiber for a second pass.
+// 返回值的 fiber 用于复用
 export function resetWorkInProgress(workInProgress, renderLanes) {
   // This resets the Fiber to what createFiber or createWorkInProgress would
   // have set the values to before during the first pass. Ideally this wouldn't
@@ -337,14 +355,12 @@ export function resetWorkInProgress(workInProgress, renderLanes) {
   // We assume pendingProps, index, key, ref, return are still untouched to
   // avoid doing another reconciliation.
 
-  // Reset the effect tag but keep any Placement tags, since that's something
+  // Reset the effect flags but keep any Placement tags, since that's something
   // that child fiber is setting, not the reconciliation.
-  workInProgress.flags &= Placement;
+  // 只保留 StaticMask 和 Placement 的 effect
+  workInProgress.flags &= StaticMask | Placement;
 
-  // The effect list is no longer valid.
-  workInProgress.nextEffect = null;
-  workInProgress.firstEffect = null;
-  workInProgress.lastEffect = null;
+  // The effects are no longer valid.
 
   const current = workInProgress.alternate;
   if (current === null) {
@@ -353,6 +369,7 @@ export function resetWorkInProgress(workInProgress, renderLanes) {
     workInProgress.lanes = renderLanes;
 
     workInProgress.child = null;
+    workInProgress.subtreeFlags = NoFlags;
     workInProgress.memoizedProps = null;
     workInProgress.memoizedState = null;
     workInProgress.updateQueue = null;
@@ -361,18 +378,22 @@ export function resetWorkInProgress(workInProgress, renderLanes) {
 
     workInProgress.stateNode = null;
 
-    if (enableProfilerTimer) {
-      // Note: We don't reset the actualTime counts. It's useful to accumulate
-      // actual time across multiple render passes.
-      workInProgress.selfBaseDuration = 0;
-      workInProgress.treeBaseDuration = 0;
-    }
+    // if (enableProfilerTimer) {
+    //   // Note: We don't reset the actualTime counts. It's useful to accumulate
+    //   // actual time across multiple render passes.
+    //   workInProgress.selfBaseDuration = 0;
+    //   workInProgress.treeBaseDuration = 0;
+    // }
   } else {
     // Reset to the cloned values that createWorkInProgress would've.
     workInProgress.childLanes = current.childLanes;
     workInProgress.lanes = current.lanes;
 
+    workInProgress.subtreeFlags = NoFlags;
+    workInProgress.deletions = null;
+
     workInProgress.child = current.child;
+
     workInProgress.memoizedProps = current.memoizedProps;
     workInProgress.memoizedState = current.memoizedState;
     workInProgress.updateQueue = current.updateQueue;
@@ -390,27 +411,60 @@ export function resetWorkInProgress(workInProgress, renderLanes) {
             firstContext: currentDependencies.firstContext,
           };
 
-    if (enableProfilerTimer) {
-      // Note: We don't reset the actualTime counts. It's useful to accumulate
-      // actual time across multiple render passes.
-      workInProgress.selfBaseDuration = current.selfBaseDuration;
-      workInProgress.treeBaseDuration = current.treeBaseDuration;
-    }
+    // if (enableProfilerTimer) {
+    //   // Note: We don't reset the actualTime counts. It's useful to accumulate
+    //   // actual time across multiple render passes.
+    //   workInProgress.selfBaseDuration = current.selfBaseDuration;
+    //   workInProgress.treeBaseDuration = current.treeBaseDuration;
+    // }
   }
 
   return workInProgress;
 }
 
-export function createHostRootFiber(tag) {
+/**
+ * 创建 hostRootFiber
+ */
+export function createHostRootFiber(
+  tag,
+  isStrictMode,
+  concurrentUpdatesByDefaultOverride,
+) {
   let mode;
-  if (tag === ConcurrentRoot) {
-    mode = ConcurrentMode | BlockingMode | StrictMode;
-  } else if (tag === BlockingRoot) {
-    mode = BlockingMode | StrictMode;
+  if (tag === ConcurrentRoot) { // createRoot
+    // 默认是 ConcurrentMode
+    mode = ConcurrentMode;
+    if (isStrictMode === true) {
+      mode |= StrictLegacyMode;
+
+      if (enableStrictEffects) {
+        // enableStrictEffects: 开发环境下为 true
+        mode |= StrictEffectsMode;
+      }
+    }
+    // else if (enableStrictEffects && createRootStrictEffectsByDefault) {
+    //   // enableStrictEffects: 开发环境下为 true
+    //   // createRootStrictEffectsByDefault: false
+    //   mode |= StrictLegacyMode | StrictEffectsMode;
+    // }
+
+    // if (
+    //   // We only use this flag for our repo tests to check both behaviors.
+    //   // TODO: Flip this flag and rename it something like "forceConcurrentByDefaultForTesting"
+    //   // enableSyncDefaultUpdates: true
+    //   !enableSyncDefaultUpdates ||
+    //   // Only for internal experiments.
+    //   // allowConcurrentByDefault: false
+    //   (allowConcurrentByDefault && concurrentUpdatesByDefaultOverride)
+    // ) {
+    //   mode |= ConcurrentUpdatesByDefaultMode;
+    // }
   } else {
+    // render
     mode = NoMode;
   }
 
+  // 开发环境下开启
   if (enableProfilerTimer && isDevToolsPresent) {
     // Always collect profile timings when DevTools are present.
     // This enables DevTools to start capturing timing at any point–
@@ -418,9 +472,13 @@ export function createHostRootFiber(tag) {
     mode |= ProfileMode;
   }
 
+  // 创建 fiber 实例
   return createFiber(HostRoot, null, null, mode);
 }
 
+/**
+ * 从 type 和 props 创建 fiber
+ */
 export function createFiberFromTypeAndProps(
   type, // React$ElementType
   key,
@@ -429,138 +487,137 @@ export function createFiberFromTypeAndProps(
   mode,
   lanes,
 ) {
+  // 默认是不确定的组件
   let fiberTag = IndeterminateComponent;
+
   // The resolved type is set if we know what the final type will be. I.e. it's not lazy.
   let resolvedType = type;
+
   if (typeof type === 'function') {
     if (shouldConstruct(type)) {
+      // 类组件
       fiberTag = ClassComponent;
-      if (__DEV__) {
-        resolvedType = resolveClassForHotReloading(resolvedType);
-      }
-    } else {
-      if (__DEV__) {
-        resolvedType = resolveFunctionForHotReloading(resolvedType);
-      }
     }
+    //! 函数组件的类型是 IndeterminateComponent
+    // see https://github.com/facebook/react/pull/8089
   } else if (typeof type === 'string') {
+    // 普通元素
     fiberTag = HostComponent;
   } else {
     getTag: switch (type) {
       case REACT_FRAGMENT_TYPE:
+        // fragment
         return createFiberFromFragment(pendingProps.children, mode, lanes, key);
-      case REACT_DEBUG_TRACING_MODE_TYPE:
-        fiberTag = Mode;
-        mode |= DebugTracingMode;
-        break;
       case REACT_STRICT_MODE_TYPE:
         fiberTag = Mode;
-        mode |= StrictMode;
+
+        mode |= StrictLegacyMode;
+        // enableStrictEffects: 依赖开发环境
+        if (enableStrictEffects && (mode & ConcurrentMode) !== NoMode) {
+          // Strict effects should never run on legacy roots
+          mode |= StrictEffectsMode;
+        }
         break;
       case REACT_PROFILER_TYPE:
         return createFiberFromProfiler(pendingProps, mode, lanes, key);
       case REACT_SUSPENSE_TYPE:
+        // suspense
         return createFiberFromSuspense(pendingProps, mode, lanes, key);
       case REACT_SUSPENSE_LIST_TYPE:
+        // suspenseList
         return createFiberFromSuspenseList(pendingProps, mode, lanes, key);
       case REACT_OFFSCREEN_TYPE:
+        // offscreen
         return createFiberFromOffscreen(pendingProps, mode, lanes, key);
       case REACT_LEGACY_HIDDEN_TYPE:
-        return createFiberFromLegacyHidden(pendingProps, mode, lanes, key);
+        if (enableLegacyHidden) {
+          return createFiberFromLegacyHidden(pendingProps, mode, lanes, key);
+        }
+      // eslint-disable-next-line no-fallthrough
       case REACT_SCOPE_TYPE:
         if (enableScopeAPI) {
           return createFiberFromScope(type, pendingProps, mode, lanes, key);
+        }
+      // eslint-disable-next-line no-fallthrough
+      case REACT_CACHE_TYPE:
+        if (enableCache) {
+          return createFiberFromCache(pendingProps, mode, lanes, key);
+        }
+      // eslint-disable-next-line no-fallthrough
+      case REACT_TRACING_MARKER_TYPE:
+        if (enableTransitionTracing) {
+          return createFiberFromTracingMarker(pendingProps, mode, lanes, key);
+        }
+      // eslint-disable-next-line no-fallthrough
+      case REACT_DEBUG_TRACING_MODE_TYPE:
+        if (enableDebugTracing) {
+          fiberTag = Mode;
+          mode |= DebugTracingMode;
+          break;
         }
       // eslint-disable-next-line no-fallthrough
       default: {
         if (typeof type === 'object' && type !== null) {
           switch (type.$$typeof) {
             case REACT_PROVIDER_TYPE:
+              // Provider
               fiberTag = ContextProvider;
               break getTag;
             case REACT_CONTEXT_TYPE:
               // This is a consumer
+              // Consumer
               fiberTag = ContextConsumer;
               break getTag;
             case REACT_FORWARD_REF_TYPE:
+              // forwardRef
               fiberTag = ForwardRef;
-              if (__DEV__) {
-                resolvedType = resolveForwardRefForHotReloading(resolvedType);
-              }
               break getTag;
             case REACT_MEMO_TYPE:
+              // memo
               fiberTag = MemoComponent;
               break getTag;
             case REACT_LAZY_TYPE:
+              // lazy
               fiberTag = LazyComponent;
+              // resolveType 为 null
               resolvedType = null;
               break getTag;
-            case REACT_BLOCK_TYPE:
-              fiberTag = Block;
-              break getTag;
-            case REACT_FUNDAMENTAL_TYPE:
-              if (enableFundamentalAPI) {
-                return createFiberFromFundamental(
-                  type,
-                  pendingProps,
-                  mode,
-                  lanes,
-                  key,
-                );
-              }
-              break;
           }
         }
         let info = '';
-        if (__DEV__) {
-          if (
-            type === undefined ||
-            (typeof type === 'object' &&
-              type !== null &&
-              Object.keys(type).length === 0)
-          ) {
-            info +=
-              ' You likely forgot to export your component from the file ' +
-              "it's defined in, or you might have mixed up default and " +
-              'named imports.';
-          }
-          const ownerName = owner ? getComponentName(owner.type) : null;
-          if (ownerName) {
-            info += '\n\nCheck the render method of `' + ownerName + '`.';
-          }
-        }
-        invariant(
-          false,
+        throw new Error(
           'Element type is invalid: expected a string (for built-in ' +
             'components) or a class/function (for composite components) ' +
-            'but got: %s.%s',
-          type == null ? type : typeof type,
-          info,
+            `but got: ${type == null ? type : typeof type}.${info}`,
         );
       }
     }
   }
 
+  // 创建 fiber 节点
   const fiber = createFiber(fiberTag, pendingProps, key, mode);
-  fiber.elementType = type;
-  fiber.type = resolvedType;
-  fiber.lanes = lanes;
 
-  if (__DEV__) {
-    fiber._debugOwner = owner;
-  }
+  // 一般的 elementType 和 type 一样，lazy 除外
+  fiber.elementType = type;
+  // lazy 组件的 type 为空
+  fiber.type = resolvedType;
+
+  // 给 lanes 赋值
+  fiber.lanes = lanes;
 
   return fiber;
 }
 
+/**
+ * 为 element 创建 fiber
+ */
 export function createFiberFromElement(element, mode, lanes) {
   let owner = null;
-  if (__DEV__) {
-    owner = element._owner;
-  }
+
   const type = element.type;
   const key = element.key;
   const pendingProps = element.props;
+
   const fiber = createFiberFromTypeAndProps(
     type,
     key,
@@ -569,32 +626,30 @@ export function createFiberFromElement(element, mode, lanes) {
     mode,
     lanes,
   );
-  if (__DEV__) {
-    fiber._debugSource = element._source;
-    fiber._debugOwner = element._owner;
-  }
+
   return fiber;
 }
 
+/**
+ * 为 fragment 创建 fiber
+ */
 export function createFiberFromFragment(elements, mode, lanes, key) {
   const fiber = createFiber(Fragment, elements, key, mode);
+
+  fiber.lanes = lanes;
+
+  return fiber;
+}
+
+/**
+ * 给文本节点创建 fiber
+ */
+export function createFiberFromText(content, mode, lanes) {
+  const fiber = createFiber(HostText, content, null, mode);
   fiber.lanes = lanes;
   return fiber;
 }
 
-export function createFiberFromFundamental(
-  fundamentalComponent,
-  pendingProps,
-  mode,
-  lanes,
-  key,
-) {
-  const fiber = createFiber(FundamentalComponent, pendingProps, key, mode);
-  fiber.elementType = fundamentalComponent;
-  fiber.type = fundamentalComponent;
-  fiber.lanes = lanes;
-  return fiber;
-}
 
 function createFiberFromScope(scope, pendingProps, mode, lanes, key) {
   const fiber = createFiber(ScopeComponent, pendingProps, key, mode);
@@ -607,14 +662,15 @@ function createFiberFromScope(scope, pendingProps, mode, lanes, key) {
 function createFiberFromProfiler(pendingProps, mode, lanes, key) {
   if (__DEV__) {
     if (typeof pendingProps.id !== 'string') {
-      console.error('Profiler must specify an "id" as a prop');
+      console.error(
+        'Profiler must specify an "id" of type `string` as a prop. Received the type `%s` instead.',
+        typeof pendingProps.id,
+      );
     }
   }
 
   const fiber = createFiber(Profiler, pendingProps, key, mode | ProfileMode);
-  // TODO: The Profiler fiber shouldn't have a type. It has a tag.
   fiber.elementType = REACT_PROFILER_TYPE;
-  fiber.type = REACT_PROFILER_TYPE;
   fiber.lanes = lanes;
 
   if (enableProfilerTimer) {
@@ -629,25 +685,13 @@ function createFiberFromProfiler(pendingProps, mode, lanes, key) {
 
 export function createFiberFromSuspense(pendingProps, mode, lanes, key) {
   const fiber = createFiber(SuspenseComponent, pendingProps, key, mode);
-
-  // TODO: The SuspenseComponent fiber shouldn't have a type. It has a tag.
-  // This needs to be fixed in getComponentName so that it relies on the tag
-  // instead.
-  fiber.type = REACT_SUSPENSE_TYPE;
   fiber.elementType = REACT_SUSPENSE_TYPE;
-
   fiber.lanes = lanes;
   return fiber;
 }
 
 export function createFiberFromSuspenseList(pendingProps, mode, lanes, key) {
   const fiber = createFiber(SuspenseListComponent, pendingProps, key, mode);
-  if (__DEV__) {
-    // TODO: The SuspenseListComponent fiber shouldn't have a type. It has a tag.
-    // This needs to be fixed in getComponentName so that it relies on the tag
-    // instead.
-    fiber.type = REACT_SUSPENSE_LIST_TYPE;
-  }
   fiber.elementType = REACT_SUSPENSE_LIST_TYPE;
   fiber.lanes = lanes;
   return fiber;
@@ -655,41 +699,37 @@ export function createFiberFromSuspenseList(pendingProps, mode, lanes, key) {
 
 export function createFiberFromOffscreen(pendingProps, mode, lanes, key) {
   const fiber = createFiber(OffscreenComponent, pendingProps, key, mode);
-  // TODO: The OffscreenComponent fiber shouldn't have a type. It has a tag.
-  // This needs to be fixed in getComponentName so that it relies on the tag
-  // instead.
-  if (__DEV__) {
-    fiber.type = REACT_OFFSCREEN_TYPE;
-  }
   fiber.elementType = REACT_OFFSCREEN_TYPE;
   fiber.lanes = lanes;
+  const primaryChildInstance = {};
+  fiber.stateNode = primaryChildInstance;
   return fiber;
 }
 
 export function createFiberFromLegacyHidden(pendingProps, mode, lanes, key) {
   const fiber = createFiber(LegacyHiddenComponent, pendingProps, key, mode);
-  // TODO: The LegacyHidden fiber shouldn't have a type. It has a tag.
-  // This needs to be fixed in getComponentName so that it relies on the tag
-  // instead.
-  if (__DEV__) {
-    fiber.type = REACT_LEGACY_HIDDEN_TYPE;
-  }
   fiber.elementType = REACT_LEGACY_HIDDEN_TYPE;
   fiber.lanes = lanes;
   return fiber;
 }
 
-export function createFiberFromText(content, mode, lanes) {
-  const fiber = createFiber(HostText, content, null, mode);
+export function createFiberFromCache(pendingProps, mode, lanes, key) {
+  const fiber = createFiber(CacheComponent, pendingProps, key, mode);
+  fiber.elementType = REACT_CACHE_TYPE;
+  fiber.lanes = lanes;
+  return fiber;
+}
+
+export function createFiberFromTracingMarker(pendingProps, mode, lanes, key) {
+  const fiber = createFiber(TracingMarkerComponent, pendingProps, key, mode);
+  fiber.elementType = REACT_TRACING_MARKER_TYPE;
   fiber.lanes = lanes;
   return fiber;
 }
 
 export function createFiberFromHostInstanceForDeletion() {
   const fiber = createFiber(HostComponent, null, null, NoMode);
-  // TODO: These should not need a type.
   fiber.elementType = 'DELETED';
-  fiber.type = 'DELETED';
   return fiber;
 }
 
@@ -742,9 +782,8 @@ export function assignFiberPropertiesInDEV(target, source) {
   target.dependencies = source.dependencies;
   target.mode = source.mode;
   target.flags = source.flags;
-  target.nextEffect = source.nextEffect;
-  target.firstEffect = source.firstEffect;
-  target.lastEffect = source.lastEffect;
+  target.subtreeFlags = source.subtreeFlags;
+  target.deletions = source.deletions;
   target.lanes = source.lanes;
   target.childLanes = source.childLanes;
   target.alternate = source.alternate;
@@ -754,7 +793,7 @@ export function assignFiberPropertiesInDEV(target, source) {
     target.selfBaseDuration = source.selfBaseDuration;
     target.treeBaseDuration = source.treeBaseDuration;
   }
-  target._debugID = source._debugID;
+
   target._debugSource = source._debugSource;
   target._debugOwner = source._debugOwner;
   target._debugNeedsRemount = source._debugNeedsRemount;

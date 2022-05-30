@@ -9,7 +9,8 @@
 
 import {showErrorDialog} from './ReactFiberErrorDialog';
 import {ClassComponent} from './ReactWorkTags';
-import getComponentName from 'shared/getComponentName';
+import getComponentNameFromFiber from 'react-reconciler/src/getComponentNameFromFiber';
+import {HostRoot} from 'react-reconciler/src/ReactWorkTags';
 
 export function logCapturedError(boundary, errorInfo) {
   try {
@@ -45,21 +46,22 @@ export function logCapturedError(boundary, errorInfo) {
         // https://github.com/facebook/react/pull/13384
       }
 
-      const componentName = source ? getComponentName(source.type) : null;
+      const componentName = source ? getComponentNameFromFiber(source) : null;
       const componentNameMessage = componentName
         ? `The above error occurred in the <${componentName}> component:`
         : 'The above error occurred in one of your React components:';
 
       let errorBoundaryMessage;
-      const errorBoundaryName = getComponentName(boundary.type);
-      if (errorBoundaryName) {
-        errorBoundaryMessage =
-          `React will try to recreate this component tree from scratch ` +
-          `using the error boundary you provided, ${errorBoundaryName}.`;
-      } else {
+      if (boundary.tag === HostRoot) {
         errorBoundaryMessage =
           'Consider adding an error boundary to your tree to customize error handling behavior.\n' +
           'Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.';
+      } else {
+        const errorBoundaryName =
+          getComponentNameFromFiber(boundary) || 'Anonymous';
+        errorBoundaryMessage =
+          `React will try to recreate this component tree from scratch ` +
+          `using the error boundary you provided, ${errorBoundaryName}.`;
       }
       const combinedMessage =
         `${componentNameMessage}\n${componentStack}\n\n` +

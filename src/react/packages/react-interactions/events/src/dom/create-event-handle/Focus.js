@@ -49,7 +49,7 @@ function isValidKey(nativeEvent) {
 
 function isTextInput(nativeEvent) {
   const {key, target} = nativeEvent;
-  if (key === 'Tab' || key === 'Esacpe') {
+  if (key === 'Tab' || key === 'Escape') {
     return false;
   }
   const {isContentEditable, tagName} = target;

@@ -14,16 +14,15 @@ import {
   parseModel,
 } from './ReactFlightClientHostConfig';
 
-import {
-  REACT_LAZY_TYPE,
-  REACT_BLOCK_TYPE,
-  REACT_ELEMENT_TYPE,
-} from 'shared/ReactSymbols';
+import {REACT_LAZY_TYPE, REACT_ELEMENT_TYPE} from 'shared/ReactSymbols';
+
+import {getOrCreateServerContext} from 'shared/ReactServerContextRegistry';
 
 const PENDING = 0;
 const RESOLVED_MODEL = 1;
-const INITIALIZED = 2;
-const ERRORED = 3;
+const RESOLVED_MODULE = 2;
+const INITIALIZED = 3;
+const ERRORED = 4;
 
 function Chunk(status, value, response) {
   this._status = status;
@@ -48,6 +47,8 @@ function readChunk(chunk) {
       return chunk._value;
     case RESOLVED_MODEL:
       return initializeModelChunk(chunk);
+    case RESOLVED_MODULE:
+      return initializeModuleChunk(chunk);
     case PENDING:
       // eslint-disable-next-line no-throw-literal
       throw chunk;
@@ -68,6 +69,10 @@ function createPendingChunk(response) {
 
 function createErrorChunk(response, error) {
   return new Chunk(ERRORED, error, response);
+}
+
+function createInitializedChunk(response, value) {
+  return new Chunk(INITIALIZED, value, response);
 }
 
 function wakeChunk(listeners) {
@@ -95,6 +100,10 @@ function createResolvedModelChunk(response, value) {
   return new Chunk(RESOLVED_MODEL, value, response);
 }
 
+function createResolvedModuleChunk(response, value) {
+  return new Chunk(RESOLVED_MODULE, value, response);
+}
+
 function resolveModelChunk(chunk, value) {
   if (chunk._status !== PENDING) {
     // We already resolved. We didn't expect to see this.
@@ -107,8 +116,28 @@ function resolveModelChunk(chunk, value) {
   wakeChunk(listeners);
 }
 
+function resolveModuleChunk(chunk, value) {
+  if (chunk._status !== PENDING) {
+    // We already resolved. We didn't expect to see this.
+    return;
+  }
+  const listeners = chunk._value;
+  const resolvedChunk = chunk;
+  resolvedChunk._status = RESOLVED_MODULE;
+  resolvedChunk._value = value;
+  wakeChunk(listeners);
+}
+
 function initializeModelChunk(chunk) {
   const value = parseModel(chunk._response, chunk._value);
+  const initializedChunk = chunk;
+  initializedChunk._status = INITIALIZED;
+  initializedChunk._value = value;
+  return value;
+}
+
+function initializeModuleChunk(chunk) {
+  const value = requireModule(chunk._value);
   const initializedChunk = chunk;
   initializedChunk._status = INITIALIZED;
   initializedChunk._value = value;
@@ -124,15 +153,6 @@ export function reportGlobalError(response, error) {
     // because we won't be getting any new data to resolve it.
     triggerErrorOnChunk(chunk, error);
   });
-}
-
-function readMaybeChunk(maybeChunk) {
-  if (maybeChunk == null || !(maybeChunk instanceof Chunk)) {
-    // $FlowFixMe
-    return maybeChunk;
-  }
-  const chunk = maybeChunk;
-  return readChunk(chunk);
 }
 
 function createElement(type, key, props) {
@@ -176,32 +196,11 @@ function createElement(type, key, props) {
   return element;
 }
 
-function initializeBlock(tuple) {
-  // Require module first and then data. The ordering matters.
-  const moduleMetaData = readMaybeChunk(tuple[1]);
-  const moduleReference = resolveModuleReference(moduleMetaData);
-  // TODO: Do this earlier, as the chunk is resolved.
-  preloadModule(moduleReference);
-
-  const moduleExport = requireModule(moduleReference);
-
-  // The ordering here is important because this call might suspend.
-  // We don't want that to prevent the module graph for being initialized.
-  const data = readMaybeChunk(tuple[2]);
-
-  return {
-    $$typeof: REACT_BLOCK_TYPE,
-    _status: -1,
-    _data: data,
-    _render: moduleExport,
-  };
-}
-
-function createLazyBlock(tuple) {
+function createLazyChunkWrapper(chunk) {
   const lazyType = {
     $$typeof: REACT_LAZY_TYPE,
-    _payload: tuple,
-    _init: initializeBlock,
+    _payload: chunk,
+    _init: readChunk,
   };
   return lazyType;
 }
@@ -217,39 +216,37 @@ function getChunk(response, id) {
 }
 
 export function parseModelString(response, parentObject, value) {
-  if (value[0] === '$') {
-    if (value === '$') {
-      return REACT_ELEMENT_TYPE;
-    } else if (value[1] === '$' || value[1] === '@') {
-      // This was an escaped string value.
-      return value.substring(1);
-    } else {
+  switch (value[0]) {
+    case '$': {
+      if (value === '$') {
+        return REACT_ELEMENT_TYPE;
+      } else if (value[1] === '$' || value[1] === '@') {
+        // This was an escaped string value.
+        return value.substring(1);
+      } else {
+        const id = parseInt(value.substring(1), 16);
+        const chunk = getChunk(response, id);
+        return readChunk(chunk);
+      }
+    }
+    case '@': {
       const id = parseInt(value.substring(1), 16);
       const chunk = getChunk(response, id);
-      if (parentObject[0] === REACT_BLOCK_TYPE) {
-        // Block types know how to deal with lazy values.
-        return chunk;
-      }
-      // For anything else we must Suspend this block if
-      // we don't yet have the value.
-      return readChunk(chunk);
+      // We create a React.lazy wrapper around any lazy values.
+      // When passed into React, we'll know how to suspend on this.
+      return createLazyChunkWrapper(chunk);
     }
-  }
-  if (value === '@') {
-    return REACT_BLOCK_TYPE;
   }
   return value;
 }
 
 export function parseModelTuple(response, value) {
   const tuple = value;
+
   if (tuple[0] === REACT_ELEMENT_TYPE) {
     // TODO: Consider having React just directly accept these arrays as elements.
     // Or even change the ReactElement type to be an array.
     return createElement(tuple[1], tuple[2], tuple[3]);
-  } else if (tuple[0] === REACT_BLOCK_TYPE) {
-    // TODO: Consider having React just directly accept these arrays as blocks.
-    return createLazyBlock(tuple);
   }
   return value;
 }
@@ -273,7 +270,44 @@ export function resolveModel(response, id, model) {
   }
 }
 
+export function resolveProvider(response, id, contextName) {
+  const chunks = response._chunks;
+  chunks.set(
+    id,
+    createInitializedChunk(
+      response,
+      getOrCreateServerContext(contextName).Provider,
+    ),
+  );
+}
+
+export function resolveModule(response, id, model) {
+  const chunks = response._chunks;
+  const chunk = chunks.get(id);
+  const moduleMetaData = parseModel(response, model);
+  const moduleReference = resolveModuleReference(moduleMetaData);
+
+  // TODO: Add an option to encode modules that are lazy loaded.
+  // For now we preload all modules as early as possible since it's likely
+  // that we'll need them.
+  preloadModule(moduleReference);
+
+  if (!chunk) {
+    chunks.set(id, createResolvedModuleChunk(response, moduleReference));
+  } else {
+    resolveModuleChunk(chunk, moduleReference);
+  }
+}
+
+export function resolveSymbol(response, id, name) {
+  const chunks = response._chunks;
+  // We assume that we'll always emit the symbol before anything references it
+  // to save a few bytes.
+  chunks.set(id, createInitializedChunk(response, Symbol.for(name)));
+}
+
 export function resolveError(response, id, message, stack) {
+  // eslint-disable-next-line react-internal/prod-error-codes
   const error = new Error(message);
   error.stack = stack;
   const chunks = response._chunks;

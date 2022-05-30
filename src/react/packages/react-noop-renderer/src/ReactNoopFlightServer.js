@@ -23,35 +23,45 @@ const ReactNoopFlightServer = ReactFlightServer({
     callback();
   },
   beginWriting(destination) {},
-  writeChunk(destination, buffer) {
-    destination.push(Buffer.from(buffer).toString('utf8'));
+  writeChunk(destination, chunk) {
+    destination.push(chunk);
+  },
+  writeChunkAndReturn(destination, chunk) {
+    destination.push(chunk);
+    return true;
   },
   completeWriting(destination) {},
   close(destination) {},
+  closeWithError(destination, error) {},
   flushBuffered(destination) {},
-  convertStringToBuffer(content) {
-    return Buffer.from(content, 'utf8');
+  stringToChunk(content) {
+    return content;
   },
-  formatChunkAsString(type, props) {
-    return JSON.stringify({type, props});
+  stringToPrecomputedChunk(content) {
+    return content;
   },
-  formatChunk(type, props) {
-    return Buffer.from(JSON.stringify({type, props}), 'utf8');
+  isModuleReference(reference) {
+    return reference.$$typeof === Symbol.for('react.module.reference');
   },
-  resolveModuleMetaData(config, renderFn) {
-    return saveModule(renderFn);
+  getModuleKey(reference) {
+    return reference;
+  },
+  resolveModuleMetaData(config, reference) {
+    return saveModule(reference.value);
   },
 });
 
-function render(model) {
+function render(model, options, context) {
   const destination = [];
   const bundlerConfig = undefined;
   const request = ReactNoopFlightServer.createRequest(
     model,
-    destination,
     bundlerConfig,
+    options ? options.onError : undefined,
+    context,
   );
   ReactNoopFlightServer.startWork(request);
+  ReactNoopFlightServer.startFlowing(request, destination);
   return destination;
 }
 

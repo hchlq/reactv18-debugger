@@ -8,10 +8,11 @@
  */
 
 import {
-  enableProfilerTimer,
   enableProfilerCommitHooks,
+  enableProfilerNestedUpdatePhase,
+  enableProfilerTimer,
 } from 'shared/ReactFeatureFlags';
-import {Profiler} from './ReactWorkTags';
+import {HostRoot, Profiler} from './ReactWorkTags';
 
 // Intentionally not named imports because Rollup would use dynamic dispatch for
 // CommonJS interop named imports.
@@ -23,6 +24,49 @@ let commitTime = 0;
 let layoutEffectStartTime = -1;
 let profilerStartTime = -1;
 let passiveEffectStartTime = -1;
+
+/**
+ * Tracks whether the current update was a nested/cascading update (scheduled from a layout effect).
+ *
+ * The overall sequence is:
+ *   1. render
+ *   2. commit (and call `onRender`, `onCommit`)
+ *   3. check for nested updates
+ *   4. flush passive effects (and call `onPostCommit`)
+ *
+ * Nested updates are identified in step 3 above,
+ * but step 4 still applies to the work that was just committed.
+ * We use two flags to track nested updates then:
+ * one tracks whether the upcoming update is a nested update,
+ * and the other tracks whether the current update was a nested update.
+ * The first value gets synced to the second at the start of the render phase.
+ */
+let currentUpdateIsNested = false;
+let nestedUpdateScheduled = false;
+
+function isCurrentUpdateNested() {
+  return currentUpdateIsNested;
+}
+
+function markNestedUpdateScheduled() {
+  if (enableProfilerNestedUpdatePhase) {
+    nestedUpdateScheduled = true;
+  }
+}
+
+function resetNestedUpdateFlag() {
+  if (enableProfilerNestedUpdatePhase) {
+    currentUpdateIsNested = false;
+    nestedUpdateScheduled = false;
+  }
+}
+
+function syncNestedUpdateFlag() {
+  if (enableProfilerNestedUpdatePhase) {
+    currentUpdateIsNested = nestedUpdateScheduled;
+    nestedUpdateScheduled = false;
+  }
+}
 
 function getCommitTime() {
   return commitTime;
@@ -79,13 +123,19 @@ function recordLayoutEffectDuration(fiber) {
 
     layoutEffectStartTime = -1;
 
-    // Store duration on the next nearest Profiler ancestor.
+    // Store duration on the next nearest Profiler ancestor
+    // Or the root (for the DevTools Profiler to read)
     let parentFiber = fiber.return;
     while (parentFiber !== null) {
-      if (parentFiber.tag === Profiler) {
-        const parentStateNode = parentFiber.stateNode;
-        parentStateNode.effectDuration += elapsedTime;
-        break;
+      switch (parentFiber.tag) {
+        case HostRoot:
+          const root = parentFiber.stateNode;
+          root.effectDuration += elapsedTime;
+          return;
+        case Profiler:
+          const parentStateNode = parentFiber.stateNode;
+          parentStateNode.effectDuration += elapsedTime;
+          return;
       }
       parentFiber = parentFiber.return;
     }
@@ -102,18 +152,26 @@ function recordPassiveEffectDuration(fiber) {
 
     passiveEffectStartTime = -1;
 
-    // Store duration on the next nearest Profiler ancestor.
+    // Store duration on the next nearest Profiler ancestor
+    // Or the root (for the DevTools Profiler to read)
     let parentFiber = fiber.return;
     while (parentFiber !== null) {
-      if (parentFiber.tag === Profiler) {
-        const parentStateNode = parentFiber.stateNode;
-        if (parentStateNode !== null) {
-          // Detached fibers have their state node cleared out.
-          // In this case, the return pointer is also cleared out,
-          // so we won't be able to report the time spent in this Profiler's subtree.
-          parentStateNode.passiveEffectDuration += elapsedTime;
-        }
-        break;
+      switch (parentFiber.tag) {
+        case HostRoot:
+          const root = parentFiber.stateNode;
+          if (root !== null) {
+            root.passiveEffectDuration += elapsedTime;
+          }
+          return;
+        case Profiler:
+          const parentStateNode = parentFiber.stateNode;
+          if (parentStateNode !== null) {
+            // Detached fibers have their state node cleared out.
+            // In this case, the return pointer is also cleared out,
+            // so we won't be able to report the time spent in this Profiler's subtree.
+            parentStateNode.passiveEffectDuration += elapsedTime;
+          }
+          return;
       }
       parentFiber = parentFiber.return;
     }
@@ -147,13 +205,17 @@ function transferActualDuration(fiber) {
 
 export {
   getCommitTime,
+  isCurrentUpdateNested,
+  markNestedUpdateScheduled,
   recordCommitTime,
   recordLayoutEffectDuration,
   recordPassiveEffectDuration,
+  resetNestedUpdateFlag,
   startLayoutEffectTimer,
   startPassiveEffectTimer,
   startProfilerTimer,
   stopProfilerTimerIfRunning,
   stopProfilerTimerIfRunningAndRecordDelta,
+  syncNestedUpdateFlag,
   transferActualDuration,
 };

@@ -18,13 +18,11 @@ import {
   SuspenseListComponent,
   OffscreenComponent,
   LegacyHiddenComponent,
+  CacheComponent,
 } from './ReactWorkTags';
 import {DidCapture, NoFlags, ShouldCapture} from './ReactFiberFlags';
 import {NoMode, ProfileMode} from './ReactTypeOfMode';
-import {
-  enableSuspenseServerRenderer,
-  enableProfilerTimer,
-} from 'shared/ReactFeatureFlags';
+import {enableProfilerTimer, enableCache} from 'shared/ReactFeatureFlags';
 
 import {popHostContainer, popHostContext} from './ReactFiberHostContext.new';
 import {popSuspenseContext} from './ReactFiberSuspenseContext.new';
@@ -36,11 +34,17 @@ import {
 } from './ReactFiberContext.new';
 import {popProvider} from './ReactFiberNewContext.new';
 import {popRenderLanes} from './ReactFiberWorkLoop.new';
+import {popCacheProvider} from './ReactFiberCacheComponent.new';
 import {transferActualDuration} from './ReactProfilerTimer.new';
+import {popTreeContext} from './ReactFiberTreeContext.new';
+import {popRootTransition, popTransition} from './ReactFiberTransition.new';
 
-import invariant from 'shared/invariant';
-
-function unwindWork(workInProgress, renderLanes) {
+function unwindWork(current, workInProgress, renderLanes) {
+  // Note: This intentionally doesn't check if we're hydrating because comparing
+  // to the current tree provider fiber is just as fast and less error-prone.
+  // Ideally we would have a special version of the work loop only
+  // for hydration.
+  popTreeContext(workInProgress);
   switch (workInProgress.tag) {
     case ClassComponent: {
       const Component = workInProgress.type;
@@ -61,17 +65,27 @@ function unwindWork(workInProgress, renderLanes) {
       return null;
     }
     case HostRoot: {
+      const root = workInProgress.stateNode;
+      if (enableCache) {
+        const cache = workInProgress.memoizedState.cache;
+        popCacheProvider(workInProgress, cache);
+      }
+      popRootTransition(workInProgress, root, renderLanes);
       popHostContainer(workInProgress);
       popTopLevelLegacyContextObject(workInProgress);
       resetMutableSourceWorkInProgressVersions();
       const flags = workInProgress.flags;
-      invariant(
-        (flags & DidCapture) === NoFlags,
-        'The root failed to unmount after an error. This is likely a bug in ' +
-          'React. Please file an issue.',
-      );
-      workInProgress.flags = (flags & ~ShouldCapture) | DidCapture;
-      return workInProgress;
+      if (
+        (flags & ShouldCapture) !== NoFlags &&
+        (flags & DidCapture) === NoFlags
+      ) {
+        // There was an error during render that wasn't captured by a suspense
+        // boundary. Do a second pass on the root to unmount the children.
+        workInProgress.flags = (flags & ~ShouldCapture) | DidCapture;
+        return workInProgress;
+      }
+      // We unwound to the root without completing it. Exit.
+      return null;
     }
     case HostComponent: {
       // TODO: popHydrationState
@@ -80,17 +94,18 @@ function unwindWork(workInProgress, renderLanes) {
     }
     case SuspenseComponent: {
       popSuspenseContext(workInProgress);
-      if (enableSuspenseServerRenderer) {
-        const suspenseState = workInProgress.memoizedState;
-        if (suspenseState !== null && suspenseState.dehydrated !== null) {
-          invariant(
-            workInProgress.alternate !== null,
+      const suspenseState = workInProgress.memoizedState;
+      if (suspenseState !== null && suspenseState.dehydrated !== null) {
+        if (workInProgress.alternate === null) {
+          throw new Error(
             'Threw in newly mounted dehydrated component. This is likely a bug in ' +
               'React. Please file an issue.',
           );
-          resetHydrationState();
         }
+
+        resetHydrationState();
       }
+
       const flags = workInProgress.flags;
       if (flags & ShouldCapture) {
         workInProgress.flags = (flags & ~ShouldCapture) | DidCapture;
@@ -115,18 +130,31 @@ function unwindWork(workInProgress, renderLanes) {
       popHostContainer(workInProgress);
       return null;
     case ContextProvider:
-      popProvider(workInProgress);
+      const context = workInProgress.type._context;
+      popProvider(context, workInProgress);
       return null;
     case OffscreenComponent:
     case LegacyHiddenComponent:
       popRenderLanes(workInProgress);
+      popTransition(workInProgress, current);
+      return null;
+    case CacheComponent:
+      if (enableCache) {
+        const cache = workInProgress.memoizedState.cache;
+        popCacheProvider(workInProgress, cache);
+      }
       return null;
     default:
       return null;
   }
 }
 
-function unwindInterruptedWork(interruptedWork) {
+function unwindInterruptedWork(current, interruptedWork, renderLanes) {
+  // Note: This intentionally doesn't check if we're hydrating because comparing
+  // to the current tree provider fiber is just as fast and less error-prone.
+  // Ideally we would have a special version of the work loop only
+  // for hydration.
+  popTreeContext(interruptedWork);
   switch (interruptedWork.tag) {
     case ClassComponent: {
       const childContextTypes = interruptedWork.type.childContextTypes;
@@ -136,6 +164,12 @@ function unwindInterruptedWork(interruptedWork) {
       break;
     }
     case HostRoot: {
+      const root = interruptedWork.stateNode;
+      if (enableCache) {
+        const cache = interruptedWork.memoizedState.cache;
+        popCacheProvider(interruptedWork, cache);
+      }
+      popRootTransition(interruptedWork, root, renderLanes);
       popHostContainer(interruptedWork);
       popTopLevelLegacyContextObject(interruptedWork);
       resetMutableSourceWorkInProgressVersions();
@@ -155,11 +189,19 @@ function unwindInterruptedWork(interruptedWork) {
       popSuspenseContext(interruptedWork);
       break;
     case ContextProvider:
-      popProvider(interruptedWork);
+      const context = interruptedWork.type._context;
+      popProvider(context, interruptedWork);
       break;
     case OffscreenComponent:
     case LegacyHiddenComponent:
       popRenderLanes(interruptedWork);
+      popTransition(interruptedWork, current);
+      break;
+    case CacheComponent:
+      if (enableCache) {
+        const cache = interruptedWork.memoizedState.cache;
+        popCacheProvider(interruptedWork, cache);
+      }
       break;
     default:
       break;

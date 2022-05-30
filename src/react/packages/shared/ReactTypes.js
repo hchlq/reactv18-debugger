@@ -7,10 +7,6 @@
  *
  */
 
-export const DiscreteEvent = 0;
-export const UserBlockingEvent = 1;
-export const ContinuousEvent = 2;
-
 // Mutable source version can be anything (e.g. number, string, immutable data structure)
 // so long as it changes every time any part of the source changes.
 

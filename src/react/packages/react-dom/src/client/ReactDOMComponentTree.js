@@ -16,7 +16,6 @@ import {
 
 import {getParentSuspenseInstance} from './ReactDOMHostConfig';
 
-import invariant from 'shared/invariant';
 import {enableScopeAPI} from 'shared/ReactFeatureFlags';
 
 const randomKey = Math.random().toString(36).slice(2);
@@ -26,6 +25,16 @@ const internalContainerInstanceKey = '__reactContainer$' + randomKey;
 const internalEventHandlersKey = '__reactEvents$' + randomKey;
 const internalEventHandlerListenersKey = '__reactListeners$' + randomKey;
 const internalEventHandlesSetKey = '__reactHandles$' + randomKey;
+
+export function detachDeletedInstance(node) {
+  // TODO: This function is only called on host components. I don't think all of
+  // these fields are relevant.
+  delete node[internalInstanceKey];
+  delete node[internalPropsKey];
+  delete node[internalEventHandlersKey];
+  delete node[internalEventHandlerListenersKey];
+  delete node[internalEventHandlesSetKey];
+}
 
 export function precacheFiberNode(hostInst, node) {
   node[internalInstanceKey] = hostInst;
@@ -159,7 +168,7 @@ export function getNodeFromInstance(inst) {
 
   // Without this first invariant, passing a non-DOM-component triggers the next
   // invariant for a missing parent, which is super confusing.
-  invariant(false, 'getNodeFromInstance: Invalid argument.');
+  throw new Error('getNodeFromInstance: Invalid argument.');
 }
 
 export function getFiberCurrentPropsFromNode(node) {

@@ -9,63 +9,76 @@ import {
   getAppendComponentStack,
   getBreakOnConsoleErrors,
   getSavedComponentFilters,
+  getShowInlineWarningsAndErrors,
+  getHideConsoleLogsInStrictMode,
 } from 'react-devtools-shared/src/utils';
-import {
-  MESSAGE_TYPE_GET_SAVED_PREFERENCES,
-  MESSAGE_TYPE_SAVED_PREFERENCES,
-} from './constants';
 
-export function initialize(contentWindow) {
-  const onGetSavedPreferencesMessage = ({data, source}) => {
-    if (source === 'react-devtools-content-script') {
-      // Ignore messages from the DevTools browser extension.
-    }
+export function createStore(bridge, config) {
+  return new Store(bridge, {
+    checkBridgeProtocolCompatibility: true,
+    supportsTraceUpdates: true,
+    supportsTimeline: true,
+    supportsNativeInspection: true,
+    ...config,
+  });
+}
 
-    switch (data.type) {
-      case MESSAGE_TYPE_GET_SAVED_PREFERENCES:
-        // This is the only message we're listening for,
-        // so it's safe to cleanup after we've received it.
-        window.removeEventListener('message', onGetSavedPreferencesMessage);
+export function createBridge(contentWindow, wall) {
+  if (wall == null) {
+    wall = {
+      listen(fn) {
+        const onMessage = ({data}) => {
+          fn(data);
+        };
+        window.addEventListener('message', onMessage);
+        return () => {
+          window.removeEventListener('message', onMessage);
+        };
+      },
+      send(event, payload, transferable) {
+        contentWindow.postMessage({event, payload}, '*', transferable);
+      },
+    };
+  }
 
-        // The renderer interface can't read saved preferences directly,
-        // because they are stored in localStorage within the context of the extension.
-        // Instead it relies on the extension to pass them through.
-        contentWindow.postMessage(
-          {
-            type: MESSAGE_TYPE_SAVED_PREFERENCES,
-            appendComponentStack: getAppendComponentStack(),
-            breakOnConsoleErrors: getBreakOnConsoleErrors(),
-            componentFilters: getSavedComponentFilters(),
-          },
-          '*',
-        );
-        break;
-      default:
-        break;
-    }
+  return new Bridge(wall);
+}
+
+export function initialize(contentWindow, {bridge, store} = {}) {
+  if (bridge == null) {
+    bridge = createBridge(contentWindow);
+  }
+
+  // Type refinement.
+  const frontendBridge = bridge;
+
+  if (store == null) {
+    store = createStore(frontendBridge);
+  }
+
+  const onGetSavedPreferences = () => {
+    // This is the only message we're listening for,
+    // so it's safe to cleanup after we've received it.
+    frontendBridge.removeListener('getSavedPreferences', onGetSavedPreferences);
+
+    const data = {
+      appendComponentStack: getAppendComponentStack(),
+      breakOnConsoleErrors: getBreakOnConsoleErrors(),
+      componentFilters: getSavedComponentFilters(),
+      showInlineWarningsAndErrors: getShowInlineWarningsAndErrors(),
+      hideConsoleLogsInStrictMode: getHideConsoleLogsInStrictMode(),
+    };
+
+    // The renderer interface can't read saved preferences directly,
+    // because they are stored in localStorage within the context of the extension.
+    // Instead it relies on the extension to pass them through.
+    frontendBridge.send('savedPreferences', data);
   };
 
-  window.addEventListener('message', onGetSavedPreferencesMessage);
-
-  const bridge = new Bridge({
-    listen(fn) {
-      const onMessage = ({data}) => {
-        fn(data);
-      };
-      window.addEventListener('message', onMessage);
-      return () => {
-        window.removeEventListener('message', onMessage);
-      };
-    },
-    send(event, payload, transferable) {
-      contentWindow.postMessage({event, payload}, '*', transferable);
-    },
-  });
-
-  const store = new Store(bridge, {supportsTraceUpdates: true});
+  frontendBridge.addListener('getSavedPreferences', onGetSavedPreferences);
 
   const ForwardRef = forwardRef((props, ref) => (
-    <DevTools ref={ref} bridge={bridge} store={store} {...props} />
+    <DevTools ref={ref} bridge={frontendBridge} store={store} {...props} />
   ));
   ForwardRef.displayName = 'DevTools';
 

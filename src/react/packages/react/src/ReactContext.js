@@ -9,27 +9,12 @@
 
 import {REACT_PROVIDER_TYPE, REACT_CONTEXT_TYPE} from 'shared/ReactSymbols';
 
-export function createContext(defaultValue, calculateChangedBits) {
-  if (calculateChangedBits === undefined) {
-    calculateChangedBits = null;
-  } else {
-    if (__DEV__) {
-      if (
-        calculateChangedBits !== null &&
-        typeof calculateChangedBits !== 'function'
-      ) {
-        console.error(
-          'createContext: Expected the optional second argument to be a ' +
-            'function. Instead received: %s',
-          calculateChangedBits,
-        );
-      }
-    }
-  }
+export function createContext(defaultValue) {
+  // TODO: Second argument used to be an optional `calculateChangedBits`
+  // function. Warn to reserve for future use?
 
   const context = {
     $$typeof: REACT_CONTEXT_TYPE,
-    _calculateChangedBits: calculateChangedBits,
     // As a workaround to support multiple concurrent renderers, we categorize
     // some renderers as primary and others as secondary. We only expect
     // there to be two concurrent renderers at most: React Native (primary) and
@@ -43,6 +28,10 @@ export function createContext(defaultValue, calculateChangedBits) {
     // These are circular
     Provider: null,
     Consumer: null,
+
+    // Add these to use same hidden class in VM as ServerContext
+    _defaultValue: null,
+    _globalName: null,
   };
 
   context.Provider = {
@@ -61,7 +50,6 @@ export function createContext(defaultValue, calculateChangedBits) {
     const Consumer = {
       $$typeof: REACT_CONTEXT_TYPE,
       _context: context,
-      _calculateChangedBits: context._calculateChangedBits,
     };
     // $FlowFixMe: Flow complains about not setting a value, which is intentional here
     Object.defineProperties(Consumer, {

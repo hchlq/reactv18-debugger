@@ -18,7 +18,7 @@ import styles from './InspectedElementSharedStyles.css';
 
 export default function InspectedElementStateTree({
   bridge,
-  getInspectedElementPath,
+  element,
   inspectedElement,
   store,
 }) {
@@ -57,7 +57,7 @@ export default function InspectedElementStateTree({
               canEditValues={true}
               canRenamePaths={true}
               depth={1}
-              getInspectedElementPath={getInspectedElementPath}
+              element={element}
               hidden={false}
               inspectedElement={inspectedElement}
               name={name}

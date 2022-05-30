@@ -12,6 +12,7 @@ import {
   deepDiffer,
   flattenStyle,
 } from 'react-native/Libraries/ReactPrivate/ReactNativePrivateInterface';
+import isArray from 'shared/isArray';
 
 const emptyObject = {};
 
@@ -47,7 +48,7 @@ function restoreDeletedValuesInNestedArray(
   node,
   validAttributes,
 ) {
-  if (Array.isArray(node)) {
+  if (isArray(node)) {
     let i = node.length;
     while (i-- && removedKeyCount > 0) {
       restoreDeletedValuesInNestedArray(
@@ -159,12 +160,12 @@ function diffNestedProperty(
     return updatePayload;
   }
 
-  if (!Array.isArray(prevProp) && !Array.isArray(nextProp)) {
+  if (!isArray(prevProp) && !isArray(nextProp)) {
     // Both are leaves, we can diff the leaves.
     return diffProperties(updatePayload, prevProp, nextProp, validAttributes);
   }
 
-  if (Array.isArray(prevProp) && Array.isArray(nextProp)) {
+  if (isArray(prevProp) && isArray(nextProp)) {
     // Both are arrays, we can diff the arrays.
     return diffNestedArrayProperty(
       updatePayload,
@@ -174,7 +175,7 @@ function diffNestedProperty(
     );
   }
 
-  if (Array.isArray(prevProp)) {
+  if (isArray(prevProp)) {
     return diffProperties(
       updatePayload,
       // $FlowFixMe - We know that this is always an object when the input is.
@@ -204,7 +205,7 @@ function addNestedProperty(updatePayload, nextProp, validAttributes) {
     return updatePayload;
   }
 
-  if (!Array.isArray(nextProp)) {
+  if (!isArray(nextProp)) {
     // Add each property of the leaf.
     return addProperties(updatePayload, nextProp, validAttributes);
   }
@@ -230,7 +231,7 @@ function clearNestedProperty(updatePayload, prevProp, validAttributes) {
     return updatePayload;
   }
 
-  if (!Array.isArray(prevProp)) {
+  if (!isArray(prevProp)) {
     // Add each property of the leaf.
     return clearProperties(updatePayload, prevProp, validAttributes);
   }

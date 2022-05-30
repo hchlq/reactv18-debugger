@@ -7,7 +7,7 @@
  *
  */
 
-import invariant from 'shared/invariant';
+import isArray from 'shared/isArray';
 
 import {checkControlledValueProps} from '../shared/ReactControlledValuePropTypes';
 import {getCurrentFiberOwnerNameInDevOrNull} from 'react-reconciler/src/ReactCurrentFiber';
@@ -35,10 +35,12 @@ let didWarnValDefaultVal = false;
 
 export function getHostProps(element, props) {
   const node = element;
-  invariant(
-    props.dangerouslySetInnerHTML == null,
-    '`dangerouslySetInnerHTML` does not make sense on <textarea>.',
-  );
+
+  if (props.dangerouslySetInnerHTML != null) {
+    throw new Error(
+      '`dangerouslySetInnerHTML` does not make sense on <textarea>.',
+    );
+  }
 
   // Always set children to the same thing. In IE9, the selection range will
   // get reset if `textContent` is mutated.  We could add a check in setTextContent
@@ -91,15 +93,17 @@ export function initWrapperState(element, props) {
         );
       }
       if (!disableTextareaChildren) {
-        invariant(
-          defaultValue == null,
-          'If you supply `defaultValue` on a <textarea>, do not pass children.',
-        );
-        if (Array.isArray(children)) {
-          invariant(
-            children.length <= 1,
-            '<textarea> can only have at most one child.',
+        if (defaultValue != null) {
+          throw new Error(
+            'If you supply `defaultValue` on a <textarea>, do not pass children.',
           );
+        }
+
+        if (isArray(children)) {
+          if (children.length > 1) {
+            throw new Error('<textarea> can only have at most one child.');
+          }
+
           children = children[0];
         }
 

@@ -7,4 +7,4 @@
  *
  */
 
-export * from '../ReactServerStreamConfigNode';
+export * from 'react-server-dom-relay/src/ReactServerStreamConfigFB';

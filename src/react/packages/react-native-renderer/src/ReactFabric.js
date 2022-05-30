@@ -12,31 +12,33 @@ import './ReactFabricInjection';
 import {
   findHostInstance,
   findHostInstanceWithWarning,
-  batchedEventUpdates,
   batchedUpdates as batchedUpdatesImpl,
   discreteUpdates,
-  flushDiscreteUpdates,
   createContainer,
   updateContainer,
   injectIntoDevTools,
   getPublicRootInstance,
 } from 'react-reconciler/src/ReactFiberReconciler';
+import {getInspectorDataForInstance} from './ReactNativeFiberInspector';
 
 import {createPortal as createPortalImpl} from 'react-reconciler/src/ReactPortal';
 import {setBatchingImplementation} from './legacy-events/ReactGenericBatching';
 import ReactVersion from 'shared/ReactVersion';
 
-// Module provided by RN:
-import {UIManager} from 'react-native/Libraries/ReactPrivate/ReactNativePrivateInterface';
+// Modules provided by RN:
+import {
+  UIManager,
+  legacySendAccessibilityEvent,
+} from 'react-native/Libraries/ReactPrivate/ReactNativePrivateInterface';
 
 import {getClosestInstanceFromNode} from './ReactFabricComponentTree';
 import {
   getInspectorDataForViewTag,
   getInspectorDataForViewAtPoint,
 } from './ReactNativeFiberInspector';
-import {LegacyRoot} from 'react-reconciler/src/ReactRootTags';
+import {LegacyRoot, ConcurrentRoot} from 'react-reconciler/src/ReactRootTags';
 import ReactSharedInternals from 'shared/ReactSharedInternals';
-import getComponentName from 'shared/getComponentName';
+import getComponentNameFromType from 'shared/getComponentNameFromType';
 
 const ReactCurrentOwner = ReactSharedInternals.ReactCurrentOwner;
 
@@ -51,7 +53,7 @@ function findHostInstance_DEPRECATED(componentOrHandle) {
             'never access something that requires stale data from the previous ' +
             'render, such as refs. Move this logic to componentDidMount and ' +
             'componentDidUpdate instead.',
-          getComponentName(owner.type) || 'A component',
+          getComponentNameFromType(owner.type) || 'A component',
         );
       }
 
@@ -61,10 +63,14 @@ function findHostInstance_DEPRECATED(componentOrHandle) {
   if (componentOrHandle == null) {
     return null;
   }
+  // $FlowIssue Flow has hardcoded values for React DOM that don't work with RN
   if (componentOrHandle._nativeTag) {
+    // $FlowIssue Flow has hardcoded values for React DOM that don't work with RN
     return componentOrHandle;
   }
+  // $FlowIssue Flow has hardcoded values for React DOM that don't work with RN
   if (componentOrHandle.canonical && componentOrHandle.canonical._nativeTag) {
+    // $FlowIssue Flow has hardcoded values for React DOM that don't work with RN
     return componentOrHandle.canonical;
   }
   let hostInstance;
@@ -84,6 +90,7 @@ function findHostInstance_DEPRECATED(componentOrHandle) {
     // Fabric
     return hostInstance.canonical;
   }
+  // $FlowFixMe[incompatible-return]
   return hostInstance;
 }
 
@@ -98,7 +105,7 @@ function findNodeHandle(componentOrHandle) {
             'never access something that requires stale data from the previous ' +
             'render, such as refs. Move this logic to componentDidMount and ' +
             'componentDidUpdate instead.',
-          getComponentName(owner.type) || 'A component',
+          getComponentNameFromType(owner.type) || 'A component',
         );
       }
 
@@ -148,32 +155,67 @@ function dispatchCommand(handle, command, args) {
           'native component. Use React.forwardRef to get access to the underlying native component',
       );
     }
-
     return;
   }
 
-  if (handle._internalInstanceHandle) {
-    nativeFabricUIManager.dispatchCommand(
-      handle._internalInstanceHandle.stateNode.node,
-      command,
-      args,
-    );
+  if (handle._internalInstanceHandle != null) {
+    const {stateNode} = handle._internalInstanceHandle;
+    if (stateNode != null) {
+      nativeFabricUIManager.dispatchCommand(stateNode.node, command, args);
+    }
   } else {
     UIManager.dispatchViewManagerCommand(handle._nativeTag, command, args);
   }
 }
 
-function render(element, containerTag, callback) {
+function sendAccessibilityEvent(handle, eventType) {
+  if (handle._nativeTag == null) {
+    if (__DEV__) {
+      console.error(
+        "sendAccessibilityEvent was called with a ref that isn't a " +
+          'native component. Use React.forwardRef to get access to the underlying native component',
+      );
+    }
+    return;
+  }
+
+  if (handle._internalInstanceHandle != null) {
+    const {stateNode} = handle._internalInstanceHandle;
+    if (stateNode != null) {
+      nativeFabricUIManager.sendAccessibilityEvent(stateNode.node, eventType);
+    }
+  } else {
+    legacySendAccessibilityEvent(handle._nativeTag, eventType);
+  }
+}
+
+function onRecoverableError(error) {
+  // TODO: Expose onRecoverableError option to userspace
+  // eslint-disable-next-line react-internal/no-production-logging, react-internal/warning-args
+  console.error(error);
+}
+
+function render(element, containerTag, callback, concurrentRoot) {
   let root = roots.get(containerTag);
 
   if (!root) {
     // TODO (bvaughn): If we decide to keep the wrapper component,
     // We could create a wrapper for containerTag as well to reduce special casing.
-    root = createContainer(containerTag, LegacyRoot, false, null);
+    root = createContainer(
+      containerTag,
+      concurrentRoot ? ConcurrentRoot : LegacyRoot,
+      null,
+      false,
+      null,
+      '',
+      onRecoverableError,
+      null,
+    );
     roots.set(containerTag, root);
   }
   updateContainer(element, root, null, callback);
 
+  // $FlowIssue Flow has hardcoded values for React DOM that don't work with RN
   return getPublicRootInstance(root);
 }
 
@@ -195,12 +237,7 @@ function createPortal(children, containerTag, key = null) {
   return createPortalImpl(children, containerTag, null, key);
 }
 
-setBatchingImplementation(
-  batchedUpdatesImpl,
-  discreteUpdates,
-  flushDiscreteUpdates,
-  batchedEventUpdates,
-);
+setBatchingImplementation(batchedUpdatesImpl, discreteUpdates);
 
 const roots = new Map();
 
@@ -210,12 +247,16 @@ export {
   findHostInstance_DEPRECATED,
   findNodeHandle,
   dispatchCommand,
+  sendAccessibilityEvent,
   render,
   // Deprecated - this function is being renamed to stopSurface, use that instead.
   // TODO (T47576999): Delete this once it's no longer called from native code.
   unmountComponentAtNode,
   stopSurface,
   createPortal,
+  // This export is typically undefined in production builds.
+  // See the "enableGetInspectorDataForInstanceInProduction" flag.
+  getInspectorDataForInstance,
 };
 
 injectIntoDevTools({

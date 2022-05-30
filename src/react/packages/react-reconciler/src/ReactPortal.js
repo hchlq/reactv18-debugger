@@ -8,6 +8,7 @@
  */
 
 import {REACT_PORTAL_TYPE} from 'shared/ReactSymbols';
+import {checkKeyStringCoercion} from 'shared/CheckStringCoercion';
 
 export function createPortal(
   children,
@@ -16,6 +17,9 @@ export function createPortal(
   implementation,
   key = null,
 ) {
+  if (__DEV__) {
+    checkKeyStringCoercion(key);
+  }
   return {
     // This tag allow us to uniquely identify this as a React Portal
     $$typeof: REACT_PORTAL_TYPE,

@@ -31,6 +31,7 @@ export default function RecordToggle({disabled}) {
       className={className}
       disabled={disabled}
       onClick={isProfiling ? stopProfiling : startProfiling}
+      testName="ProfilerToggleButton"
       title={isProfiling ? 'Stop profiling' : 'Start profiling'}
     >
       <ButtonIcon type="record" />

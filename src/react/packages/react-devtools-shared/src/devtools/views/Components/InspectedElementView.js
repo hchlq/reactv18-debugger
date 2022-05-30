@@ -19,22 +19,29 @@ import ButtonIcon from '../ButtonIcon';
 import Icon from '../Icon';
 import HocBadges from './HocBadges';
 import InspectedElementContextTree from './InspectedElementContextTree';
+import InspectedElementErrorsAndWarningsTree from './InspectedElementErrorsAndWarningsTree';
 import InspectedElementHooksTree from './InspectedElementHooksTree';
 import InspectedElementPropsTree from './InspectedElementPropsTree';
 import InspectedElementStateTree from './InspectedElementStateTree';
+import InspectedElementStyleXPlugin from './InspectedElementStyleXPlugin';
 import InspectedElementSuspenseToggle from './InspectedElementSuspenseToggle';
 import NativeStyleEditor from './NativeStyleEditor';
 import Badge from './Badge';
 import {useHighlightNativeElement} from '../hooks';
+import {
+  copyInspectedElementPath as copyInspectedElementPathAPI,
+  storeAsGlobal as storeAsGlobalAPI,
+} from 'react-devtools-shared/src/backendAPI';
+import {enableStyleXFeatures} from 'react-devtools-feature-flags';
 
 import styles from './InspectedElementView.css';
 
 export default function InspectedElementView({
-  copyInspectedElementPath,
   element,
-  getInspectedElementPath,
+  hookNames,
   inspectedElement,
-  storeAsGlobal,
+  parseHookNames,
+  toggleParseHookNames,
 }) {
   const {id} = element;
   const {owners, rendererPackageName, rendererVersion, rootType, source} =
@@ -63,7 +70,7 @@ export default function InspectedElementView({
 
         <InspectedElementPropsTree
           bridge={bridge}
-          getInspectedElementPath={getInspectedElementPath}
+          element={element}
           inspectedElement={inspectedElement}
           store={store}
         />
@@ -76,21 +83,40 @@ export default function InspectedElementView({
 
         <InspectedElementStateTree
           bridge={bridge}
-          getInspectedElementPath={getInspectedElementPath}
+          element={element}
           inspectedElement={inspectedElement}
           store={store}
         />
 
         <InspectedElementHooksTree
           bridge={bridge}
-          getInspectedElementPath={getInspectedElementPath}
+          element={element}
+          hookNames={hookNames}
           inspectedElement={inspectedElement}
+          parseHookNames={parseHookNames}
           store={store}
+          toggleParseHookNames={toggleParseHookNames}
         />
 
         <InspectedElementContextTree
           bridge={bridge}
-          getInspectedElementPath={getInspectedElementPath}
+          element={element}
+          inspectedElement={inspectedElement}
+          store={store}
+        />
+
+        {enableStyleXFeatures && (
+          <InspectedElementStyleXPlugin
+            bridge={bridge}
+            element={element}
+            inspectedElement={inspectedElement}
+            store={store}
+          />
+        )}
+
+        <InspectedElementErrorsAndWarningsTree
+          bridge={bridge}
+          element={element}
           inspectedElement={inspectedElement}
           store={store}
         />
@@ -98,7 +124,10 @@ export default function InspectedElementView({
         <NativeStyleEditor />
 
         {showRenderedBy && (
-          <div className={styles.Owners}>
+          <div
+            className={styles.Owners}
+            data-testname="InspectedElementView-Owners"
+          >
             <div className={styles.OwnersHeader}>rendered by</div>
             {showOwnersList &&
               owners.map((owner) => (
@@ -127,37 +156,63 @@ export default function InspectedElementView({
 
       {isContextMenuEnabledForInspectedElement && (
         <ContextMenu id="InspectedElement">
-          {(data) => (
-            <Fragment>
-              <ContextMenuItem
-                onClick={() => copyInspectedElementPath(id, data.path)}
-                title="Copy value to clipboard"
-              >
-                <Icon className={styles.ContextMenuIcon} type="copy" /> Copy
-                value to clipboard
-              </ContextMenuItem>
-              <ContextMenuItem
-                onClick={() => storeAsGlobal(id, data.path)}
-                title="Store as global variable"
-              >
-                <Icon
-                  className={styles.ContextMenuIcon}
-                  type="store-as-global-variable"
-                />{' '}
-                Store as global variable
-              </ContextMenuItem>
-              {viewAttributeSourceFunction !== null &&
-                data.type === 'function' && (
-                  <ContextMenuItem
-                    onClick={() => viewAttributeSourceFunction(id, data.path)}
-                    title="Go to definition"
-                  >
-                    <Icon className={styles.ContextMenuIcon} type="code" /> Go
-                    to definition
-                  </ContextMenuItem>
-                )}
-            </Fragment>
-          )}
+          {({path, type: pathType}) => {
+            const copyInspectedElementPath = () => {
+              const rendererID = store.getRendererIDForElement(id);
+              if (rendererID !== null) {
+                copyInspectedElementPathAPI({
+                  bridge,
+                  id,
+                  path,
+                  rendererID,
+                });
+              }
+            };
+
+            const storeAsGlobal = () => {
+              const rendererID = store.getRendererIDForElement(id);
+              if (rendererID !== null) {
+                storeAsGlobalAPI({
+                  bridge,
+                  id,
+                  path,
+                  rendererID,
+                });
+              }
+            };
+
+            return (
+              <Fragment>
+                <ContextMenuItem
+                  onClick={copyInspectedElementPath}
+                  title="Copy value to clipboard"
+                >
+                  <Icon className={styles.ContextMenuIcon} type="copy" /> Copy
+                  value to clipboard
+                </ContextMenuItem>
+                <ContextMenuItem
+                  onClick={storeAsGlobal}
+                  title="Store as global variable"
+                >
+                  <Icon
+                    className={styles.ContextMenuIcon}
+                    type="store-as-global-variable"
+                  />{' '}
+                  Store as global variable
+                </ContextMenuItem>
+                {viewAttributeSourceFunction !== null &&
+                  pathType === 'function' && (
+                    <ContextMenuItem
+                      onClick={() => viewAttributeSourceFunction(id, path)}
+                      title="Go to definition"
+                    >
+                      <Icon className={styles.ContextMenuIcon} type="code" /> Go
+                      to definition
+                    </ContextMenuItem>
+                  )}
+              </Fragment>
+            );
+          }}
         </ContextMenu>
       )}
     </Fragment>
@@ -189,7 +244,7 @@ function formatSourceForDisplay(fileName, lineNumber) {
 function Source({fileName, lineNumber}) {
   const handleCopy = () => copy(`${fileName}:${lineNumber}`);
   return (
-    <div className={styles.Source}>
+    <div className={styles.Source} data-testname="InspectedElementView-Source">
       <div className={styles.SourceHeaderRow}>
         <div className={styles.SourceHeader}>source</div>
         <Button onClick={handleCopy} title="Copy to clipboard">
