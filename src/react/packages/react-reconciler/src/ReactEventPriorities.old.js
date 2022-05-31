@@ -26,15 +26,23 @@ export const IdleEventPriority = IdleLane;
 // 默认是 NoLane
 let currentUpdatePriority = NoLane;
 
+/**
+ * 获取当前事件的优先级
+ */
 export function getCurrentUpdatePriority() {
   return currentUpdatePriority;
 }
 
-// 设置本次更新的优先级
+/**
+ * 设置事件的优先级
+ */
 export function setCurrentUpdatePriority(newPriority) {
   currentUpdatePriority = newPriority;
 }
 
+/**
+ * 以优先级 priority 执行 fn
+ */
 export function runWithPriority(priority, fn) {
   const previousPriority = currentUpdatePriority;
   try {
@@ -45,27 +53,42 @@ export function runWithPriority(priority, fn) {
   }
 }
 
+/**
+ * 获取 a 和 b 中优先级较高的
+ */
 export function higherEventPriority(a, b) {
   return a !== 0 && a < b ? a : b;
 }
 
+/**
+ * 获取 a 和 b 中优先级比较低的
+ */
 export function lowerEventPriority(a, b) {
   return a === 0 || a > b ? a : b;
 }
 
+/**
+ * 判断是不是 a 的优先级比 b 的优先级高
+ */
 export function isHigherEventPriority(a, b) {
   return a !== 0 && a < b;
 }
 
+/**
+ * 车道 lane 转为事件优先级
+ */
 export function lanesToEventPriority(lanes) {
   const lane = getHighestPriorityLane(lanes);
   if (!isHigherEventPriority(DiscreteEventPriority, lane)) {
+    //  DiscreteEventPriority > lane
     return DiscreteEventPriority;
   }
   if (!isHigherEventPriority(ContinuousEventPriority, lane)) {
+    // ContinuousEventPriority > lane > DiscreteEventPriority
     return ContinuousEventPriority;
   }
   if (includesNonIdleWork(lane)) {
+    // lane 中包含了非 Idle 的任务
     return DefaultEventPriority;
   }
   return IdleEventPriority;

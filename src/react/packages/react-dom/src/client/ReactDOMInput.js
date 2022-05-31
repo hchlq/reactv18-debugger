@@ -47,6 +47,9 @@ function isControlled(props) {
  * See http://www.w3.org/TR/2012/WD-html5-20121025/the-input-element.html
  */
 
+/**
+ * 给 props 合并一些其他的属性的默认值
+ */
 export function getHostProps(element, props) {
   const node = element;
   const checked = props.checked;
@@ -124,38 +127,6 @@ export function updateChecked(element, props) {
 
 export function updateWrapper(element, props) {
   const node = element;
-  if (__DEV__) {
-    const controlled = isControlled(props);
-
-    if (
-      !node._wrapperState.controlled &&
-      controlled &&
-      !didWarnUncontrolledToControlled
-    ) {
-      console.error(
-        'A component is changing an uncontrolled input to be controlled. ' +
-          'This is likely caused by the value changing from undefined to ' +
-          'a defined value, which should not happen. ' +
-          'Decide between using a controlled or uncontrolled input ' +
-          'element for the lifetime of the component. More info: https://reactjs.org/link/controlled-components',
-      );
-      didWarnUncontrolledToControlled = true;
-    }
-    if (
-      node._wrapperState.controlled &&
-      !controlled &&
-      !didWarnControlledToUncontrolled
-    ) {
-      console.error(
-        'A component is changing a controlled input to be uncontrolled. ' +
-          'This is likely caused by the value changing from a defined to ' +
-          'undefined, which should not happen. ' +
-          'Decide between using a controlled or uncontrolled input ' +
-          'element for the lifetime of the component. More info: https://reactjs.org/link/controlled-components',
-      );
-      didWarnControlledToUncontrolled = true;
-    }
-  }
 
   updateChecked(element, props);
 

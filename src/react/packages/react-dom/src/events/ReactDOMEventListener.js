@@ -463,6 +463,7 @@ export function getEventPriority(domEventName) {
     case 'popstate':
     case 'select':
     case 'selectstart':
+      // 离散事件：1
       return DiscreteEventPriority;
     case 'drag':
     case 'dragenter':
@@ -485,22 +486,24 @@ export function getEventPriority(domEventName) {
     case 'mouseleave':
     case 'pointerenter':
     case 'pointerleave':
+      // 持续的事件：4
       return ContinuousEventPriority;
     case 'message': {
       // We might be in the Scheduler callback.
       // Eventually this mechanism will be replaced by a check
       // of the current priority on the native scheduler.
+      // 在 scheduleCallback 中
       const schedulerPriority = getCurrentSchedulerPriorityLevel();
       switch (schedulerPriority) {
-        case ImmediateSchedulerPriority:
+        case ImmediateSchedulerPriority: // 1
           return DiscreteEventPriority;
-        case UserBlockingSchedulerPriority:
+        case UserBlockingSchedulerPriority: // 2
           return ContinuousEventPriority;
-        case NormalSchedulerPriority:
-        case LowSchedulerPriority:
+        case NormalSchedulerPriority: // 3
+        case LowSchedulerPriority: // 4
           // TODO: Handle LowSchedulerPriority, somehow. Maybe the same lane as hydration.
           return DefaultEventPriority;
-        case IdleSchedulerPriority:
+        case IdleSchedulerPriority: // 5
           return IdleEventPriority;
         default:
           return DefaultEventPriority;

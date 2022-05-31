@@ -105,22 +105,22 @@ export function getValueForProperty(node, name, expected, propertyInfo) {
  * attributes have multiple equivalent values.
  */
 export function getValueForAttribute(node, name, expected) {
-  if (__DEV__) {
-    if (!isAttributeNameSafe(name)) {
-      return;
-    }
-    if (!node.hasAttribute(name)) {
-      return expected === undefined ? undefined : null;
-    }
-    const value = node.getAttribute(name);
-    if (__DEV__) {
-      checkAttributeStringCoercion(expected, name);
-    }
-    if (value === '' + expected) {
-      return expected;
-    }
-    return value;
-  }
+  // if (__DEV__) {
+  //   if (!isAttributeNameSafe(name)) {
+  //     return;
+  //   }
+  //   if (!node.hasAttribute(name)) {
+  //     return expected === undefined ? undefined : null;
+  //   }
+  //   const value = node.getAttribute(name);
+  //   if (__DEV__) {
+  //     checkAttributeStringCoercion(expected, name);
+  //   }
+  //   if (value === '' + expected) {
+  //     return expected;
+  //   }
+  //   return value;
+  // }
 }
 
 /**
@@ -188,9 +188,6 @@ export function setValueForProperty(node, name, value, isCustomComponentTag) {
       if (value === null) {
         node.removeAttribute(attributeName);
       } else {
-        if (__DEV__) {
-          checkAttributeStringCoercion(value, name);
-        }
         node.setAttribute(
           attributeName,
           enableTrustedTypesIntegration ? value : '' + value,

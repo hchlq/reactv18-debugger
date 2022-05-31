@@ -80,6 +80,9 @@ let selectionInformation = null;
 
 export * from 'react-reconciler/src/ReactFiberHostConfigWithNoPersistence';
 
+/**
+ * 获取 rootContainerInstance 的 namespaceURI
+ */
 export function getRootHostContext(rootContainerInstance) {
   let type;
   let namespace;
@@ -87,7 +90,11 @@ export function getRootHostContext(rootContainerInstance) {
   switch (nodeType) {
     case DOCUMENT_NODE:
     case DOCUMENT_FRAGMENT_NODE: {
+      // 1. document
+      // 2. documentFragment
       type = nodeType === DOCUMENT_NODE ? '#document' : '#fragment';
+
+      // 根元素 html
       const root = rootContainerInstance.documentElement;
       namespace = root ? root.namespaceURI : getChildNamespace(null, '');
       break;
@@ -103,57 +110,68 @@ export function getRootHostContext(rootContainerInstance) {
       break;
     }
   }
-  if (__DEV__) {
-    const validatedTag = type.toLowerCase();
-    const ancestorInfo = updatedAncestorInfo(null, validatedTag);
-    return {namespace, ancestorInfo};
-  }
+
+  // 返回 namespace
   return namespace;
 }
 
+/**
+ * 获取 parentHostContext 的 namespace
+ */
 export function getChildHostContext(
   parentHostContext,
   type,
   rootContainerInstance,
 ) {
-  if (__DEV__) {
-    const parentHostContextDev = parentHostContext;
-    const namespace = getChildNamespace(parentHostContextDev.namespace, type);
-    const ancestorInfo = updatedAncestorInfo(
-      parentHostContextDev.ancestorInfo,
-      type,
-    );
-    return {namespace, ancestorInfo};
-  }
   const parentNamespace = parentHostContext;
   return getChildNamespace(parentNamespace, type);
 }
 
+/**
+ * 获取 instance, 返回的还是参数本身
+ */
 export function getPublicInstance(instance) {
   return instance;
 }
 
+/**
+ * commit 之前的准备，获取激活的元素对应的 fiber 节点
+ */
 export function prepareForCommit(containerInfo) {
+  // 默认是 true
   eventsEnabled = ReactBrowserEventEmitterIsEnabled();
+
+  // 获取当前激活的的元素节点
   selectionInformation = getSelectionInformation();
+
   let activeInstance = null;
+  
   if (enableCreateEventHandleAPI) {
     const focusedElem = selectionInformation.focusedElem;
     if (focusedElem !== null) {
+      // 获取最近的 fiber 节点
       activeInstance = getClosestInstanceFromNode(focusedElem);
     }
   }
+
+  // 设置为 false
   ReactBrowserEventEmitterSetEnabled(false);
+
   return activeInstance;
 }
 
+/**
+ * 激活的实例失焦之前
+ */
 export function beforeActiveInstanceBlur(internalInstanceHandle) {
   if (enableCreateEventHandleAPI) {
     ReactBrowserEventEmitterSetEnabled(true);
+
     dispatchBeforeDetachedBlur(
       selectionInformation.focusedElem,
       internalInstanceHandle,
     );
+
     ReactBrowserEventEmitterSetEnabled(false);
   }
 }
@@ -314,7 +332,7 @@ export function createTextInstance(
 }
 
 /**
- * 获取事件的优先级
+ * 根据 window 当前正在处理的事件，获取事件的优先级
  */
 export function getCurrentEventPriority() {
   // 当前浏览器正在处理的事件对象
@@ -323,6 +341,8 @@ export function getCurrentEventPriority() {
     // 没有事件对象，返回默认的优先级
     return DefaultEventPriority;
   }
+
+  // 根据事件的类型，获取优先级，比如 click
   return getEventPriority(currentEvent.type);
 }
 
@@ -342,6 +362,7 @@ const localPromise = typeof Promise === 'function' ? Promise : undefined;
 //     Microtasks
 // -------------------
 export const supportsMicrotasks = true;
+// queueMicrotask > promise > setTimeout
 export const scheduleMicrotask =
   typeof queueMicrotask === 'function'
     ? queueMicrotask
@@ -362,6 +383,9 @@ function handleErrorInNextTick(error) {
 
 export const supportsMutation = true;
 
+/**
+ * commit 挂载，主要处理「可替换元素」
+ */
 export function commitMount(
   domElement,
   type,
@@ -380,11 +404,13 @@ export function commitMount(
     case 'select':
     case 'textarea':
       if (newProps.autoFocus) {
+        // 自动聚焦
         domElement.focus();
       }
       return;
     case 'img': {
       if (newProps.src) {
+        // 设置图片元素
         domElement.src = newProps.src;
       }
       return;
@@ -392,6 +418,9 @@ export function commitMount(
   }
 }
 
+/**
+ * commit 更新
+ */
 export function commitUpdate(
   domElement,
   updatePayload,
@@ -401,28 +430,46 @@ export function commitUpdate(
   internalInstanceHandle,
 ) {
   // Apply the diff to the DOM node.
+  // 更新 props
   updateProperties(domElement, updatePayload, type, oldProps, newProps);
+
   // Update the props handle so that we know which props are the ones with
   // with current event handlers.
+  // 更新 dom 上保存的 props
+  // domElement[internalPropsKey] = newProps
   updateFiberProps(domElement, newProps);
 }
 
+/**
+ * 清空元素的文本内容
+ */
 export function resetTextContent(domElement) {
   setTextContent(domElement, '');
 }
 
+/**
+ * 更新文本内容
+ */
 export function commitTextUpdate(textInstance, oldText, newText) {
   textInstance.nodeValue = newText;
 }
 
+/**
+ * appendChild
+ */
 export function appendChild(parentInstance, child) {
   parentInstance.appendChild(child);
 }
 
+/**
+ * 将 child 插入到 container 中
+ */
 export function appendChildToContainer(container, child) {
   let parentNode;
   if (container.nodeType === COMMENT_NODE) {
+    // container 是注释节点，插入到其 parentNode 中
     parentNode = container.parentNode;
+    // 将 child 插入到注释节点 container 前
     parentNode.insertBefore(child, container);
   } else {
     parentNode = container;
@@ -446,10 +493,18 @@ export function appendChildToContainer(container, child) {
   }
 }
 
+/**
+ * 以 beforeChild 为参考节点，将 child 插入到 parentInstance 中
+ */
 export function insertBefore(parentInstance, child, beforeChild) {
   parentInstance.insertBefore(child, beforeChild);
 }
 
+/**
+ * 以 beforeChild 为参考节点，将 child 插入到 container 中
+ * 
+ * 如果 container 是注释节点，那么插入到其父节点中
+ */
 export function insertInContainerBefore(container, child, beforeChild) {
   if (container.nodeType === COMMENT_NODE) {
     container.parentNode.insertBefore(child, beforeChild);
@@ -458,12 +513,18 @@ export function insertInContainerBefore(container, child, beforeChild) {
   }
 }
 
+/**
+ * 创建事件类型为 type 的事件对象
+ */
 function createEvent(type, bubbles) {
   const event = document.createEvent('Event');
   event.initEvent(type, bubbles, false);
   return event;
 }
 
+/**
+ * 派发 beforeblur 事件
+ */
 function dispatchBeforeDetachedBlur(target, internalInstanceHandle) {
   if (enableCreateEventHandleAPI) {
     const event = createEvent('beforeblur', true);
@@ -472,10 +533,14 @@ function dispatchBeforeDetachedBlur(target, internalInstanceHandle) {
     // can propagate through the React internal tree.
     // $FlowFixMe: internal field
     event._detachedInterceptFiber = internalInstanceHandle;
+    
     target.dispatchEvent(event);
   }
 }
 
+/**
+ * 派发 afterblur 事件
+ */
 function dispatchAfterDetachedBlur(target) {
   if (enableCreateEventHandleAPI) {
     const event = createEvent('afterblur', false);
@@ -487,10 +552,18 @@ function dispatchAfterDetachedBlur(target) {
   }
 }
 
+/**
+ * 移除 parentInstance 下的 child 孩子
+ */
 export function removeChild(parentInstance, child) {
   parentInstance.removeChild(child);
 }
 
+/**
+ * 移除 container 下的 child 孩子
+ * 
+ * 如果 container 是注释节点，那么使用 container.parentNode 来移除 child
+ */
 export function removeChildFromContainer(container, child) {
   if (container.nodeType === COMMENT_NODE) {
     container.parentNode.removeChild(child);
@@ -549,6 +622,9 @@ export function clearSuspenseBoundaryFromContainer(
   retryIfBlockedOn(container);
 }
 
+/**
+ * 隐藏 instance 元素
+ */
 export function hideInstance(instance) {
   // TODO: Does this work for all element types? What about MathML? Should we
   // pass host context to this method?
@@ -561,31 +637,48 @@ export function hideInstance(instance) {
   }
 }
 
+/**
+ * 清空文本节点的内容
+ */
 export function hideTextInstance(textInstance) {
   textInstance.nodeValue = '';
 }
 
+/**
+ * 显示 instance 元素，从 props 中取出 display 属性
+ */
 export function unhideInstance(instance, props) {
-  instance = instance;
   const styleProp = props[STYLE];
+
+  // 获取 display 值
   const display =
     styleProp !== undefined &&
     styleProp !== null &&
     styleProp.hasOwnProperty('display')
       ? styleProp.display
       : null;
+
   instance.style.display = dangerousStyleValue('display', display);
 }
 
+/**
+ * 设置文本节点的内容
+ */
 export function unhideTextInstance(textInstance, text) {
   textInstance.nodeValue = text;
 }
 
+/**
+ * 清除元素内容
+ */
 export function clearContainer(container) {
   if (container.nodeType === ELEMENT_NODE) {
+    // 元素节点
     container.textContent = '';
   } else if (container.nodeType === DOCUMENT_NODE) {
+    // document 节点
     if (container.documentElement) {
+      // document.documentElement 就是 html 元素
       container.removeChild(container.documentElement);
     }
   }
