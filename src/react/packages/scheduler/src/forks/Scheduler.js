@@ -274,6 +274,9 @@ function workLoop(hasTimeRemaining, initialTime) {
   }
 }
 
+/**
+ * 以调度优先级 priorityLevel 执行 eventHandler
+ */
 function unstable_runWithPriority(priorityLevel, eventHandler) {
   switch (priorityLevel) {
     case ImmediatePriority:
@@ -283,30 +286,41 @@ function unstable_runWithPriority(priorityLevel, eventHandler) {
     case IdlePriority:
       break;
     default:
+      // 其他的调度优先级使用 NormalPriority
       priorityLevel = NormalPriority;
   }
 
+  // 保存当前的优先级
   var previousPriorityLevel = currentPriorityLevel;
+
   currentPriorityLevel = priorityLevel;
 
   try {
     return eventHandler();
   } finally {
+    // 恢复为之前的优先级
     currentPriorityLevel = previousPriorityLevel;
   }
 }
 
+/**
+ * 使用下一个优先级执行 eventHandler
+ */
 function unstable_next(eventHandler) {
   var priorityLevel;
+  // 根据 currentPriorityLevel 选择下一个优先级
+  // NoPriority, NormalPriority, LowerPriority, IdlePriority
   switch (currentPriorityLevel) {
     case ImmediatePriority:
     case UserBlockingPriority:
     case NormalPriority:
       // Shift down to normal priority
+      // 1 ~ 3 的优先级转到 3
       priorityLevel = NormalPriority;
       break;
     default:
       // Anything lower than normal priority should remain at the current level.
+      // 其他较低的优先级还是保持 currentPriorityLevel
       priorityLevel = currentPriorityLevel;
       break;
   }
@@ -321,6 +335,10 @@ function unstable_next(eventHandler) {
   }
 }
 
+/**
+ * 返回一个函数，保存闭包内的调度优先级，执行返回的函数之后，使用闭包内的调度优先级
+ * 相当于保存一个调度优先级，等到调用这个回调函数的时候，使用这个调度优先级
+ */
 function unstable_wrapCallback(callback) {
   var parentPriorityLevel = currentPriorityLevel;
   return function () {
@@ -339,6 +357,7 @@ function unstable_wrapCallback(callback) {
 function unstable_scheduleCallback(priorityLevel, callback, options) {
   var currentTime = getCurrentTime();
 
+  // 确定 startTime
   var startTime;
   if (typeof options === 'object' && options !== null) {
     var delay = options.delay;
@@ -351,6 +370,7 @@ function unstable_scheduleCallback(priorityLevel, callback, options) {
     startTime = currentTime;
   }
 
+  // 确定 timeout
   var timeout;
   switch (priorityLevel) {
     case ImmediatePriority:
@@ -371,6 +391,7 @@ function unstable_scheduleCallback(priorityLevel, callback, options) {
       break;
   }
 
+  // 确定过期时间
   var expirationTime = startTime + timeout;
 
   var newTask = {
@@ -381,9 +402,6 @@ function unstable_scheduleCallback(priorityLevel, callback, options) {
     expirationTime,
     sortIndex: -1,
   };
-  if (enableProfiling) {
-    newTask.isQueued = false;
-  }
 
   if (startTime > currentTime) {
     // This is a delayed task.
@@ -403,10 +421,7 @@ function unstable_scheduleCallback(priorityLevel, callback, options) {
   } else {
     newTask.sortIndex = expirationTime;
     push(taskQueue, newTask);
-    if (enableProfiling) {
-      markTaskStart(newTask, currentTime);
-      newTask.isQueued = true;
-    }
+    
     // Schedule a host callback, if needed. If we're already performing work,
     // wait until the next time we yield.
     if (!isHostCallbackScheduled && !isPerformingWork) {
@@ -658,11 +673,13 @@ function cancelHostTimeout() {
 const unstable_requestPaint = requestPaint;
 
 export {
+  // 调度优先级
   ImmediatePriority as unstable_ImmediatePriority,
   UserBlockingPriority as unstable_UserBlockingPriority,
   NormalPriority as unstable_NormalPriority,
   IdlePriority as unstable_IdlePriority,
   LowPriority as unstable_LowPriority,
+
   unstable_runWithPriority,
   unstable_next,
   unstable_scheduleCallback,
