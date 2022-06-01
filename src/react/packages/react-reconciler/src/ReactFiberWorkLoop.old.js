@@ -442,14 +442,6 @@ export function requestUpdateLane(fiber) {
 
   const isTransition = requestCurrentTransition() !== NoTransition;
   if (isTransition) {
-    if (__DEV__ && ReactCurrentBatchConfig.transition !== null) {
-      const transition = ReactCurrentBatchConfig.transition;
-      if (!transition._updatedFibers) {
-        transition._updatedFibers = new Set();
-      }
-
-      transition._updatedFibers.add(fiber);
-    }
     // The algorithm for assigning an update to a lane should be stable for all
     // updates at the same priority within the same event. To do this, the
     // inputs to the algorithm must be the same.
@@ -770,11 +762,13 @@ function ensureRootIsScheduled(root, currentTime) {
     // Special case: Sync React callbacks are scheduled on a special
     // internal queue
     if (root.tag === LegacyRoot) {
+      //  render 模式
       scheduleLegacySyncCallback(performSyncWorkOnRoot.bind(null, root));
     } else {
       scheduleSyncCallback(performSyncWorkOnRoot.bind(null, root));
     }
 
+    // 放到下一个微任务中，去清空 callback
     if (supportsMicrotasks) {
       // Flush the queue in a microtask.
       scheduleMicrotask(() => {
@@ -799,6 +793,7 @@ function ensureRootIsScheduled(root, currentTime) {
   } else {
     let schedulerPriorityLevel;
 
+    // 根据事件优先级转为调度优先级
     switch (lanesToEventPriority(nextLanes)) {
       case DiscreteEventPriority:
         schedulerPriorityLevel = ImmediateSchedulerPriority;
@@ -816,7 +811,7 @@ function ensureRootIsScheduled(root, currentTime) {
         schedulerPriorityLevel = NormalSchedulerPriority;
         break;
     }
-
+    // debugger
     newCallbackNode = scheduleCallback(
       schedulerPriorityLevel,
       performConcurrentWorkOnRoot.bind(null, root),
@@ -1482,7 +1477,7 @@ function prepareFreshStack(root, lanes) {
 
   // 4. 重置全局的 lanes
   workInProgressRootRenderLanes =
-  workInProgressRootIncludedLanes =
+    workInProgressRootIncludedLanes =
     subtreeRenderLanes =
       lanes;
 
@@ -1776,7 +1771,6 @@ function renderRootConcurrent(root, lanes) {
 
   popDispatcher(prevDispatcher);
   executionContext = prevExecutionContext;
-
 
   // Check if the tree has completed.
   if (workInProgress !== null) {
@@ -3033,26 +3027,11 @@ export function restorePendingUpdaters(root, lanes) {
 
 const fakeActCallbackNode = {};
 function scheduleCallback(priorityLevel, callback) {
-  if (__DEV__) {
-    // If we're currently inside an `act` scope, bypass Scheduler and push to
-    // the `act` queue instead.
-    const actQueue = ReactCurrentActQueue.current;
-    if (actQueue !== null) {
-      actQueue.push(callback);
-      return fakeActCallbackNode;
-    } else {
-      return Scheduler_scheduleCallback(priorityLevel, callback);
-    }
-  } else {
-    // In production, always call Scheduler. This function will be stripped out.
-    return Scheduler_scheduleCallback(priorityLevel, callback);
-  }
+  // In production, always call Scheduler. This function will be stripped out.
+  return Scheduler_scheduleCallback(priorityLevel, callback);
 }
 
 function cancelCallback(callbackNode) {
-  if (__DEV__ && callbackNode === fakeActCallbackNode) {
-    return;
-  }
   // In production, always call Scheduler. This function will be stripped out.
   return Scheduler_cancelCallback(callbackNode);
 }

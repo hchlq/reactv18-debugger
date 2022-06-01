@@ -145,7 +145,7 @@ export function prepareForCommit(containerInfo) {
   selectionInformation = getSelectionInformation();
 
   let activeInstance = null;
-  
+
   if (enableCreateEventHandleAPI) {
     const focusedElem = selectionInformation.focusedElem;
     if (focusedElem !== null) {
@@ -227,7 +227,7 @@ export function createInstance(
 
   //   parentNamespace = hostContextDev.namespace;
   // } else {
-  parentNamespace = hostContext.namespace;
+  parentNamespace = hostContext;
   // }
 
   const domElement = createElement(
@@ -502,7 +502,7 @@ export function insertBefore(parentInstance, child, beforeChild) {
 
 /**
  * 以 beforeChild 为参考节点，将 child 插入到 container 中
- * 
+ *
  * 如果 container 是注释节点，那么插入到其父节点中
  */
 export function insertInContainerBefore(container, child, beforeChild) {
@@ -533,7 +533,7 @@ function dispatchBeforeDetachedBlur(target, internalInstanceHandle) {
     // can propagate through the React internal tree.
     // $FlowFixMe: internal field
     event._detachedInterceptFiber = internalInstanceHandle;
-    
+
     target.dispatchEvent(event);
   }
 }
@@ -561,7 +561,7 @@ export function removeChild(parentInstance, child) {
 
 /**
  * 移除 container 下的 child 孩子
- * 
+ *
  * 如果 container 是注释节点，那么使用 container.parentNode 来移除 child
  */
 export function removeChildFromContainer(container, child) {

@@ -373,7 +373,7 @@ export function createElement(
   parentNamespace,
 ) {
   let isCustomComponentTag;
-
+  // debugger
   // We create tags in the namespace of their parent container, except HTML
   // tags get no namespace.
   const ownerDocument = getOwnerDocumentFromRootContainer(rootContainerElement);

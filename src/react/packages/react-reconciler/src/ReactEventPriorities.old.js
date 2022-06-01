@@ -78,12 +78,16 @@ export function isHigherEventPriority(a, b) {
  * 车道 lane 转为事件优先级
  */
 export function lanesToEventPriority(lanes) {
+  // 选取 lanes 中优先级最高的车道
   const lane = getHighestPriorityLane(lanes);
+
   if (!isHigherEventPriority(DiscreteEventPriority, lane)) {
+    // lane 优先级大于 DiscreteEventPriority
     //  DiscreteEventPriority > lane
     return DiscreteEventPriority;
   }
   if (!isHigherEventPriority(ContinuousEventPriority, lane)) {
+    // lane 的优先级大于 ContinuousEventPriority
     // ContinuousEventPriority > lane > DiscreteEventPriority
     return ContinuousEventPriority;
   }
