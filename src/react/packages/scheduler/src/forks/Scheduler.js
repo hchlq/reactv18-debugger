@@ -355,6 +355,8 @@ function unstable_wrapCallback(callback) {
 }
 
 function unstable_scheduleCallback(priorityLevel, callback, options) {
+  // console.log("isInputPending: ", isInputPending)
+  // debugger
   var currentTime = getCurrentTime();
 
   // 确定 startTime
@@ -451,13 +453,6 @@ function unstable_getFirstCallbackNode() {
 }
 
 function unstable_cancelCallback(task) {
-  if (enableProfiling) {
-    if (task.isQueued) {
-      const currentTime = getCurrentTime();
-      markTaskCanceled(task, currentTime);
-      task.isQueued = false;
-    }
-  }
 
   // Null out the callback to indicate the task has been canceled. (Can't
   // remove from the queue because you can't remove arbitrary nodes from an
@@ -672,6 +667,8 @@ function cancelHostTimeout() {
 
 const unstable_requestPaint = requestPaint;
 
+const unstable_setDisableYieldValue = () => {}
+const unstable_yieldValue = () => {}
 export {
   // 调度优先级
   ImmediatePriority as unstable_ImmediatePriority,
@@ -693,6 +690,9 @@ export {
   unstable_getFirstCallbackNode,
   getCurrentTime as unstable_now,
   forceFrameRate as unstable_forceFrameRate,
+  
+  unstable_setDisableYieldValue,
+  unstable_yieldValue
 };
 
 export const unstable_Profiling = enableProfiling
