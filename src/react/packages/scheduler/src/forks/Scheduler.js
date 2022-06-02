@@ -484,6 +484,7 @@ function shouldYieldToHost() {
   if (timeElapsed < frameInterval) {
     // The main thread has only been blocked for a really short amount of time;
     // smaller than a single frame. Don't yield yet.
+    // 该时间片没有执行完
     return false;
   }
 
@@ -556,6 +557,7 @@ function forceFrameRate(fps) {
   }
 
   if (fps > 0) {
+    // 8 ~ 1000
     frameInterval = Math.floor(1000 / fps);
   } else {
     // reset the framerate
@@ -690,7 +692,7 @@ export {
   unstable_getFirstCallbackNode,
   getCurrentTime as unstable_now,
   forceFrameRate as unstable_forceFrameRate,
-  
+
   unstable_setDisableYieldValue,
   unstable_yieldValue
 };
