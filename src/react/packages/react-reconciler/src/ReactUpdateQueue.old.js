@@ -124,13 +124,7 @@ let hasForceUpdate = false;
 let didWarnUpdateInsideUpdate;
 let currentlyProcessingQueue;
 export let resetCurrentlyProcessingQueue;
-if (__DEV__) {
-  didWarnUpdateInsideUpdate = false;
-  currentlyProcessingQueue = null;
-  resetCurrentlyProcessingQueue = () => {
-    currentlyProcessingQueue = null;
-  };
-}
+
 
 export function initializeUpdateQueue(fiber) {
   const queue = {
@@ -139,20 +133,26 @@ export function initializeUpdateQueue(fiber) {
     firstBaseUpdate: null,
     lastBaseUpdate: null,
     shared: {
-      pending: null,
+      pending: null, // 共享的 pending 队列
       interleaved: null,
       lanes: NoLanes,
     },
     effects: null,
   };
+
   fiber.updateQueue = queue;
 }
 
+/**
+ * 克隆 current.updateQueue 的队列数据
+ */
 export function cloneUpdateQueue(current, workInProgress) {
   // Clone the update queue from current. Unless it's already a clone.
   const queue = workInProgress.updateQueue;
   const currentQueue = current.updateQueue;
+
   if (queue === currentQueue) {
+
     const clone = {
       baseState: currentQueue.baseState,
       firstBaseUpdate: currentQueue.firstBaseUpdate,
@@ -160,6 +160,7 @@ export function cloneUpdateQueue(current, workInProgress) {
       shared: currentQueue.shared,
       effects: currentQueue.effects,
     };
+
     workInProgress.updateQueue = clone;
   }
 }
@@ -212,20 +213,6 @@ export function enqueueUpdate(fiber, update, lane) {
     sharedQueue.pending = update;
   }
 
-  if (__DEV__) {
-    if (
-      currentlyProcessingQueue === sharedQueue &&
-      !didWarnUpdateInsideUpdate
-    ) {
-      console.error(
-        'An update (setState, replaceState, or forceUpdate) was scheduled ' +
-          'from inside an update function. Update functions should be pure, ' +
-          'with zero side-effects. Consider using componentDidUpdate or a ' +
-          'callback.',
-      );
-      didWarnUpdateInsideUpdate = true;
-    }
-  }
 }
 
 export function entangleTransitions(root, fiber, lane) {
@@ -341,61 +328,30 @@ function getStateFromUpdate(
   instance,
 ) {
   switch (update.tag) {
+    // 在一些生命周期钩子中，返回的值会替换掉 state, 会用到这个标记
     case ReplaceState: {
       const payload = update.payload;
       if (typeof payload === 'function') {
         // Updater function
-        if (__DEV__) {
-          enterDisallowedContextReadInDEV();
-        }
         const nextState = payload.call(instance, prevState, nextProps);
-        if (__DEV__) {
-          if (
-            debugRenderPhaseSideEffectsForStrictMode &&
-            workInProgress.mode & StrictLegacyMode
-          ) {
-            setIsStrictModeForDevtools(true);
-            try {
-              payload.call(instance, prevState, nextProps);
-            } finally {
-              setIsStrictModeForDevtools(false);
-            }
-          }
-          exitDisallowedContextReadInDEV();
-        }
         return nextState;
       }
       // State object
       return payload;
     }
+
     case CaptureUpdate: {
       workInProgress.flags =
         (workInProgress.flags & ~ShouldCapture) | DidCapture;
     }
+
     // Intentional fallthrough
     case UpdateState: {
       const payload = update.payload;
       let partialState;
       if (typeof payload === 'function') {
         // Updater function
-        if (__DEV__) {
-          enterDisallowedContextReadInDEV();
-        }
         partialState = payload.call(instance, prevState, nextProps);
-        if (__DEV__) {
-          if (
-            debugRenderPhaseSideEffectsForStrictMode &&
-            workInProgress.mode & StrictLegacyMode
-          ) {
-            setIsStrictModeForDevtools(true);
-            try {
-              payload.call(instance, prevState, nextProps);
-            } finally {
-              setIsStrictModeForDevtools(false);
-            }
-          }
-          exitDisallowedContextReadInDEV();
-        }
       } else {
         // Partial state object
         partialState = payload;
@@ -407,6 +363,7 @@ function getStateFromUpdate(
       // Merge the partial state and the previous state.
       return assign({}, prevState, partialState);
     }
+
     case ForceUpdate: {
       hasForceUpdate = true;
       return prevState;
@@ -415,6 +372,9 @@ function getStateFromUpdate(
   return prevState;
 }
 
+/**
+ * 处理类组件 / 根容器的更新队列
+ */
 export function processUpdateQueue(
   workInProgress,
   props,
@@ -424,31 +384,34 @@ export function processUpdateQueue(
   // This is always non-null on a ClassComponent or HostRoot
   const queue = workInProgress.updateQueue;
 
+  // 默认不是强制更新
   hasForceUpdate = false;
-
-  if (__DEV__) {
-    currentlyProcessingQueue = queue.shared;
-  }
 
   let firstBaseUpdate = queue.firstBaseUpdate;
   let lastBaseUpdate = queue.lastBaseUpdate;
 
   // Check if there are pending updates. If so, transfer them to the base queue.
   let pendingQueue = queue.shared.pending;
+
   if (pendingQueue !== null) {
+    // 有待更新的队列
+
     queue.shared.pending = null;
 
     // The pending queue is circular. Disconnect the pointer between first
     // and last so that it's non-circular.
     const lastPendingUpdate = pendingQueue;
     const firstPendingUpdate = lastPendingUpdate.next;
+    // 断开循环链表
     lastPendingUpdate.next = null;
+
     // Append pending updates to base queue
     if (lastBaseUpdate === null) {
       firstBaseUpdate = firstPendingUpdate;
     } else {
       lastBaseUpdate.next = firstPendingUpdate;
     }
+
     lastBaseUpdate = lastPendingUpdate;
 
     // If there's a current queue, and it's different from the base queue, then
@@ -459,14 +422,18 @@ export function processUpdateQueue(
     const current = workInProgress.alternate;
     if (current !== null) {
       // This is always non-null on a ClassComponent or HostRoot
+      // 将当前的 updateQueue 任务链表添加到 
+      // current.updateQueue.firstBaseUpdate 和 current.updateQueue.lastBaseUpdate 中 
       const currentQueue = current.updateQueue;
       const currentLastBaseUpdate = currentQueue.lastBaseUpdate;
       if (currentLastBaseUpdate !== lastBaseUpdate) {
+
         if (currentLastBaseUpdate === null) {
           currentQueue.firstBaseUpdate = firstPendingUpdate;
         } else {
           currentLastBaseUpdate.next = firstPendingUpdate;
         }
+
         currentQueue.lastBaseUpdate = lastPendingUpdate;
       }
     }
@@ -484,11 +451,13 @@ export function processUpdateQueue(
     let newFirstBaseUpdate = null;
     let newLastBaseUpdate = null;
 
+    // 从 firstBaseUpdate 开始处理
     let update = firstBaseUpdate;
     do {
       const updateLane = update.lane;
       const updateEventTime = update.eventTime;
       if (!isSubsetOfLanes(renderLanes, updateLane)) {
+        // renderLanes 车道中不包含该任务的 updateLane 车道
         // Priority is insufficient. Skip this update. If this is the first
         // skipped update, the previous update/state is the new base
         // update/state.
@@ -502,17 +471,21 @@ export function processUpdateQueue(
 
           next: null,
         };
+        
         if (newLastBaseUpdate === null) {
           newFirstBaseUpdate = newLastBaseUpdate = clone;
+          // 跳过的更新开始的首个 baseState
           newBaseState = newState;
         } else {
           newLastBaseUpdate = newLastBaseUpdate.next = clone;
         }
         // Update the remaining priority in the queue.
+        // 合并本次跳过的更新
         newLanes = mergeLanes(newLanes, updateLane);
       } else {
         // This update does have sufficient priority.
-
+        
+        // 有跳过的优先级，将该任务也放到链表之后，可能需要执行两次该任务
         if (newLastBaseUpdate !== null) {
           const clone = {
             eventTime: updateEventTime,
@@ -539,13 +512,16 @@ export function processUpdateQueue(
           props,
           instance,
         );
+
         const callback = update.callback;
+
         if (
           callback !== null &&
           // If the update was already committed, we should not queue its
           // callback again.
           update.lane !== NoLane
         ) {
+          // 本次的副作用增加 Callback 
           workInProgress.flags |= Callback;
           const effects = queue.effects;
           if (effects === null) {
@@ -555,6 +531,7 @@ export function processUpdateQueue(
           }
         }
       }
+      // 继续处理下一个
       update = update.next;
       if (update === null) {
         pendingQueue = queue.shared.pending;
@@ -567,6 +544,7 @@ export function processUpdateQueue(
           // Intentionally unsound. Pending updates form a circular list, but we
           // unravel them when transferring them to the base queue.
           const firstPendingUpdate = lastPendingUpdate.next;
+          // 断开循环链表
           lastPendingUpdate.next = null;
           update = firstPendingUpdate;
           queue.lastBaseUpdate = lastPendingUpdate;
@@ -575,10 +553,12 @@ export function processUpdateQueue(
       }
     } while (true);
 
+    // 没有跳过的更新
     if (newLastBaseUpdate === null) {
       newBaseState = newState;
     }
 
+    // 更新 queue 上本次跳过的更新任务
     queue.baseState = newBaseState;
     queue.firstBaseUpdate = newFirstBaseUpdate;
     queue.lastBaseUpdate = newLastBaseUpdate;
@@ -609,10 +589,6 @@ export function processUpdateQueue(
     markSkippedUpdateLanes(newLanes);
     workInProgress.lanes = newLanes;
     workInProgress.memoizedState = newState;
-  }
-
-  if (__DEV__) {
-    currentlyProcessingQueue = null;
   }
 }
 

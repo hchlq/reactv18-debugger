@@ -455,7 +455,6 @@ export function requestUpdateLane(fiber) {
     }
     return currentEventTransitionLane;
   }
-
   // Updates originating inside certain React methods, like flushSync, have
   // their priority set by tracking it with a context variable.
   //
@@ -463,6 +462,7 @@ export function requestUpdateLane(fiber) {
   // use that directly.
   // TODO: Move this type conversion to the event priority module.
   const updateLane = getCurrentUpdatePriority();
+  // console.log('updateLane: ', updateLane)
   if (updateLane !== NoLane) {
     return updateLane;
   }
@@ -494,21 +494,9 @@ function requestRetryLane(fiber) {
 export function scheduleUpdateOnFiber(fiber, lane, eventTime) {
   checkForNestedUpdates();
 
-  if (__DEV__) {
-    if (isRunningInsertionEffect) {
-      console.error('useInsertionEffect must not schedule updates.');
-    }
-  }
-
   const root = markUpdateLaneFromFiberToRoot(fiber, lane);
   if (root === null) {
     return null;
-  }
-
-  if (__DEV__) {
-    if (isFlushingPassiveEffects) {
-      didScheduleUpdateDuringPassiveEffects = true;
-    }
   }
 
   // Mark that the root has a pending update.
@@ -523,7 +511,7 @@ export function scheduleUpdateOnFiber(fiber, lane, eventTime) {
     // hook updates, which are handled differently and don't reach this
     // function), but there are some internal React features that use this as
     // an implementation detail, like selective hydration.
-    warnAboutRenderPhaseUpdatesInDEV(fiber);
+    // warnAboutRenderPhaseUpdatesInDEV(fiber);
 
     // Track lanes that were updated during the render phase
     workInProgressRootRenderPhaseUpdatedLanes = mergeLanes(
@@ -533,44 +521,44 @@ export function scheduleUpdateOnFiber(fiber, lane, eventTime) {
   } else {
     // This is a normal update, scheduled from outside the render phase. For
     // example, during an input event.
-    if (enableUpdaterTracking) {
-      if (isDevToolsPresent) {
-        addFiberToLanesMap(root, fiber, lane);
-      }
-    }
+    // if (enableUpdaterTracking) {
+    //   if (isDevToolsPresent) {
+    //     addFiberToLanesMap(root, fiber, lane);
+    //   }
+    // }
 
-    warnIfUpdatesNotWrappedWithActDEV(fiber);
+    // warnIfUpdatesNotWrappedWithActDEV(fiber);
 
-    if (enableProfilerTimer && enableProfilerNestedUpdateScheduledHook) {
-      if (
-        (executionContext & CommitContext) !== NoContext &&
-        root === rootCommittingMutationOrLayoutEffects
-      ) {
-        if (fiber.mode & ProfileMode) {
-          let current = fiber;
-          while (current !== null) {
-            if (current.tag === Profiler) {
-              const {id, onNestedUpdateScheduled} = current.memoizedProps;
-              if (typeof onNestedUpdateScheduled === 'function') {
-                onNestedUpdateScheduled(id);
-              }
-            }
-            current = current.return;
-          }
-        }
-      }
-    }
+    // if (enableProfilerTimer && enableProfilerNestedUpdateScheduledHook) {
+    //   if (
+    //     (executionContext & CommitContext) !== NoContext &&
+    //     root === rootCommittingMutationOrLayoutEffects
+    //   ) {
+    //     if (fiber.mode & ProfileMode) {
+    //       let current = fiber;
+    //       while (current !== null) {
+    //         if (current.tag === Profiler) {
+    //           const {id, onNestedUpdateScheduled} = current.memoizedProps;
+    //           if (typeof onNestedUpdateScheduled === 'function') {
+    //             onNestedUpdateScheduled(id);
+    //           }
+    //         }
+    //         current = current.return;
+    //       }
+    //     }
+    //   }
+    // }
 
-    if (enableTransitionTracing) {
-      const transition = ReactCurrentBatchConfig.transition;
-      if (transition !== null) {
-        if (transition.startTime === -1) {
-          transition.startTime = now();
-        }
+    // if (enableTransitionTracing) {
+    //   const transition = ReactCurrentBatchConfig.transition;
+    //   if (transition !== null) {
+    //     if (transition.startTime === -1) {
+    //       transition.startTime = now();
+    //     }
 
-        addTransitionToLanesMap(root, transition, lane);
-      }
-    }
+    //     addTransitionToLanesMap(root, transition, lane);
+    //   }
+    // }
 
     if (root === workInProgressRoot) {
       // TODO: Consolidate with `isInterleavedUpdate` check
@@ -581,6 +569,7 @@ export function scheduleUpdateOnFiber(fiber, lane, eventTime) {
       // phase update. In that case, we don't treat render phase updates as if
       // they were interleaved, for backwards compat reasons.
       if (
+        // deferRenderPhaseUpdateToNextBatch: false
         deferRenderPhaseUpdateToNextBatch ||
         (executionContext & RenderContext) === NoContext
       ) {
@@ -758,6 +747,7 @@ function ensureRootIsScheduled(root, currentTime) {
 
   // Schedule a new callback.
   let newCallbackNode;
+  // console.log('newCallbackPriority: ', newCallbackPriority)
   if (newCallbackPriority === SyncLane) {
     // Special case: Sync React callbacks are scheduled on a special
     // internal queue
@@ -871,7 +861,10 @@ function performConcurrentWorkOnRoot(root, didTimeout) {
   const shouldTimeSlice =
     !includesBlockingLane(root, lanes) &&
     !includesExpiredLane(root, lanes) &&
-    (disableSchedulerTimeoutInWorkLoop || !didTimeout);
+    !didTimeout;
+  // (disableSchedulerTimeoutInWorkLoop || !didTimeout);
+
+  console.log(includesBlockingLane(root, lanes), didTimeout);
   let exitStatus = shouldTimeSlice
     ? renderRootConcurrent(root, lanes) // 应该使用时间切片
     : renderRootSync(root, lanes); // 不使用时间切片
@@ -1794,6 +1787,7 @@ function renderRootConcurrent(root, lanes) {
 /** @noinline */
 function workLoopConcurrent() {
   // Perform work until Scheduler asks us to yield
+  debugger;
   while (workInProgress !== null && !shouldYield()) {
     performUnitOfWork(workInProgress);
   }
@@ -1812,6 +1806,7 @@ function performUnitOfWork(unitOfWork) {
   //   next = beginWork(current, unitOfWork, subtreeRenderLanes);
   //   stopProfilerTimerIfRunningAndRecordDelta(unitOfWork, true);
   // } else {
+  // 第一次的时候，current 表示的是根容器对应的 fiber，比较特殊
   next = beginWork(current, unitOfWork, subtreeRenderLanes);
   // }
 

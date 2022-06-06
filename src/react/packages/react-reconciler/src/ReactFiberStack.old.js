@@ -52,6 +52,10 @@ function pop(cursor, fiber) {
   index--;
 }
 
+/**
+ * 1. 保存老的 cursor.current 值到栈中
+ * 2. 更新 cursor.current 为第二个参数 value
+ */
 function push(cursor, value, fiber) {
   index++;
 

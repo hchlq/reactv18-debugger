@@ -140,6 +140,10 @@ function popTopLevelContextObject(fiber) {
   }
 }
 
+/**
+ * 主要和老的 Context 有关
+ * 添加顶层的 Context 对象
+ */
 function pushTopLevelContextObject(fiber, context, didChange) {
   if (disableLegacyContext) {
     return;
@@ -151,7 +155,17 @@ function pushTopLevelContextObject(fiber, context, didChange) {
       );
     }
 
+    // push 实现
+    // index++;
+    // valueStack[index] = cursor.current;
+    // cursor.current = value;
+
+    // push 主要做的是
+    // 1. 往栈中保存 cursor.current 老的值
+    // 2. 更新 cursor.current 新值为第二个参数
+
     push(contextStackCursor, context, fiber);
+
     push(didPerformWorkStackCursor, didChange, fiber);
   }
 }

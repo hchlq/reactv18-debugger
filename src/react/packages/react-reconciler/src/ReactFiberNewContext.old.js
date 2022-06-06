@@ -597,13 +597,19 @@ export function checkIfContextChanged(currentDependencies) {
   return false;
 }
 
+/**
+ * Context 消费的准备工作
+ */
 export function prepareToReadContext(workInProgress, renderLanes) {
   currentlyRenderingFiber = workInProgress;
   lastContextDependency = null;
   lastFullyObservedContext = null;
 
   const dependencies = workInProgress.dependencies;
+
+  // 将 dependencies.firstContext 重置为空
   if (dependencies !== null) {
+    // enableLazyContextPropagation： false
     if (enableLazyContextPropagation) {
       // Reset the work-in-progress list
       dependencies.firstContext = null;
@@ -622,19 +628,6 @@ export function prepareToReadContext(workInProgress, renderLanes) {
 }
 
 export function readContext(context) {
-  if (__DEV__) {
-    // This warning would fire if you read context inside a Hook like useMemo.
-    // Unlike the class check below, it's not enforced in production for perf.
-    if (isDisallowedContextReadInDEV) {
-      console.error(
-        'Context can only be read while React is rendering. ' +
-          'In classes, you can read it in the render method or getDerivedStateFromProps. ' +
-          'In function components, you can read it directly in the function body, but not ' +
-          'inside Hooks like useReducer() or useMemo().',
-      );
-    }
-  }
-
   const value = isPrimaryRenderer
     ? context._currentValue
     : context._currentValue2;
