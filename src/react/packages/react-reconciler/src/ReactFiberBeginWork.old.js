@@ -907,7 +907,6 @@ function updateFunctionComponent(
   nextProps,
   renderLanes,
 ) {
-
   // 老的 Context 模式
   let context;
   if (!disableLegacyContext) {
@@ -917,7 +916,7 @@ function updateFunctionComponent(
 
   let nextChildren;
   prepareToReadContext(workInProgress, renderLanes);
-  
+
   // let hasId;
   // if (enableSchedulingProfiler) {
   //   markComponentRenderStarted(workInProgress);
@@ -936,7 +935,9 @@ function updateFunctionComponent(
   //   markComponentRenderStopped();
   // }
 
+  // console.log('=========', workInProgress.flags, workInProgress.lanes, renderLanes)
   if (current !== null && !didReceiveUpdate) {
+    // 更新阶段 并且 没有接受到新的更新
     bailoutHooks(current, workInProgress, renderLanes);
     return bailoutOnAlreadyFinishedWork(current, workInProgress, renderLanes);
   }
@@ -1292,6 +1293,7 @@ function updateHostComponent(current, workInProgress, renderLanes) {
     // case. We won't handle it as a reified child. We will instead handle
     // this in the host environment that also has access to this prop. That
     // avoids allocating another HostText fiber and traversing it.
+    // 新孩子是文本节点，nextChildren 为空，避免多余的遍历和比较
     nextChildren = null;
   } else if (prevProps !== null && shouldSetTextContent(type, prevProps)) {
     // If we're switching from a direct text child to a normal child, or to
@@ -1301,6 +1303,8 @@ function updateHostComponent(current, workInProgress, renderLanes) {
   }
 
   markRef(current, workInProgress);
+
+  // 协调孩子
   reconcileChildren(current, workInProgress, nextChildren, renderLanes);
   return workInProgress.child;
 }
@@ -3578,6 +3582,27 @@ function beginWork(current, workInProgress, renderLanes) {
   // sometimes bails out later in the begin phase. This indicates that we should
   // move this assignment out of the common path and into each branch.
   workInProgress.lanes = NoLanes;
+  
+  // if (workInProgress.tag === FunctionComponent) {
+  //   workInProgress.lanes = 1
+  // }
+  
+  // if (workInProgress.tag === FunctionComponent) {
+  //   console.log('--------')
+  //   let v = workInProgress.lanes
+  //   Object.defineProperty(workInProgress, 'lanes', {
+  //     get(newVal) {
+  //       return v
+  //     },
+  //     set(newVal) {
+  //       console.log('newVal: ', newVal)
+  //       if (newVal === 0) {
+  //         debugger
+  //       }
+  //       v = newVal
+  //     }
+  //   })
+  // }
 
   switch (workInProgress.tag) {
     case IndeterminateComponent: {
