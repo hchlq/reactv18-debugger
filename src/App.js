@@ -4,9 +4,12 @@ function App() {
   return (
     <div className="App">
       <h1 onClick={() => setCount(count + 1)}>{ count }</h1>
-      <header>header</header>
+      <div>
+        <h2>111</h2>
+      </div>
+      {/* <header>header</header>
       <main>main</main>
-      <footer>footer</footer>
+      <footer>footer</footer> */}
     </div>
   );
 }

@@ -193,31 +193,38 @@ if (supportsMutation) {
     workInProgress,
     needsVisibilityToggle,
     isHidden,
-  ) {
+  ) { 
+    console.log(workInProgress.type)
+    // debugger
     // We only have the top Fiber that was created but we need recurse down its
     // children to find all the terminal nodes.
-    let node = workInProgress.child;
+    le = workInProgress.child;
     while (node !== null) {
       if (node.tag === HostComponent || node.tag === HostText) {
+        // 元素或者文本节点
         appendInitialChild(parent, node.stateNode);
       } else if (node.tag === HostPortal) {
         // If we have a portal child, then we don't want to traverse
         // down its children. Instead, we'll get insertions from each child in
         // the portal directly.
       } else if (node.child !== null) {
+        // 不是元素类型，可能是类组件 / 函数组件等，指向其孩子
         node.child.return = node;
         node = node.child;
         continue;
       }
+
       if (node === workInProgress) {
         return;
       }
+
       while (node.sibling === null) {
         if (node.return === null || node.return === workInProgress) {
           return;
         }
         node = node.return;
       }
+
       node.sibling.return = node.return;
       node = node.sibling;
     }
