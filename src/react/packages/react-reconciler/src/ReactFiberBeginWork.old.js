@@ -874,20 +874,32 @@ function updateProfiler(current, workInProgress, renderLanes) {
   return workInProgress.child;
 }
 
+/**
+ * 可能需要增加 Ref 的 flag
+ */
 function markRef(current, workInProgress) {
   const ref = workInProgress.ref;
+
   if (
     (current === null && ref !== null) ||
     (current !== null && current.ref !== ref)
   ) {
+    // 1. 首次挂载
+    // 2. 更新阶段：新老的 ref 不一样
+
     // Schedule a Ref effect
     workInProgress.flags |= Ref;
+
+    // enableSuspenseLayoutEffectSemantics: true
     if (enableSuspenseLayoutEffectSemantics) {
       workInProgress.flags |= RefStatic;
     }
   }
 }
 
+/**
+ * 更新函数组件
+ */
 function updateFunctionComponent(
   current,
   workInProgress,
@@ -895,22 +907,8 @@ function updateFunctionComponent(
   nextProps,
   renderLanes,
 ) {
-  if (__DEV__) {
-    if (workInProgress.type !== workInProgress.elementType) {
-      // Lazy component props can't be validated in createElement
-      // because they're only guaranteed to be resolved here.
-      const innerPropTypes = Component.propTypes;
-      if (innerPropTypes) {
-        checkPropTypes(
-          innerPropTypes,
-          nextProps, // Resolved props
-          'prop',
-          getComponentNameFromType(Component),
-        );
-      }
-    }
-  }
 
+  // 老的 Context 模式
   let context;
   if (!disableLegacyContext) {
     const unmaskedContext = getUnmaskedContext(workInProgress, Component, true);
@@ -918,66 +916,34 @@ function updateFunctionComponent(
   }
 
   let nextChildren;
-  let hasId;
   prepareToReadContext(workInProgress, renderLanes);
-  if (enableSchedulingProfiler) {
-    markComponentRenderStarted(workInProgress);
-  }
-  if (__DEV__) {
-    ReactCurrentOwner.current = workInProgress;
-    setIsRendering(true);
-    nextChildren = renderWithHooks(
-      current,
-      workInProgress,
-      Component,
-      nextProps,
-      context,
-      renderLanes,
-    );
-    hasId = checkDidRenderIdHook();
-    if (
-      debugRenderPhaseSideEffectsForStrictMode &&
-      workInProgress.mode & StrictLegacyMode
-    ) {
-      setIsStrictModeForDevtools(true);
-      try {
-        nextChildren = renderWithHooks(
-          current,
-          workInProgress,
-          Component,
-          nextProps,
-          context,
-          renderLanes,
-        );
-        hasId = checkDidRenderIdHook();
-      } finally {
-        setIsStrictModeForDevtools(false);
-      }
-    }
-    setIsRendering(false);
-  } else {
-    nextChildren = renderWithHooks(
-      current,
-      workInProgress,
-      Component,
-      nextProps,
-      context,
-      renderLanes,
-    );
-    hasId = checkDidRenderIdHook();
-  }
-  if (enableSchedulingProfiler) {
-    markComponentRenderStopped();
-  }
+  
+  // let hasId;
+  // if (enableSchedulingProfiler) {
+  //   markComponentRenderStarted(workInProgress);
+  // }
+  nextChildren = renderWithHooks(
+    current,
+    workInProgress,
+    Component,
+    nextProps,
+    context,
+    renderLanes,
+  );
+
+  // hasId = checkDidRenderIdHook();
+  // if (enableSchedulingProfiler) {
+  //   markComponentRenderStopped();
+  // }
 
   if (current !== null && !didReceiveUpdate) {
     bailoutHooks(current, workInProgress, renderLanes);
     return bailoutOnAlreadyFinishedWork(current, workInProgress, renderLanes);
   }
 
-  if (getIsHydrating() && hasId) {
-    pushMaterializedTreeId(workInProgress);
-  }
+  // if (getIsHydrating() && hasId) {
+  //   pushMaterializedTreeId(workInProgress);
+  // }
 
   // React DevTools reads this flag.
   workInProgress.flags |= PerformedWork;
@@ -985,6 +951,9 @@ function updateFunctionComponent(
   return workInProgress.child;
 }
 
+/**
+ * 更新类组件
+ */
 function updateClassComponent(
   current,
   workInProgress,
@@ -992,55 +961,6 @@ function updateClassComponent(
   nextProps,
   renderLanes,
 ) {
-  if (__DEV__) {
-    // This is used by DevTools to force a boundary to error.
-    switch (shouldError(workInProgress)) {
-      case false: {
-        const instance = workInProgress.stateNode;
-        const ctor = workInProgress.type;
-        // TODO This way of resetting the error boundary state is a hack.
-        // Is there a better way to do this?
-        const tempInstance = new ctor(
-          workInProgress.memoizedProps,
-          instance.context,
-        );
-        const state = tempInstance.state;
-        instance.updater.enqueueSetState(instance, state, null);
-        break;
-      }
-      case true: {
-        workInProgress.flags |= DidCapture;
-        workInProgress.flags |= ShouldCapture;
-        // eslint-disable-next-line react-internal/prod-error-codes
-        const error = new Error('Simulated error coming from DevTools');
-        const lane = pickArbitraryLane(renderLanes);
-        workInProgress.lanes = mergeLanes(workInProgress.lanes, lane);
-        // Schedule the error boundary to re-render using updated state
-        const update = createClassErrorUpdate(
-          workInProgress,
-          createCapturedValue(error, workInProgress),
-          lane,
-        );
-        enqueueCapturedUpdate(workInProgress, update);
-        break;
-      }
-    }
-
-    if (workInProgress.type !== workInProgress.elementType) {
-      // Lazy component props can't be validated in createElement
-      // because they're only guaranteed to be resolved here.
-      const innerPropTypes = Component.propTypes;
-      if (innerPropTypes) {
-        checkPropTypes(
-          innerPropTypes,
-          nextProps, // Resolved props
-          'prop',
-          getComponentNameFromType(Component),
-        );
-      }
-    }
-  }
-
   // Push context providers early to prevent context stack mismatches.
   // During mounting we don't know the child context yet as the instance doesn't exist.
   // We will invalidate the child context in finishClassComponent() right after rendering.
@@ -1051,8 +971,10 @@ function updateClassComponent(
   } else {
     hasContext = false;
   }
+
   prepareToReadContext(workInProgress, renderLanes);
 
+  // 类组件实例
   const instance = workInProgress.stateNode;
   let shouldUpdate;
   if (instance === null) {
@@ -1079,6 +1001,7 @@ function updateClassComponent(
       renderLanes,
     );
   }
+
   const nextUnitOfWork = finishClassComponent(
     current,
     workInProgress,
@@ -1087,19 +1010,7 @@ function updateClassComponent(
     hasContext,
     renderLanes,
   );
-  if (__DEV__) {
-    const inst = workInProgress.stateNode;
-    if (shouldUpdate && inst.props !== nextProps) {
-      if (!didWarnAboutReassigningProps) {
-        console.error(
-          'It looks like %s is reassigning its own `this.props` while rendering. ' +
-            'This is not supported and can lead to confusing bugs.',
-          getComponentNameFromFiber(workInProgress) || 'a component',
-        );
-      }
-      didWarnAboutReassigningProps = true;
-    }
-  }
+
   return nextUnitOfWork;
 }
 
@@ -1202,6 +1113,7 @@ function finishClassComponent(
 
 function pushHostRootContext(workInProgress) {
   const root = workInProgress.stateNode;
+
   if (root.pendingContext) {
     pushTopLevelContextObject(
       workInProgress,
@@ -1212,6 +1124,7 @@ function pushHostRootContext(workInProgress) {
     // Should always be set
     pushTopLevelContextObject(workInProgress, root.context, false);
   }
+
   pushHostContainer(workInProgress, root.containerInfo);
 }
 
@@ -1355,18 +1268,23 @@ function mountHostRootWithoutHydrating(
   return workInProgress.child;
 }
 
+/**
+ * 普通元素的协调
+ */
 function updateHostComponent(current, workInProgress, renderLanes) {
   pushHostContext(workInProgress);
 
-  if (current === null) {
-    tryToClaimNextHydratableInstance(workInProgress);
-  }
+  // if (current === null) {
+  //   tryToClaimNextHydratableInstance(workInProgress);
+  // }
 
   const type = workInProgress.type;
   const nextProps = workInProgress.pendingProps;
   const prevProps = current !== null ? current.memoizedProps : null;
 
   let nextChildren = nextProps.children;
+
+  // 判断孩子是不是只是文本内容，如果是的话，当作特殊情况来处理
   const isDirectTextChild = shouldSetTextContent(type, nextProps);
 
   if (isDirectTextChild) {
@@ -1378,6 +1296,7 @@ function updateHostComponent(current, workInProgress, renderLanes) {
   } else if (prevProps !== null && shouldSetTextContent(type, prevProps)) {
     // If we're switching from a direct text child to a normal child, or to
     // empty, we need to schedule the text content to be reset.
+    // 新孩子不是文本，老的孩子是文本，加上 ContextReset 的 effect 标记
     workInProgress.flags |= ContentReset;
   }
 
@@ -3240,39 +3159,45 @@ function resetSuspendedCurrentOnMountInLegacyMode(current, workInProgress) {
   }
 }
 
+/**
+ * 提前进入该 fiber 的 finishedWork
+ */
 function bailoutOnAlreadyFinishedWork(current, workInProgress, renderLanes) {
   if (current !== null) {
     // Reuse previous dependencies
     workInProgress.dependencies = current.dependencies;
   }
 
-  if (enableProfilerTimer) {
-    // Don't update "base" render times for bailouts.
-    stopProfilerTimerIfRunning(workInProgress);
-  }
+  // if (enableProfilerTimer) {
+  //   // Don't update "base" render times for bailouts.
+  //   stopProfilerTimerIfRunning(workInProgress);
+  // }
 
   markSkippedUpdateLanes(workInProgress.lanes);
 
   // Check if the children have any pending work.
+  // 检查孩子是否有本次车道中待更新的任务
   if (!includesSomeLane(renderLanes, workInProgress.childLanes)) {
     // The children don't have any work either. We can skip them.
     // TODO: Once we add back resuming, we should check if the children are
     // a work-in-progress set. If so, we need to transfer their effects.
 
-    if (enableLazyContextPropagation && current !== null) {
-      // Before bailing out, check if there are any context changes in
-      // the children.
-      lazilyPropagateParentContextChanges(current, workInProgress, renderLanes);
-      if (!includesSomeLane(renderLanes, workInProgress.childLanes)) {
-        return null;
-      }
-    } else {
-      return null;
-    }
+    // enableLazyContextPropagation: false
+    // if (enableLazyContextPropagation && current !== null) {
+    //   // Before bailing out, check if there are any context changes in
+    //   // the children.
+    //   lazilyPropagateParentContextChanges(current, workInProgress, renderLanes);
+    //   if (!includesSomeLane(renderLanes, workInProgress.childLanes)) {
+    //     return null;
+    //   }
+    // } else {
+    return null;
+    // }
   }
 
   // This fiber doesn't have work, but its subtree does. Clone the child
   // fibers and continue.
+  // 该 fiber 没有更新任务，但是它的子树还有待更新的任务，克隆其子孩子，继续执行
   cloneChildFibers(current, workInProgress);
   return workInProgress.child;
 }
@@ -3675,10 +3600,12 @@ function beginWork(current, workInProgress, renderLanes) {
     case FunctionComponent: {
       const Component = workInProgress.type;
       const unresolvedProps = workInProgress.pendingProps;
+
       const resolvedProps =
         workInProgress.elementType === Component
           ? unresolvedProps
           : resolveDefaultProps(Component, unresolvedProps);
+
       return updateFunctionComponent(
         current,
         workInProgress,

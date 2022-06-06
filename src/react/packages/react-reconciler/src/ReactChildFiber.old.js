@@ -1296,6 +1296,10 @@ function ChildReconciler(shouldTrackSideEffects) {
 export const reconcileChildFibers = ChildReconciler(true);
 export const mountChildFibers = ChildReconciler(false);
 
+/**
+ * 克隆孩子 fiber
+ * 包括其兄弟
+ */
 export function cloneChildFibers(current, workInProgress) {
   if (current !== null && workInProgress.child !== current.child) {
     throw new Error('Resuming work not yet implemented.');
@@ -1305,11 +1309,14 @@ export function cloneChildFibers(current, workInProgress) {
     return;
   }
 
+  // 1. 克隆孩子
   let currentChild = workInProgress.child;
   let newChild = createWorkInProgress(currentChild, currentChild.pendingProps);
   workInProgress.child = newChild;
 
   newChild.return = workInProgress;
+
+  // 2. 克隆孩子的兄弟
   while (currentChild.sibling !== null) {
     currentChild = currentChild.sibling;
     newChild = newChild.sibling = createWorkInProgress(
@@ -1318,6 +1325,8 @@ export function cloneChildFibers(current, workInProgress) {
     );
     newChild.return = workInProgress;
   }
+
+  // 最后一个孩子的兄弟是空 
   newChild.sibling = null;
 }
 

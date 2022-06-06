@@ -811,7 +811,7 @@ function ensureRootIsScheduled(root, currentTime) {
         schedulerPriorityLevel = NormalSchedulerPriority;
         break;
     }
-    // debugger
+
     newCallbackNode = scheduleCallback(
       schedulerPriorityLevel,
       performConcurrentWorkOnRoot.bind(null, root),
@@ -872,6 +872,8 @@ function performConcurrentWorkOnRoot(root, didTimeout) {
     !includesBlockingLane(root, lanes) &&
     !includesExpiredLane(root, lanes) &&
     (disableSchedulerTimeoutInWorkLoop || !didTimeout);
+
+    // debugger
   let exitStatus = shouldTimeSlice
     ? renderRootConcurrent(root, lanes) // 应该使用时间切片
     : renderRootSync(root, lanes); // 不使用时间切片
