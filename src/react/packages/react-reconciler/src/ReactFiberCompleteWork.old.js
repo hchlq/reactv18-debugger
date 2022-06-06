@@ -594,6 +594,9 @@ function cutOffTailIfNeeded(renderState, hasRenderedATailFallback) {
   }
 }
 
+/**
+ * 合并 completeWork.subtreeFlags 和 completeWork.childLanes
+ */
 function bubbleProperties(completedWork) {
   const didBailout =
     completedWork.alternate !== null &&
@@ -604,106 +607,47 @@ function bubbleProperties(completedWork) {
 
   if (!didBailout) {
     // Bubble up the earliest expiration time.
-    if (enableProfilerTimer && (completedWork.mode & ProfileMode) !== NoMode) {
-      // In profiling mode, resetChildExpirationTime is also used to reset
-      // profiler durations.
-      let actualDuration = completedWork.actualDuration;
-      let treeBaseDuration = completedWork.selfBaseDuration;
+    let child = completedWork.child;
+    while (child !== null) {
+      newChildLanes = mergeLanes(
+        newChildLanes,
+        mergeLanes(child.lanes, child.childLanes),
+      );
 
-      let child = completedWork.child;
-      while (child !== null) {
-        newChildLanes = mergeLanes(
-          newChildLanes,
-          mergeLanes(child.lanes, child.childLanes),
-        );
+      subtreeFlags |= child.subtreeFlags;
+      subtreeFlags |= child.flags;
 
-        subtreeFlags |= child.subtreeFlags;
-        subtreeFlags |= child.flags;
+      // Update the return pointer so the tree is consistent. This is a code
+      // smell because it assumes the commit phase is never concurrent with
+      // the render phase. Will address during refactor to alternate model.
+      child.return = completedWork;
 
-        // When a fiber is cloned, its actualDuration is reset to 0. This value will
-        // only be updated if work is done on the fiber (i.e. it doesn't bailout).
-        // When work is done, it should bubble to the parent's actualDuration. If
-        // the fiber has not been cloned though, (meaning no work was done), then
-        // this value will reflect the amount of time spent working on a previous
-        // render. In that case it should not bubble. We determine whether it was
-        // cloned by comparing the child pointer.
-        actualDuration += child.actualDuration;
-
-        treeBaseDuration += child.treeBaseDuration;
-        child = child.sibling;
-      }
-
-      completedWork.actualDuration = actualDuration;
-      completedWork.treeBaseDuration = treeBaseDuration;
-    } else {
-      let child = completedWork.child;
-      while (child !== null) {
-        newChildLanes = mergeLanes(
-          newChildLanes,
-          mergeLanes(child.lanes, child.childLanes),
-        );
-
-        subtreeFlags |= child.subtreeFlags;
-        subtreeFlags |= child.flags;
-
-        // Update the return pointer so the tree is consistent. This is a code
-        // smell because it assumes the commit phase is never concurrent with
-        // the render phase. Will address during refactor to alternate model.
-        child.return = completedWork;
-
-        child = child.sibling;
-      }
+      child = child.sibling;
     }
 
     completedWork.subtreeFlags |= subtreeFlags;
   } else {
-    // Bubble up the earliest expiration time.
-    if (enableProfilerTimer && (completedWork.mode & ProfileMode) !== NoMode) {
-      // In profiling mode, resetChildExpirationTime is also used to reset
-      // profiler durations.
-      let treeBaseDuration = completedWork.selfBaseDuration;
+    let child = completedWork.child;
+    while (child !== null) {
+      // 合并孩子的 lanes
+      newChildLanes = mergeLanes(
+        newChildLanes,
+        mergeLanes(child.lanes, child.childLanes),
+      );
 
-      let child = completedWork.child;
-      while (child !== null) {
-        newChildLanes = mergeLanes(
-          newChildLanes,
-          mergeLanes(child.lanes, child.childLanes),
-        );
+      // "Static" flags share the lifetime of the fiber/hook they belong to,
+      // so we should bubble those up even during a bailout. All the other
+      // flags have a lifetime only of a single render + commit, so we should
+      // ignore them.
+      subtreeFlags |= child.subtreeFlags & StaticMask;
+      subtreeFlags |= child.flags & StaticMask;
 
-        // "Static" flags share the lifetime of the fiber/hook they belong to,
-        // so we should bubble those up even during a bailout. All the other
-        // flags have a lifetime only of a single render + commit, so we should
-        // ignore them.
-        subtreeFlags |= child.subtreeFlags & StaticMask;
-        subtreeFlags |= child.flags & StaticMask;
+      // Update the return pointer so the tree is consistent. This is a code
+      // smell because it assumes the commit phase is never concurrent with
+      // the render phase. Will address during refactor to alternate model.
+      child.return = completedWork;
 
-        treeBaseDuration += child.treeBaseDuration;
-        child = child.sibling;
-      }
-
-      completedWork.treeBaseDuration = treeBaseDuration;
-    } else {
-      let child = completedWork.child;
-      while (child !== null) {
-        newChildLanes = mergeLanes(
-          newChildLanes,
-          mergeLanes(child.lanes, child.childLanes),
-        );
-
-        // "Static" flags share the lifetime of the fiber/hook they belong to,
-        // so we should bubble those up even during a bailout. All the other
-        // flags have a lifetime only of a single render + commit, so we should
-        // ignore them.
-        subtreeFlags |= child.subtreeFlags & StaticMask;
-        subtreeFlags |= child.flags & StaticMask;
-
-        // Update the return pointer so the tree is consistent. This is a code
-        // smell because it assumes the commit phase is never concurrent with
-        // the render phase. Will address during refactor to alternate model.
-        child.return = completedWork;
-
-        child = child.sibling;
-      }
+      child = child.sibling;
     }
 
     completedWork.subtreeFlags |= subtreeFlags;
@@ -714,6 +658,9 @@ function bubbleProperties(completedWork) {
   return didBailout;
 }
 
+/**
+ * 完成了一个单元
+ */
 function completeWork(current, workInProgress, renderLanes) {
   const newProps = workInProgress.pendingProps;
   // Note: This intentionally doesn't check if we're hydrating because comparing
@@ -745,16 +692,6 @@ function completeWork(current, workInProgress, renderLanes) {
     case HostRoot: {
       const fiberRoot = workInProgress.stateNode;
 
-      if (enableTransitionTracing) {
-        const transitions = getWorkInProgressTransitions();
-        // We set the Passive flag here because if there are new transitions,
-        // we will need to schedule callbacks and process the transitions,
-        // which we do in the passive phase
-        if (transitions !== null) {
-          workInProgress.flags |= Passive;
-        }
-      }
-
       if (enableCache) {
         let previousCache = null;
         if (current !== null) {
@@ -767,6 +704,7 @@ function completeWork(current, workInProgress, renderLanes) {
         }
         popCacheProvider(workInProgress, cache);
       }
+
       popRootTransition(workInProgress, fiberRoot, renderLanes);
       popHostContainer(workInProgress);
       popTopLevelLegacyContextObject(workInProgress);
@@ -775,6 +713,8 @@ function completeWork(current, workInProgress, renderLanes) {
         fiberRoot.context = fiberRoot.pendingContext;
         fiberRoot.pendingContext = null;
       }
+
+      // ssr
       if (current === null || current.child === null) {
         // If we hydrated, pop so that we can delete any remaining children
         // that weren't hydrated.
@@ -808,16 +748,11 @@ function completeWork(current, workInProgress, renderLanes) {
           }
         }
       }
+
+      // 该版本下，在浏览器环境下什么都不做
       updateHostContainer(current, workInProgress);
+
       bubbleProperties(workInProgress);
-      if (enableTransitionTracing) {
-        if ((workInProgress.subtreeFlags & Visibility) !== NoFlags) {
-          // If any of our suspense children toggle visibility, this means that
-          // the pending boundaries array needs to be updated, which we only
-          // do in the passive phase.
-          workInProgress.flags |= Passive;
-        }
-      }
       return null;
     }
     case HostComponent: {
