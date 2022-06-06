@@ -801,7 +801,7 @@ function ensureRootIsScheduled(root, currentTime) {
         schedulerPriorityLevel = NormalSchedulerPriority;
         break;
     }
-    // debugger
+
     newCallbackNode = scheduleCallback(
       schedulerPriorityLevel,
       performConcurrentWorkOnRoot.bind(null, root),
@@ -865,6 +865,8 @@ function performConcurrentWorkOnRoot(root, didTimeout) {
   // (disableSchedulerTimeoutInWorkLoop || !didTimeout);
 
   console.log(includesBlockingLane(root, lanes), didTimeout);
+
+  // debugger
   let exitStatus = shouldTimeSlice
     ? renderRootConcurrent(root, lanes) // 应该使用时间切片
     : renderRootSync(root, lanes); // 不使用时间切片
@@ -1815,6 +1817,7 @@ function performUnitOfWork(unitOfWork) {
   unitOfWork.memoizedProps = unitOfWork.pendingProps;
   if (next === null) {
     // If this doesn't spawn new work, complete the current work.
+    // 说明没有孩子了，下一个要找兄弟
     completeUnitOfWork(unitOfWork);
   } else {
     // 赋值给 workInProgress 继续执行
@@ -1827,6 +1830,7 @@ function performUnitOfWork(unitOfWork) {
 function completeUnitOfWork(unitOfWork) {
   // Attempt to complete the current unit of work, then move to the next
   // sibling. If there are no more siblings, return to the parent fiber.
+  // 先是 sibling，如果没有兄弟，那么换到 parent
   let completedWork = unitOfWork;
   do {
     // The current, flushed, state of this fiber is the alternate. Ideally
@@ -1837,27 +1841,30 @@ function completeUnitOfWork(unitOfWork) {
 
     // Check if the work completed or if something threw.
     if ((completedWork.flags & Incomplete) === NoFlags) {
+      // 已经完成了
       // setCurrentDebugFiberInDEV(completedWork);
       let next;
-      if (
-        !enableProfilerTimer ||
-        (completedWork.mode & ProfileMode) === NoMode
-      ) {
-        next = completeWork(current, completedWork, subtreeRenderLanes);
-      } else {
-        // startProfilerTimer(completedWork);
-        next = completeWork(current, completedWork, subtreeRenderLanes);
-        // Update render duration assuming we didn't error.
-        // stopProfilerTimerIfRunningAndRecordDelta(completedWork, false);
-      }
+      // if (
+      //   !enableProfilerTimer ||
+      //   (completedWork.mode & ProfileMode) === NoMode
+      // ) {
+      //   next = completeWork(current, completedWork, subtreeRenderLanes);
+      // } else {
+      // startProfilerTimer(completedWork);
+      next = completeWork(current, completedWork, subtreeRenderLanes);
+      // Update render duration assuming we didn't error.
+      // stopProfilerTimerIfRunningAndRecordDelta(completedWork, false);
+      // }
       // resetCurrentDebugFiberInDEV();
 
       if (next !== null) {
         // Completing this fiber spawned new work. Work on that next.
+        // 返回了另外一个任务
         workInProgress = next;
         return;
       }
     } else {
+      // 没有完成
       // This fiber did not complete because something threw. Pop values off
       // the stack without entering the complete phase. If this is a boundary,
       // capture values if possible.
@@ -1905,12 +1912,15 @@ function completeUnitOfWork(unitOfWork) {
       }
     }
 
+    // 先获取兄弟 sibling
     const siblingFiber = completedWork.sibling;
     if (siblingFiber !== null) {
       // If there is more work to do in this returnFiber, do that next.
       workInProgress = siblingFiber;
       return;
     }
+    // 没有了兄弟, 到父亲
+    // 因为父亲已经执行过了 beginWork，父亲在这里只需要执行 completeWork 即可
     // Otherwise, return to the parent
     completedWork = returnFiber;
     // Update the next thing we're working on in case something throws.
@@ -1918,6 +1928,7 @@ function completeUnitOfWork(unitOfWork) {
   } while (completedWork !== null);
 
   // We've reached the root.
+  // 所有都执行完成了，那么根的状态变为 Completed
   if (workInProgressRootExitStatus === RootInProgress) {
     workInProgressRootExitStatus = RootCompleted;
   }

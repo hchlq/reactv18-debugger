@@ -427,20 +427,9 @@ export function bailoutHooks(current, workInProgress, lanes) {
   workInProgress.updateQueue = current.updateQueue;
   // TODO: Don't need to reset the flags here, because they're reset in the
   // complete phase (bubbleProperties).
-  if (
-    __DEV__ &&
-    enableStrictEffects &&
-    (workInProgress.mode & StrictEffectsMode) !== NoMode
-  ) {
-    workInProgress.flags &= ~(
-      MountPassiveDevEffect |
-      MountLayoutDevEffect |
-      PassiveEffect |
-      UpdateEffect
-    );
-  } else {
-    workInProgress.flags &= ~(PassiveEffect | UpdateEffect);
-  }
+  // flags 中去掉 PassiveEffect 和 UpdateEffect
+  workInProgress.flags &= ~(PassiveEffect | UpdateEffect);
+
   current.lanes = removeLanes(current.lanes, lanes);
 }
 
@@ -1968,15 +1957,6 @@ function dispatchReducerAction(fiber, queue, action) {
 }
 
 function dispatchSetState(fiber, queue, action) {
-  if (__DEV__) {
-    if (typeof arguments[3] === 'function') {
-      console.error(
-        "State updates from the useState() and useReducer() Hooks don't support the " +
-          'second callback argument. To execute a side effect after ' +
-          'rendering, declare it in the component body with useEffect().',
-      );
-    }
-  }
 
   const lane = requestUpdateLane(fiber);
 
@@ -1994,7 +1974,9 @@ function dispatchSetState(fiber, queue, action) {
     enqueueUpdate(fiber, queue, update, lane);
 
     const alternate = fiber.alternate;
+    console.log('fiber.lanes: ', fiber.lanes)
     if (
+      // 在 beginWork 中会被赋值为 NoLanes
       fiber.lanes === NoLanes &&
       (alternate === null || alternate.lanes === NoLanes)
     ) {

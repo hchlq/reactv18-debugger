@@ -82,10 +82,12 @@ export * from 'react-reconciler/src/ReactFiberHostConfigWithNoPersistence';
 
 /**
  * 获取 rootContainerInstance 的 namespaceURI
+ * 即获取根容器的命名空间
  */
 export function getRootHostContext(rootContainerInstance) {
   let type;
   let namespace;
+
   const nodeType = rootContainerInstance.nodeType;
   switch (nodeType) {
     case DOCUMENT_NODE:
@@ -96,6 +98,7 @@ export function getRootHostContext(rootContainerInstance) {
 
       // 根元素 html
       const root = rootContainerInstance.documentElement;
+      // root 存在，就用 root 的 namespaceURI，否则就用默认的命名空间，即 HTML_NAMESPACE
       namespace = root ? root.namespaceURI : getChildNamespace(null, '');
       break;
     }
@@ -104,8 +107,10 @@ export function getRootHostContext(rootContainerInstance) {
         nodeType === COMMENT_NODE
           ? rootContainerInstance.parentNode
           : rootContainerInstance;
+
       const ownNamespace = container.namespaceURI || null;
       type = container.tagName;
+      
       namespace = getChildNamespace(ownNamespace, type);
       break;
     }
@@ -116,12 +121,11 @@ export function getRootHostContext(rootContainerInstance) {
 }
 
 /**
- * 获取 parentHostContext 的 namespace
+ * 获取孩子的命名空间
  */
 export function getChildHostContext(
   parentHostContext,
   type,
-  rootContainerInstance,
 ) {
   const parentNamespace = parentHostContext;
   return getChildNamespace(parentNamespace, type);

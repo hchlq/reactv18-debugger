@@ -556,6 +556,7 @@ export function includesOnlyTransitions(lanes) {
  * BlockingLane 包含 InputContinuousLane 和 DefaultLane
  */
 export function includesBlockingLane(root, lanes) {
+  // debugger
   if (
     allowConcurrentByDefault &&
     (root.current.mode & ConcurrentUpdatesByDefaultMode) !== NoMode
