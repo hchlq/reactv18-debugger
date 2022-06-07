@@ -233,6 +233,7 @@ if (supportsMutation) {
   updateHostContainer = function (current, workInProgress) {
     // Noop
   };
+  // 更新普通元素
   updateHostComponent = function (
     current,
     workInProgress,
@@ -242,6 +243,7 @@ if (supportsMutation) {
   ) {
     // If we have an alternate, that means this is an update and we need to
     // schedule a side-effect to do the updates.
+    // 新老 props 一样，不用更新
     const oldProps = current.memoizedProps;
     if (oldProps === newProps) {
       // In mutation mode, this is sufficient for a bailout because
@@ -258,6 +260,9 @@ if (supportsMutation) {
     // TODO: Experiencing an error where oldProps is null. Suggests a host
     // component is hitting the resume path. Figure out why. Possibly
     // related to `hidden`.
+
+    // 比较属性，得到一个更新后的属性变化数组，数组每两项代表一个属性名和属性值
+    // e.g. [children, '1'] 代表的是新孩子的值为 '1'
     const updatePayload = prepareUpdate(
       instance,
       type,
@@ -266,11 +271,15 @@ if (supportsMutation) {
       rootContainerInstance,
       currentHostContext,
     );
+
+    // console.log('updatePayload: ', updatePayload)
     // TODO: Type this specific to this type of component.
     workInProgress.updateQueue = updatePayload;
+
     // If the update payload indicates that there is a change or if there
     // is a new ref we mark this as an update. All the work is done in commitWork.
     if (updatePayload) {
+      // 有属性变化，给当前的 workInProgress 增加 Update flags
       markUpdate(workInProgress);
     }
   };

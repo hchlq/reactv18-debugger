@@ -1974,7 +1974,7 @@ function dispatchSetState(fiber, queue, action) {
     enqueueUpdate(fiber, queue, update, lane);
 
     const alternate = fiber.alternate;
-    console.log('fiber.lanes: ', fiber.lanes)
+    // console.log('fiber.lanes: ', fiber.lanes)
     if (
       // 在 beginWork 中会被赋值为 NoLanes
       fiber.lanes === NoLanes &&

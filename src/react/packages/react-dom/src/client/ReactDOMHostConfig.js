@@ -424,6 +424,8 @@ export function commitMount(
 
 /**
  * commit 更新
+ * 1. 应用 diff 后属性的更新到
+ * 2. 更新 node 上保存的 props
  */
 export function commitUpdate(
   domElement,
