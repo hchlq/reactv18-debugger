@@ -595,7 +595,7 @@ function cutOffTailIfNeeded(renderState, hasRenderedATailFallback) {
 }
 
 /**
- * 合并 completeWork.subtreeFlags 和 completeWork.childLanes
+ * 合并孩子及其孩子兄弟的 completeWork.subtreeFlags 和 completeWork.childLanes
  */
 function bubbleProperties(completedWork) {
   const didBailout =
@@ -679,6 +679,7 @@ function completeWork(current, workInProgress, renderLanes) {
     case Profiler:
     case ContextConsumer:
     case MemoComponent:
+      // 合并孩子的 lane 和 flags
       bubbleProperties(workInProgress);
       return null;
     case ClassComponent: {
@@ -759,6 +760,7 @@ function completeWork(current, workInProgress, renderLanes) {
       popHostContext(workInProgress);
       const rootContainerInstance = getRootHostContainer();
       const type = workInProgress.type;
+
       if (current !== null && workInProgress.stateNode != null) {
         updateHostComponent(
           current,
@@ -769,6 +771,7 @@ function completeWork(current, workInProgress, renderLanes) {
         );
 
         if (current.ref !== workInProgress.ref) {
+          // 标记 ref
           markRef(workInProgress);
         }
       } else {
@@ -806,6 +809,7 @@ function completeWork(current, workInProgress, renderLanes) {
             markUpdate(workInProgress);
           }
         } else {
+          // 创建元素
           const instance = createInstance(
             type,
             newProps,
@@ -814,6 +818,7 @@ function completeWork(current, workInProgress, renderLanes) {
             workInProgress,
           );
 
+          // 添加所有的孩子到 instance 中
           appendAllChildren(instance, workInProgress, false, false);
 
           workInProgress.stateNode = instance;
@@ -830,6 +835,7 @@ function completeWork(current, workInProgress, renderLanes) {
               currentHostContext,
             )
           ) {
+            // 标记为更新
             markUpdate(workInProgress);
           }
         }
@@ -839,6 +845,7 @@ function completeWork(current, workInProgress, renderLanes) {
           markRef(workInProgress);
         }
       }
+
       bubbleProperties(workInProgress);
       return null;
     }
