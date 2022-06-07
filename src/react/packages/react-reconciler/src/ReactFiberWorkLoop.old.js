@@ -1941,6 +1941,8 @@ function commitRoot(root, recoverableErrors, transitions) {
   const prevTransition = ReactCurrentBatchConfig.transition;
 
   try {
+    // 1. 将 transition 置为空
+    // 2. 设置 updatePriority 为 DiscreteEventPriority
     ReactCurrentBatchConfig.transition = null;
     setCurrentUpdatePriority(DiscreteEventPriority);
     commitRootImpl(
@@ -1972,47 +1974,29 @@ function commitRootImpl(
     // flush synchronous work at the end, to avoid factoring hazards like this.
     flushPassiveEffects();
   } while (rootWithPendingPassiveEffects !== null);
-  flushRenderPhaseStrictModeWarningsInDEV();
+  // flushRenderPhaseStrictModeWarningsInDEV();
 
   if ((executionContext & (RenderContext | CommitContext)) !== NoContext) {
+    // 执行上下文是 RenderContext 或者 CommitContext
     throw new Error('Should not already be working.');
   }
 
   const finishedWork = root.finishedWork;
   const lanes = root.finishedLanes;
 
-  if (__DEV__) {
-    if (enableDebugTracing) {
-      logCommitStarted(lanes);
-    }
-  }
-
-  if (enableSchedulingProfiler) {
-    markCommitStarted(lanes);
-  }
+  // if (enableSchedulingProfiler) {
+  //   markCommitStarted(lanes);
+  // }
 
   if (finishedWork === null) {
-    if (__DEV__) {
-      if (enableDebugTracing) {
-        logCommitStopped();
-      }
-    }
-
     if (enableSchedulingProfiler) {
       markCommitStopped();
     }
 
     return null;
-  } else {
-    if (__DEV__) {
-      if (lanes === NoLanes) {
-        console.error(
-          'root.finishedLanes should not be empty during a commit. This is a ' +
-            'bug in React.',
-        );
-      }
-    }
-  }
+  } 
+
+  // console.log(root.finishedLanes, finishedWork, finishedWork.lanes, finishedWork.childLanes)
   root.finishedWork = null;
   root.finishedLanes = NoLanes;
 
@@ -2025,6 +2009,7 @@ function commitRootImpl(
 
   // commitRoot never returns a continuation; it always finishes synchronously.
   // So we can clear these now to allow a new callback to be scheduled.
+  // 重置 callbackNode 和 callbackPriority
   root.callbackNode = null;
   root.callbackPriority = NoLane;
 
@@ -2111,17 +2096,17 @@ function commitRootImpl(
       finishedWork,
     );
 
-    if (enableProfilerTimer) {
-      // Mark the current commit time to be shared by all Profilers in this
-      // batch. This enables them to be grouped later.
-      recordCommitTime();
-    }
+    // if (enableProfilerTimer) {
+    //   // Mark the current commit time to be shared by all Profilers in this
+    //   // batch. This enables them to be grouped later.
+    //   recordCommitTime();
+    // }
 
-    if (enableProfilerTimer && enableProfilerNestedUpdateScheduledHook) {
-      // Track the root here, rather than in commitLayoutEffects(), because of ref setters.
-      // Updates scheduled during ref detachment should also be flagged.
-      rootCommittingMutationOrLayoutEffects = root;
-    }
+    // if (enableProfilerTimer && enableProfilerNestedUpdateScheduledHook) {
+    //   // Track the root here, rather than in commitLayoutEffects(), because of ref setters.
+    //   // Updates scheduled during ref detachment should also be flagged.
+    //   rootCommittingMutationOrLayoutEffects = root;
+    // }
 
     // The next phase is the mutation phase, where we mutate the host tree.
     commitMutationEffects(root, finishedWork, lanes);
@@ -2142,28 +2127,18 @@ function commitRootImpl(
     // The next phase is the layout phase, where we call effects that read
     // the host tree after it's been mutated. The idiomatic use case for this is
     // layout, but class component lifecycles also fire here for legacy reasons.
-    if (__DEV__) {
-      if (enableDebugTracing) {
-        logLayoutEffectsStarted(lanes);
-      }
-    }
-    if (enableSchedulingProfiler) {
-      markLayoutEffectsStarted(lanes);
-    }
+    // if (enableSchedulingProfiler) {
+    //   markLayoutEffectsStarted(lanes);
+    // }
     commitLayoutEffects(finishedWork, root, lanes);
-    if (__DEV__) {
-      if (enableDebugTracing) {
-        logLayoutEffectsStopped();
-      }
-    }
 
-    if (enableSchedulingProfiler) {
-      markLayoutEffectsStopped();
-    }
+    // if (enableSchedulingProfiler) {
+    //   markLayoutEffectsStopped();
+    // }
 
-    if (enableProfilerTimer && enableProfilerNestedUpdateScheduledHook) {
-      rootCommittingMutationOrLayoutEffects = null;
-    }
+    // if (enableProfilerTimer && enableProfilerNestedUpdateScheduledHook) {
+    //   rootCommittingMutationOrLayoutEffects = null;
+    // }
 
     // Tell Scheduler to yield at the end of the frame, so the browser has an
     // opportunity to paint.
@@ -2224,11 +2199,6 @@ function commitRootImpl(
     legacyErrorBoundariesThatAlreadyFailed = null;
   }
 
-  if (__DEV__ && enableStrictEffects) {
-    if (!rootDidHavePassiveEffects) {
-      commitDoubleInvokeEffectsInDEV(root.current, false);
-    }
-  }
 
   onCommitRootDevTools(finishedWork.stateNode, renderPriorityLevel);
 
@@ -2236,10 +2206,6 @@ function commitRootImpl(
     if (isDevToolsPresent) {
       root.memoizedUpdaters.clear();
     }
-  }
-
-  if (__DEV__) {
-    onCommitRootTestSelector();
   }
 
   // Always call this before exiting `commitRoot`, to ensure that any
@@ -2299,12 +2265,6 @@ function commitRootImpl(
 
   // If layout work was scheduled, flush it now.
   flushSyncCallbacks();
-
-  if (__DEV__) {
-    if (enableDebugTracing) {
-      logCommitStopped();
-    }
-  }
 
   if (enableSchedulingProfiler) {
     markCommitStopped();

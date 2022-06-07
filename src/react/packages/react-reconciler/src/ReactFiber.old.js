@@ -310,8 +310,19 @@ export function createWorkInProgress(current, pendingProps) {
   workInProgress.flags = current.flags & StaticMask;
 
   // 复用 childLanes 和 lanes
+  // debugger
   workInProgress.childLanes = current.childLanes;
   workInProgress.lanes = current.lanes;
+  // let t = workInProgress.lanes
+  // Object.defineProperty(workInProgress, 'lanes', {
+  //   set(n) {
+  //     if (n === 0) debugger;
+  //     t = n
+  //   },
+  //   get() {
+  //     return t
+  //   }
+  // })
 
   // 复用孩子
   workInProgress.child = current.child;

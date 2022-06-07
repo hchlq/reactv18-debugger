@@ -5,7 +5,7 @@ import * as ReactDom from "react-dom";
 // import App from './_test/hooks/useState'
 import App from './_test/hooks/ref'
 
-ReactDom.createRoot(document.getElementById("root")).render(<h1>1111</h1>)
+ReactDom.createRoot(document.getElementById("root")).render(<App/>)
 // HostText
 // ReactDom.createRoot(document.getElementById("root")).render('fjkdlsjaflk')
 // ReactDom.render(<App />, document.getElementById("root"));

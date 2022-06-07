@@ -669,6 +669,7 @@ function bubbleProperties(completedWork) {
     completedWork.subtreeFlags |= subtreeFlags;
   }
 
+  // console.log('newChildLanes: ', newChildLanes)
   completedWork.childLanes = newChildLanes;
 
   return didBailout;
