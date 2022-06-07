@@ -836,7 +836,7 @@ function completeWork(current, workInProgress, renderLanes) {
             workInProgress,
           );
 
-          // 添加所有的孩子到 instance 中
+          // 添加所有的孩子到该元素的孩子中
           appendAllChildren(instance, workInProgress, false, false);
 
           workInProgress.stateNode = instance;
@@ -868,11 +868,13 @@ function completeWork(current, workInProgress, renderLanes) {
       return null;
     }
     case HostText: {
+      // debugger
       const newText = newProps;
       if (current && workInProgress.stateNode != null) {
         const oldText = current.memoizedProps;
         // If we have an alternate, that means this is an update and we need
         // to schedule a side-effect to do the updates.
+        // props 代表的是元素
         updateHostText(current, workInProgress, oldText, newText);
       } else {
         if (typeof newText !== 'string') {
