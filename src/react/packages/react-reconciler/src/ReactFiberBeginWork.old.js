@@ -886,7 +886,7 @@ function markRef(current, workInProgress) {
   ) {
     // 1. 首次挂载
     // 2. 更新阶段：新老的 ref 不一样
-
+    // console.log('beginWork markRef')
     // Schedule a Ref effect
     workInProgress.flags |= Ref;
 

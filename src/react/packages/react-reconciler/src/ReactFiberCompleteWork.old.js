@@ -194,11 +194,11 @@ if (supportsMutation) {
     needsVisibilityToggle,
     isHidden,
   ) { 
-    console.log(workInProgress.type)
+    // console.log(workInProgress.type)
     // debugger
     // We only have the top Fiber that was created but we need recurse down its
     // children to find all the terminal nodes.
-    le = workInProgress.child;
+    let node = workInProgress.child;
     while (node !== null) {
       if (node.tag === HostComponent || node.tag === HostText) {
         // 元素或者文本节点
@@ -778,7 +778,9 @@ function completeWork(current, workInProgress, renderLanes) {
         );
 
         if (current.ref !== workInProgress.ref) {
-          // 标记 ref
+          // console.log('completeWork markRef')
+          // 标记 ref，有可能被标记两次，在 updateHostComponent 已经标记过了
+          // 标记两次不会有影响
           markRef(workInProgress);
         }
       } else {

@@ -864,7 +864,7 @@ function performConcurrentWorkOnRoot(root, didTimeout) {
     !didTimeout;
   // (disableSchedulerTimeoutInWorkLoop || !didTimeout);
 
-  console.log(includesBlockingLane(root, lanes), didTimeout);
+  // console.log(includesBlockingLane(root, lanes), didTimeout);
 
   // debugger
   let exitStatus = shouldTimeSlice
