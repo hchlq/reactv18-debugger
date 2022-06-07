@@ -282,39 +282,15 @@ export function createHydrationContainer(
 }
 
 export function updateContainer(element, container, parentComponent, callback) {
-  if (__DEV__) {
-    onScheduleRoot(container, element);
-  }
   const current = container.current;
   const eventTime = requestEventTime();
   const lane = requestUpdateLane(current);
-
-  if (enableSchedulingProfiler) {
-    markRenderScheduled(lane);
-  }
 
   const context = getContextForSubtree(parentComponent);
   if (container.context === null) {
     container.context = context;
   } else {
     container.pendingContext = context;
-  }
-
-  if (__DEV__) {
-    if (
-      ReactCurrentFiberIsRendering &&
-      ReactCurrentFiberCurrent !== null &&
-      !didWarnAboutNestedUpdates
-    ) {
-      didWarnAboutNestedUpdates = true;
-      console.error(
-        'Render methods should be a pure function of props and state; ' +
-          'triggering nested component updates from render is not allowed. ' +
-          'If necessary, trigger nested updates in componentDidUpdate.\n\n' +
-          'Check the render method of %s.',
-        getComponentNameFromFiber(ReactCurrentFiberCurrent) || 'Unknown',
-      );
-    }
   }
 
   const update = createUpdate(eventTime, lane);
@@ -324,15 +300,6 @@ export function updateContainer(element, container, parentComponent, callback) {
 
   callback = callback === undefined ? null : callback;
   if (callback !== null) {
-    if (__DEV__) {
-      if (typeof callback !== 'function') {
-        console.error(
-          'render(...): Expected the last optional `callback` argument to be a ' +
-            'function. Instead received: %s.',
-          callback,
-        );
-      }
-    }
     update.callback = callback;
   }
 

@@ -307,14 +307,6 @@ export function renderWithHooks(
   renderLanes = nextRenderLanes;
   currentlyRenderingFiber = workInProgress;
 
-  if (__DEV__) {
-    hookTypesDev = current !== null ? current._debugHookTypes : null;
-    hookTypesUpdateIndexDev = -1;
-    // Used for hot reloading:
-    ignorePreviousDependencies =
-      current !== null && current.type !== workInProgress.type;
-  }
-
   workInProgress.memoizedState = null;
   workInProgress.updateQueue = null;
   workInProgress.lanes = NoLanes;
@@ -333,25 +325,10 @@ export function renderWithHooks(
   // Using memoizedState to differentiate between mount/update only works if at least one stateful hook is used.
   // Non-stateful hooks (e.g. context) don't get added to memoizedState,
   // so memoizedState would be null during updates and mounts.
-  if (__DEV__) {
-    if (current !== null && current.memoizedState !== null) {
-      ReactCurrentDispatcher.current = HooksDispatcherOnUpdateInDEV;
-    } else if (hookTypesDev !== null) {
-      // This dispatcher handles an edge case where a component is updating,
-      // but no stateful hooks have been used.
-      // We want to match the production code behavior (which will use HooksDispatcherOnMount),
-      // but with the extra DEV validation to ensure hooks ordering hasn't changed.
-      // This dispatcher does that.
-      ReactCurrentDispatcher.current = HooksDispatcherOnMountWithHookTypesInDEV;
-    } else {
-      ReactCurrentDispatcher.current = HooksDispatcherOnMountInDEV;
-    }
-  } else {
-    ReactCurrentDispatcher.current =
-      current === null || current.memoizedState === null
-        ? HooksDispatcherOnMount
-        : HooksDispatcherOnUpdate;
-  }
+  ReactCurrentDispatcher.current =
+    current === null || current.memoizedState === null
+      ? HooksDispatcherOnMount
+      : HooksDispatcherOnUpdate;
 
   let children = Component(props, secondArg);
 
@@ -372,22 +349,12 @@ export function renderWithHooks(
       }
 
       numberOfReRenders += 1;
-      if (__DEV__) {
-        // Even when hot reloading, allow dependencies to stabilize
-        // after first render to prevent infinite render phase updates.
-        ignorePreviousDependencies = false;
-      }
 
       // Start over from the beginning of the list
       currentHook = null;
       workInProgressHook = null;
 
       workInProgress.updateQueue = null;
-
-      if (__DEV__) {
-        // Also validate hook order for cascading updates.
-        hookTypesUpdateIndexDev = -1;
-      }
 
       ReactCurrentDispatcher.current = __DEV__
         ? HooksDispatcherOnRerenderInDEV
@@ -401,10 +368,6 @@ export function renderWithHooks(
   // at the beginning of the render phase and there's no re-entrance.
   ReactCurrentDispatcher.current = ContextOnlyDispatcher;
 
-  if (__DEV__) {
-    workInProgress._debugHookTypes = hookTypesDev;
-  }
-
   // This check uses currentHook so that it works the same in DEV and prod bundles.
   // hookTypesDev could catch more cases (e.g. context) but only in DEV bundles.
   const didRenderTooFewHooks =
@@ -415,33 +378,6 @@ export function renderWithHooks(
 
   currentHook = null;
   workInProgressHook = null;
-
-  if (__DEV__) {
-    currentHookNameInDev = null;
-    hookTypesDev = null;
-    hookTypesUpdateIndexDev = -1;
-
-    // Confirm that a static flag was not added or removed since the last
-    // render. If this fires, it suggests that we incorrectly reset the static
-    // flags in some other part of the codebase. This has happened before, for
-    // example, in the SuspenseList implementation.
-    if (
-      current !== null &&
-      (current.flags & StaticMaskEffect) !==
-        (workInProgress.flags & StaticMaskEffect) &&
-      // Disable this warning in legacy mode, because legacy Suspense is weird
-      // and creates false positives. To make this work in legacy mode, we'd
-      // need to mark fibers that commit in an incomplete state, somehow. For
-      // now I'll disable the warning that most of the bugs that would trigger
-      // it are either exclusive to concurrent mode or exist in both.
-      (current.mode & ConcurrentMode) !== NoMode
-    ) {
-      console.error(
-        'Internal React error: Expected static flag was missing. Please ' +
-          'notify the React team.',
-      );
-    }
-  }
 
   didScheduleRenderPhaseUpdate = false;
   // This is reset by checkDidRenderIdHook
@@ -474,6 +410,7 @@ export function renderWithHooks(
       }
     }
   }
+  
   return children;
 }
 

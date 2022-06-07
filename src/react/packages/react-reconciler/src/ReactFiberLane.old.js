@@ -205,6 +205,7 @@ export function getNextLanes(root, wipLanes) {
   // even if the work is suspended.
   // 优先处理不是空闲的任务，知道非空闲的任务处理完成了，才会处理空闲的任务
   const nonIdlePendingLanes = pendingLanes & NonIdleLanes;
+  // console.log('nonIdlePendingLanes: ', nonIdlePendingLanes)
   if (nonIdlePendingLanes !== NoLanes) {
     // 排除掉 suspense
     const nonIdleUnblockedLanes = nonIdlePendingLanes & ~suspendedLanes;

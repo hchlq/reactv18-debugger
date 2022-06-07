@@ -1113,6 +1113,7 @@ function finishClassComponent(
 }
 
 function pushHostRootContext(workInProgress) {
+  // HostRoot fiber 中 stateNode 代表的就是 fiberRoot
   const root = workInProgress.stateNode;
 
   if (root.pendingContext) {
@@ -1129,125 +1130,61 @@ function pushHostRootContext(workInProgress) {
   pushHostContainer(workInProgress, root.containerInfo);
 }
 
+/**
+ * 挂载或者更新根容器
+ */
 function updateHostRoot(current, workInProgress, renderLanes) {
   pushHostRootContext(workInProgress);
 
+  // 根容器一定是有 current 的
   if (current === null) {
     throw new Error('Should have a current fiber. This is a bug in React.');
   }
 
   const nextProps = workInProgress.pendingProps;
+
   const prevState = workInProgress.memoizedState;
+
+  // 前一个孩子
   const prevChildren = prevState.element;
+
+  // 克隆更新队列
   cloneUpdateQueue(current, workInProgress);
+
+  // 处理更新队列
   processUpdateQueue(workInProgress, nextProps, null, renderLanes);
 
+  // 下一个状态，在 processUpdateQueue 中已经处理了的
   const nextState = workInProgress.memoizedState;
-  const root = workInProgress.stateNode;
-  pushRootTransition(workInProgress, root, renderLanes);
 
-  if (enableCache) {
-    const nextCache = nextState.cache;
-    pushCacheProvider(workInProgress, nextCache);
-    if (nextCache !== prevState.cache) {
-      // The root cache refreshed.
-      propagateContextChange(workInProgress, CacheContext, renderLanes);
-    }
-  }
+  // const root = workInProgress.stateNode;
+
+  // pushRootTransition(workInProgress, root, renderLanes);
+
+  // if (enableCache) {
+  //   const nextCache = nextState.cache;
+  //   pushCacheProvider(workInProgress, nextCache);
+  //   if (nextCache !== prevState.cache) {
+  //     // The root cache refreshed.
+  //     propagateContextChange(workInProgress, CacheContext, renderLanes);
+  //   }
+  // }
 
   // Caution: React DevTools currently depends on this property
   // being called "element".
+  
   const nextChildren = nextState.element;
-  if (supportsHydration && prevState.isDehydrated) {
-    // This is a hydration root whose shell has not yet hydrated. We should
-    // attempt to hydrate.
 
-    // Flip isDehydrated to false to indicate that when this render
-    // finishes, the root will no longer be dehydrated.
-    const overrideState = {
-      element: nextChildren,
-      isDehydrated: false,
-      cache: nextState.cache,
-      pendingSuspenseBoundaries: nextState.pendingSuspenseBoundaries,
-      transitions: nextState.transitions,
-    };
-    const updateQueue = workInProgress.updateQueue;
-    // `baseState` can always be the last state because the root doesn't
-    // have reducer functions so it doesn't need rebasing.
-    updateQueue.baseState = overrideState;
-    workInProgress.memoizedState = overrideState;
-
-    if (workInProgress.flags & ForceClientRender) {
-      // Something errored during a previous attempt to hydrate the shell, so we
-      // forced a client render.
-      const recoverableError = new Error(
-        'There was an error while hydrating. Because the error happened outside ' +
-          'of a Suspense boundary, the entire root will switch to ' +
-          'client rendering.',
-      );
-      return mountHostRootWithoutHydrating(
-        current,
-        workInProgress,
-        nextChildren,
-        renderLanes,
-        recoverableError,
-      );
-    } else if (nextChildren !== prevChildren) {
-      const recoverableError = new Error(
-        'This root received an early update, before anything was able ' +
-          'hydrate. Switched the entire root to client rendering.',
-      );
-      return mountHostRootWithoutHydrating(
-        current,
-        workInProgress,
-        nextChildren,
-        renderLanes,
-        recoverableError,
-      );
-    } else {
-      // The outermost shell has not hydrated yet. Start hydrating.
-      enterHydrationState(workInProgress);
-      if (enableUseMutableSource) {
-        const mutableSourceEagerHydrationData =
-          root.mutableSourceEagerHydrationData;
-        if (mutableSourceEagerHydrationData != null) {
-          for (let i = 0; i < mutableSourceEagerHydrationData.length; i += 2) {
-            const mutableSource = mutableSourceEagerHydrationData[i];
-            const version = mutableSourceEagerHydrationData[i + 1];
-            setWorkInProgressVersion(mutableSource, version);
-          }
-        }
-      }
-
-      const child = mountChildFibers(
-        workInProgress,
-        null,
-        nextChildren,
-        renderLanes,
-      );
-      workInProgress.child = child;
-
-      let node = child;
-      while (node) {
-        // Mark each child as hydrating. This is a fast path to know whether this
-        // tree is part of a hydrating tree. This is used to determine if a child
-        // node has fully mounted yet, and for scheduling event replaying.
-        // Conceptually this is similar to Placement in that a new subtree is
-        // inserted into the React tree here. It just happens to not need DOM
-        // mutations because it already exists.
-        node.flags = (node.flags & ~Placement) | Hydrating;
-        node = node.sibling;
-      }
-    }
-  } else {
-    // Root is not dehydrated. Either this is a client-only root, or it
-    // already hydrated.
-    resetHydrationState();
-    if (nextChildren === prevChildren) {
-      return bailoutOnAlreadyFinishedWork(current, workInProgress, renderLanes);
-    }
-    reconcileChildren(current, workInProgress, nextChildren, renderLanes);
+  // Root is not dehydrated. Either this is a client-only root, or it
+  // already hydrated.
+  if (nextChildren === prevChildren) {
+    // 前后孩子都一样，提前进入 finishedWork
+    return bailoutOnAlreadyFinishedWork(current, workInProgress, renderLanes);
   }
+
+  // 孩子不一样，进入更新孩子阶段
+  reconcileChildren(current, workInProgress, nextChildren, renderLanes);
+
   return workInProgress.child;
 }
 
@@ -1324,25 +1261,25 @@ function mountLazyComponent(
   elementType,
   renderLanes,
 ) {
-  resetSuspendedCurrentOnMountInLegacyMode(_current, workInProgress);
+  // resetSuspendedCurrentOnMountInLegacyMode(_current, workInProgress);
 
   const props = workInProgress.pendingProps;
   const lazyComponent = elementType;
   const payload = lazyComponent._payload;
   const init = lazyComponent._init;
+
+  // 执行 init 方法
   let Component = init(payload);
+
   // Store the unwrapped component in the type.
   workInProgress.type = Component;
+
   const resolvedTag = (workInProgress.tag = resolveLazyComponentTag(Component));
   const resolvedProps = resolveDefaultProps(Component, props);
+  
   let child;
   switch (resolvedTag) {
     case FunctionComponent: {
-      if (__DEV__) {
-        validateFunctionComponentInDev(workInProgress, Component);
-        workInProgress.type = Component =
-          resolveFunctionForHotReloading(Component);
-      }
       child = updateFunctionComponent(
         null,
         workInProgress,
@@ -1353,10 +1290,6 @@ function mountLazyComponent(
       return child;
     }
     case ClassComponent: {
-      if (__DEV__) {
-        workInProgress.type = Component =
-          resolveClassForHotReloading(Component);
-      }
       child = updateClassComponent(
         null,
         workInProgress,
@@ -1367,10 +1300,6 @@ function mountLazyComponent(
       return child;
     }
     case ForwardRef: {
-      if (__DEV__) {
-        workInProgress.type = Component =
-          resolveForwardRefForHotReloading(Component);
-      }
       child = updateForwardRef(
         null,
         workInProgress,
@@ -1381,19 +1310,6 @@ function mountLazyComponent(
       return child;
     }
     case MemoComponent: {
-      if (__DEV__) {
-        if (workInProgress.type !== workInProgress.elementType) {
-          const outerPropTypes = Component.propTypes;
-          if (outerPropTypes) {
-            checkPropTypes(
-              outerPropTypes,
-              resolvedProps, // Resolved for outer only
-              'prop',
-              getComponentNameFromType(Component),
-            );
-          }
-        }
-      }
       child = updateMemoComponent(
         null,
         workInProgress,
@@ -1404,16 +1320,8 @@ function mountLazyComponent(
       return child;
     }
   }
+  
   let hint = '';
-  if (__DEV__) {
-    if (
-      Component !== null &&
-      typeof Component === 'object' &&
-      Component.$$typeof === REACT_LAZY_TYPE
-    ) {
-      hint = ' Did you wrap a component in React.lazy() more than once?';
-    }
-  }
 
   // This message intentionally doesn't mention ForwardRef or MemoComponent
   // because the fact that it's a separate type of work is an
@@ -1463,16 +1371,20 @@ function mountIncompleteClassComponent(
   );
 }
 
+/**
+ * 挂载不确定的组件，一般是首次挂载的函数组件
+ */
 function mountIndeterminateComponent(
   _current,
   workInProgress,
   Component,
   renderLanes,
 ) {
-  resetSuspendedCurrentOnMountInLegacyMode(_current, workInProgress);
+  // resetSuspendedCurrentOnMountInLegacyMode(_current, workInProgress);
 
   const props = workInProgress.pendingProps;
   let context;
+  // 没有禁止老的 Context 模式
   if (!disableLegacyContext) {
     const unmaskedContext = getUnmaskedContext(
       workInProgress,
@@ -1482,117 +1394,45 @@ function mountIndeterminateComponent(
     context = getMaskedContext(workInProgress, unmaskedContext);
   }
 
+  // 准备工作，准备去阅读上下文的的值
   prepareToReadContext(workInProgress, renderLanes);
+
   let value;
   let hasId;
 
-  if (enableSchedulingProfiler) {
-    markComponentRenderStarted(workInProgress);
-  }
-  if (__DEV__) {
-    if (
-      Component.prototype &&
-      typeof Component.prototype.render === 'function'
-    ) {
-      const componentName = getComponentNameFromType(Component) || 'Unknown';
+  value = renderWithHooks(
+    null,
+    workInProgress, // 当前正在执行的函数 fiber
+    Component, // 函数本身
+    props, // props
+    context, // 上下文
+    renderLanes, // 当前渲染的车道
+  );
 
-      if (!didWarnAboutBadClass[componentName]) {
-        console.error(
-          "The <%s /> component appears to have a render method, but doesn't extend React.Component. " +
-            'This is likely to cause errors. Change %s to extend React.Component instead.',
-          componentName,
-          componentName,
-        );
-        didWarnAboutBadClass[componentName] = true;
-      }
-    }
-
-    if (workInProgress.mode & StrictLegacyMode) {
-      ReactStrictModeWarnings.recordLegacyContextWarning(workInProgress, null);
-    }
-
-    setIsRendering(true);
-    ReactCurrentOwner.current = workInProgress;
-    value = renderWithHooks(
-      null,
-      workInProgress,
-      Component,
-      props,
-      context,
-      renderLanes,
-    );
-    hasId = checkDidRenderIdHook();
-    setIsRendering(false);
-  } else {
-    value = renderWithHooks(
-      null,
-      workInProgress,
-      Component,
-      props,
-      context,
-      renderLanes,
-    );
-    hasId = checkDidRenderIdHook();
-  }
-  if (enableSchedulingProfiler) {
-    markComponentRenderStopped();
-  }
+  // 检查是否有 useId hook
+  // hasId = checkDidRenderIdHook();
 
   // React DevTools reads this flag.
   workInProgress.flags |= PerformedWork;
 
-  if (__DEV__) {
-    // Support for module components is deprecated and is removed behind a flag.
-    // Whether or not it would crash later, we want to show a good message in DEV first.
-    if (
-      typeof value === 'object' &&
-      value !== null &&
-      typeof value.render === 'function' &&
-      value.$$typeof === undefined
-    ) {
-      const componentName = getComponentNameFromType(Component) || 'Unknown';
-      if (!didWarnAboutModulePatternComponent[componentName]) {
-        console.error(
-          'The <%s /> component appears to be a function component that returns a class instance. ' +
-            'Change %s to a class that extends React.Component instead. ' +
-            "If you can't use a class try assigning the prototype on the function as a workaround. " +
-            "`%s.prototype = React.Component.prototype`. Don't use an arrow function since it " +
-            'cannot be called with `new` by React.',
-          componentName,
-          componentName,
-          componentName,
-        );
-        didWarnAboutModulePatternComponent[componentName] = true;
-      }
-    }
-  }
-
   if (
     // Run these checks in production only if the flag is off.
     // Eventually we'll delete this branch altogether.
+    // disableModulePatternComponents 是函数式 render 对象
+    // e.g.
+    //  function Button(props) {
+    //   return {
+    //     render() {
+    //       return <div />;
+    //     }
+    //   }
+    // }
     !disableModulePatternComponents &&
     typeof value === 'object' &&
     value !== null &&
     typeof value.render === 'function' &&
     value.$$typeof === undefined
   ) {
-    if (__DEV__) {
-      const componentName = getComponentNameFromType(Component) || 'Unknown';
-      if (!didWarnAboutModulePatternComponent[componentName]) {
-        console.error(
-          'The <%s /> component appears to be a function component that returns a class instance. ' +
-            'Change %s to a class that extends React.Component instead. ' +
-            "If you can't use a class try assigning the prototype on the function as a workaround. " +
-            "`%s.prototype = React.Component.prototype`. Don't use an arrow function since it " +
-            'cannot be called with `new` by React.',
-          componentName,
-          componentName,
-          componentName,
-        );
-        didWarnAboutModulePatternComponent[componentName] = true;
-      }
-    }
-
     // Proceed under the assumption that this is a class instance
     workInProgress.tag = ClassComponent;
 
@@ -1629,44 +1469,12 @@ function mountIndeterminateComponent(
   } else {
     // Proceed under the assumption that this is a function component
     workInProgress.tag = FunctionComponent;
-    if (__DEV__) {
-      if (disableLegacyContext && Component.contextTypes) {
-        console.error(
-          '%s uses the legacy contextTypes API which is no longer supported. ' +
-            'Use React.createContext() with React.useContext() instead.',
-          getComponentNameFromType(Component) || 'Unknown',
-        );
-      }
 
-      if (
-        debugRenderPhaseSideEffectsForStrictMode &&
-        workInProgress.mode & StrictLegacyMode
-      ) {
-        setIsStrictModeForDevtools(true);
-        try {
-          value = renderWithHooks(
-            null,
-            workInProgress,
-            Component,
-            props,
-            context,
-            renderLanes,
-          );
-          hasId = checkDidRenderIdHook();
-        } finally {
-          setIsStrictModeForDevtools(false);
-        }
-      }
-    }
-
-    if (getIsHydrating() && hasId) {
-      pushMaterializedTreeId(workInProgress);
-    }
+    // if (getIsHydrating() && hasId) {
+    //   pushMaterializedTreeId(workInProgress);
+    // }
 
     reconcileChildren(null, workInProgress, value, renderLanes);
-    if (__DEV__) {
-      validateFunctionComponentInDev(workInProgress, Component);
-    }
     return workInProgress.child;
   }
 }
@@ -3266,21 +3074,32 @@ function remountFiber(current, oldWorkInProgress, newWorkInProgress) {
   }
 }
 
+/**
+ * 检查是否有更新任务
+ * 在该版本中，不会检查 Contexts
+ */
 function checkScheduledUpdateOrContext(current, renderLanes) {
   // Before performing an early bailout, we must check if there are pending
   // updates or context.
   const updateLanes = current.lanes;
+
+  // 上一次的更新车道中包含本次的渲染车道
   if (includesSomeLane(updateLanes, renderLanes)) {
+    // updateLanes & renderLanes !== NoLanes
     return true;
   }
+
   // No pending update, but because context is propagated lazily, we need
   // to check for a context change before we bail out.
+  // enableLazyContextPropagation: false
   if (enableLazyContextPropagation) {
+    // 检查 Context 的消费侧是否改变了
     const dependencies = current.dependencies;
     if (dependencies !== null && checkIfContextChanged(dependencies)) {
       return true;
     }
   }
+
   return false;
 }
 
@@ -3493,58 +3312,50 @@ function attemptEarlyBailoutIfNoScheduledUpdate(
 }
 
 function beginWork(current, workInProgress, renderLanes) {
-  if (__DEV__) {
-    if (workInProgress._debugNeedsRemount && current !== null) {
-      // This will restart the begin phase with a new fiber.
-      return remountFiber(
-        current,
-        workInProgress,
-        createFiberFromTypeAndProps(
-          workInProgress.type,
-          workInProgress.key,
-          workInProgress.pendingProps,
-          workInProgress._debugOwner || null,
-          workInProgress.mode,
-          workInProgress.lanes,
-        ),
-      );
-    }
-  }
-
   if (current !== null) {
     const oldProps = current.memoizedProps;
     const newProps = workInProgress.pendingProps;
 
     if (
       oldProps !== newProps ||
-      hasLegacyContextChanged() ||
+      hasLegacyContextChanged()
       // Force a re-render if the implementation changed due to hot reload:
-      (__DEV__ ? workInProgress.type !== current.type : false)
+      // || (__DEV__ ? workInProgress.type !== current.type : false)
     ) {
       // If props or context changed, mark the fiber as having performed work.
       // This may be unset if the props are determined to be equal later (memo).
       didReceiveUpdate = true;
     } else {
+      // props 和 老的 Context 都没有改变
       // Neither props nor legacy context changes. Check if there's a pending
       // update or context change.
+
+      // 判断有没有更新主要看：current.lanes & renderLanes !== NoLanes
       const hasScheduledUpdateOrContext = checkScheduledUpdateOrContext(
         current,
         renderLanes,
       );
+
       if (
         !hasScheduledUpdateOrContext &&
         // If this is the second pass of an error or suspense boundary, there
         // may not be work scheduled on `current`, so we check for this flag.
+        // flags 中不包含 DidCapture
         (workInProgress.flags & DidCapture) === NoFlags
       ) {
         // No pending updates or context. Bail out now.
         didReceiveUpdate = false;
+        //! 没有更新任务和 Context，不用走往下走了，是一个优化点
         return attemptEarlyBailoutIfNoScheduledUpdate(
           current,
           workInProgress,
           renderLanes,
         );
       }
+
+      // 1. hasScheduledUpdateOrContext 为 true
+      // 2. hasScheduledUpdateOrContext 为 false, workInProgress.flags 中包含 DidCapture
+
       if ((current.flags & ForceUpdateForLegacySuspense) !== NoFlags) {
         // This is a special case that only exists for legacy mode.
         // See https://github.com/facebook/react/pull/19216.
@@ -3554,26 +3365,12 @@ function beginWork(current, workInProgress, renderLanes) {
         // nor legacy context. Set this to false. If an update queue or context
         // consumer produces a changed value, it will set this to true. Otherwise,
         // the component will assume the children have not changed and bail out.
+        // 在当前的 workInProgress 上有更新的任务，但是该更新不是 props 改变和 Context 引起的更新
         didReceiveUpdate = false;
       }
     }
   } else {
     didReceiveUpdate = false;
-
-    if (getIsHydrating() && isForkedChild(workInProgress)) {
-      // Check if this child belongs to a list of muliple children in
-      // its parent.
-      //
-      // In a true multi-threaded implementation, we would render children on
-      // parallel threads. This would represent the beginning of a new render
-      // thread for this subtree.
-      //
-      // We only use this for id generation during hydration, which is why the
-      // logic is located in this special branch.
-      const slotIndex = workInProgress.index;
-      const numberOfForks = getForksAtLevel(workInProgress);
-      pushTreeId(workInProgress, numberOfForks, slotIndex);
-    }
   }
 
   // Before entering the begin phase, clear pending update priority.
@@ -3581,6 +3378,7 @@ function beginWork(current, workInProgress, renderLanes) {
   // the update queue. However, there's an exception: SimpleMemoComponent
   // sometimes bails out later in the begin phase. This indicates that we should
   // move this assignment out of the common path and into each branch.
+  //! 重置 workInProgress.lanes 为 NoLanes
   workInProgress.lanes = NoLanes;
   
   // if (workInProgress.tag === FunctionComponent) {
@@ -3604,7 +3402,10 @@ function beginWork(current, workInProgress, renderLanes) {
   //   })
   // }
 
+  // tag 就是 fiber 保存的元素的类型，比如 ClassComponent, HostComponent 等
   switch (workInProgress.tag) {
+    // 首次挂载函数组件全部走这个分支
+    // see https://github.com/facebook/react/pull/8089
     case IndeterminateComponent: {
       return mountIndeterminateComponent(
         current,
@@ -3613,6 +3414,7 @@ function beginWork(current, workInProgress, renderLanes) {
         renderLanes,
       );
     }
+    // React.lazy
     case LazyComponent: {
       const elementType = workInProgress.elementType;
       return mountLazyComponent(
@@ -3623,6 +3425,7 @@ function beginWork(current, workInProgress, renderLanes) {
       );
     }
     case FunctionComponent: {
+      // 到这的函数组件一定是更新时
       const Component = workInProgress.type;
       const unresolvedProps = workInProgress.pendingProps;
 
@@ -3655,10 +3458,13 @@ function beginWork(current, workInProgress, renderLanes) {
       );
     }
     case HostRoot:
+      // 根容器 (#root)
       return updateHostRoot(current, workInProgress, renderLanes);
     case HostComponent:
+      // 普通元素
       return updateHostComponent(current, workInProgress, renderLanes);
     case HostText:
+      // 文本元素
       return updateHostText(current, workInProgress);
     case SuspenseComponent:
       return updateSuspenseComponent(current, workInProgress, renderLanes);
@@ -3694,19 +3500,6 @@ function beginWork(current, workInProgress, renderLanes) {
       const unresolvedProps = workInProgress.pendingProps;
       // Resolve outer props first, then resolve inner props.
       let resolvedProps = resolveDefaultProps(type, unresolvedProps);
-      if (__DEV__) {
-        if (workInProgress.type !== workInProgress.elementType) {
-          const outerPropTypes = type.propTypes;
-          if (outerPropTypes) {
-            checkPropTypes(
-              outerPropTypes,
-              resolvedProps, // Resolved for outer only
-              'prop',
-              getComponentNameFromType(type),
-            );
-          }
-        }
-      }
       resolvedProps = resolveDefaultProps(type.type, resolvedProps);
       return updateMemoComponent(
         current,
