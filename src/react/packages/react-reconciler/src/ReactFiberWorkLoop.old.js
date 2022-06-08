@@ -2065,10 +2065,12 @@ function commitRootImpl(
   // to check for the existence of `firstEffect` to satisfy Flow. I think the
   // only other reason this optimization exists is because it affects profiling.
   // Reconsider whether this is necessary.
+  // 孩子的 effect
   const subtreeHasEffects =
     (finishedWork.subtreeFlags &
       (BeforeMutationMask | MutationMask | LayoutMask | PassiveMask)) !==
     NoFlags;
+  // 根的 effect
   const rootHasEffect =
     (finishedWork.flags &
       (BeforeMutationMask | MutationMask | LayoutMask | PassiveMask)) !==
@@ -2077,10 +2079,13 @@ function commitRootImpl(
   if (subtreeHasEffects || rootHasEffect) {
     const prevTransition = ReactCurrentBatchConfig.transition;
     ReactCurrentBatchConfig.transition = null;
+
     const previousPriority = getCurrentUpdatePriority();
+    // 之后触发更新的，使用的 updateLane 就是 DiscreteEventPriority
     setCurrentUpdatePriority(DiscreteEventPriority);
 
     const prevExecutionContext = executionContext;
+    // 增加 CommitContext 上下文
     executionContext |= CommitContext;
 
     // Reset this to null before calling lifecycles
@@ -2113,11 +2118,11 @@ function commitRootImpl(
     // The next phase is the mutation phase, where we mutate the host tree.
     commitMutationEffects(root, finishedWork, lanes);
 
-    if (enableCreateEventHandleAPI) {
-      if (shouldFireAfterActiveInstanceBlur) {
-        afterActiveInstanceBlur();
-      }
-    }
+    // if (enableCreateEventHandleAPI) {
+    //   if (shouldFireAfterActiveInstanceBlur) {
+    //     afterActiveInstanceBlur();
+    //   }
+    // }
     resetAfterCommit(root.containerInfo);
 
     // The work-in-progress tree is now the current tree. This must come after

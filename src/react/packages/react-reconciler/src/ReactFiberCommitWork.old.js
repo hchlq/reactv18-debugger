@@ -290,6 +290,7 @@ let focusedInstanceHandle = null;
 let shouldFireAfterActiveInstanceBlur = false;
 
 export function commitBeforeMutationEffects(root, firstChild) {
+  // 获取当前激活的 fiber 实例
   focusedInstanceHandle = prepareForCommit(root.containerInfo);
 
   nextEffect = firstChild;
@@ -309,18 +310,19 @@ function commitBeforeMutationEffects_begin() {
 
     // This phase is only used for beforeActiveInstanceBlur.
     // Let's skip the whole loop if it's off.
-    if (enableCreateEventHandleAPI) {
-      // TODO: Should wrap this in flags check, too, as optimization
-      const deletions = fiber.deletions;
-      if (deletions !== null) {
-        for (let i = 0; i < deletions.length; i++) {
-          const deletion = deletions[i];
-          commitBeforeMutationEffectsDeletion(deletion);
-        }
-      }
-    }
+    // if (enableCreateEventHandleAPI) {
+    //   // TODO: Should wrap this in flags check, too, as optimization
+    //   const deletions = fiber.deletions;
+    //   if (deletions !== null) {
+    //     for (let i = 0; i < deletions.length; i++) {
+    //       const deletion = deletions[i];
+    //       commitBeforeMutationEffectsDeletion(deletion);
+    //     }
+    //   }
+    // }
 
     const child = fiber.child;
+    // 先处理子孩子，再处理父亲，从里到外
     if (
       (fiber.subtreeFlags & BeforeMutationMask) !== NoFlags &&
       child !== null
@@ -336,21 +338,23 @@ function commitBeforeMutationEffects_begin() {
 function commitBeforeMutationEffects_complete() {
   while (nextEffect !== null) {
     const fiber = nextEffect;
-    setCurrentDebugFiberInDEV(fiber);
+    // setCurrentDebugFiberInDEV(fiber);
     try {
       commitBeforeMutationEffectsOnFiber(fiber);
     } catch (error) {
       captureCommitPhaseError(fiber, fiber.return, error);
     }
-    resetCurrentDebugFiberInDEV();
+    // resetCurrentDebugFiberInDEV();
 
     const sibling = fiber.sibling;
+    // 处理兄弟的孩子
     if (sibling !== null) {
       sibling.return = fiber.return;
       nextEffect = sibling;
       return;
     }
 
+    // 处理父亲
     nextEffect = fiber.return;
   }
 }
@@ -359,23 +363,23 @@ function commitBeforeMutationEffectsOnFiber(finishedWork) {
   const current = finishedWork.alternate;
   const flags = finishedWork.flags;
 
-  if (enableCreateEventHandleAPI) {
-    if (!shouldFireAfterActiveInstanceBlur && focusedInstanceHandle !== null) {
-      // Check to see if the focused element was inside of a hidden (Suspense) subtree.
-      // TODO: Move this out of the hot path using a dedicated effect tag.
-      if (
-        finishedWork.tag === SuspenseComponent &&
-        isSuspenseBoundaryBeingHidden(current, finishedWork) &&
-        doesFiberContain(finishedWork, focusedInstanceHandle)
-      ) {
-        shouldFireAfterActiveInstanceBlur = true;
-        beforeActiveInstanceBlur(finishedWork);
-      }
-    }
-  }
+  // if (enableCreateEventHandleAPI) {
+  //   if (!shouldFireAfterActiveInstanceBlur && focusedInstanceHandle !== null) {
+  //     // Check to see if the focused element was inside of a hidden (Suspense) subtree.
+  //     // TODO: Move this out of the hot path using a dedicated effect tag.
+  //     if (
+  //       finishedWork.tag === SuspenseComponent &&
+  //       isSuspenseBoundaryBeingHidden(current, finishedWork) &&
+  //       doesFiberContain(finishedWork, focusedInstanceHandle)
+  //     ) {
+  //       shouldFireAfterActiveInstanceBlur = true;
+  //       beforeActiveInstanceBlur(finishedWork);
+  //     }
+  //   }
+  // }
 
   if ((flags & Snapshot) !== NoFlags) {
-    setCurrentDebugFiberInDEV(finishedWork);
+    // setCurrentDebugFiberInDEV(finishedWork);
 
     switch (finishedWork.tag) {
       case FunctionComponent:
@@ -391,56 +395,22 @@ function commitBeforeMutationEffectsOnFiber(finishedWork) {
           // We could update instance props and state here,
           // but instead we rely on them being set during last render.
           // TODO: revisit this when we implement resuming.
-          if (__DEV__) {
-            if (
-              finishedWork.type === finishedWork.elementType &&
-              !didWarnAboutReassigningProps
-            ) {
-              if (instance.props !== finishedWork.memoizedProps) {
-                console.error(
-                  'Expected %s props to match memoized props before ' +
-                    'getSnapshotBeforeUpdate. ' +
-                    'This might either be because of a bug in React, or because ' +
-                    'a component reassigns its own `this.props`. ' +
-                    'Please file an issue.',
-                  getComponentNameFromFiber(finishedWork) || 'instance',
-                );
-              }
-              if (instance.state !== finishedWork.memoizedState) {
-                console.error(
-                  'Expected %s state to match memoized state before ' +
-                    'getSnapshotBeforeUpdate. ' +
-                    'This might either be because of a bug in React, or because ' +
-                    'a component reassigns its own `this.state`. ' +
-                    'Please file an issue.',
-                  getComponentNameFromFiber(finishedWork) || 'instance',
-                );
-              }
-            }
-          }
+          // 执行类组件上的 getSnapshotBeforeUpdate
+          // 参数是: prevProps 和 prevState
           const snapshot = instance.getSnapshotBeforeUpdate(
             finishedWork.elementType === finishedWork.type
               ? prevProps
               : resolveDefaultProps(finishedWork.type, prevProps),
             prevState,
           );
-          if (__DEV__) {
-            const didWarnSet = didWarnAboutUndefinedSnapshotBeforeUpdate;
-            if (snapshot === undefined && !didWarnSet.has(finishedWork.type)) {
-              didWarnSet.add(finishedWork.type);
-              console.error(
-                '%s.getSnapshotBeforeUpdate(): A snapshot value (or null) ' +
-                  'must be returned. You have returned undefined.',
-                getComponentNameFromFiber(finishedWork),
-              );
-            }
-          }
+          // 保存 snapshot 的返回值
           instance.__reactInternalSnapshotBeforeUpdate = snapshot;
         }
         break;
       }
       case HostRoot: {
         if (supportsMutation) {
+          // 清空根容器的所有内容
           const root = finishedWork.stateNode;
           clearContainer(root.containerInfo);
         }
@@ -460,7 +430,7 @@ function commitBeforeMutationEffectsOnFiber(finishedWork) {
       }
     }
 
-    resetCurrentDebugFiberInDEV();
+    // resetCurrentDebugFiberInDEV();
   }
 }
 

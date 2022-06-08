@@ -732,10 +732,10 @@ function completeWork(current, workInProgress, renderLanes) {
         fiberRoot.pendingContext = null;
       }
 
-      // ssr
       if (current === null || current.child === null) {
         // If we hydrated, pop so that we can delete any remaining children
         // that weren't hydrated.
+        // ssr
         const wasHydrated = popHydrationState(workInProgress);
         if (wasHydrated) {
           // If we hydrated, then we'll need to schedule an update for
@@ -743,6 +743,7 @@ function completeWork(current, workInProgress, renderLanes) {
           markUpdate(workInProgress);
         } else {
           if (current !== null) {
+            // debugger
             const prevState = current.memoizedState;
             if (
               // Check if this is a client root
@@ -756,6 +757,7 @@ function completeWork(current, workInProgress, renderLanes) {
               // updates too, because current.child would only be null if the
               // previous render was null (so the container would already
               // be empty).
+              //! 给根元素加上 Snapshot
               workInProgress.flags |= Snapshot;
 
               // If this was a forced client render, there may have been
