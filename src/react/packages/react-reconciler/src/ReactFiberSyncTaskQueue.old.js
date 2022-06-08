@@ -46,6 +46,9 @@ export function flushSyncCallbacksOnlyInLegacyMode() {
   }
 }
 
+/**
+ * 清空同步回调
+ */
 export function flushSyncCallbacks() {
   if (!isFlushingSyncQueue && syncQueue !== null) {
     // Prevent re-entrance.

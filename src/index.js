@@ -3,7 +3,8 @@ import * as ReactDom from "react-dom";
 
 // import App from "./App";
 // import App from './_test/hooks/useState'
-import App from './_test/hooks/ref'
+// import App from './_test/hooks/ref'
+import App from './_test/hooks/useEffect'
 
 ReactDom.createRoot(document.getElementById("root")).render(<App/>)
 // HostText

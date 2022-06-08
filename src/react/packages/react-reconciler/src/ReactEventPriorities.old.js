@@ -81,16 +81,22 @@ export function lanesToEventPriority(lanes) {
   // 选取 lanes 中优先级最高的车道
   const lane = getHighestPriorityLane(lanes);
 
+  // 选择下一个比 lane 低的优先级
+
   if (!isHigherEventPriority(DiscreteEventPriority, lane)) {
     // lane 优先级大于 DiscreteEventPriority
+    // e.g. lane === 1
     //  DiscreteEventPriority > lane
     return DiscreteEventPriority;
   }
+
   if (!isHigherEventPriority(ContinuousEventPriority, lane)) {
     // lane 的优先级大于 ContinuousEventPriority
+    // e.g. lane === 2
     // ContinuousEventPriority > lane > DiscreteEventPriority
     return ContinuousEventPriority;
   }
+
   if (includesNonIdleWork(lane)) {
     // lane 中包含了非 Idle 的任务
     return DefaultEventPriority;

@@ -493,33 +493,23 @@ function commitHookEffectListUnmount(
         const destroy = effect.destroy;
         effect.destroy = undefined;
         if (destroy !== undefined) {
-          if (enableSchedulingProfiler) {
-            if ((flags & HookPassive) !== NoHookEffect) {
-              markComponentPassiveEffectUnmountStarted(finishedWork);
-            } else if ((flags & HookLayout) !== NoHookEffect) {
-              markComponentLayoutEffectUnmountStarted(finishedWork);
-            }
-          }
-
-          if (__DEV__) {
-            if ((flags & HookInsertion) !== NoHookEffect) {
-              setIsRunningInsertionEffect(true);
-            }
-          }
+          // if (enableSchedulingProfiler) {
+          //   if ((flags & HookPassive) !== NoHookEffect) {
+          //     markComponentPassiveEffectUnmountStarted(finishedWork);
+          //   } else if ((flags & HookLayout) !== NoHookEffect) {
+          //     markComponentLayoutEffectUnmountStarted(finishedWork);
+          //   }
+          // }
+          // 执行 destroy 回调
           safelyCallDestroy(finishedWork, nearestMountedAncestor, destroy);
-          if (__DEV__) {
-            if ((flags & HookInsertion) !== NoHookEffect) {
-              setIsRunningInsertionEffect(false);
-            }
-          }
 
-          if (enableSchedulingProfiler) {
-            if ((flags & HookPassive) !== NoHookEffect) {
-              markComponentPassiveEffectUnmountStopped();
-            } else if ((flags & HookLayout) !== NoHookEffect) {
-              markComponentLayoutEffectUnmountStopped();
-            }
-          }
+          // if (enableSchedulingProfiler) {
+          //   if ((flags & HookPassive) !== NoHookEffect) {
+          //     markComponentPassiveEffectUnmountStopped();
+          //   } else if ((flags & HookLayout) !== NoHookEffect) {
+          //     markComponentLayoutEffectUnmountStopped();
+          //   }
+          // }
         }
       }
       effect = effect.next;
@@ -535,80 +525,26 @@ function commitHookEffectListMount(flags, finishedWork) {
     let effect = firstEffect;
     do {
       if ((effect.tag & flags) === flags) {
-        if (enableSchedulingProfiler) {
-          if ((flags & HookPassive) !== NoHookEffect) {
-            markComponentPassiveEffectMountStarted(finishedWork);
-          } else if ((flags & HookLayout) !== NoHookEffect) {
-            markComponentLayoutEffectMountStarted(finishedWork);
-          }
-        }
+        // if (enableSchedulingProfiler) {
+        //   if ((flags & HookPassive) !== NoHookEffect) {
+        //     markComponentPassiveEffectMountStarted(finishedWork);
+        //   } else if ((flags & HookLayout) !== NoHookEffect) {
+        //     markComponentLayoutEffectMountStarted(finishedWork);
+        //   }
+        // }
 
         // Mount
         const create = effect.create;
-        if (__DEV__) {
-          if ((flags & HookInsertion) !== NoHookEffect) {
-            setIsRunningInsertionEffect(true);
-          }
-        }
         effect.destroy = create();
-        if (__DEV__) {
-          if ((flags & HookInsertion) !== NoHookEffect) {
-            setIsRunningInsertionEffect(false);
-          }
-        }
 
-        if (enableSchedulingProfiler) {
-          if ((flags & HookPassive) !== NoHookEffect) {
-            markComponentPassiveEffectMountStopped();
-          } else if ((flags & HookLayout) !== NoHookEffect) {
-            markComponentLayoutEffectMountStopped();
-          }
-        }
+        // if (enableSchedulingProfiler) {
+        //   if ((flags & HookPassive) !== NoHookEffect) {
+        //     markComponentPassiveEffectMountStopped();
+        //   } else if ((flags & HookLayout) !== NoHookEffect) {
+        //     markComponentLayoutEffectMountStopped();
+        //   }
+        // }
 
-        if (__DEV__) {
-          const destroy = effect.destroy;
-          if (destroy !== undefined && typeof destroy !== 'function') {
-            let hookName;
-            if ((effect.tag & HookLayout) !== NoFlags) {
-              hookName = 'useLayoutEffect';
-            } else if ((effect.tag & HookInsertion) !== NoFlags) {
-              hookName = 'useInsertionEffect';
-            } else {
-              hookName = 'useEffect';
-            }
-            let addendum;
-            if (destroy === null) {
-              addendum =
-                ' You returned null. If your effect does not require clean ' +
-                'up, return undefined (or nothing).';
-            } else if (typeof destroy.then === 'function') {
-              addendum =
-                '\n\nIt looks like you wrote ' +
-                hookName +
-                '(async () => ...) or returned a Promise. ' +
-                'Instead, write the async function inside your effect ' +
-                'and call it immediately:\n\n' +
-                hookName +
-                '(() => {\n' +
-                '  async function fetchData() {\n' +
-                '    // You can await here\n' +
-                '    const response = await MyAPI.getData(someId);\n' +
-                '    // ...\n' +
-                '  }\n' +
-                '  fetchData();\n' +
-                `}, [someId]); // Or [] if effect doesn't need props or state\n\n` +
-                'Learn more about data fetching with Hooks: https://reactjs.org/link/hooks-data-fetching';
-            } else {
-              addendum = ' You returned: ' + destroy;
-            }
-            console.error(
-              '%s must not return anything besides a function, ' +
-                'which is used for clean-up.%s',
-              hookName,
-              addendum,
-            );
-          }
-        }
       }
       effect = effect.next;
     } while (effect !== firstEffect);
@@ -2554,6 +2490,8 @@ function commitPassiveMountEffects_begin(
   while (nextEffect !== null) {
     const fiber = nextEffect;
     const firstChild = fiber.child;
+    // debugger
+    // 1. 先执行子孙的 useEffect, 再执行祖先的 useEffect
     if ((fiber.subtreeFlags & PassiveMask) !== NoFlags && firstChild !== null) {
       firstChild.return = fiber;
       nextEffect = firstChild;
@@ -2575,10 +2513,11 @@ function commitPassiveMountEffects_complete(
   committedTransitions,
 ) {
   while (nextEffect !== null) {
+    // debugger
     const fiber = nextEffect;
 
     if ((fiber.flags & Passive) !== NoFlags) {
-      setCurrentDebugFiberInDEV(fiber);
+      // setCurrentDebugFiberInDEV(fiber);
       try {
         commitPassiveMountOnFiber(
           root,
@@ -2589,7 +2528,7 @@ function commitPassiveMountEffects_complete(
       } catch (error) {
         captureCommitPhaseError(fiber, fiber.return, error);
       }
-      resetCurrentDebugFiberInDEV();
+      // resetCurrentDebugFiberInDEV();
     }
 
     if (fiber === subtreeRoot) {
@@ -2598,12 +2537,14 @@ function commitPassiveMountEffects_complete(
     }
 
     const sibling = fiber.sibling;
+    // 处理兄弟的
     if (sibling !== null) {
       sibling.return = fiber.return;
       nextEffect = sibling;
       return;
     }
 
+    // 处理父亲
     nextEffect = fiber.return;
   }
 }
@@ -2738,7 +2679,11 @@ function commitPassiveMountOnFiber(
   }
 }
 
+/**
+ * 执行卸载的 useEffect
+ */
 export function commitPassiveUnmountEffects(firstChild) {
+  // nextEffect 从 firstChild 开始
   nextEffect = firstChild;
   commitPassiveUnmountEffects_begin();
 }
@@ -2772,6 +2717,7 @@ function commitPassiveUnmountEffects_begin() {
           //
           // We can't disconnect `alternate` on nodes that haven't been deleted
           // yet, but we can disconnect the `sibling` and `child` pointers.
+          // 将 fiber 的孩子和兄弟节点置为空
           const previousFiber = fiber.alternate;
           if (previousFiber !== null) {
             let detachedChild = previousFiber.child;
@@ -2786,12 +2732,14 @@ function commitPassiveUnmountEffects_begin() {
           }
         }
 
+        // 恢复 nextEffect
         nextEffect = fiber;
       }
     }
 
     if ((fiber.subtreeFlags & PassiveMask) !== NoFlags && child !== null) {
       child.return = fiber;
+      // 处理下一个孩子
       nextEffect = child;
     } else {
       commitPassiveUnmountEffects_complete();
@@ -2802,12 +2750,14 @@ function commitPassiveUnmountEffects_begin() {
 function commitPassiveUnmountEffects_complete() {
   while (nextEffect !== null) {
     const fiber = nextEffect;
+    // 存在 effect 副作用
     if ((fiber.flags & Passive) !== NoFlags) {
-      setCurrentDebugFiberInDEV(fiber);
+      // setCurrentDebugFiberInDEV(fiber);
       commitPassiveUnmountOnFiber(fiber);
-      resetCurrentDebugFiberInDEV();
+      // resetCurrentDebugFiberInDEV();
     }
 
+    // 1. 处理兄弟
     const sibling = fiber.sibling;
     if (sibling !== null) {
       sibling.return = fiber.return;
@@ -2815,6 +2765,7 @@ function commitPassiveUnmountEffects_complete() {
       return;
     }
 
+    // 2. 兄弟处理完成，处理父亲
     nextEffect = fiber.return;
   }
 }
@@ -2824,25 +2775,26 @@ function commitPassiveUnmountOnFiber(finishedWork) {
     case FunctionComponent:
     case ForwardRef:
     case SimpleMemoComponent: {
-      if (
-        enableProfilerTimer &&
-        enableProfilerCommitHooks &&
-        finishedWork.mode & ProfileMode
-      ) {
-        startPassiveEffectTimer();
-        commitHookEffectListUnmount(
-          HookPassive | HookHasEffect,
-          finishedWork,
-          finishedWork.return,
-        );
-        recordPassiveEffectDuration(finishedWork);
-      } else {
-        commitHookEffectListUnmount(
-          HookPassive | HookHasEffect,
-          finishedWork,
-          finishedWork.return,
-        );
-      }
+      // if (
+      //   enableProfilerTimer &&
+      //   enableProfilerCommitHooks &&
+      //   finishedWork.mode & ProfileMode
+      // ) {
+      //   startPassiveEffectTimer();
+      //   commitHookEffectListUnmount(
+      //     HookPassive | HookHasEffect,
+      //     finishedWork,
+      //     finishedWork.return,
+      //   );
+      //   recordPassiveEffectDuration(finishedWork);
+      // } else {
+      // 执行 effect 的回调 
+      commitHookEffectListUnmount(
+        HookPassive | HookHasEffect,
+        finishedWork,
+        finishedWork.return,
+      );
+      // }
       break;
     }
   }
