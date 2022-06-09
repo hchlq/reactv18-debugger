@@ -1846,8 +1846,9 @@ function commitMutationEffectsOnFiber(finishedWork, root, lanes) {
       recursivelyTraverseMutationEffects(root, finishedWork, lanes);
       commitReconciliationEffects(finishedWork);
 
-      if (flags & Update) {
+      if (flags & Update) { // hook 在更新阶段是加上了 Update 标记
         try {
+          // 执行 useInsertionEffect 的销毁和回调函数
           commitHookEffectListUnmount(
             HookInsertion | HookHasEffect,
             finishedWork,
@@ -1883,6 +1884,7 @@ function commitMutationEffectsOnFiber(finishedWork, root, lanes) {
           recordLayoutEffectDuration(finishedWork);
         } else {
           try {
+            // 执行 useLayoutEffect 的销毁函数
             commitHookEffectListUnmount(
               HookLayout | HookHasEffect,
               finishedWork,
@@ -2186,9 +2188,9 @@ function commitReconciliationEffects(finishedWork) {
     // and isMounted is deprecated anyway so we should be able to kill this.
     finishedWork.flags &= ~Placement;
   }
-  if (flags & Hydrating) {
-    finishedWork.flags &= ~Hydrating;
-  }
+  // if (flags & Hydrating) {
+  //   finishedWork.flags &= ~Hydrating;
+  // }
 }
 
 export function commitLayoutEffects(finishedWork, root, committedLanes) {
