@@ -289,6 +289,10 @@ function safelyCallDestroy(current, nearestMountedAncestor, destroy) {
 let focusedInstanceHandle = null;
 let shouldFireAfterActiveInstanceBlur = false;
 
+/**
+ * 第一阶段
+ * 主要执行类组件的 getSnapshotBeforeUpdate 和 清空根容器的内容
+ */
 export function commitBeforeMutationEffects(root, firstChild) {
   // 获取当前激活的 fiber 实例
   focusedInstanceHandle = prepareForCommit(root.containerInfo);
@@ -1785,13 +1789,16 @@ export function isSuspenseBoundaryBeingHidden(current, finishedWork) {
   return false;
 }
 
+/**
+ * 第二阶段
+ */
 export function commitMutationEffects(root, finishedWork, committedLanes) {
   inProgressLanes = committedLanes;
   inProgressRoot = root;
 
-  setCurrentDebugFiberInDEV(finishedWork);
+  // setCurrentDebugFiberInDEV(finishedWork);
   commitMutationEffectsOnFiber(finishedWork, root, committedLanes);
-  setCurrentDebugFiberInDEV(finishedWork);
+  // setCurrentDebugFiberInDEV(finishedWork);
 
   inProgressLanes = null;
   inProgressRoot = null;
