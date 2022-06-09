@@ -518,7 +518,6 @@ function commitHookEffectListMount(flags, finishedWork) {
         //     markComponentLayoutEffectMountStopped();
         //   }
         // }
-
       }
       effect = effect.next;
     } while (effect !== firstEffect);
@@ -1846,7 +1845,8 @@ function commitMutationEffectsOnFiber(finishedWork, root, lanes) {
       recursivelyTraverseMutationEffects(root, finishedWork, lanes);
       commitReconciliationEffects(finishedWork);
 
-      if (flags & Update) { // hook 在更新阶段是加上了 Update 标记
+      if (flags & Update) {
+        // hook 在更新阶段是加上了 Update 标记
         try {
           // 执行 useInsertionEffect 的销毁和回调函数
           commitHookEffectListUnmount(
@@ -1866,35 +1866,36 @@ function commitMutationEffectsOnFiber(finishedWork, root, lanes) {
         // This prevents sibling component effects from interfering with each other,
         // e.g. a destroy function in one component should never override a ref set
         // by a create function in another component during the same commit.
-        if (
-          enableProfilerTimer &&
-          enableProfilerCommitHooks &&
-          finishedWork.mode & ProfileMode
-        ) {
-          try {
-            startLayoutEffectTimer();
-            commitHookEffectListUnmount(
-              HookLayout | HookHasEffect,
-              finishedWork,
-              finishedWork.return,
-            );
-          } catch (error) {
-            captureCommitPhaseError(finishedWork, finishedWork.return, error);
-          }
-          recordLayoutEffectDuration(finishedWork);
-        } else {
-          try {
-            // 执行 useLayoutEffect 的销毁函数
-            commitHookEffectListUnmount(
-              HookLayout | HookHasEffect,
-              finishedWork,
-              finishedWork.return,
-            );
-          } catch (error) {
-            captureCommitPhaseError(finishedWork, finishedWork.return, error);
-          }
+        // if (
+        //   enableProfilerTimer &&
+        //   enableProfilerCommitHooks &&
+        //   finishedWork.mode & ProfileMode
+        // ) {
+        //   try {
+        //     startLayoutEffectTimer();
+        //     commitHookEffectListUnmount(
+        //       HookLayout | HookHasEffect,
+        //       finishedWork,
+        //       finishedWork.return,
+        //     );
+        //   } catch (error) {
+        //     captureCommitPhaseError(finishedWork, finishedWork.return, error);
+        //   }
+        //   recordLayoutEffectDuration(finishedWork);
+        // } else {
+        try {
+          // 执行 useLayoutEffect 的销毁函数
+          // debugger
+          commitHookEffectListUnmount(
+            HookLayout | HookHasEffect,
+            finishedWork,
+            finishedWork.return,
+          );
+        } catch (error) {
+          captureCommitPhaseError(finishedWork, finishedWork.return, error);
         }
       }
+      // }
       return;
     }
     case ClassComponent: {
@@ -2000,7 +2001,9 @@ function commitMutationEffectsOnFiber(finishedWork, root, lanes) {
       return;
     }
     case HostRoot: {
+      // debugger
       recursivelyTraverseMutationEffects(root, finishedWork, lanes);
+      // debugger
       commitReconciliationEffects(finishedWork);
 
       if (flags & Update) {
@@ -2767,7 +2770,7 @@ function commitPassiveUnmountOnFiber(finishedWork) {
       //   );
       //   recordPassiveEffectDuration(finishedWork);
       // } else {
-      // 执行 effect 的回调 
+      // 执行 effect 的回调
       commitHookEffectListUnmount(
         HookPassive | HookHasEffect,
         finishedWork,
