@@ -6,9 +6,20 @@ import * as ReactDom from "react-dom";
 // import App from './_test/hooks/ref'
 // import App from './_test/hooks/effect/useEffect'
 // import App from './_test/hooks/effect/update'
-import App from './_test/hooks/effect/useLayoutEffect'
+import App from "./_test/hooks/effect/useLayoutEffect";
 
-ReactDom.createRoot(document.getElementById("root")).render(<App/>)
+ReactDom.createRoot(document.getElementById("root")).render(<App />);
 // HostText
 // ReactDom.createRoot(document.getElementById("root")).render('fjkdlsjaflk')
 // ReactDom.render(<App />, document.getElementById("root"));
+
+// switch (1) {
+//   case 1:
+//     console.log("===11");
+//   case 2:
+//     console.log("===222");
+//   case 3:
+//     console.log("===333");
+//   default:
+//     console.log("====default");
+// }

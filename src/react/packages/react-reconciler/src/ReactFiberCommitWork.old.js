@@ -240,6 +240,9 @@ function safelyAttachRef(current, nearestMountedAncestor) {
   }
 }
 
+/**
+ * 解绑 ref
+ */
 function safelyDetachRef(current, nearestMountedAncestor) {
   const ref = current.ref;
   if (ref !== null) {
@@ -262,15 +265,6 @@ function safelyDetachRef(current, nearestMountedAncestor) {
         }
       } catch (error) {
         captureCommitPhaseError(current, nearestMountedAncestor, error);
-      }
-      if (__DEV__) {
-        if (typeof retVal === 'function') {
-          console.error(
-            'Unexpected return value from a callback ref in %s. ' +
-              'A callback ref should not return a function.',
-            getComponentNameFromFiber(current),
-          );
-        }
       }
     } else {
       ref.current = null;
@@ -1420,6 +1414,7 @@ function commitDeletionEffects(root, returnFiber, deletedFiber) {
       }
       parent = parent.return;
     }
+
     if (hostParent === null) {
       throw new Error(
         'Expected to find a host parent. This error is likely caused by ' +
@@ -1455,6 +1450,7 @@ function commitDeletionEffectsOnFiber(
   nearestMountedAncestor,
   deletedFiber,
 ) {
+  debugger
   onCommitUnmount(deletedFiber);
 
   // The cases in this outer switch modify the stack before they traverse
@@ -1465,6 +1461,7 @@ function commitDeletionEffectsOnFiber(
       if (!offscreenSubtreeWasHidden) {
         safelyDetachRef(deletedFiber, nearestMountedAncestor);
       }
+      // 走到 HostText 分支
       // Intentional fallthrough to next branch
     }
     // eslint-disable-next-line-no-fallthrough
@@ -1476,6 +1473,7 @@ function commitDeletionEffectsOnFiber(
         const prevHostParent = hostParent;
         const prevHostParentIsContainer = hostParentIsContainer;
         hostParent = null;
+        // 递归的删除孩子
         recursivelyTraverseDeletionEffects(
           finishedRoot,
           nearestMountedAncestor,
