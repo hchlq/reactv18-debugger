@@ -518,7 +518,6 @@ function commitHookEffectListMount(flags, finishedWork) {
         //     markComponentLayoutEffectMountStopped();
         //   }
         // }
-
       }
       effect = effect.next;
     } while (effect !== firstEffect);
@@ -1209,6 +1208,9 @@ function emptyPortalContainer(current) {
   replaceContainerChildren(containerInfo, emptyChildSet);
 }
 
+/**
+ * 获取 fiber 的父亲 fiber 实例
+ */
 function getHostParentFiber(fiber) {
   let parent = fiber.return;
   while (parent !== null) {
@@ -1225,6 +1227,10 @@ function getHostParentFiber(fiber) {
 }
 
 function isHostParent(fiber) {
+  // fiber 一下情况下满足 hostParent
+  // 1. 普通元素
+  // 2. 根元素
+  // 2. Portal
   return (
     fiber.tag === HostComponent ||
     fiber.tag === HostRoot ||
@@ -1232,13 +1238,18 @@ function isHostParent(fiber) {
   );
 }
 
+/**
+ * 获取 fiber 插入的参考节点
+ */
 function getHostSibling(fiber) {
   // We're going to search forward into the tree until we find a sibling host
   // node. Unfortunately, if multiple insertions are done in a row we have to
   // search past them. This leads to exponential search for the next sibling.
+  // 导致了指数级搜索成本
   // TODO: Find a more efficient way to do this.
   let node = fiber;
   siblings: while (true) {
+    // 1. 处理 sibling 为空的情况
     // If we didn't find anything, let's try the next sibling.
     while (node.sibling === null) {
       if (node.return === null || isHostParent(node.return)) {
@@ -1246,9 +1257,13 @@ function getHostSibling(fiber) {
         // last sibling.
         return null;
       }
+
       node = node.return;
     }
+
     node.sibling.return = node.return;
+
+    // 2. 找到符合的 sibling
     node = node.sibling;
     while (
       node.tag !== HostComponent &&
@@ -1266,11 +1281,14 @@ function getHostSibling(fiber) {
       if (node.child === null || node.tag === HostPortal) {
         continue siblings;
       } else {
+        // 可能是组件的情况，要找到其孩子
         node.child.return = node;
         node = node.child;
       }
     }
+
     // Check if this host node is stable or about to be placed.
+    // node 没有 Placement 标记
     if (!(node.flags & Placement)) {
       // Found it!
       return node.stateNode;
@@ -1278,28 +1296,41 @@ function getHostSibling(fiber) {
   }
 }
 
+/**
+ * 执行元素的插入
+ */
 function commitPlacement(finishedWork) {
   if (!supportsMutation) {
     return;
   }
 
   // Recursively insert all host nodes into the parent.
+  // 获取父亲 fiber
   const parentFiber = getHostParentFiber(finishedWork);
 
   // Note: these two variables *must* always be updated together.
   switch (parentFiber.tag) {
     case HostComponent: {
+      // 获取父亲
       const parent = parentFiber.stateNode;
+
+      // 父亲有重置内容的 effect
       if (parentFiber.flags & ContentReset) {
         // Reset the text content of the parent before doing any insertions
+        // 先将父元素的内容清空
         resetTextContent(parent);
+
         // Clear ContentReset from the effect tag
+        // 去掉 ContextReset 的 effect
         parentFiber.flags &= ~ContentReset;
       }
 
+      // 获取 finishedWork 插入的参考兄弟节点
       const before = getHostSibling(finishedWork);
+
       // We only have the top Fiber that was inserted but we need to recurse down its
       // children to find all the terminal nodes.
+      // insert 或者 插入到父元素的最后一个
       insertOrAppendPlacementNode(finishedWork, before, parent);
       break;
     }
@@ -1346,14 +1377,22 @@ function insertOrAppendPlacementNodeIntoContainer(node, before, parent) {
   }
 }
 
+/**
+ * 
+ * @param {*} node 即将插入的节点
+ * @param {*} before 插入到哪个元素之前
+ * @param {*} parent 父元素
+ */
 function insertOrAppendPlacementNode(node, before, parent) {
   const {tag} = node;
   const isHost = tag === HostComponent || tag === HostText;
   if (isHost) {
+    // 普通元素节点
     const stateNode = node.stateNode;
     if (before) {
       insertBefore(parent, stateNode, before);
     } else {
+      // 插入到最后
       appendChild(parent, stateNode);
     }
   } else if (tag === HostPortal) {
@@ -1361,10 +1400,13 @@ function insertOrAppendPlacementNode(node, before, parent) {
     // down its children. Instead, we'll get insertions from each child in
     // the portal directly.
   } else {
+    // 可能是函数组件
     const child = node.child;
     if (child !== null) {
+      // 插入孩子
       insertOrAppendPlacementNode(child, before, parent);
       let sibling = child.sibling;
+      // 插入兄弟节点
       while (sibling !== null) {
         insertOrAppendPlacementNode(sibling, before, parent);
         sibling = sibling.sibling;
@@ -1846,7 +1888,8 @@ function commitMutationEffectsOnFiber(finishedWork, root, lanes) {
       recursivelyTraverseMutationEffects(root, finishedWork, lanes);
       commitReconciliationEffects(finishedWork);
 
-      if (flags & Update) { // hook 在更新阶段是加上了 Update 标记
+      if (flags & Update) {
+        // hook 在更新阶段是加上了 Update 标记
         try {
           // 执行 useInsertionEffect 的销毁和回调函数
           commitHookEffectListUnmount(
@@ -1866,43 +1909,45 @@ function commitMutationEffectsOnFiber(finishedWork, root, lanes) {
         // This prevents sibling component effects from interfering with each other,
         // e.g. a destroy function in one component should never override a ref set
         // by a create function in another component during the same commit.
-        if (
-          enableProfilerTimer &&
-          enableProfilerCommitHooks &&
-          finishedWork.mode & ProfileMode
-        ) {
-          try {
-            startLayoutEffectTimer();
-            commitHookEffectListUnmount(
-              HookLayout | HookHasEffect,
-              finishedWork,
-              finishedWork.return,
-            );
-          } catch (error) {
-            captureCommitPhaseError(finishedWork, finishedWork.return, error);
-          }
-          recordLayoutEffectDuration(finishedWork);
-        } else {
-          try {
-            // 执行 useLayoutEffect 的销毁函数
-            commitHookEffectListUnmount(
-              HookLayout | HookHasEffect,
-              finishedWork,
-              finishedWork.return,
-            );
-          } catch (error) {
-            captureCommitPhaseError(finishedWork, finishedWork.return, error);
-          }
+        // if (
+        //   enableProfilerTimer &&
+        //   enableProfilerCommitHooks &&
+        //   finishedWork.mode & ProfileMode
+        // ) {
+        //   try {
+        //     startLayoutEffectTimer();
+        //     commitHookEffectListUnmount(
+        //       HookLayout | HookHasEffect,
+        //       finishedWork,
+        //       finishedWork.return,
+        //     );
+        //   } catch (error) {
+        //     captureCommitPhaseError(finishedWork, finishedWork.return, error);
+        //   }
+        //   recordLayoutEffectDuration(finishedWork);
+        // } else {
+        try {
+          // 执行 useLayoutEffect 的销毁函数
+          commitHookEffectListUnmount(
+            HookLayout | HookHasEffect,
+            finishedWork,
+            finishedWork.return,
+          );
+        } catch (error) {
+          captureCommitPhaseError(finishedWork, finishedWork.return, error);
         }
       }
+      // }
       return;
     }
     case ClassComponent: {
       recursivelyTraverseMutationEffects(root, finishedWork, lanes);
       commitReconciliationEffects(finishedWork);
 
+      // 2. 解绑 ref
       if (flags & Ref) {
         if (current !== null) {
+          // 解绑 ref
           safelyDetachRef(current, current.return);
         }
       }
@@ -2171,6 +2216,7 @@ function commitMutationEffectsOnFiber(finishedWork, root, lanes) {
     }
   }
 }
+// 执行 Placement 的 effect
 function commitReconciliationEffects(finishedWork) {
   // Placement effects (insertions, reorders) can be scheduled on any fiber
   // type. They needs to happen after the children effects have fired, but
@@ -2767,7 +2813,7 @@ function commitPassiveUnmountOnFiber(finishedWork) {
       //   );
       //   recordPassiveEffectDuration(finishedWork);
       // } else {
-      // 执行 effect 的回调 
+      // 执行 effect 的回调
       commitHookEffectListUnmount(
         HookPassive | HookHasEffect,
         finishedWork,
