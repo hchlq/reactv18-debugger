@@ -332,6 +332,7 @@ function ChildReconciler(shouldTrackSideEffects) {
       }
     } else {
       // This is an insertion.
+      // debugger
       newFiber.flags |= Placement;
       return lastPlacedIndex;
     }
@@ -341,6 +342,8 @@ function ChildReconciler(shouldTrackSideEffects) {
     // This is simpler for the single child case. We only need to do a
     // placement for inserting new children.
     if (shouldTrackSideEffects && newFiber.alternate === null) {
+      // debugger
+      // HostRoot 的 shouldTrackSideEffects 为 true
       newFiber.flags |= Placement;
     }
     return newFiber;

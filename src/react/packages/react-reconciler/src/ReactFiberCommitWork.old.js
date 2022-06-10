@@ -1835,6 +1835,7 @@ export function isSuspenseBoundaryBeingHidden(current, finishedWork) {
  * 第二阶段
  */
 export function commitMutationEffects(root, finishedWork, committedLanes) {
+  // debugger
   inProgressLanes = committedLanes;
   inProgressRoot = root;
 
@@ -1846,6 +1847,11 @@ export function commitMutationEffects(root, finishedWork, committedLanes) {
   inProgressRoot = null;
 }
 
+/**
+ * 循环的遍历有 MutationEffect 副作用的
+ * 1. 删除
+ * 2. 插入
+ */
 function recursivelyTraverseMutationEffects(root, parentFiber, lanes) {
   // Deletions effects can be scheduled on any fiber type. They need to happen
   // before the children effects hae fired.
@@ -1861,16 +1867,18 @@ function recursivelyTraverseMutationEffects(root, parentFiber, lanes) {
     }
   }
 
-  const prevDebugFiber = getCurrentDebugFiberInDEV();
+  // const prevDebugFiber = getCurrentDebugFiberInDEV();
+  // debugger
+  // console.log(MutationMask)
   if (parentFiber.subtreeFlags & MutationMask) {
     let child = parentFiber.child;
     while (child !== null) {
-      setCurrentDebugFiberInDEV(child);
+      // setCurrentDebugFiberInDEV(child);
       commitMutationEffectsOnFiber(child, root, lanes);
       child = child.sibling;
     }
   }
-  setCurrentDebugFiberInDEV(prevDebugFiber);
+  // setCurrentDebugFiberInDEV(prevDebugFiber);
 }
 
 function commitMutationEffectsOnFiber(finishedWork, root, lanes) {
@@ -1885,6 +1893,7 @@ function commitMutationEffectsOnFiber(finishedWork, root, lanes) {
     case ForwardRef:
     case MemoComponent:
     case SimpleMemoComponent: {
+      // debugger
       recursivelyTraverseMutationEffects(root, finishedWork, lanes);
       commitReconciliationEffects(finishedWork);
 
