@@ -1222,9 +1222,10 @@ function updateHostComponent(current, workInProgress, renderLanes) {
 
   let nextChildren = nextProps.children;
 
-  // 判断孩子是不是只是文本内容，如果是的话，当作特殊情况来处理
+  // 判断新孩子是不是只是文本内容，如果是的话，当作特殊情况来处理
   const isDirectTextChild = shouldSetTextContent(type, nextProps);
 
+  // debugger
   if (isDirectTextChild) {
     // We special case a direct text child of a host node. This is a common
     // case. We won't handle it as a reified child. We will instead handle
@@ -1235,7 +1236,7 @@ function updateHostComponent(current, workInProgress, renderLanes) {
   } else if (prevProps !== null && shouldSetTextContent(type, prevProps)) {
     // If we're switching from a direct text child to a normal child, or to
     // empty, we need to schedule the text content to be reset.
-    // 新孩子不是文本，老的孩子是文本，加上 ContextReset 的 effect 标记
+    // 新孩子不是文本，老的孩子是文本，workInProgress 加上 ContextReset 的 effect 标记
     workInProgress.flags |= ContentReset;
   }
 

@@ -8,7 +8,8 @@ import * as ReactDom from "react-dom";
 // import App from './_test/hooks/effect/update'
 // import App from "./_test/hooks/effect/useLayoutEffect";
 // import App from "./_test/hooks/effect/unmountEffect";
-import App from './_test/hostComponent/updateQueue'
+// import App from './_test/hostComponent/updateQueue'
+import App from './_test/hostComponent/onlyText'
 
 
 ReactDom.createRoot(document.getElementById("root")).render(<App />);

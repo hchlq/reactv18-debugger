@@ -2007,6 +2007,7 @@ function commitMutationEffectsOnFiber(finishedWork, root, lanes) {
             finishedWork.updateQueue = null;
             if (updatePayload !== null) {
               // 更新属性
+              // 纯文本的孩子也在这更新（字符串，数字等），其他类型的孩子不会在这更新（比如元素，组件等）
               try {
                 commitUpdate(
                   instance,
