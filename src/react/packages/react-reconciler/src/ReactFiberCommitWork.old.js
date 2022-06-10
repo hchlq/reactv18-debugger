@@ -1865,9 +1865,9 @@ export function commitMutationEffects(root, finishedWork, committedLanes) {
 }
 
 /**
- * 循环的遍历有 MutationEffect 副作用的
- * 1. 删除
- * 2. 插入
+ * 循环的遍历有 MutationEffect 副作用的 Placement | Deletion
+ * 1. 自己身上挂的删除
+ * 2. 孩子新增的插入节点
  */
 function recursivelyTraverseMutationEffects(root, parentFiber, lanes) {
   // Deletions effects can be scheduled on any fiber type. They need to happen
@@ -1987,14 +1987,18 @@ function commitMutationEffectsOnFiber(finishedWork, root, lanes) {
           }
         }
 
+        // 更新属性
         if (flags & Update) {
+          // debugger
           const instance = finishedWork.stateNode;
           if (instance != null) {
             // Commit the work prepared earlier.
+            // { ...props } & children
             const newProps = finishedWork.memoizedProps;
             // For hydration we reuse the update path but we treat the oldProps
             // as the newProps. The updatePayload will contain the real change in
             // this case.
+            // { ...props } & children
             const oldProps =
               current !== null ? current.memoizedProps : newProps;
             const type = finishedWork.type;
@@ -2002,6 +2006,7 @@ function commitMutationEffectsOnFiber(finishedWork, root, lanes) {
             const updatePayload = finishedWork.updateQueue;
             finishedWork.updateQueue = null;
             if (updatePayload !== null) {
+              // 更新属性
               try {
                 commitUpdate(
                   instance,

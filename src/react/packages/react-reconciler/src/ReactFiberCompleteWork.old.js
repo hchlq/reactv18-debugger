@@ -274,6 +274,7 @@ if (supportsMutation) {
 
     // console.log('updatePayload: ', updatePayload)
     // TODO: Type this specific to this type of component.
+    // 挂在到元素的 updateQueue 中
     workInProgress.updateQueue = updatePayload;
 
     // If the update payload indicates that there is a change or if there
