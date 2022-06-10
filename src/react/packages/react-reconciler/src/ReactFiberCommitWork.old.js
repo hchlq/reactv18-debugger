@@ -142,9 +142,6 @@ import {releaseCache, retainCache} from './ReactFiberCacheComponent.old';
 import {clearTransitionsForLanes} from './ReactFiberLane.old';
 
 let didWarnAboutUndefinedSnapshotBeforeUpdate = null;
-if (__DEV__) {
-  didWarnAboutUndefinedSnapshotBeforeUpdate = new Set();
-}
 
 // Used during the commit phase to track the state of the Offscreen component stack.
 // Allows us to avoid traversing the return path to find the nearest Offscreen ancestor.
@@ -586,23 +583,8 @@ function commitLayoutEffectOnFiber(
           // This is done to prevent sibling component effects from interfering with each other,
           // e.g. a destroy function in one component should never override a ref set
           // by a create function in another component during the same commit.
-          if (
-            enableProfilerTimer &&
-            enableProfilerCommitHooks &&
-            finishedWork.mode & ProfileMode
-          ) {
-            try {
-              startLayoutEffectTimer();
-              commitHookEffectListMount(
-                HookLayout | HookHasEffect,
-                finishedWork,
-              );
-            } finally {
-              recordLayoutEffectDuration(finishedWork);
-            }
-          } else {
-            commitHookEffectListMount(HookLayout | HookHasEffect, finishedWork);
-          }
+          // 执行 useLayoutEffect 回调函数
+          commitHookEffectListMount(HookLayout | HookHasEffect, finishedWork);
         }
         break;
       }
@@ -613,48 +595,7 @@ function commitLayoutEffectOnFiber(
             if (current === null) {
               // We could update instance props and state here,
               // but instead we rely on them being set during last render.
-              // TODO: revisit this when we implement resuming.
-              if (__DEV__) {
-                if (
-                  finishedWork.type === finishedWork.elementType &&
-                  !didWarnAboutReassigningProps
-                ) {
-                  if (instance.props !== finishedWork.memoizedProps) {
-                    console.error(
-                      'Expected %s props to match memoized props before ' +
-                        'componentDidMount. ' +
-                        'This might either be because of a bug in React, or because ' +
-                        'a component reassigns its own `this.props`. ' +
-                        'Please file an issue.',
-                      getComponentNameFromFiber(finishedWork) || 'instance',
-                    );
-                  }
-                  if (instance.state !== finishedWork.memoizedState) {
-                    console.error(
-                      'Expected %s state to match memoized state before ' +
-                        'componentDidMount. ' +
-                        'This might either be because of a bug in React, or because ' +
-                        'a component reassigns its own `this.state`. ' +
-                        'Please file an issue.',
-                      getComponentNameFromFiber(finishedWork) || 'instance',
-                    );
-                  }
-                }
-              }
-              if (
-                enableProfilerTimer &&
-                enableProfilerCommitHooks &&
-                finishedWork.mode & ProfileMode
-              ) {
-                try {
-                  startLayoutEffectTimer();
-                  instance.componentDidMount();
-                } finally {
-                  recordLayoutEffectDuration(finishedWork);
-                }
-              } else {
-                instance.componentDidMount();
-              }
+              instance.componentDidMount();
             } else {
               const prevProps =
                 finishedWork.elementType === finishedWork.type
@@ -667,55 +608,11 @@ function commitLayoutEffectOnFiber(
               // We could update instance props and state here,
               // but instead we rely on them being set during last render.
               // TODO: revisit this when we implement resuming.
-              if (__DEV__) {
-                if (
-                  finishedWork.type === finishedWork.elementType &&
-                  !didWarnAboutReassigningProps
-                ) {
-                  if (instance.props !== finishedWork.memoizedProps) {
-                    console.error(
-                      'Expected %s props to match memoized props before ' +
-                        'componentDidUpdate. ' +
-                        'This might either be because of a bug in React, or because ' +
-                        'a component reassigns its own `this.props`. ' +
-                        'Please file an issue.',
-                      getComponentNameFromFiber(finishedWork) || 'instance',
-                    );
-                  }
-                  if (instance.state !== finishedWork.memoizedState) {
-                    console.error(
-                      'Expected %s state to match memoized state before ' +
-                        'componentDidUpdate. ' +
-                        'This might either be because of a bug in React, or because ' +
-                        'a component reassigns its own `this.state`. ' +
-                        'Please file an issue.',
-                      getComponentNameFromFiber(finishedWork) || 'instance',
-                    );
-                  }
-                }
-              }
-              if (
-                enableProfilerTimer &&
-                enableProfilerCommitHooks &&
-                finishedWork.mode & ProfileMode
-              ) {
-                try {
-                  startLayoutEffectTimer();
-                  instance.componentDidUpdate(
-                    prevProps,
-                    prevState,
-                    instance.__reactInternalSnapshotBeforeUpdate,
-                  );
-                } finally {
-                  recordLayoutEffectDuration(finishedWork);
-                }
-              } else {
-                instance.componentDidUpdate(
-                  prevProps,
-                  prevState,
-                  instance.__reactInternalSnapshotBeforeUpdate,
-                );
-              }
+              instance.componentDidUpdate(
+                prevProps,
+                prevState,
+                instance.__reactInternalSnapshotBeforeUpdate,
+              );
             }
           }
         }
@@ -724,36 +621,11 @@ function commitLayoutEffectOnFiber(
         // commit phase. Consider removing the type check.
         const updateQueue = finishedWork.updateQueue;
         if (updateQueue !== null) {
-          if (__DEV__) {
-            if (
-              finishedWork.type === finishedWork.elementType &&
-              !didWarnAboutReassigningProps
-            ) {
-              if (instance.props !== finishedWork.memoizedProps) {
-                console.error(
-                  'Expected %s props to match memoized props before ' +
-                    'processing the update queue. ' +
-                    'This might either be because of a bug in React, or because ' +
-                    'a component reassigns its own `this.props`. ' +
-                    'Please file an issue.',
-                  getComponentNameFromFiber(finishedWork) || 'instance',
-                );
-              }
-              if (instance.state !== finishedWork.memoizedState) {
-                console.error(
-                  'Expected %s state to match memoized state before ' +
-                    'processing the update queue. ' +
-                    'This might either be because of a bug in React, or because ' +
-                    'a component reassigns its own `this.state`. ' +
-                    'Please file an issue.',
-                  getComponentNameFromFiber(finishedWork) || 'instance',
-                );
-              }
-            }
-          }
           // We could update instance props and state here,
           // but instead we rely on them being set during last render.
           // TODO: revisit this when we implement resuming.
+          // 执行 setState 的第二个回调函数参数
+          // 第三个参数是 this 指向
           commitUpdateQueue(finishedWork, updateQueue, instance);
         }
         break;
@@ -774,6 +646,7 @@ function commitLayoutEffectOnFiber(
                 break;
             }
           }
+          // 第三个参数是 this 指向
           commitUpdateQueue(finishedWork, updateQueue, instance);
         }
         break;
@@ -788,6 +661,7 @@ function commitLayoutEffectOnFiber(
         if (current === null && finishedWork.flags & Update) {
           const type = finishedWork.type;
           const props = finishedWork.memoizedProps;
+          // 执行表单元素的 domElement.focus(); 和更换图片的 src
           commitMount(instance, type, props, finishedWork);
         }
 
@@ -881,19 +755,23 @@ function commitLayoutEffectOnFiber(
     }
   }
 
+  // enableSuspenseLayoutEffectSemantics： true
+  // offscreenSubtreeWasHidden：一般为 false
   if (!enableSuspenseLayoutEffectSemantics || !offscreenSubtreeWasHidden) {
-    if (enableScopeAPI) {
-      // TODO: This is a temporary solution that allowed us to transition away
-      // from React Flare on www.
-      if (finishedWork.flags & Ref && finishedWork.tag !== ScopeComponent) {
-        commitAttachRef(finishedWork);
-      }
-    } else {
-      if (finishedWork.flags & Ref) {
-        commitAttachRef(finishedWork);
-      }
+    // false
+    // if (enableScopeAPI) {
+    //   // TODO: This is a temporary solution that allowed us to transition away
+    //   // from React Flare on www.
+    //   if (finishedWork.flags & Ref && finishedWork.tag !== ScopeComponent) {
+    //     commitAttachRef(finishedWork);
+    //   }
+    // } else {
+    // 挂载 effect
+    if (finishedWork.flags & Ref) {
+      commitAttachRef(finishedWork);
     }
   }
+  // }
 }
 
 function reappearLayoutEffectsOnFiber(node) {
@@ -1009,58 +887,30 @@ function hideOrUnhideAllChildren(finishedWork, isHidden) {
   }
 }
 
+// 绑定 ref
 function commitAttachRef(finishedWork) {
   const ref = finishedWork.ref;
   if (ref !== null) {
     const instance = finishedWork.stateNode;
+    // 元素实例
+    // 1. 普通元素：元素实例
+    // 2. 类组件：类实例
     let instanceToUse;
     switch (finishedWork.tag) {
       case HostComponent:
+        // 获取 fiber 示例
         instanceToUse = getPublicInstance(instance);
         break;
       default:
         instanceToUse = instance;
     }
     // Moved outside to ensure DCE works with this flag
-    if (enableScopeAPI && finishedWork.tag === ScopeComponent) {
-      instanceToUse = instance;
-    }
+    // if (enableScopeAPI && finishedWork.tag === ScopeComponent) {
+    //   instanceToUse = instance;
+    // }
     if (typeof ref === 'function') {
-      let retVal;
-      if (
-        enableProfilerTimer &&
-        enableProfilerCommitHooks &&
-        finishedWork.mode & ProfileMode
-      ) {
-        try {
-          startLayoutEffectTimer();
-          retVal = ref(instanceToUse);
-        } finally {
-          recordLayoutEffectDuration(finishedWork);
-        }
-      } else {
-        retVal = ref(instanceToUse);
-      }
-      if (__DEV__) {
-        if (typeof retVal === 'function') {
-          console.error(
-            'Unexpected return value from a callback ref in %s. ' +
-              'A callback ref should not return a function.',
-            getComponentNameFromFiber(finishedWork),
-          );
-        }
-      }
+      ref(instanceToUse);
     } else {
-      if (__DEV__) {
-        if (!ref.hasOwnProperty('current')) {
-          console.error(
-            'Unexpected ref object provided for %s. ' +
-              'Use either a ref-setter function or React.createRef().',
-            getComponentNameFromFiber(finishedWork),
-          );
-        }
-      }
-
       ref.current = instanceToUse;
     }
   }
@@ -1850,6 +1700,9 @@ export function isSuspenseBoundaryBeingHidden(current, finishedWork) {
 
 /**
  * 第二阶段
+ * 1. 执行插入和删除操作
+ * 2. 解绑 ref
+ * 3. 执行 useInsertionEffect, useLayoutEffect 的回调函数
  */
 export function commitMutationEffects(root, finishedWork, committedLanes) {
   // debugger
@@ -2256,6 +2109,9 @@ function commitReconciliationEffects(finishedWork) {
   // }
 }
 
+/**
+ * 第三阶段
+ */
 export function commitLayoutEffects(finishedWork, root, committedLanes) {
   inProgressLanes = committedLanes;
   inProgressRoot = root;
@@ -2275,6 +2131,7 @@ function commitLayoutEffects_begin(subtreeRoot, root, committedLanes) {
     const fiber = nextEffect;
     const firstChild = fiber.child;
 
+    // OffscreenComponent
     if (
       enableSuspenseLayoutEffectSemantics &&
       fiber.tag === OffscreenComponent &&
@@ -2328,6 +2185,7 @@ function commitLayoutEffects_begin(subtreeRoot, root, committedLanes) {
       }
     }
 
+    // 先执行孩子，再执行父亲
     if ((fiber.subtreeFlags & LayoutMask) !== NoFlags && firstChild !== null) {
       firstChild.return = fiber;
       nextEffect = firstChild;
@@ -2341,14 +2199,15 @@ function commitLayoutMountEffects_complete(subtreeRoot, root, committedLanes) {
   while (nextEffect !== null) {
     const fiber = nextEffect;
     if ((fiber.flags & LayoutMask) !== NoFlags) {
+      // LayoutMask: Update | Callback | Ref | Visibility
       const current = fiber.alternate;
-      setCurrentDebugFiberInDEV(fiber);
+      // setCurrentDebugFiberInDEV(fiber);
       try {
         commitLayoutEffectOnFiber(root, current, fiber, committedLanes);
       } catch (error) {
         captureCommitPhaseError(fiber, fiber.return, error);
       }
-      resetCurrentDebugFiberInDEV();
+      // resetCurrentDebugFiberInDEV();
     }
 
     if (fiber === subtreeRoot) {
