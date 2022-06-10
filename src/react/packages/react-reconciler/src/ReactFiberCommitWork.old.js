@@ -1372,7 +1372,7 @@ function insertOrAppendPlacementNodeIntoContainer(node, before, parent) {
 }
 
 /**
- * 
+ *
  * @param {*} node 即将插入的节点
  * @param {*} before 插入到哪个元素之前
  * @param {*} parent 父元素
@@ -1437,6 +1437,7 @@ function commitDeletionEffects(root, returnFiber, deletedFiber) {
     // can track the nearest host component on the JS stack as we traverse the
     // tree during the commit phase. This would make insertions faster, too.
     let parent = returnFiber;
+    // 确定 hostParent 和 hostParentIsContainer
     findParent: while (parent !== null) {
       switch (parent.tag) {
         case HostComponent: {
@@ -1446,11 +1447,13 @@ function commitDeletionEffects(root, returnFiber, deletedFiber) {
         }
         case HostRoot: {
           hostParent = parent.stateNode.containerInfo;
+          // 代表父亲是根容器
           hostParentIsContainer = true;
           break findParent;
         }
         case HostPortal: {
           hostParent = parent.stateNode.containerInfo;
+          // 代表父亲是根容器
           hostParentIsContainer = true;
           break findParent;
         }
@@ -1493,7 +1496,7 @@ function commitDeletionEffectsOnFiber(
   nearestMountedAncestor,
   deletedFiber,
 ) {
-  debugger
+  // debugger;
   onCommitUnmount(deletedFiber);
 
   // The cases in this outer switch modify the stack before they traverse
@@ -1513,6 +1516,7 @@ function commitDeletionEffectsOnFiber(
       // to `null` on the stack to indicate that nested children don't
       // need to be removed.
       if (supportsMutation) {
+        // 保存 hostParent 和 hostParentIsContainer
         const prevHostParent = hostParent;
         const prevHostParentIsContainer = hostParentIsContainer;
         hostParent = null;
@@ -1522,12 +1526,14 @@ function commitDeletionEffectsOnFiber(
           nearestMountedAncestor,
           deletedFiber,
         );
+
         hostParent = prevHostParent;
         hostParentIsContainer = prevHostParentIsContainer;
 
         if (hostParent !== null) {
           // Now that all the child effects have unmounted, we can remove the
           // node from the tree.
+          // 已经删除了节点所有的孩子，应该删除该节点本身了
           if (hostParentIsContainer) {
             removeChildFromContainer(hostParent, deletedFiber.stateNode);
           } else {
@@ -1601,8 +1607,10 @@ function commitDeletionEffectsOnFiber(
     case MemoComponent:
     case SimpleMemoComponent: {
       if (!offscreenSubtreeWasHidden) {
+        // 执行 effect 的回调
         const updateQueue = deletedFiber.updateQueue;
         if (updateQueue !== null) {
+          // 取出各个 effect 依次执行
           const lastEffect = updateQueue.lastEffect;
           if (lastEffect !== null) {
             const firstEffect = lastEffect.next;
@@ -1611,40 +1619,47 @@ function commitDeletionEffectsOnFiber(
             do {
               const {destroy, tag} = effect;
               if (destroy !== undefined) {
+                // 调用 useLayoutEffect 和 useInsertion 的销毁函数
+                // useEffect 会在 commitImpl 后面执行 flushPassiveEffects 执行销毁回调
                 if ((tag & HookInsertion) !== NoHookEffect) {
+                  // useInsertionEffect
                   safelyCallDestroy(
                     deletedFiber,
                     nearestMountedAncestor,
                     destroy,
                   );
                 } else if ((tag & HookLayout) !== NoHookEffect) {
-                  if (enableSchedulingProfiler) {
-                    markComponentLayoutEffectUnmountStarted(deletedFiber);
-                  }
+                  // useLayoutEffect
 
-                  if (
-                    enableProfilerTimer &&
-                    enableProfilerCommitHooks &&
-                    deletedFiber.mode & ProfileMode
-                  ) {
-                    startLayoutEffectTimer();
-                    safelyCallDestroy(
-                      deletedFiber,
-                      nearestMountedAncestor,
-                      destroy,
-                    );
-                    recordLayoutEffectDuration(deletedFiber);
-                  } else {
-                    safelyCallDestroy(
-                      deletedFiber,
-                      nearestMountedAncestor,
-                      destroy,
-                    );
-                  }
+                  // if (enableSchedulingProfiler) {
+                  //   markComponentLayoutEffectUnmountStarted(deletedFiber);
+                  // }
 
-                  if (enableSchedulingProfiler) {
-                    markComponentLayoutEffectUnmountStopped();
-                  }
+                  // if (
+                  //   enableProfilerTimer &&
+                  //   enableProfilerCommitHooks &&
+                  //   deletedFiber.mode & ProfileMode
+                  // ) {
+                  //   startLayoutEffectTimer();
+                  //   safelyCallDestroy(
+                  //     deletedFiber,
+                  //     nearestMountedAncestor,
+                  //     destroy,
+                  //   );
+                  //   recordLayoutEffectDuration(deletedFiber);
+                  // } else {
+
+                  safelyCallDestroy(
+                    deletedFiber,
+                    nearestMountedAncestor,
+                    destroy,
+                  );
+
+                  // }
+
+                  // if (enableSchedulingProfiler) {
+                  //   markComponentLayoutEffectUnmountStopped();
+                  // }
                 }
               }
               effect = effect.next;
@@ -1653,6 +1668,7 @@ function commitDeletionEffectsOnFiber(
         }
       }
 
+      // 递归的卸载孩子
       recursivelyTraverseDeletionEffects(
         finishedRoot,
         nearestMountedAncestor,
@@ -1662,8 +1678,10 @@ function commitDeletionEffectsOnFiber(
     }
     case ClassComponent: {
       if (!offscreenSubtreeWasHidden) {
+        // 解绑 ref
         safelyDetachRef(deletedFiber, nearestMountedAncestor);
         const instance = deletedFiber.stateNode;
+        // 执行卸载函数 componentWillUnmount
         if (typeof instance.componentWillUnmount === 'function') {
           safelyCallComponentWillUnmount(
             deletedFiber,
@@ -1672,6 +1690,7 @@ function commitDeletionEffectsOnFiber(
           );
         }
       }
+      // 递归的卸载孩子
       recursivelyTraverseDeletionEffects(
         finishedRoot,
         nearestMountedAncestor,
@@ -1916,23 +1935,6 @@ function commitMutationEffectsOnFiber(finishedWork, root, lanes) {
         // This prevents sibling component effects from interfering with each other,
         // e.g. a destroy function in one component should never override a ref set
         // by a create function in another component during the same commit.
-        // if (
-        //   enableProfilerTimer &&
-        //   enableProfilerCommitHooks &&
-        //   finishedWork.mode & ProfileMode
-        // ) {
-        //   try {
-        //     startLayoutEffectTimer();
-        //     commitHookEffectListUnmount(
-        //       HookLayout | HookHasEffect,
-        //       finishedWork,
-        //       finishedWork.return,
-        //     );
-        //   } catch (error) {
-        //     captureCommitPhaseError(finishedWork, finishedWork.return, error);
-        //   }
-        //   recordLayoutEffectDuration(finishedWork);
-        // } else {
         try {
           // 执行 useLayoutEffect 的销毁函数
           // debugger
@@ -1945,7 +1947,6 @@ function commitMutationEffectsOnFiber(finishedWork, root, lanes) {
           captureCommitPhaseError(finishedWork, finishedWork.return, error);
         }
       }
-      // }
       return;
     }
     case ClassComponent: {

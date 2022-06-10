@@ -2174,17 +2174,13 @@ function commitRootImpl(
     // schedule a callback until after flushing layout work.
     rootDoesHavePassiveEffects = false;
 
-    // 给 rootWithPendingPassiveEffects 赋值，用于清除延迟调用的 useEffect 回调
+    // 给 rootWithPendingPassiveEffects 和 pendingPassiveEffectsLanes 赋值，用于清除延迟调用的 useEffect 回调
     rootWithPendingPassiveEffects = root;
     pendingPassiveEffectsLanes = lanes;
   } else {
     // There were no passive effects, so we can immediately release the cache
     // pool for this render.
     releaseRootPooledCache(root, remainingLanes);
-    if (__DEV__) {
-      nestedPassiveUpdateCount = 0;
-      rootWithPassiveNestedUpdates = null;
-    }
   }
 
   // Read this again, since an effect might have updated it
@@ -2209,12 +2205,6 @@ function commitRootImpl(
 
   onCommitRootDevTools(finishedWork.stateNode, renderPriorityLevel);
 
-  if (enableUpdaterTracking) {
-    if (isDevToolsPresent) {
-      root.memoizedUpdaters.clear();
-    }
-  }
-
   // Always call this before exiting `commitRoot`, to ensure that any
   // additional work on this root is scheduled.
   ensureRootIsScheduled(root, now());
@@ -2236,6 +2226,7 @@ function commitRootImpl(
     throw error;
   }
 
+  // 如果 useEffect 是 “离散” 渲染的结果，最后时同步的清空 useEffect 
   // If the passive effects are the result of a discrete render, flush them
   // synchronously at the end of the current task so that the result is
   // immediately observable. Otherwise, we assume that they are not
@@ -2248,15 +2239,16 @@ function commitRootImpl(
     includesSomeLane(pendingPassiveEffectsLanes, SyncLane) &&
     root.tag !== LegacyRoot
   ) {
+    // 提前清空 useEffect
     flushPassiveEffects();
   }
 
   // Read this again, since a passive effect might have updated it
   remainingLanes = root.pendingLanes;
   if (includesSomeLane(remainingLanes, SyncLane)) {
-    if (enableProfilerTimer && enableProfilerNestedUpdatePhase) {
-      markNestedUpdateScheduled();
-    }
+    // if (enableProfilerTimer && enableProfilerNestedUpdatePhase) {
+    //   markNestedUpdateScheduled();
+    // }
 
     // Count the number of times the root synchronously re-renders without
     // finishing. If there are too many, it indicates an infinite update loop.
@@ -2273,9 +2265,9 @@ function commitRootImpl(
   // If layout work was scheduled, flush it now.
   flushSyncCallbacks();
 
-  if (enableSchedulingProfiler) {
-    markCommitStopped();
-  }
+  // if (enableSchedulingProfiler) {
+  //   markCommitStopped();
+  // }
 
   return null;
 }
