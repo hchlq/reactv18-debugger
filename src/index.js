@@ -11,7 +11,8 @@ import * as ReactDom from "react-dom";
 // import App from './_test/hostComponent/updateQueue'
 // import App from './_test/hostComponent/onlyText'
 // import App from './_test/hooks/effect/useLayoutEffect-mul'
-import App from './_test/firstRender/reconcileChild'
+// import App from './_test/firstRender/reconcileChild'
+import App from './_test/reconciler-child/update'
 
 
 ReactDom.createRoot(document.getElementById("root")).render(<App />);
