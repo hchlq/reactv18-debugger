@@ -42,106 +42,24 @@ let ownerHasKeyUseWarning;
 let ownerHasFunctionTypeWarning;
 let warnForMissingKey = (child, returnFiber) => {};
 
-if (__DEV__) {
-  didWarnAboutMaps = false;
-  didWarnAboutGenerators = false;
-  didWarnAboutStringRefs = {};
-
-  /**
-   * Warn if there's no key explicitly set on dynamic arrays of children or
-   * object keys are not valid. This allows us to keep track of children between
-   * updates.
-   */
-  ownerHasKeyUseWarning = {};
-  ownerHasFunctionTypeWarning = {};
-
-  warnForMissingKey = (child, returnFiber) => {
-    if (child === null || typeof child !== 'object') {
-      return;
-    }
-    if (!child._store || child._store.validated || child.key != null) {
-      return;
-    }
-
-    if (typeof child._store !== 'object') {
-      throw new Error(
-        'React Component in warnForMissingKey should have a _store. ' +
-          'This error is likely caused by a bug in React. Please file an issue.',
-      );
-    }
-
-    child._store.validated = true;
-
-    const componentName = getComponentNameFromFiber(returnFiber) || 'Component';
-
-    if (ownerHasKeyUseWarning[componentName]) {
-      return;
-    }
-    ownerHasKeyUseWarning[componentName] = true;
-
-    console.error(
-      'Each child in a list should have a unique ' +
-        '"key" prop. See https://reactjs.org/link/warning-keys for ' +
-        'more information.',
-    );
-  };
-}
-
+/**
+ * 处理字符串类型的 ref
+ */
 function coerceRef(returnFiber, current, element) {
   const mixedRef = element.ref;
   if (
+    // 只处理不是函数，对象的 ref
     mixedRef !== null &&
     typeof mixedRef !== 'function' &&
     typeof mixedRef !== 'object'
   ) {
-    if (__DEV__) {
-      // TODO: Clean this up once we turn on the string ref warning for
-      // everyone, because the strict mode case will no longer be relevant
-      if (
-        (returnFiber.mode & StrictLegacyMode || warnAboutStringRefs) &&
-        // We warn in ReactElement.js if owner and self are equal for string refs
-        // because these cannot be automatically converted to an arrow function
-        // using a codemod. Therefore, we don't have to warn about string refs again.
-        !(
-          element._owner &&
-          element._self &&
-          element._owner.stateNode !== element._self
-        )
-      ) {
-        const componentName =
-          getComponentNameFromFiber(returnFiber) || 'Component';
-        if (!didWarnAboutStringRefs[componentName]) {
-          if (warnAboutStringRefs) {
-            console.error(
-              'Component "%s" contains the string ref "%s". Support for string refs ' +
-                'will be removed in a future major release. We recommend using ' +
-                'useRef() or createRef() instead. ' +
-                'Learn more about using refs safely here: ' +
-                'https://reactjs.org/link/strict-mode-string-ref',
-              componentName,
-              mixedRef,
-            );
-          } else {
-            console.error(
-              'A string ref, "%s", has been found within a strict mode tree. ' +
-                'String refs are a source of potential bugs and should be avoided. ' +
-                'We recommend using useRef() or createRef() instead. ' +
-                'Learn more about using refs safely here: ' +
-                'https://reactjs.org/link/strict-mode-string-ref',
-              mixedRef,
-            );
-          }
-          didWarnAboutStringRefs[componentName] = true;
-        }
-      }
-    }
-
     if (element._owner) {
       const owner = element._owner;
       let inst;
       if (owner) {
         const ownerFiber = owner;
 
+        // owner 不是类组件，抛出错误
         if (ownerFiber.tag !== ClassComponent) {
           throw new Error(
             'Function components cannot have string refs. ' +
@@ -151,6 +69,7 @@ function coerceRef(returnFiber, current, element) {
           );
         }
 
+        // 类组件
         inst = ownerFiber.stateNode;
       }
 
@@ -163,9 +82,7 @@ function coerceRef(returnFiber, current, element) {
       // Assigning this to a const so Flow knows it won't change in the closure
       const resolvedInst = inst;
 
-      if (__DEV__) {
-        checkPropStringCoercion(mixedRef, 'ref');
-      }
+      // 字符串的 ref
       const stringRef = '' + mixedRef;
       // Check if previous string ref matches new string ref
       if (
@@ -174,23 +91,29 @@ function coerceRef(returnFiber, current, element) {
         typeof current.ref === 'function' &&
         current.ref._stringRef === stringRef
       ) {
+        // 和老的一样
         return current.ref;
       }
+      // 构建 ref 函数
       const ref = function (value) {
         let refs = resolvedInst.refs;
         if (refs === emptyRefsObject) {
           // This is a lazy pooled frozen object, so we need to initialize.
+          // 增加实例的 refs 对象
           refs = resolvedInst.refs = {};
         }
         if (value === null) {
           delete refs[stringRef];
         } else {
+          // 实例上增加 ref
           refs[stringRef] = value;
         }
       };
+      // 做缓存
       ref._stringRef = stringRef;
       return ref;
     } else {
+      // 不是字符串
       if (typeof mixedRef !== 'string') {
         throw new Error(
           'Expected ref to be a function, a string, an object returned by React.createRef(), or null.',
@@ -209,6 +132,7 @@ function coerceRef(returnFiber, current, element) {
       }
     }
   }
+
   return mixedRef;
 }
 
@@ -254,20 +178,29 @@ function resolveLazy(lazyType) {
 // a compiler or we can do it manually. Helpers that don't need this branching
 // live outside of this function.
 function ChildReconciler(shouldTrackSideEffects) {
+  /**
+   * 删除孩子，并且增加 ChildDeletetion 标记
+   */
   function deleteChild(returnFiber, childToDelete) {
     if (!shouldTrackSideEffects) {
       // Noop.
       return;
     }
+
     const deletions = returnFiber.deletions;
     if (deletions === null) {
+      // 创建一个数组，用于存放本次删除的孩子
       returnFiber.deletions = [childToDelete];
+      // 孩子的 ChildDeletion
       returnFiber.flags |= ChildDeletion;
     } else {
       deletions.push(childToDelete);
     }
   }
 
+  /**
+   * 删除其余的孩子
+   */
   function deleteRemainingChildren(returnFiber, currentFirstChild) {
     if (!shouldTrackSideEffects) {
       // Noop.
@@ -278,6 +211,7 @@ function ChildReconciler(shouldTrackSideEffects) {
     // assuming that after the first child we've already added everything.
     let childToDelete = currentFirstChild;
     while (childToDelete !== null) {
+      // 加上 ChildDeletion 的 effect 标记
       deleteChild(returnFiber, childToDelete);
       childToDelete = childToDelete.sibling;
     }
@@ -311,7 +245,11 @@ function ChildReconciler(shouldTrackSideEffects) {
     return clone;
   }
 
+  /**
+   * “放置”孩子
+   */
   function placeChild(newFiber, lastPlacedIndex, newIndex) {
+    // 更新 fiber.index
     newFiber.index = newIndex;
     if (!shouldTrackSideEffects) {
       // During hydration, the useId algorithm needs to know which fibers are
@@ -320,17 +258,23 @@ function ChildReconciler(shouldTrackSideEffects) {
       return lastPlacedIndex;
     }
     const current = newFiber.alternate;
+    // 与老的 fiber 进行比较
     if (current !== null) {
       const oldIndex = current.index;
       if (oldIndex < lastPlacedIndex) {
+        // 移动的节点
         // This is a move.
+        // 1 2 3
+        // 2 3 1
         newFiber.flags |= Placement;
         return lastPlacedIndex;
       } else {
+        // oldIndex 大于等于 lastPlaceIndex 的话，就更新 lastPlaceIndex
         // This item can stay in place.
         return oldIndex;
       }
     } else {
+      // 新增的
       // This is an insertion.
       // debugger
       newFiber.flags |= Placement;
@@ -338,6 +282,9 @@ function ChildReconciler(shouldTrackSideEffects) {
     }
   }
 
+  /**
+   * 更新阶段插入的元素，加上 Placement 的 flag
+   */
   function placeSingleChild(newFiber) {
     // This is simpler for the single child case. We only need to do a
     // placement for inserting new children.
@@ -446,6 +393,9 @@ function ChildReconciler(shouldTrackSideEffects) {
     }
   }
 
+  /**
+   * 创建孩子
+   */
   function createChild(returnFiber, newChild, lanes) {
     if (
       (typeof newChild === 'string' && newChild !== '') ||
@@ -491,7 +441,9 @@ function ChildReconciler(shouldTrackSideEffects) {
         }
       }
 
+      // 孩子是数组
       if (isArray(newChild) || getIteratorFn(newChild)) {
+        // debugger
         const created = createFiberFromFragment(
           newChild,
           returnFiber.mode,
@@ -503,12 +455,6 @@ function ChildReconciler(shouldTrackSideEffects) {
       }
 
       throwOnInvalidObjectType(returnFiber, newChild);
-    }
-
-    if (__DEV__) {
-      if (typeof newChild === 'function') {
-        warnOnFunctionType(returnFiber);
-      }
     }
 
     return null;
@@ -708,15 +654,6 @@ function ChildReconciler(shouldTrackSideEffects) {
     // If you change this code, also update reconcileChildrenIterator() which
     // uses the same algorithm.
 
-    if (__DEV__) {
-      // First, validate keys.
-      let knownKeys = null;
-      for (let i = 0; i < newChildren.length; i++) {
-        const child = newChildren[i];
-        knownKeys = warnOnInvalidKey(child, knownKeys, returnFiber);
-      }
-    }
-
     let resultingFirstChild = null;
     let previousNewFiber = null;
 
@@ -726,11 +663,16 @@ function ChildReconciler(shouldTrackSideEffects) {
     let nextOldFiber = null;
     for (; oldFiber !== null && newIdx < newChildren.length; newIdx++) {
       if (oldFiber.index > newIdx) {
+        // ?? 这一条件代表啥
+        // nextOldFiber 继续保持 oldFiber
         nextOldFiber = oldFiber;
         oldFiber = null;
       } else {
+        // 下一个是其兄弟节点
         nextOldFiber = oldFiber.sibling;
       }
+
+      // 更新插槽孩子
       const newFiber = updateSlot(
         returnFiber,
         oldFiber,
@@ -782,7 +724,9 @@ function ChildReconciler(shouldTrackSideEffects) {
     if (oldFiber === null) {
       // If we don't have any more existing children we can choose a fast path
       // since the rest will all be insertions.
+      // 新建 或者 老的已经处理完成了，剩下的都是插入的
       for (; newIdx < newChildren.length; newIdx++) {
+        // 根据 JSX 创建孩子 fiber
         const newFiber = createChild(returnFiber, newChildren[newIdx], lanes);
         if (newFiber === null) {
           continue;
@@ -1052,6 +996,9 @@ function ChildReconciler(shouldTrackSideEffects) {
     return resultingFirstChild;
   }
 
+  /**
+   * 处理文本孩子
+   */
   function reconcileSingleTextNode(
     returnFiber,
     currentFirstChild,
@@ -1063,19 +1010,29 @@ function ChildReconciler(shouldTrackSideEffects) {
     if (currentFirstChild !== null && currentFirstChild.tag === HostText) {
       // We already have an existing node so let's just update it and delete
       // the rest.
+      // 删除老元素其他的兄弟节点
       deleteRemainingChildren(returnFiber, currentFirstChild.sibling);
+      // 复用 currentFirstChild
       const existing = useFiber(currentFirstChild, textContent);
+      // 更新父亲的指向
       existing.return = returnFiber;
       return existing;
     }
+
+    // 新增的 或者 新老类型不一样
     // The existing first child is not a text node so we need to create one
     // and delete the existing ones.
+    // 删除所有的老的节点
     deleteRemainingChildren(returnFiber, currentFirstChild);
+    // 创建 textFiber
     const created = createFiberFromText(textContent, returnFiber.mode, lanes);
     created.return = returnFiber;
     return created;
   }
 
+  /**
+   * 单个元素孩子
+   */
   function reconcileSingleElement(
     returnFiber,
     currentFirstChild,
@@ -1084,29 +1041,30 @@ function ChildReconciler(shouldTrackSideEffects) {
   ) {
     const key = element.key;
     let child = currentFirstChild;
+    // 存在老的孩子，表示更新阶段
     while (child !== null) {
       // TODO: If key === null and child.key === null, then this only applies to
       // the first item in the list.
       if (child.key === key) {
         const elementType = element.type;
         if (elementType === REACT_FRAGMENT_TYPE) {
+          // 新的类型是 Fragment
           if (child.tag === Fragment) {
+            // 老的类型也是 Fragment
+            // 删除其余多余的兄弟节点
             deleteRemainingChildren(returnFiber, child.sibling);
+            // 复用老的节点
             const existing = useFiber(child, element.props.children);
             existing.return = returnFiber;
-            if (__DEV__) {
-              existing._debugSource = element._source;
-              existing._debugOwner = element._owner;
-            }
             return existing;
           }
         } else {
           if (
             child.elementType === elementType ||
             // Keep this check inline so it only runs on the false path:
-            (__DEV__
-              ? isCompatibleFamilyForHotReloading(child, element)
-              : false) ||
+            // || (__DEV__
+            //   ? isCompatibleFamilyForHotReloading(child, element)
+            //   : false)
             // Lazy types should reconcile their resolved type.
             // We need to do this after the Hot Reloading check above,
             // because hot reloading has different semantics than prod because
@@ -1116,26 +1074,28 @@ function ChildReconciler(shouldTrackSideEffects) {
               elementType.$$typeof === REACT_LAZY_TYPE &&
               resolveLazy(elementType) === child.type)
           ) {
+            // 新的的是 lazy 组件，老的也是 lazy 组件
             deleteRemainingChildren(returnFiber, child.sibling);
+            // 复用老的孩子
             const existing = useFiber(child, element.props);
+            // 类组件上的 ref
             existing.ref = coerceRef(returnFiber, child, element);
             existing.return = returnFiber;
-            if (__DEV__) {
-              existing._debugSource = element._source;
-              existing._debugOwner = element._owner;
-            }
             return existing;
           }
         }
+        // key 相同，类型不同，删除其他的老的孩子，结束循环
         // Didn't match.
         deleteRemainingChildren(returnFiber, child);
         break;
       } else {
+        // key 不一样，删除孩子
         deleteChild(returnFiber, child);
       }
       child = child.sibling;
     }
 
+    // 创建新的类型
     if (element.type === REACT_FRAGMENT_TYPE) {
       const created = createFiberFromFragment(
         element.props.children,
@@ -1198,6 +1158,7 @@ function ChildReconciler(shouldTrackSideEffects) {
     newChild,
     lanes,
   ) {
+    // console.log(newChild)
     // This function is not recursive.
     // If the top level item is an array, we treat it as a set of children,
     // not as a fragment. Nested arrays on the other hand will be treated as
@@ -1211,14 +1172,18 @@ function ChildReconciler(shouldTrackSideEffects) {
       newChild !== null &&
       newChild.type === REACT_FRAGMENT_TYPE &&
       newChild.key === null;
+
+    // 不带 key 的 Fragment
     if (isUnkeyedTopLevelFragment) {
       newChild = newChild.props.children;
     }
 
     // Handle object types
+    // 处理单个孩子的
     if (typeof newChild === 'object' && newChild !== null) {
       switch (newChild.$$typeof) {
         case REACT_ELEMENT_TYPE:
+          // 单个元素孩子
           return placeSingleChild(
             reconcileSingleElement(
               returnFiber,
@@ -1248,15 +1213,20 @@ function ChildReconciler(shouldTrackSideEffects) {
           );
       }
 
+      // 多个孩子
       if (isArray(newChild)) {
-        return reconcileChildrenArray(
+        // debugger
+        const result = reconcileChildrenArray(
           returnFiber,
           currentFirstChild,
           newChild,
           lanes,
         );
+        console.log('result: ', result)
+        return result
       }
 
+      // iterator
       if (getIteratorFn(newChild)) {
         return reconcileChildrenIterator(
           returnFiber,
@@ -1266,9 +1236,12 @@ function ChildReconciler(shouldTrackSideEffects) {
         );
       }
 
+      // 其他不合法的类型
       throwOnInvalidObjectType(returnFiber, newChild);
     }
 
+    // 处理孩子是 number 或者 string 的
+    // e.g. <div> string </div>, <div> number </div>
     if (
       (typeof newChild === 'string' && newChild !== '') ||
       typeof newChild === 'number'
@@ -1281,12 +1254,6 @@ function ChildReconciler(shouldTrackSideEffects) {
           lanes,
         ),
       );
-    }
-
-    if (__DEV__) {
-      if (typeof newChild === 'function') {
-        warnOnFunctionType(returnFiber);
-      }
     }
 
     // Remaining cases are all treated as empty.
@@ -1329,7 +1296,7 @@ export function cloneChildFibers(current, workInProgress) {
     newChild.return = workInProgress;
   }
 
-  // 最后一个孩子的兄弟是空 
+  // 最后一个孩子的兄弟是空
   newChild.sibling = null;
 }
 

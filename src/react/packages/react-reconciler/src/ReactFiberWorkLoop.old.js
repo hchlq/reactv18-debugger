@@ -2174,7 +2174,7 @@ function commitRootImpl(
     // schedule a callback until after flushing layout work.
     rootDoesHavePassiveEffects = false;
 
-    // 给 rootWithPendingPassiveEffects 和 pendingPassiveEffectsLanes 赋值，用于清除延迟调用的 useEffect 回调
+    //! 给 rootWithPendingPassiveEffects 和 pendingPassiveEffectsLanes 赋值，用于清除延迟调用的 useEffect 回调
     rootWithPendingPassiveEffects = root;
     pendingPassiveEffectsLanes = lanes;
   } else {

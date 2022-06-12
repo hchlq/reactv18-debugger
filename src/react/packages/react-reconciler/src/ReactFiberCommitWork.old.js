@@ -1718,7 +1718,7 @@ export function commitMutationEffects(root, finishedWork, committedLanes) {
 }
 
 /**
- * 循环的遍历有 MutationEffect 副作用的 Placement | Deletion
+ * 循环的遍历有 MutationEffect 副作用的 Placement | ChildDeletion
  * 1. 自己身上挂的删除
  * 2. 孩子新增的插入节点
  */
