@@ -142,104 +142,6 @@ let globalClientIdCounter = 0;
 
 const RE_RENDER_LIMIT = 25;
 
-// In DEV, this is the name of the currently executing primitive hook
-let currentHookNameInDev = null;
-
-// In DEV, this list ensures that hooks are called in the same order between renders.
-// The list stores the order of hooks used during the initial render (mount).
-// Subsequent renders (updates) reference this list.
-let hookTypesDev = null;
-let hookTypesUpdateIndexDev = -1;
-
-// In DEV, this tracks whether currently rendering component needs to ignore
-// the dependencies for Hooks that need them (e.g. useEffect or useMemo).
-// When true, such Hooks will always be "remounted". Only used during hot reload.
-let ignorePreviousDependencies = false;
-
-function mountHookTypesDev() {
-  if (__DEV__) {
-    const hookName = currentHookNameInDev;
-
-    if (hookTypesDev === null) {
-      hookTypesDev = [hookName];
-    } else {
-      hookTypesDev.push(hookName);
-    }
-  }
-}
-
-function updateHookTypesDev() {
-  if (__DEV__) {
-    const hookName = currentHookNameInDev;
-
-    if (hookTypesDev !== null) {
-      hookTypesUpdateIndexDev++;
-      if (hookTypesDev[hookTypesUpdateIndexDev] !== hookName) {
-        warnOnHookMismatchInDev(hookName);
-      }
-    }
-  }
-}
-
-function checkDepsAreArrayDev(deps) {
-  if (__DEV__) {
-    if (deps !== undefined && deps !== null && !isArray(deps)) {
-      // Verify deps, but only on mount to avoid extra checks.
-      // It's unlikely their type would change as usually you define them inline.
-      console.error(
-        '%s received a final argument that is not an array (instead, received `%s`). When ' +
-          'specified, the final argument must be an array.',
-        currentHookNameInDev,
-        typeof deps,
-      );
-    }
-  }
-}
-
-function warnOnHookMismatchInDev(currentHookName) {
-  if (__DEV__) {
-    const componentName = getComponentNameFromFiber(currentlyRenderingFiber);
-    if (!didWarnAboutMismatchedHooksForComponent.has(componentName)) {
-      didWarnAboutMismatchedHooksForComponent.add(componentName);
-
-      if (hookTypesDev !== null) {
-        let table = '';
-
-        const secondColumnStart = 30;
-
-        for (let i = 0; i <= hookTypesUpdateIndexDev; i++) {
-          const oldHookName = hookTypesDev[i];
-          const newHookName =
-            i === hookTypesUpdateIndexDev ? currentHookName : oldHookName;
-
-          let row = `${i + 1}. ${oldHookName}`;
-
-          // Extra space so second column lines up
-          // lol @ IE not supporting String#repeat
-          while (row.length < secondColumnStart) {
-            row += ' ';
-          }
-
-          row += newHookName + '\n';
-
-          table += row;
-        }
-
-        console.error(
-          'React has detected a change in the order of Hooks called by %s. ' +
-            'This will lead to bugs and errors if not fixed. ' +
-            'For more information, read the Rules of Hooks: https://reactjs.org/link/rules-of-hooks\n\n' +
-            '   Previous render            Next render\n' +
-            '   ------------------------------------------------------\n' +
-            '%s' +
-            '   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n',
-          componentName,
-          table,
-        );
-      }
-    }
-  }
-}
 
 function throwInvalidHookError() {
   throw new Error(
@@ -252,41 +154,15 @@ function throwInvalidHookError() {
   );
 }
 
+/**
+ * 判断依赖项是否相等
+ */
 function areHookInputsEqual(nextDeps, prevDeps) {
-  if (__DEV__) {
-    if (ignorePreviousDependencies) {
-      // Only true when this component is being hot reloaded.
-      return false;
-    }
-  }
 
   if (prevDeps === null) {
-    if (__DEV__) {
-      console.error(
-        '%s received a final argument during this render, but not during ' +
-          'the previous render. Even though the final argument is optional, ' +
-          'its type cannot change between renders.',
-        currentHookNameInDev,
-      );
-    }
     return false;
   }
 
-  if (__DEV__) {
-    // Don't bother comparing lengths in prod because these arrays should be
-    // passed inline.
-    if (nextDeps.length !== prevDeps.length) {
-      console.error(
-        'The final argument passed to %s changed size between renders. The ' +
-          'order and size of this array must remain constant.\n\n' +
-          'Previous: %s\n' +
-          'Incoming: %s',
-        currentHookNameInDev,
-        `[${prevDeps.join(', ')}]`,
-        `[${nextDeps.join(', ')}]`,
-      );
-    }
-  }
   for (let i = 0; i < prevDeps.length && i < nextDeps.length; i++) {
     if (is(nextDeps[i], prevDeps[i])) {
       continue;
@@ -296,6 +172,9 @@ function areHookInputsEqual(nextDeps, prevDeps) {
   return true;
 }
 
+/**
+ * 开始启动执行函数组件
+ */
 export function renderWithHooks(
   current,
   workInProgress,
@@ -307,6 +186,7 @@ export function renderWithHooks(
   renderLanes = nextRenderLanes;
   currentlyRenderingFiber = workInProgress;
 
+  // 重置函数组件 fiber 的状态
   workInProgress.memoizedState = null;
   workInProgress.updateQueue = null;
   workInProgress.lanes = NoLanes;
@@ -330,6 +210,7 @@ export function renderWithHooks(
       ? HooksDispatcherOnMount
       : HooksDispatcherOnUpdate;
 
+  // 执行函数组件
   let children = Component(props, secondArg);
 
   // Check if there was a render phase update
@@ -341,6 +222,7 @@ export function renderWithHooks(
       didScheduleRenderPhaseUpdateDuringThisPass = false;
       localIdCounter = 0;
 
+      // 最大可以在渲染中更新 25 次
       if (numberOfReRenders >= RE_RENDER_LIMIT) {
         throw new Error(
           'Too many re-renders. React limits the number of renders to prevent ' +
@@ -360,12 +242,14 @@ export function renderWithHooks(
         ? HooksDispatcherOnRerenderInDEV
         : HooksDispatcherOnRerender;
 
+      // 重新调用 Component 
       children = Component(props, secondArg);
     } while (didScheduleRenderPhaseUpdateDuringThisPass);
   }
 
   // We can assume the previous dispatcher is always this one, since we set it
   // at the beginning of the render phase and there's no re-entrance.
+  // 重置 ReactCurrentDispatcher，此后调用 hook 会报错
   ReactCurrentDispatcher.current = ContextOnlyDispatcher;
 
   // This check uses currentHook so that it works the same in DEV and prod bundles.
@@ -1342,7 +1226,7 @@ function rerenderState(initialState) {
  */
 function pushEffect(tag, create, destroy, deps) {
   const effect = {
-    tag,
+    tag, // fiber tag
     create,
     destroy,
     deps,
@@ -1370,21 +1254,6 @@ function pushEffect(tag, create, destroy, deps) {
 }
 
 let stackContainsErrorMessage = null;
-
-function getCallerStackFrame() {
-  // eslint-disable-next-line react-internal/prod-error-codes
-  const stackFrames = new Error('Error message').stack.split('\n');
-
-  // Some browsers (e.g. Chrome) include the error message in the stack
-  // but others (e.g. Firefox) do not.
-  if (stackContainsErrorMessage === null) {
-    stackContainsErrorMessage = stackFrames[0].includes('Error message');
-  }
-
-  return stackContainsErrorMessage
-    ? stackFrames.slice(3, 4).join('\n')
-    : stackFrames.slice(2, 3).join('\n');
-}
 
 /**
  * 挂载 ref
