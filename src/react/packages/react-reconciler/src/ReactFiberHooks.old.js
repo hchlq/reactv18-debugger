@@ -106,9 +106,6 @@ const {ReactCurrentDispatcher, ReactCurrentBatchConfig} = ReactSharedInternals;
 
 let didWarnAboutMismatchedHooksForComponent;
 let didWarnUncachedGetSnapshot;
-if (__DEV__) {
-  didWarnAboutMismatchedHooksForComponent = new Set();
-}
 
 // These are set right before calling the component.
 let renderLanes = NoLanes;
@@ -1153,7 +1150,6 @@ function mountSyncExternalStore(subscribe, getSnapshot, getServerSnapshot) {
 
   // Schedule an effect to subscribe to the store.
   mountEffect(subscribeToStore.bind(null, fiber, inst, subscribe), [subscribe]);
-
   // Schedule an effect to update the mutable instance fields. We will update
   // this whenever subscribe, getSnapshot, or value changes. Because there's no
   // clean-up function, and we track the deps correctly, we can call pushEffect
@@ -1435,6 +1431,7 @@ function updateEffectImpl(fiberFlags, hookFlags, create, deps) {
     }
   }
 
+  // 依赖不相等 或者 依赖项为 undefined
   currentlyRenderingFiber.flags |= fiberFlags;
 
   hook.memoizedState = pushEffect(
