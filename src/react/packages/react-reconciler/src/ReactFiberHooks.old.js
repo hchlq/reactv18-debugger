@@ -1321,19 +1321,6 @@ function mountEffect(create, deps) {
     create,
     deps,
   );
-  // if (
-  //   __DEV__ &&
-  //   enableStrictEffects &&
-  //   (currentlyRenderingFiber.mode & StrictEffectsMode) !== NoMode
-  // ) {
-  //   return mountEffectImpl(
-  //     MountPassiveDevEffect | PassiveEffect | PassiveStaticEffect,
-  //     HookPassive,
-  //     create,
-  //     deps,
-  //   );
-  // } else {
-  // }
 }
 
 function updateEffect(create, deps) {
@@ -1350,16 +1337,16 @@ function updateInsertionEffect(create, deps) {
 
 function mountLayoutEffect(create, deps) {
   let fiberFlags = UpdateEffect;
-  if (enableSuspenseLayoutEffectSemantics) {
-    fiberFlags |= LayoutStaticEffect;
-  }
-  if (
-    __DEV__ &&
-    enableStrictEffects &&
-    (currentlyRenderingFiber.mode & StrictEffectsMode) !== NoMode
-  ) {
-    fiberFlags |= MountLayoutDevEffect;
-  }
+  // if (enableSuspenseLayoutEffectSemantics) {
+  //   fiberFlags |= LayoutStaticEffect;
+  // }
+  // if (
+  //   __DEV__ &&
+  //   enableStrictEffects &&
+  //   (currentlyRenderingFiber.mode & StrictEffectsMode) !== NoMode
+  // ) {
+  //   fiberFlags |= MountLayoutDevEffect;
+  // }
   return mountEffectImpl(fiberFlags, HookLayout, create, deps);
 }
 
