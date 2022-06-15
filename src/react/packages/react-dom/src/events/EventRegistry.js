@@ -11,6 +11,7 @@ import {enableCreateEventHandleAPI} from 'shared/ReactFeatureFlags';
 
 export const allNativeEvents = new Set();
 
+// 支持自定义事件
 if (enableCreateEventHandleAPI) {
   allNativeEvents.add('beforeblur');
   allNativeEvents.add('afterblur');
@@ -18,6 +19,7 @@ if (enableCreateEventHandleAPI) {
 
 /**
  * Mapping from registration name to event name
+ * 映射注册的名字到事件名字
  */
 export const registrationNameDependencies = {};
 
@@ -30,32 +32,20 @@ export const registrationNameDependencies = {};
 export const possibleRegistrationNames = __DEV__ ? {} : null;
 // Trust the developer to only use possibleRegistrationNames in __DEV__
 
+// 注册两个阶段的事件
 export function registerTwoPhaseEvent(registrationName, dependencies) {
   registerDirectEvent(registrationName, dependencies);
   registerDirectEvent(registrationName + 'Capture', dependencies);
 }
 
+/**
+ * 注册事件
+ * @param {*} registrationName react 名字 e.g. onClick
+ * @param {*} dependencies 事件名列表
+ */
 export function registerDirectEvent(registrationName, dependencies) {
-  if (__DEV__) {
-    if (registrationNameDependencies[registrationName]) {
-      console.error(
-        'EventRegistry: More than one plugin attempted to publish the same ' +
-          'registration name, `%s`.',
-        registrationName,
-      );
-    }
-  }
 
   registrationNameDependencies[registrationName] = dependencies;
-
-  if (__DEV__) {
-    const lowerCasedName = registrationName.toLowerCase();
-    possibleRegistrationNames[lowerCasedName] = registrationName;
-
-    if (registrationName === 'onDoubleClick') {
-      possibleRegistrationNames.ondblclick = registrationName;
-    }
-  }
 
   for (let i = 0; i < dependencies.length; i++) {
     allNativeEvents.add(dependencies[i]);

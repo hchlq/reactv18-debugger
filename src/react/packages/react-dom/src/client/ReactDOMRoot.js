@@ -142,27 +142,6 @@ export function createRoot(container, options) {
   let transitionCallbacks = null;
 
   if (options !== null && options !== undefined) {
-    if (__DEV__) {
-      if (options.hydrate) {
-        console.warn(
-          'hydrate through createRoot is deprecated. Use ReactDOMClient.hydrateRoot(container, <App />) instead.',
-        );
-      } else {
-        if (
-          typeof options === 'object' &&
-          options !== null &&
-          options.$$typeof === REACT_ELEMENT_TYPE
-        ) {
-          console.error(
-            'You passed a JSX element to createRoot. You probably meant to ' +
-              'call root.render instead. ' +
-              'Example usage:\n\n' +
-              '  let root = createRoot(domContainer);\n' +
-              '  root.render(<App />);',
-          );
-        }
-      }
-    }
     if (options.unstable_strictMode === true) {
       isStrictMode = true;
     }
@@ -197,6 +176,8 @@ export function createRoot(container, options) {
 
   const rootContainerElement =
     container.nodeType === COMMENT_NODE ? container.parentNode : container;
+  // 注册事件到根容器上
+  // rootContainerElement 就是根容器
   listenToAllSupportedEvents(rootContainerElement);
 
   return new ReactDOMRoot(root);

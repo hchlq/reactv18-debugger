@@ -182,6 +182,7 @@ export const mediaEventTypes = [
   'waiting',
 ];
 
+// 不代理的事件列表
 // We should not delegate these events to the container, but rather
 // set them on the actual target element itself. This is primarily
 // because these events do not consistently bubble in the DOM.
@@ -266,15 +267,6 @@ function dispatchEventsForPlugins(
 }
 
 export function listenToNonDelegatedEvent(domEventName, targetElement) {
-  if (__DEV__) {
-    if (!nonDelegatedEvents.has(domEventName)) {
-      console.error(
-        'Did not expect a listenToNonDelegatedEvent() call for "%s". ' +
-          'This is a bug in React. Please file an issue.',
-        domEventName,
-      );
-    }
-  }
   const isCapturePhaseListener = false;
   const listenerSet = getEventListenerSet(targetElement);
   const listenerSetKey = getListenerSetKey(
@@ -297,15 +289,6 @@ export function listenToNativeEvent(
   isCapturePhaseListener,
   target,
 ) {
-  if (__DEV__) {
-    if (nonDelegatedEvents.has(domEventName) && !isCapturePhaseListener) {
-      console.error(
-        'Did not expect a listenToNativeEvent() call for "%s" in the bubble phase. ' +
-          'This is a bug in React. Please file an issue.',
-        domEventName,
-      );
-    }
-  }
 
   let eventSystemFlags = 0;
   if (isCapturePhaseListener) {
@@ -348,19 +331,27 @@ export function listenToNativeEventForNonManagedEventTarget(
 
 const listeningMarker = '_reactListening' + Math.random().toString(36).slice(2);
 
+/**
+ * 注册支持的事件
+ */
 export function listenToAllSupportedEvents(rootContainerElement) {
   if (!rootContainerElement[listeningMarker]) {
     rootContainerElement[listeningMarker] = true;
+
     allNativeEvents.forEach((domEventName) => {
       // We handle selectionchange separately because it
       // doesn't bubble and needs to be on the document.
       if (domEventName !== 'selectionchange') {
+        // 如果改事件是需要事件代理，在捕获和冒泡事件都会被触发
         if (!nonDelegatedEvents.has(domEventName)) {
+          // 注册冒泡阶段事件
           listenToNativeEvent(domEventName, false, rootContainerElement);
         }
+        // 注册捕获阶段事件
         listenToNativeEvent(domEventName, true, rootContainerElement);
       }
     });
+
     const ownerDocument =
       rootContainerElement.nodeType === DOCUMENT_NODE
         ? rootContainerElement
@@ -370,6 +361,7 @@ export function listenToAllSupportedEvents(rootContainerElement) {
       // but it is attached to the document.
       if (!ownerDocument[listeningMarker]) {
         ownerDocument[listeningMarker] = true;
+        // 在 document 上注册 selectionchange，冒泡阶段触发的
         listenToNativeEvent('selectionchange', false, ownerDocument);
       }
     }
