@@ -246,18 +246,20 @@ export function processDispatchQueue(dispatchQueue, eventSystemFlags) {
 
 function dispatchEventsForPlugins(
   domEventName,
-  eventSystemFlags,
+  eventSystemFlags, // 冒泡阶段的事件 flag 为 0
   nativeEvent,
   targetInst,
   targetContainer,
 ) {
-  if (domEventName === 'click') {
-    console.log('eventSystemFlags: ', domEventName, eventSystemFlags)
-  }
+  // if (domEventName === 'click') {
+  //   console.log('eventSystemFlags: ', domEventName, eventSystemFlags)
+  // }
+
   // 获取事件对象
   const nativeEventTarget = getEventTarget(nativeEvent);
   const dispatchQueue = [];
 
+  // 提取事件
   extractEvents(
     dispatchQueue,
     domEventName,
@@ -303,7 +305,9 @@ export function listenToNativeEvent(
     // 捕获阶段触发的事件
     eventSystemFlags |= IS_CAPTURE_PHASE;
   }
-
+  // if (domEventName === 'click') {
+  //   console.log(eventSystemFlags)
+  // }
   addTrappedEventListener(
     target,
     domEventName,
@@ -483,6 +487,9 @@ function isMatchingRootContainer(grandContainer, targetContainer) {
   );
 }
 
+/**
+ * 派发事件给插件事件系统
+ */
 export function dispatchEventForPluginEventSystem(
   domEventName,
   eventSystemFlags,
