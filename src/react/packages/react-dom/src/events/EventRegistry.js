@@ -35,6 +35,7 @@ export const possibleRegistrationNames = __DEV__ ? {} : null;
 // 注册两个阶段的事件
 export function registerTwoPhaseEvent(registrationName, dependencies) {
   registerDirectEvent(registrationName, dependencies);
+  // 捕获阶段的事件名
   registerDirectEvent(registrationName + 'Capture', dependencies);
 }
 
