@@ -1306,6 +1306,10 @@ export function deferredUpdates(fn) {
   }
 }
 
+/**
+ * 批量更新
+ * 其实就是增加了 BatchedContext 的执行上下文标记
+ */
 export function batchedUpdates(fn, a) {
   const prevExecutionContext = executionContext;
   executionContext |= BatchedContext;
@@ -1316,9 +1320,10 @@ export function batchedUpdates(fn, a) {
     // If there were legacy sync updates, flush them at the end of the outer
     // most batchedUpdates-like method.
     if (
-      executionContext === NoContext &&
+      executionContext === NoContext 
+      // &&
       // Treat `act` as if it's inside `batchedUpdates`, even in legacy mode.
-      !(__DEV__ && ReactCurrentActQueue.isBatchingLegacy)
+      // !(__DEV__ && ReactCurrentActQueue.isBatchingLegacy)
     ) {
       resetRenderTimer();
       flushSyncCallbacksOnlyInLegacyMode();

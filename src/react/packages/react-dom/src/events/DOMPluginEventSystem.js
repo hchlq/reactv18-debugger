@@ -19,7 +19,6 @@ import {
   IS_EVENT_HANDLE_NON_MANAGED_NODE,
   IS_NON_DELEGATED,
 } from './EventSystemFlags';
-import {isReplayingEvent} from './CurrentReplayingEvent';
 
 import {
   HostRoot,
@@ -252,8 +251,13 @@ function dispatchEventsForPlugins(
   targetInst,
   targetContainer,
 ) {
+  if (domEventName === 'click') {
+    console.log('eventSystemFlags: ', domEventName, eventSystemFlags)
+  }
+  // 获取事件对象
   const nativeEventTarget = getEventTarget(nativeEvent);
   const dispatchQueue = [];
+
   extractEvents(
     dispatchQueue,
     domEventName,
@@ -263,6 +267,7 @@ function dispatchEventsForPlugins(
     eventSystemFlags,
     targetContainer,
   );
+
   processDispatchQueue(dispatchQueue, eventSystemFlags);
 }
 
@@ -284,16 +289,21 @@ export function listenToNonDelegatedEvent(domEventName, targetElement) {
   }
 }
 
+/**
+ * 监听原生的事件
+ */
 export function listenToNativeEvent(
   domEventName,
   isCapturePhaseListener,
   target,
 ) {
-
+  // 默认的事件标识是 0
   let eventSystemFlags = 0;
   if (isCapturePhaseListener) {
+    // 捕获阶段触发的事件
     eventSystemFlags |= IS_CAPTURE_PHASE;
   }
+
   addTrappedEventListener(
     target,
     domEventName,
@@ -368,6 +378,9 @@ export function listenToAllSupportedEvents(rootContainerElement) {
   }
 }
 
+/**
+ * 添加事件监听
+ */
 function addTrappedEventListener(
   targetContainer,
   domEventName,
@@ -375,30 +388,19 @@ function addTrappedEventListener(
   isCapturePhaseListener,
   isDeferredListenerForLegacyFBSupport,
 ) {
+  // 1. 创建事件函数
   let listener = createEventListenerWrapperWithPriority(
     targetContainer,
     domEventName,
     eventSystemFlags,
   );
+
   // If passive option is not supported, then the event will be
   // active and not passive.
   let isPassiveListener = undefined;
-  if (passiveBrowserEventsSupported) {
-    // Browsers introduced an intervention, making these events
-    // passive by default on document. React doesn't bind them
-    // to document anymore, but changing this now would undo
-    // the performance wins from the change. So we emulate
-    // the existing behavior manually on the roots now.
-    // https://github.com/facebook/react/issues/19651
-    if (
-      domEventName === 'touchstart' ||
-      domEventName === 'touchmove' ||
-      domEventName === 'wheel'
-    ) {
-      isPassiveListener = true;
-    }
-  }
 
+  // 2. 确定 container
+  // 一般都是 targetContainer
   targetContainer =
     enableLegacyFBSupport && isDeferredListenerForLegacyFBSupport
       ? targetContainer.ownerDocument
@@ -416,21 +418,12 @@ function addTrappedEventListener(
   // browsers do not support this today, and given this is
   // to support legacy code patterns, it's likely they'll
   // need support for such browsers.
-  if (enableLegacyFBSupport && isDeferredListenerForLegacyFBSupport) {
-    const originalListener = listener;
-    listener = function (...p) {
-      removeEventListener(
-        targetContainer,
-        domEventName,
-        unsubscribeListener,
-        isCapturePhaseListener,
-      );
-      return originalListener.apply(this, p);
-    };
-  }
+
+  // 3. 注册监听事件
   // TODO: There are too many combinations here. Consolidate them.
   if (isCapturePhaseListener) {
     if (isPassiveListener !== undefined) {
+      // capture + passive
       unsubscribeListener = addEventCaptureListenerWithPassiveFlag(
         targetContainer,
         domEventName,
@@ -438,6 +431,7 @@ function addTrappedEventListener(
         isPassiveListener,
       );
     } else {
+      // capture + non-passive
       unsubscribeListener = addEventCaptureListener(
         targetContainer,
         domEventName,
@@ -446,6 +440,7 @@ function addTrappedEventListener(
     }
   } else {
     if (isPassiveListener !== undefined) {
+      // bubble + passive
       unsubscribeListener = addEventBubbleListenerWithPassiveFlag(
         targetContainer,
         domEventName,
@@ -453,6 +448,7 @@ function addTrappedEventListener(
         isPassiveListener,
       );
     } else {
+      // bubble + non-passive
       unsubscribeListener = addEventBubbleListener(
         targetContainer,
         domEventName,
@@ -476,6 +472,9 @@ function deferClickToDocumentForLegacyFBSupport(domEventName, targetContainer) {
   );
 }
 
+/**
+ * 是否匹配到了根容器
+ */
 function isMatchingRootContainer(grandContainer, targetContainer) {
   return (
     grandContainer === targetContainer ||
@@ -496,25 +495,12 @@ export function dispatchEventForPluginEventSystem(
     (eventSystemFlags & IS_EVENT_HANDLE_NON_MANAGED_NODE) === 0 &&
     (eventSystemFlags & IS_NON_DELEGATED) === 0
   ) {
+    // 捕获阶段事件
     const targetContainerNode = targetContainer;
 
     // If we are using the legacy FB support flag, we
     // defer the event to the null with a one
     // time event listener so we can defer the event.
-    if (
-      enableLegacyFBSupport &&
-      // If our event flags match the required flags for entering
-      // FB legacy mode and we are processing the "click" event,
-      // then we can defer the event to the "document", to allow
-      // for legacy FB support, where the expected behavior was to
-      // match React < 16 behavior of delegated clicks to the doc.
-      domEventName === 'click' &&
-      (eventSystemFlags & SHOULD_NOT_DEFER_CLICK_FOR_FB_SUPPORT_MODE) === 0 &&
-      !isReplayingEvent(nativeEvent)
-    ) {
-      deferClickToDocumentForLegacyFBSupport(domEventName, targetContainer);
-      return;
-    }
     if (targetInst !== null) {
       // The below logic attempts to work out if we need to change
       // the target fiber to a different ancestor. We had similar logic
@@ -530,15 +516,19 @@ export function dispatchEventForPluginEventSystem(
       let node = targetInst;
 
       mainLoop: while (true) {
+        // 从 当前 fiber 实例开始向上查找
         if (node === null) {
           return;
         }
         const nodeTag = node.tag;
         if (nodeTag === HostRoot || nodeTag === HostPortal) {
+          // 根容器
           let container = node.stateNode.containerInfo;
           if (isMatchingRootContainer(container, targetContainerNode)) {
+            // 匹配到了根容器
             break;
           }
+
           if (nodeTag === HostPortal) {
             // The target is a portal, but it's not the rootContainer we're looking for.
             // Normally portals handle their own events all the way down to the root.
@@ -584,12 +574,14 @@ export function dispatchEventForPluginEventSystem(
     }
   }
 
+  // 事件处理需要批量更新
   batchedUpdates(() =>
+    // 增加一个 BatchedUpdateContext 上下文标记去执行 dispatchEventForPlugins
     dispatchEventsForPlugins(
       domEventName,
       eventSystemFlags,
       nativeEvent,
-      ancestorInst,
+      ancestorInst, // 不是多颗树的情况，ancestorInst 就是 targetInst
       targetContainer,
     ),
   );
