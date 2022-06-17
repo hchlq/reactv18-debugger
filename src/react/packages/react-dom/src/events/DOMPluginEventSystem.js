@@ -8,7 +8,6 @@
  */
 
 import {
-  SHOULD_NOT_DEFER_CLICK_FOR_FB_SUPPORT_MODE,
   IS_LEGACY_FB_SUPPORT_MODE,
   SHOULD_NOT_PROCESS_POLYFILL_EVENT_PLUGINS,
 } from './EventSystemFlags';
@@ -37,7 +36,6 @@ import {
 import {COMMENT_NODE} from '../shared/HTMLNodeType';
 import {batchedUpdates} from './ReactDOMUpdateBatching';
 import getListener from './getListener';
-import {passiveBrowserEventsSupported} from './checkPassiveEvents';
 
 import {
   enableLegacyFBSupport,
@@ -51,7 +49,6 @@ import {
 import {DOCUMENT_NODE} from '../shared/HTMLNodeType';
 import {createEventListenerWrapperWithPriority} from './ReactDOMEventListener';
 import {
-  removeEventListener,
   addEventCaptureListener,
   addEventBubbleListener,
   addEventBubbleListenerWithPassiveFlag,
@@ -610,41 +607,24 @@ export function accumulateSinglePhaseListeners(
   accumulateTargetOnly,
   nativeEvent,
 ) {
+  // 捕获阶段的事件名字
   const captureName = reactName !== null ? reactName + 'Capture' : null;
+
+  // 确定捕获阶段注册的 react 事件名
   const reactEventName = inCapturePhase ? captureName : reactName;
   let listeners = [];
 
   let instance = targetFiber;
   let lastHostComponent = null;
 
+  // 收集所有的从该元素到根容器的事件处理函数
   // Accumulate all instances and listeners via the target -> root path.
   while (instance !== null) {
     const {stateNode, tag} = instance;
     // Handle listeners that are on HostComponents (i.e. <div>)
     if (tag === HostComponent && stateNode !== null) {
+      // 最后的普通元素
       lastHostComponent = stateNode;
-
-      // createEventHandle listeners
-      if (enableCreateEventHandleAPI) {
-        const eventHandlerListeners =
-          getEventHandlerListeners(lastHostComponent);
-        if (eventHandlerListeners !== null) {
-          eventHandlerListeners.forEach((entry) => {
-            if (
-              entry.type === nativeEventType &&
-              entry.capture === inCapturePhase
-            ) {
-              listeners.push(
-                createDispatchListener(
-                  instance,
-                  entry.callback,
-                  lastHostComponent,
-                ),
-              );
-            }
-          });
-        }
-      }
 
       // Standard React on* listeners, i.e. onClick or onClickCapture
       if (reactEventName !== null) {
@@ -655,57 +635,15 @@ export function accumulateSinglePhaseListeners(
           );
         }
       }
-    } else if (
-      enableCreateEventHandleAPI &&
-      enableScopeAPI &&
-      tag === ScopeComponent &&
-      lastHostComponent !== null &&
-      stateNode !== null
-    ) {
-      // Scopes
-      const reactScopeInstance = stateNode;
-      const eventHandlerListeners =
-        getEventHandlerListeners(reactScopeInstance);
-      if (eventHandlerListeners !== null) {
-        eventHandlerListeners.forEach((entry) => {
-          if (
-            entry.type === nativeEventType &&
-            entry.capture === inCapturePhase
-          ) {
-            listeners.push(
-              createDispatchListener(
-                instance,
-                entry.callback,
-                lastHostComponent,
-              ),
-            );
-          }
-        });
-      }
     }
+
     // If we are only accumulating events for the target, then we don't
     // continue to propagate through the React fiber tree to find other
     // listeners.
     if (accumulateTargetOnly) {
       break;
     }
-    // If we are processing the onBeforeBlur event, then we need to take
-    // into consideration that part of the React tree might have been hidden
-    // or deleted (as we're invoking this event during commit). We can find
-    // this out by checking if intercept fiber set on the event matches the
-    // current instance fiber. In which case, we should clear all existing
-    // listeners.
-    if (enableCreateEventHandleAPI && nativeEvent.type === 'beforeblur') {
-      // $FlowFixMe: internal field
-      const detachedInterceptFiber = nativeEvent._detachedInterceptFiber;
-      if (
-        detachedInterceptFiber !== null &&
-        (detachedInterceptFiber === instance ||
-          detachedInterceptFiber === instance.alternate)
-      ) {
-        listeners = [];
-      }
-    }
+
     instance = instance.return;
   }
   return listeners;
