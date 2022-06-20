@@ -177,7 +177,7 @@ export function renderWithHooks(
   workInProgress,
   Component,
   props,
-  secondArg,
+  secondArg, // 一般是 ref
   nextRenderLanes,
 ) {
   renderLanes = nextRenderLanes;
