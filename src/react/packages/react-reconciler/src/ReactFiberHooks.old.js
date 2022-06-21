@@ -139,7 +139,6 @@ let globalClientIdCounter = 0;
 
 const RE_RENDER_LIMIT = 25;
 
-
 function throwInvalidHookError() {
   throw new Error(
     'Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for' +
@@ -155,7 +154,6 @@ function throwInvalidHookError() {
  * 判断依赖项是否相等
  */
 function areHookInputsEqual(nextDeps, prevDeps) {
-
   if (prevDeps === null) {
     return false;
   }
@@ -239,7 +237,7 @@ export function renderWithHooks(
         ? HooksDispatcherOnRerenderInDEV
         : HooksDispatcherOnRerender;
 
-      // 重新调用 Component 
+      // 重新调用 Component
       children = Component(props, secondArg);
     } while (didScheduleRenderPhaseUpdateDuringThisPass);
   }
@@ -387,7 +385,7 @@ function mountWorkInProgressHook() {
 }
 
 /**
- * 找到对应的上次对应顺序的 hook 
+ * 找到对应的上次对应顺序的 hook
  */
 function updateWorkInProgressHook() {
   // This function is used both for updates and for re-renders triggered by a
@@ -1222,7 +1220,7 @@ function rerenderState(initialState) {
  */
 function pushEffect(tag, create, destroy, deps) {
   const effect = {
-    tag, // fiber tag
+    tag,
     create,
     destroy,
     deps,
@@ -1271,8 +1269,11 @@ function updateRef() {
  */
 function mountEffectImpl(fiberFlags, hookFlags, create, deps) {
   const hook = mountWorkInProgressHook();
+
   const nextDeps = deps === undefined ? null : deps;
+
   currentlyRenderingFiber.flags |= fiberFlags;
+
   hook.memoizedState = pushEffect(
     // 用于执行 effect 时判断的标记
     HookHasEffect | hookFlags,
@@ -1336,18 +1337,7 @@ function updateInsertionEffect(create, deps) {
 }
 
 function mountLayoutEffect(create, deps) {
-  let fiberFlags = UpdateEffect;
-  // if (enableSuspenseLayoutEffectSemantics) {
-  //   fiberFlags |= LayoutStaticEffect;
-  // }
-  // if (
-  //   __DEV__ &&
-  //   enableStrictEffects &&
-  //   (currentlyRenderingFiber.mode & StrictEffectsMode) !== NoMode
-  // ) {
-  //   fiberFlags |= MountLayoutDevEffect;
-  // }
-  return mountEffectImpl(fiberFlags, HookLayout, create, deps);
+  return mountEffectImpl(UpdateEffect, HookLayout, create, deps);
 }
 
 function updateLayoutEffect(create, deps) {

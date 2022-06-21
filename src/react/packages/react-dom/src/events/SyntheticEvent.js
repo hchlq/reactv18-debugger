@@ -153,6 +153,7 @@ const UIEventInterface = {
   view: 0,
   detail: 0,
 };
+
 export const SyntheticUIEvent = createSyntheticEvent(UIEventInterface);
 
 let lastMovementX;
@@ -203,6 +204,7 @@ const MouseEventInterface = {
     if ('movementX' in event) {
       return event.movementX;
     }
+    // polyfill movementX
     updateMouseMovementPolyfillState(event);
     return lastMovementX;
   },

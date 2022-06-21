@@ -599,6 +599,9 @@ function createDispatchListener(instance, listener, currentTarget) {
   };
 }
 
+/**
+ * 获取单一阶段的事件处理处理函数
+ */
 export function accumulateSinglePhaseListeners(
   targetFiber,
   reactName,
@@ -618,6 +621,7 @@ export function accumulateSinglePhaseListeners(
   let lastHostComponent = null;
 
   // 收集所有的从该元素到根容器的事件处理函数
+  // e.g. <div onClick={ ... }> <h1 onClick={ ... }></h1> </div> ，会从 h1 -> div 收集
   // Accumulate all instances and listeners via the target -> root path.
   while (instance !== null) {
     const {stateNode, tag} = instance;
@@ -640,6 +644,7 @@ export function accumulateSinglePhaseListeners(
     // If we are only accumulating events for the target, then we don't
     // continue to propagate through the React fiber tree to find other
     // listeners.
+    // 只需要 target 上的事件处理函数
     if (accumulateTargetOnly) {
       break;
     }
