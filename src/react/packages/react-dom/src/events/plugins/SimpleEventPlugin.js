@@ -105,6 +105,7 @@ function extractEvents(
     case 'mouseout':
     case 'mouseover':
     case 'contextmenu':
+      // 鼠标事件合成事件
       SyntheticEventCtor = SyntheticMouseEvent;
       break;
     case 'drag':
@@ -115,23 +116,28 @@ function extractEvents(
     case 'dragover':
     case 'dragstart':
     case 'drop':
+      // 拖拽事件合成对象
       SyntheticEventCtor = SyntheticDragEvent;
       break;
     case 'touchcancel':
     case 'touchend':
     case 'touchmove':
     case 'touchstart':
+      // touch 事件合成对象
       SyntheticEventCtor = SyntheticTouchEvent;
       break;
     case ANIMATION_END:
     case ANIMATION_ITERATION:
     case ANIMATION_START:
+      // animation 事件合成对象
       SyntheticEventCtor = SyntheticAnimationEvent;
       break;
     case TRANSITION_END:
+      // transition 事件合成对象
       SyntheticEventCtor = SyntheticTransitionEvent;
       break;
     case 'scroll':
+      // scroll 事件合成对象
       SyntheticEventCtor = SyntheticUIEvent;
       break;
     case 'wheel':
@@ -140,6 +146,7 @@ function extractEvents(
     case 'copy':
     case 'cut':
     case 'paste':
+      // cliBoard 事件合成对象
       SyntheticEventCtor = SyntheticClipboardEvent;
       break;
     case 'gotpointercapture':
@@ -150,6 +157,7 @@ function extractEvents(
     case 'pointerout':
     case 'pointerover':
     case 'pointerup':
+      // Pointer 事件合成对象
       SyntheticEventCtor = SyntheticPointerEvent;
       break;
     default:
@@ -183,12 +191,13 @@ function extractEvents(
 
   if (listeners.length > 0) {
     // Intentionally create event lazily.
+    // 创建合成对象
     const event = new SyntheticEventCtor(
-      reactName,
-      reactEventType,
-      null,
-      nativeEvent,
-      nativeEventTarget,
+      reactName, // 注册的 react 事件名
+      reactEventType, // 事件类型
+      null, // fiber 实例
+      nativeEvent, // 原生事件对象
+      nativeEventTarget, // 原声事件对象对应的目标元素
     );
     // 添加到派发队列中
     dispatchQueue.push({event, listeners});

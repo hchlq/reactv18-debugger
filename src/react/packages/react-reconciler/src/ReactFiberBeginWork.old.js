@@ -327,23 +327,8 @@ function updateForwardRef(
   // hasn't yet mounted. This happens after the first render suspends.
   // We'll need to figure out if this is fine or can cause issues.
 
-  if (__DEV__) {
-    if (workInProgress.type !== workInProgress.elementType) {
-      // Lazy component props can't be validated in createElement
-      // because they're only guaranteed to be resolved here.
-      const innerPropTypes = Component.propTypes;
-      if (innerPropTypes) {
-        checkPropTypes(
-          innerPropTypes,
-          nextProps, // Resolved props
-          'prop',
-          getComponentNameFromType(Component),
-        );
-      }
-    }
-  }
-
   const render = Component.render;
+  // 获取 forward fiber上的 ref 对象
   const ref = workInProgress.ref;
 
   // The rest is a fork of updateFunctionComponent
@@ -353,52 +338,21 @@ function updateForwardRef(
   if (enableSchedulingProfiler) {
     markComponentRenderStarted(workInProgress);
   }
-  if (__DEV__) {
-    ReactCurrentOwner.current = workInProgress;
-    setIsRendering(true);
-    nextChildren = renderWithHooks(
-      current,
-      workInProgress,
-      render,
-      nextProps,
-      ref,
-      renderLanes,
-    );
-    hasId = checkDidRenderIdHook();
-    if (
-      debugRenderPhaseSideEffectsForStrictMode &&
-      workInProgress.mode & StrictLegacyMode
-    ) {
-      setIsStrictModeForDevtools(true);
-      try {
-        nextChildren = renderWithHooks(
-          current,
-          workInProgress,
-          render,
-          nextProps,
-          ref,
-          renderLanes,
-        );
-        hasId = checkDidRenderIdHook();
-      } finally {
-        setIsStrictModeForDevtools(false);
-      }
-    }
-    setIsRendering(false);
-  } else {
-    nextChildren = renderWithHooks(
-      current,
-      workInProgress,
-      render,
-      nextProps,
-      ref,
-      renderLanes,
-    );
-    hasId = checkDidRenderIdHook();
-  }
-  if (enableSchedulingProfiler) {
-    markComponentRenderStopped();
-  }
+
+  nextChildren = renderWithHooks(
+    current,
+    workInProgress,
+    render,
+    nextProps,
+    ref,
+    renderLanes,
+  );
+
+  hasId = checkDidRenderIdHook();
+
+  // if (enableSchedulingProfiler) {
+  //   markComponentRenderStopped();
+  // }
 
   if (current !== null && !didReceiveUpdate) {
     bailoutHooks(current, workInProgress, renderLanes);
@@ -1172,7 +1126,7 @@ function updateHostRoot(current, workInProgress, renderLanes) {
 
   // Caution: React DevTools currently depends on this property
   // being called "element".
-  
+
   const nextChildren = nextState.element;
 
   // Root is not dehydrated. Either this is a client-only root, or it
@@ -1277,7 +1231,7 @@ function mountLazyComponent(
 
   const resolvedTag = (workInProgress.tag = resolveLazyComponentTag(Component));
   const resolvedProps = resolveDefaultProps(Component, props);
-  
+
   let child;
   switch (resolvedTag) {
     case FunctionComponent: {
@@ -1321,7 +1275,7 @@ function mountLazyComponent(
       return child;
     }
   }
-  
+
   let hint = '';
 
   // This message intentionally doesn't mention ForwardRef or MemoComponent
@@ -3381,11 +3335,11 @@ function beginWork(current, workInProgress, renderLanes) {
   // move this assignment out of the common path and into each branch.
   //! 重置 workInProgress.lanes 为 NoLanes
   workInProgress.lanes = NoLanes;
-  
+
   // if (workInProgress.tag === FunctionComponent) {
   //   workInProgress.lanes = 1
   // }
-  
+
   // if (workInProgress.tag === FunctionComponent) {
   //   console.log('--------')
   //   let v = workInProgress.lanes

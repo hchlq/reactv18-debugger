@@ -91,6 +91,7 @@ function extractEvents(
     eventSystemFlags,
     targetContainer,
   );
+
   const shouldProcessPolyfillPlugins =
     (eventSystemFlags & SHOULD_NOT_PROCESS_POLYFILL_EVENT_PLUGINS) === 0;
   // We don't process these events unless we are in the
@@ -210,8 +211,10 @@ function processDispatchQueueItemsInOrder(
 ) {
   let previousInstance;
   if (inCapturePhase) {
+    // 捕获阶段
     for (let i = dispatchListeners.length - 1; i >= 0; i--) {
       const {instance, currentTarget, listener} = dispatchListeners[i];
+      // instance !== previousInstance 总是为 true
       if (instance !== previousInstance && event.isPropagationStopped()) {
         return;
       }
@@ -219,8 +222,11 @@ function processDispatchQueueItemsInOrder(
       previousInstance = instance;
     }
   } else {
+    // 冒泡阶段
     for (let i = 0; i < dispatchListeners.length; i++) {
       const {instance, currentTarget, listener} = dispatchListeners[i];
+      // 停止了冒泡
+      // instance !== previousInstance 总是为 true
       if (instance !== previousInstance && event.isPropagationStopped()) {
         return;
       }
@@ -243,18 +249,22 @@ export function processDispatchQueue(dispatchQueue, eventSystemFlags) {
 
 function dispatchEventsForPlugins(
   domEventName,
-  eventSystemFlags,
+  eventSystemFlags, // 冒泡阶段的事件 flag 为 0
   nativeEvent,
   targetInst,
   targetContainer,
 ) {
-  if (domEventName === 'click') {
-    console.log('eventSystemFlags: ', domEventName, eventSystemFlags);
-  }
+  // if (domEventName === 'click') {
+  //   console.log('eventSystemFlags: ', domEventName, eventSystemFlags)
+  // }
+
   // 获取事件对象
   const nativeEventTarget = getEventTarget(nativeEvent);
+
+  // [{event, listeners}, {event2, listeners2}]
   const dispatchQueue = [];
 
+  // 提取事件
   extractEvents(
     dispatchQueue,
     domEventName,
@@ -300,7 +310,9 @@ export function listenToNativeEvent(
     // 捕获阶段触发的事件
     eventSystemFlags |= IS_CAPTURE_PHASE;
   }
-
+  // if (domEventName === 'click') {
+  //   console.log(eventSystemFlags)
+  // }
   addTrappedEventListener(
     target,
     domEventName,
@@ -480,6 +492,9 @@ function isMatchingRootContainer(grandContainer, targetContainer) {
   );
 }
 
+/**
+ * 派发事件给插件事件系统
+ */
 export function dispatchEventForPluginEventSystem(
   domEventName,
   eventSystemFlags,
@@ -592,6 +607,9 @@ function createDispatchListener(instance, listener, currentTarget) {
   };
 }
 
+/**
+ * 获取单一阶段的事件处理处理函数
+ */
 export function accumulateSinglePhaseListeners(
   targetFiber,
   reactName,
@@ -611,6 +629,7 @@ export function accumulateSinglePhaseListeners(
   let lastHostComponent = null;
 
   // 收集所有的从该元素到根容器的事件处理函数
+  // e.g. <div onClick={ ... }> <h1 onClick={ ... }></h1> </div> ，会从 h1 -> div 收集
   // Accumulate all instances and listeners via the target -> root path.
   while (instance !== null) {
     const {stateNode, tag} = instance;
@@ -633,6 +652,7 @@ export function accumulateSinglePhaseListeners(
     // If we are only accumulating events for the target, then we don't
     // continue to propagate through the React fiber tree to find other
     // listeners.
+    // 只需要 target 上的事件处理函数
     if (accumulateTargetOnly) {
       break;
     }
