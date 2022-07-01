@@ -24,15 +24,12 @@ import {
   enableUpdaterTracking,
   enableTransitionTracing,
 } from 'shared/ReactFeatureFlags';
-import {initializeUpdateQueue} from './ReactUpdateQueue.old';
+import {initializeUpdateQueue} from './ReactFiberClassUpdateQueue.old';
 import {LegacyRoot, ConcurrentRoot} from './ReactRootTags';
 import {createCache, retainCache} from './ReactFiberCacheComponent.old';
 
-/**
- * fiberRoot 实例
- */
 function FiberRootNode(
-  containerInfo, // 根容器
+  containerInfo,
   tag,
   hydrate,
   identifierPrefix,
@@ -62,10 +59,11 @@ function FiberRootNode(
   this.entangledLanes = NoLanes;
   this.entanglements = createLaneMap(NoLanes);
 
+  this.hiddenUpdates = createLaneMap(null);
+
   this.identifierPrefix = identifierPrefix;
   this.onRecoverableError = onRecoverableError;
 
-  // true
   if (enableCache) {
     this.pooledCache = null;
     this.pooledCacheLanes = NoLanes;
@@ -75,12 +73,11 @@ function FiberRootNode(
     this.mutableSourceEagerHydrationData = null;
   }
 
-  // false
   if (enableSuspenseCallback) {
     this.hydrationCallbacks = null;
   }
 
-  // false
+  this.incompleteTransitions = new Map();
   if (enableTransitionTracing) {
     this.transitionCallbacks = null;
     const transitionLanesMap = (this.transitionLanes = []);
@@ -89,13 +86,11 @@ function FiberRootNode(
     }
   }
 
-  // enableProfilerTimer: false, enableProfilerCommitHooks: false
   if (enableProfilerTimer && enableProfilerCommitHooks) {
     this.effectDuration = 0;
     this.passiveEffectDuration = 0;
   }
 
-  // false
   if (enableUpdaterTracking) {
     this.memoizedUpdaters = new Set();
     const pendingUpdatersLaneMap = (this.pendingUpdatersLaneMap = []);
@@ -114,12 +109,8 @@ function FiberRootNode(
         break;
     }
   }
-
 }
 
-/**
- * 创建 fiberRoot
- */
 export function createFiberRoot(
   containerInfo,
   tag,
@@ -136,7 +127,6 @@ export function createFiberRoot(
   onRecoverableError,
   transitionCallbacks,
 ) {
-  // 1. 创建 fiberRoot
   const root = new FiberRootNode(
     containerInfo,
     tag,
@@ -144,31 +134,24 @@ export function createFiberRoot(
     identifierPrefix,
     onRecoverableError,
   );
-
-  // false
   if (enableSuspenseCallback) {
     root.hydrationCallbacks = hydrationCallbacks;
   }
 
-  // false
   if (enableTransitionTracing) {
     root.transitionCallbacks = transitionCallbacks;
   }
 
   // Cyclic construction. This cheats the type system right now because
   // stateNode is any.
-  // 创建 hostRootFiber
   const uninitializedFiber = createHostRootFiber(
     tag,
     isStrictMode,
     concurrentUpdatesByDefaultOverride,
   );
-
-  // rootFiber 和 fiberRoot 相关联
   root.current = uninitializedFiber;
   uninitializedFiber.stateNode = root;
 
-  // true
   if (enableCache) {
     const initialCache = createCache();
     retainCache(initialCache);
@@ -182,29 +165,21 @@ export function createFiberRoot(
     // retained separately.
     root.pooledCache = initialCache;
     retainCache(initialCache);
-
     const initialState = {
       element: initialChildren,
       isDehydrated: hydrate,
       cache: initialCache,
-      transitions: null,
-      pendingSuspenseBoundaries: null,
     };
-
     uninitializedFiber.memoizedState = initialState;
   } else {
     const initialState = {
-      element: initialChildren, // 默认为空
+      element: initialChildren,
       isDehydrated: hydrate,
       cache: null, // not enabled yet
-      transitions: null,
-      pendingSuspenseBoundaries: null,
     };
-    // 初始化 memoizedState
     uninitializedFiber.memoizedState = initialState;
   }
 
-  // 初始化 hostRootFiber.updateQueue
   initializeUpdateQueue(uninitializedFiber);
 
   return root;

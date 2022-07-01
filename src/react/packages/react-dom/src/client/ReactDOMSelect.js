@@ -121,9 +121,6 @@ function updateOptions(node, multiple, propValue, setDefaultSelected) {
  * selected.
  */
 
-/**
- * 给 props 合并上 value 默认值
- */
 export function getHostProps(element, props) {
   return assign({}, props, {
     value: undefined,

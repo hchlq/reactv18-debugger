@@ -59,7 +59,6 @@ function isSameOriginFrame(iframe) {
 function getActiveElementDeep() {
   let win = window;
   let element = getActiveElement();
-  
   while (element instanceof win.HTMLIFrameElement) {
     if (isSameOriginFrame(element)) {
       win = element.contentWindow;
@@ -68,7 +67,6 @@ function getActiveElementDeep() {
     }
     element = getActiveElement(win.document);
   }
-
   return element;
 }
 

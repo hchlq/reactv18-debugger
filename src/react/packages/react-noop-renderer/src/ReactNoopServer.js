@@ -63,12 +63,13 @@ const ReactNoopServer = ReactFizzServer({
     return null;
   },
 
-  pushTextInstance(target, text) {
+  pushTextInstance(target, text, responseState, textEmbedded) {
     const textInstance = {
       text,
       hidden: false,
     };
     target.push(Buffer.from(JSON.stringify(textInstance), 'utf8'), POP);
+    return false;
   },
   pushStartInstance(target, type, props) {
     const instance = {
@@ -84,6 +85,9 @@ const ReactNoopServer = ReactFizzServer({
   pushEndInstance(target, type, props) {
     target.push(POP);
   },
+
+  // This is a noop in ReactNoop
+  pushSegmentFinale(target, responseState, lastPushedText, textEmbedded) {},
 
   writeCompletedRoot(destination, responseState) {
     return true;

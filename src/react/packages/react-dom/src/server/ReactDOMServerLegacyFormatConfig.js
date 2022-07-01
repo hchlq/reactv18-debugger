@@ -10,6 +10,7 @@
 import {
   createResponseState as createResponseStateImpl,
   pushTextInstance as pushTextInstanceImpl,
+  pushSegmentFinale as pushSegmentFinaleImpl,
   writeStartCompletedSuspenseBoundary as writeStartCompletedSuspenseBoundaryImpl,
   writeStartClientRenderedSuspenseBoundary as writeStartClientRenderedSuspenseBoundaryImpl,
   writeEndCompletedSuspenseBoundary as writeEndCompletedSuspenseBoundaryImpl,
@@ -69,11 +70,30 @@ import {stringToChunk} from 'react-server/src/ReactServerStreamConfig';
 
 import escapeTextForBrowser from './escapeTextForBrowser';
 
-export function pushTextInstance(target, text, responseState) {
+export function pushTextInstance(target, text, responseState, textEmbedded) {
   if (responseState.generateStaticMarkup) {
     target.push(stringToChunk(escapeTextForBrowser(text)));
+    return false;
   } else {
-    pushTextInstanceImpl(target, text, responseState);
+    return pushTextInstanceImpl(target, text, responseState, textEmbedded);
+  }
+}
+
+export function pushSegmentFinale(
+  target,
+  responseState,
+  lastPushedText,
+  textEmbedded,
+) {
+  if (responseState.generateStaticMarkup) {
+    return;
+  } else {
+    return pushSegmentFinaleImpl(
+      target,
+      responseState,
+      lastPushedText,
+      textEmbedded,
+    );
   }
 }
 
@@ -91,6 +111,10 @@ export function writeStartCompletedSuspenseBoundary(
 export function writeStartClientRenderedSuspenseBoundary(
   destination,
   responseState,
+  // flushing these error arguments are not currently supported in this legacy streaming format.
+  errorDigest,
+  errorMessage,
+  errorComponentStack,
 ) {
   if (responseState.generateStaticMarkup) {
     // A client rendered boundary is done and doesn't need a representation in the HTML
@@ -100,6 +124,9 @@ export function writeStartClientRenderedSuspenseBoundary(
   return writeStartClientRenderedSuspenseBoundaryImpl(
     destination,
     responseState,
+    errorDigest,
+    errorMessage,
+    errorComponentStack,
   );
 }
 export function writeEndCompletedSuspenseBoundary(destination, responseState) {

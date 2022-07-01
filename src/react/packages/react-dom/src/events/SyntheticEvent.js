@@ -56,7 +56,6 @@ function createSyntheticEvent(Interface) {
       }
       const normalize = Interface[propName];
       if (normalize) {
-        // 放到合成对象实例中，覆盖原是对象
         this[propName] = normalize(nativeEvent);
       } else {
         this[propName] = nativeEvent[propName];
@@ -67,7 +66,6 @@ function createSyntheticEvent(Interface) {
       nativeEvent.defaultPrevented != null
         ? nativeEvent.defaultPrevented
         : nativeEvent.returnValue === false;
-
     if (defaultPrevented) {
       this.isDefaultPrevented = functionThatReturnsTrue;
     } else {
@@ -77,12 +75,10 @@ function createSyntheticEvent(Interface) {
     return this;
   }
 
-  // 将 preventDefault 和 stopPropagation 合并到 SyntheticBaseEvent 的原型上
   assign(SyntheticBaseEvent.prototype, {
     preventDefault: function () {
       this.defaultPrevented = true;
       const event = this.nativeEvent;
-
       if (!event) {
         return;
       }
@@ -93,7 +89,6 @@ function createSyntheticEvent(Interface) {
       } else if (typeof event.returnValue !== 'unknown') {
         event.returnValue = false;
       }
-
       this.isDefaultPrevented = functionThatReturnsTrue;
     },
 
@@ -134,7 +129,6 @@ function createSyntheticEvent(Interface) {
      */
     isPersistent: functionThatReturnsTrue,
   });
-
   return SyntheticBaseEvent;
 }
 
@@ -159,7 +153,6 @@ const UIEventInterface = {
   view: 0,
   detail: 0,
 };
-
 export const SyntheticUIEvent = createSyntheticEvent(UIEventInterface);
 
 let lastMovementX;
@@ -210,7 +203,6 @@ const MouseEventInterface = {
     if ('movementX' in event) {
       return event.movementX;
     }
-    // polyfill movementX
     updateMouseMovementPolyfillState(event);
     return lastMovementX;
   },

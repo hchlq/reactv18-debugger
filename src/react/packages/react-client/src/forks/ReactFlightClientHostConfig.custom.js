@@ -25,6 +25,7 @@
 
 // eslint-disable-line no-undef
 // eslint-disable-line no-undef
+// eslint-disable-line no-undef
 export const resolveModuleReference = $$$hostConfig.resolveModuleReference;
 export const preloadModule = $$$hostConfig.preloadModule;
 export const requireModule = $$$hostConfig.requireModule;

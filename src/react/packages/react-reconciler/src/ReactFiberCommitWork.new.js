@@ -17,7 +17,6 @@ import {
   enableScopeAPI,
   enableStrictEffects,
   deletedTreeCleanUpLevel,
-  enableSuspenseLayoutEffectSemantics,
   enableUpdaterTracking,
   enableCache,
   enableTransitionTracing,
@@ -41,6 +40,7 @@ import {
   OffscreenComponent,
   LegacyHiddenComponent,
   CacheComponent,
+  TracingMarkerComponent,
 } from './ReactWorkTags';
 import {detachDeletedInstance} from './ReactFiberHostConfig';
 import {
@@ -75,7 +75,7 @@ import {
   startPassiveEffectTimer,
 } from './ReactProfilerTimer.new';
 import {ConcurrentMode, NoMode, ProfileMode} from './ReactTypeOfMode';
-import {commitUpdateQueue} from './ReactUpdateQueue.new';
+import {commitUpdateQueue} from './ReactFiberClassUpdateQueue.new';
 import {
   getPublicInstance,
   supportsMutation,
@@ -114,6 +114,7 @@ import {
   restorePendingUpdaters,
   addTransitionStartCallbackToPendingTransition,
   addTransitionCompleteCallbackToPendingTransition,
+  addMarkerCompleteCallbackToPendingTransition,
   setIsRunningInsertionEffect,
 } from './ReactFiberWorkLoop.new';
 import {
@@ -148,7 +149,6 @@ if (__DEV__) {
 
 // Used during the commit phase to track the state of the Offscreen component stack.
 // Allows us to avoid traversing the return path to find the nearest Offscreen ancestor.
-// Only used when enableSuspenseLayoutEffectSemantics is enabled.
 let offscreenSubtreeIsHidden = false;
 let offscreenSubtreeWasHidden = false;
 
@@ -675,10 +675,7 @@ function commitLayoutEffectOnFiber(
       case FunctionComponent:
       case ForwardRef:
       case SimpleMemoComponent: {
-        if (
-          !enableSuspenseLayoutEffectSemantics ||
-          !offscreenSubtreeWasHidden
-        ) {
+        if (!offscreenSubtreeWasHidden) {
           // At this point layout effects have already been destroyed (during mutation phase).
           // This is done to prevent sibling component effects from interfering with each other,
           // e.g. a destroy function in one component should never override a ref set
@@ -966,7 +963,8 @@ function commitLayoutEffectOnFiber(
       case IncompleteClassComponent:
       case ScopeComponent:
       case OffscreenComponent:
-      case LegacyHiddenComponent: {
+      case LegacyHiddenComponent:
+      case TracingMarkerComponent: {
         break;
       }
 
@@ -978,7 +976,7 @@ function commitLayoutEffectOnFiber(
     }
   }
 
-  if (!enableSuspenseLayoutEffectSemantics || !offscreenSubtreeWasHidden) {
+  if (!offscreenSubtreeWasHidden) {
     if (enableScopeAPI) {
       // TODO: This is a temporary solution that allowed us to transition away
       // from React Flare on www.
@@ -1027,6 +1025,69 @@ function reappearLayoutEffectsOnFiber(node) {
     case HostComponent: {
       safelyAttachRef(node, node.return);
       break;
+    }
+  }
+}
+
+function commitTransitionProgress(offscreenFiber) {
+  if (enableTransitionTracing) {
+    // This function adds suspense boundaries to the root
+    // or tracing marker's pendingSuspenseBoundaries map.
+    // When a suspense boundary goes from a resolved to a fallback
+    // state we add the boundary to the map, and when it goes from
+    // a fallback to a resolved state, we remove the boundary from
+    // the map.
+
+    // We use stateNode on the Offscreen component as a stable object
+    // that doesnt change from render to render. This way we can
+    // distinguish between different Offscreen instances (vs. the same
+    // Offscreen instance with different fibers)
+    const offscreenInstance = offscreenFiber.stateNode;
+
+    let prevState = null;
+    const previousFiber = offscreenFiber.alternate;
+    if (previousFiber !== null && previousFiber.memoizedState !== null) {
+      prevState = previousFiber.memoizedState;
+    }
+    const nextState = offscreenFiber.memoizedState;
+
+    const wasHidden = prevState !== null;
+    const isHidden = nextState !== null;
+
+    const pendingMarkers = offscreenInstance.pendingMarkers;
+    // If there is a name on the suspense boundary, store that in
+    // the pending boundaries.
+    let name = null;
+    const parent = offscreenFiber.return;
+    if (
+      parent !== null &&
+      parent.tag === SuspenseComponent &&
+      parent.memoizedProps.unstable_name
+    ) {
+      name = parent.memoizedProps.unstable_name;
+    }
+
+    if (!wasHidden && isHidden) {
+      // The suspense boundaries was just hidden. Add the boundary
+      // to the pending boundary set if it's there
+      if (pendingMarkers !== null) {
+        pendingMarkers.forEach((pendingBoundaries) => {
+          pendingBoundaries.set(offscreenInstance, {
+            name,
+          });
+        });
+      }
+    } else if (wasHidden && !isHidden) {
+      // The suspense boundary went from hidden to visible. Remove
+      // the boundary from the pending suspense boundaries set
+      // if it's there
+      if (pendingMarkers !== null) {
+        pendingMarkers.forEach((pendingBoundaries) => {
+          if (pendingBoundaries.has(offscreenInstance)) {
+            pendingBoundaries.delete(offscreenInstance);
+          }
+        });
+      }
     }
   }
 }
@@ -1741,11 +1802,7 @@ function commitDeletionEffectsOnFiber(
       return;
     }
     case OffscreenComponent: {
-      if (
-        // TODO: Remove this dead flag
-        enableSuspenseLayoutEffectSemantics &&
-        deletedFiber.mode & ConcurrentMode
-      ) {
+      if (deletedFiber.mode & ConcurrentMode) {
         // If this offscreen component is hidden, we already unmounted it. Before
         // deleting the children, track that it's already unmounted so that we
         // don't attempt to unmount the effects again.
@@ -2142,8 +2199,14 @@ function commitMutationEffectsOnFiber(finishedWork, root, lanes) {
       const offscreenFiber = finishedWork.child;
 
       if (offscreenFiber.flags & Visibility) {
+        const offscreenInstance = offscreenFiber.stateNode;
         const newState = offscreenFiber.memoizedState;
         const isHidden = newState !== null;
+
+        // Track the current state on the Offscreen instance so we can
+        // read it during an event
+        offscreenInstance.isHidden = isHidden;
+
         if (isHidden) {
           const wasHidden =
             offscreenFiber.alternate !== null &&
@@ -2168,11 +2231,7 @@ function commitMutationEffectsOnFiber(finishedWork, root, lanes) {
     case OffscreenComponent: {
       const wasHidden = current !== null && current.memoizedState !== null;
 
-      if (
-        // TODO: Remove this dead flag
-        enableSuspenseLayoutEffectSemantics &&
-        finishedWork.mode & ConcurrentMode
-      ) {
+      if (finishedWork.mode & ConcurrentMode) {
         // Before committing the children, track on the stack whether this
         // offscreen subtree was already hidden, so that we don't unmount the
         // effects again.
@@ -2187,27 +2246,30 @@ function commitMutationEffectsOnFiber(finishedWork, root, lanes) {
       commitReconciliationEffects(finishedWork);
 
       if (flags & Visibility) {
+        const offscreenInstance = finishedWork.stateNode;
         const newState = finishedWork.memoizedState;
         const isHidden = newState !== null;
         const offscreenBoundary = finishedWork;
 
-        if (enableSuspenseLayoutEffectSemantics) {
-          if (isHidden) {
-            if (!wasHidden) {
-              if ((offscreenBoundary.mode & ConcurrentMode) !== NoMode) {
-                nextEffect = offscreenBoundary;
-                let offscreenChild = offscreenBoundary.child;
-                while (offscreenChild !== null) {
-                  nextEffect = offscreenChild;
-                  disappearLayoutEffects_begin(offscreenChild);
-                  offscreenChild = offscreenChild.sibling;
-                }
+        // Track the current state on the Offscreen instance so we can
+        // read it during an event
+        offscreenInstance.isHidden = isHidden;
+
+        if (isHidden) {
+          if (!wasHidden) {
+            if ((offscreenBoundary.mode & ConcurrentMode) !== NoMode) {
+              nextEffect = offscreenBoundary;
+              let offscreenChild = offscreenBoundary.child;
+              while (offscreenChild !== null) {
+                nextEffect = offscreenChild;
+                disappearLayoutEffects_begin(offscreenChild);
+                offscreenChild = offscreenChild.sibling;
               }
             }
-          } else {
-            if (wasHidden) {
-              // TODO: Move re-appear call here for symmetry?
-            }
+          }
+        } else {
+          if (wasHidden) {
+            // TODO: Move re-appear call here for symmetry?
           }
         }
 
@@ -2297,11 +2359,7 @@ function commitLayoutEffects_begin(subtreeRoot, root, committedLanes) {
     const fiber = nextEffect;
     const firstChild = fiber.child;
 
-    if (
-      enableSuspenseLayoutEffectSemantics &&
-      fiber.tag === OffscreenComponent &&
-      isModernRoot
-    ) {
+    if (fiber.tag === OffscreenComponent && isModernRoot) {
       // Keep track of the current Offscreen stack's state.
       const isHidden = fiber.memoizedState !== null;
       const newOffscreenSubtreeIsHidden = isHidden || offscreenSubtreeIsHidden;
@@ -2656,23 +2714,38 @@ function commitPassiveMountOnFiber(
       }
 
       if (enableTransitionTracing) {
+        // Get the transitions that were initiatized during the render
+        // and add a start transition callback for each of them
+        const root = finishedWork.stateNode;
+        const incompleteTransitions = root.incompleteTransitions;
+        // Initial render
         if (committedTransitions !== null) {
           committedTransitions.forEach((transition) => {
-            // TODO(luna) Do we want to log TransitionStart in the startTransition callback instead?
             addTransitionStartCallbackToPendingTransition({
-              transitionName: transition.name,
-              startTime: transition.startTime,
-            });
-
-            addTransitionCompleteCallbackToPendingTransition({
               transitionName: transition.name,
               startTime: transition.startTime,
             });
           });
 
           clearTransitionsForLanes(finishedRoot, committedLanes);
-          finishedWork.memoizedState.transitions = null;
         }
+
+        incompleteTransitions.forEach(
+          ({pendingSuspenseBoundaries}, transition) => {
+            if (
+              pendingSuspenseBoundaries === null ||
+              pendingSuspenseBoundaries.size === 0
+            ) {
+              addTransitionCompleteCallbackToPendingTransition({
+                transitionName: transition.name,
+                startTime: transition.startTime,
+              });
+              incompleteTransitions.delete(transition);
+            }
+          },
+        );
+
+        clearTransitionsForLanes(finishedRoot, committedLanes);
       }
       break;
     }
@@ -2709,9 +2782,60 @@ function commitPassiveMountOnFiber(
       }
 
       if (enableTransitionTracing) {
-        // TODO: Add code to actually process the update queue
-        finishedWork.updateQueue = null;
+        const isFallback = finishedWork.memoizedState;
+        const queue = finishedWork.updateQueue;
+        const instance = finishedWork.stateNode;
+
+        if (queue !== null) {
+          if (isFallback) {
+            const transitions = queue.transitions;
+            let prevTransitions = instance.transitions;
+            if (instance.pendingMarkers === null) {
+              instance.pendingMarkers = new Set();
+            }
+            if (transitions !== null && prevTransitions === null) {
+              instance.transitions = prevTransitions = new Set();
+            }
+
+            if (transitions !== null) {
+              transitions.forEach((transition) => {
+                // Add all the transitions saved in the update queue during
+                // the render phase (ie the transitions associated with this boundary)
+                // into the transitions set.
+                prevTransitions.add(transition);
+              });
+            }
+
+            const markerInstances = queue.markerInstances;
+            if (markerInstances !== null) {
+              markerInstances.forEach((markerInstance) => {
+                if (markerInstance.pendingSuspenseBoundaries === null) {
+                  markerInstance.pendingSuspenseBoundaries = new Map();
+                }
+
+                const markerTransitions = markerInstance.transitions;
+                // There should only be a few tracing marker transitions because
+                // they should be only associated with the transition that
+                // caused them
+                if (markerTransitions !== null) {
+                  markerTransitions.forEach((transition) => {
+                    if (instance.transitions.has(transition)) {
+                      instance.pendingMarkers.add(
+                        markerInstance.pendingSuspenseBoundaries,
+                      );
+                    }
+                  });
+                }
+              });
+            }
+          }
+
+          finishedWork.updateQueue = null;
+        }
+
+        commitTransitionProgress(finishedWork);
       }
+
       break;
     }
     case CacheComponent: {
@@ -2731,6 +2855,28 @@ function commitPassiveMountOnFiber(
           if (previousCache != null) {
             releaseCache(previousCache);
           }
+        }
+      }
+      break;
+    }
+    case TracingMarkerComponent: {
+      if (enableTransitionTracing) {
+        // Get the transitions that were initiatized during the render
+        // and add a start transition callback for each of them
+        const instance = finishedWork.stateNode;
+        if (
+          instance.pendingSuspenseBoundaries === null ||
+          instance.pendingSuspenseBoundaries.size === 0
+        ) {
+          instance.transitions.forEach((transition) => {
+            addMarkerCompleteCallbackToPendingTransition({
+              transitionName: transition.name,
+              startTime: transition.startTime,
+              markerName: finishedWork.memoizedProps.name,
+            });
+          });
+          instance.transitions = null;
+          instance.pendingSuspenseBoundaries = null;
         }
       }
       break;

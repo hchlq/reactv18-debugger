@@ -689,6 +689,7 @@ function createReactNoop(reconciler, useMutation) {
           false,
           '',
           onRecoverableError,
+          null,
         );
         roots.set(rootID, root);
       }
@@ -742,6 +743,7 @@ function createReactNoop(reconciler, useMutation) {
         false,
         '',
         onRecoverableError,
+        null,
       );
       return {
         _Scheduler: Scheduler,

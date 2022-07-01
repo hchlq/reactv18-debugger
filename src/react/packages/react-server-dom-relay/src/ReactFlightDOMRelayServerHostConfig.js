@@ -77,6 +77,10 @@ export function processModelChunk(request, id, model) {
   return ['J', id, json];
 }
 
+export function processReferenceChunk(request, id, reference) {
+  return ['J', id, reference];
+}
+
 export function processModuleChunk(request, id, moduleMetaData) {
   // The moduleMetaData is already a JSON serializable value.
   return ['M', id, moduleMetaData];

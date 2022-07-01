@@ -7,6 +7,9 @@
  *
  */
 
+// Doing this because there's a merge conflict because of the way sync-reconciler-fork
+// is implemented
+
 // Unwind Circular: moved from ReactFiberHooks.old
 
 // A Fiber is work on a Component that needs to be done or was done. There can

@@ -51,9 +51,35 @@ function lazyInitializer(payload) {
   }
   if (payload._status === Resolved) {
     const moduleObject = payload._result;
+    if (__DEV__) {
+      if (moduleObject === undefined) {
+        console.error(
+          'lazy: Expected the result of a dynamic imp' +
+            'ort() call. ' +
+            'Instead received: %s\n\nYour code should look like: \n  ' +
+            // Break up imports to avoid accidentally parsing them as dependencies.
+            'const MyComponent = lazy(() => imp' +
+            "ort('./MyComponent'))\n\n" +
+            'Did you accidentally put curly braces around the import?',
+          moduleObject,
+        );
+      }
+    }
+    if (__DEV__) {
+      if (!('default' in moduleObject)) {
+        console.error(
+          'lazy: Expected the result of a dynamic imp' +
+            'ort() call. ' +
+            'Instead received: %s\n\nYour code should look like: \n  ' +
+            // Break up imports to avoid accidentally parsing them as dependencies.
+            'const MyComponent = lazy(() => imp' +
+            "ort('./MyComponent'))",
+          moduleObject,
+        );
+      }
+    }
     return moduleObject.default;
   } else {
-    //! 抛出错误 
     throw payload._result;
   }
 }
@@ -70,6 +96,53 @@ export function lazy(ctor) {
     _payload: payload,
     _init: lazyInitializer,
   };
+
+  if (__DEV__) {
+    // In production, this would just set it on the object.
+    let defaultProps;
+    let propTypes;
+    // $FlowFixMe
+    Object.defineProperties(lazyType, {
+      defaultProps: {
+        configurable: true,
+        get() {
+          return defaultProps;
+        },
+        set(newDefaultProps) {
+          console.error(
+            'React.lazy(...): It is not supported to assign `defaultProps` to ' +
+              'a lazy component import. Either specify them where the component ' +
+              'is defined, or create a wrapping component around it.',
+          );
+          defaultProps = newDefaultProps;
+          // Match production behavior more closely:
+          // $FlowFixMe
+          Object.defineProperty(lazyType, 'defaultProps', {
+            enumerable: true,
+          });
+        },
+      },
+      propTypes: {
+        configurable: true,
+        get() {
+          return propTypes;
+        },
+        set(newPropTypes) {
+          console.error(
+            'React.lazy(...): It is not supported to assign `propTypes` to ' +
+              'a lazy component import. Either specify them where the component ' +
+              'is defined, or create a wrapping component around it.',
+          );
+          propTypes = newPropTypes;
+          // Match production behavior more closely:
+          // $FlowFixMe
+          Object.defineProperty(lazyType, 'propTypes', {
+            enumerable: true,
+          });
+        },
+      },
+    });
+  }
 
   return lazyType;
 }

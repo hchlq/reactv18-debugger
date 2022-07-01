@@ -28,6 +28,7 @@ describe('ProfilerStore', () => {
     ReactDOM = require('react-dom');
   });
 
+  // @reactVersion >= 16.9
   it('should not remove profiling data when roots are unmounted', async () => {
     const Parent = ({count}) =>
       new Array(count)
@@ -64,6 +65,7 @@ describe('ProfilerStore', () => {
     expect(store.profilerStore.getDataForRoot(rootB)).not.toBeNull();
   });
 
+  // @reactVersion >= 16.9
   it('should not allow new/saved profiling data to be set while profiling is in progress', () => {
     utils.act(() => store.profilerStore.startProfiling());
     const fauxProfilingData = {
@@ -81,6 +83,7 @@ describe('ProfilerStore', () => {
     expect(store.profilerStore.profilingData).toBe(fauxProfilingData);
   });
 
+  // @reactVersion >= 16.9
   // This test covers current broken behavior (arguably) with the synthetic event system.
   it('should filter empty commits', () => {
     const inputRef = React.createRef();
@@ -122,6 +125,7 @@ describe('ProfilerStore', () => {
     expect(data.operations).toHaveLength(1);
   });
 
+  // @reactVersion >= 16.9
   it('should filter empty commits alt', () => {
     let commitCount = 0;
 
@@ -173,6 +177,7 @@ describe('ProfilerStore', () => {
     expect(data.operations).toHaveLength(1);
   });
 
+  // @reactVersion >= 16.9
   it('should throw if component filters are modified while profiling', () => {
     utils.act(() => store.profilerStore.startProfiling());
 
@@ -188,6 +193,7 @@ describe('ProfilerStore', () => {
     }).toThrow('Cannot modify filter preferences while profiling');
   });
 
+  // @reactVersion >= 16.9
   it('should not throw if state contains a property hasOwnProperty ', () => {
     let setStateCallback;
     const ControlledInput = () => {
@@ -220,6 +226,7 @@ describe('ProfilerStore', () => {
     expect(data.operations).toHaveLength(1);
   });
 
+  // @reactVersion >= 18.0
   it('should not throw while initializing context values for Fibers within a not-yet-mounted subtree', () => {
     const promise = new Promise((resolve) => {});
     const SuspendingView = () => {

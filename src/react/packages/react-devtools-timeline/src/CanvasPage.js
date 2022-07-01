@@ -55,6 +55,7 @@ import useContextMenu from 'react-devtools-shared/src/devtools/ContextMenu/useCo
 import {getBatchRange} from './utils/getBatchRange';
 import {MAX_ZOOM_LEVEL, MIN_ZOOM_LEVEL} from './view-base/constants';
 import {TimelineSearchContext} from './TimelineSearchContext';
+import {TimelineContext} from './TimelineContext';
 
 import styles from './CanvasPage.css';
 
@@ -496,6 +497,8 @@ function AutoSizedCanvas({data, height, viewState, width}) {
     ref: canvasRef,
   });
 
+  const {selectEvent} = useContext(TimelineContext);
+
   useEffect(() => {
     const {current: userTimingMarksView} = userTimingMarksViewRef;
     if (userTimingMarksView) {
@@ -530,6 +533,12 @@ function AutoSizedCanvas({data, height, viewState, width}) {
             schedulingEvent,
           });
         }
+      };
+      schedulingEventsView.onClick = (schedulingEvent) => {
+        selectEvent({
+          ...EMPTY_CONTEXT_INFO,
+          schedulingEvent,
+        });
       };
     }
 

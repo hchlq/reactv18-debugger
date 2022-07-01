@@ -595,6 +595,8 @@ export function attach(hook, rendererID, renderer, global) {
       getDisplayNameForFiber,
       getIsProfiling: () => isProfiling,
       getLaneLabelMap,
+      currentDispatcherRef: renderer.currentDispatcherRef,
+      workTagMap: ReactTypeOfWork,
       reactVersion: version,
     });
 
@@ -2714,6 +2716,10 @@ export function attach(hook, rendererID, renderer, global) {
     return fiber != null ? getDisplayNameForFiber(fiber) : null;
   }
 
+  function getFiberForNative(hostInstance) {
+    return renderer.findFiberByHostInstance(hostInstance);
+  }
+
   function getFiberIDForNative(
     hostInstance,
     findNearestUnfilteredAncestor = false,
@@ -4318,6 +4324,7 @@ export function attach(hook, rendererID, renderer, global) {
     flushInitialOperations,
     getBestMatchForTrackedPath,
     getDisplayNameForFiberID,
+    getFiberForNative,
     getFiberIDForNative,
     getInstanceAndStyle,
     getOwnersList,

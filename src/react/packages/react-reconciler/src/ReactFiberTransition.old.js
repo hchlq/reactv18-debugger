@@ -124,17 +124,17 @@ export function pushTransition(
 
 export function popTransition(workInProgress, current) {
   if (current !== null) {
-    if (enableCache) {
-      pop(resumedCache, workInProgress);
-    }
-
     if (enableTransitionTracing) {
       pop(transitionStack, workInProgress);
+    }
+
+    if (enableCache) {
+      pop(resumedCache, workInProgress);
     }
   }
 }
 
-export function getSuspendedTransitions() {
+export function getPendingTransitions() {
   if (!enableTransitionTracing) {
     return null;
   }

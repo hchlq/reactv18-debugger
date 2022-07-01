@@ -84,6 +84,12 @@ export function processModelChunk(request, id, model) {
   return stringToChunk(row);
 }
 
+export function processReferenceChunk(request, id, reference) {
+  const json = stringify(reference);
+  const row = serializeRowHeader('J', id) + json + '\n';
+  return stringToChunk(row);
+}
+
 export function processModuleChunk(request, id, moduleMetaData) {
   const json = stringify(moduleMetaData);
   const row = serializeRowHeader('M', id) + json + '\n';

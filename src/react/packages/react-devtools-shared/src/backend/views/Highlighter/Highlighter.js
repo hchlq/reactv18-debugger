@@ -23,7 +23,7 @@ export function hideOverlay() {
   }
 }
 
-export function showOverlay(elements, componentName, hideAfterTimeout) {
+export function showOverlay(elements, componentName, agent, hideAfterTimeout) {
   // TODO (npm-packages) Detect RN and support it somehow
   if (window.document == null) {
     return;
@@ -38,7 +38,7 @@ export function showOverlay(elements, componentName, hideAfterTimeout) {
   }
 
   if (overlay === null) {
-    overlay = new Overlay();
+    overlay = new Overlay(agent);
   }
 
   overlay.inspect(elements, componentName);

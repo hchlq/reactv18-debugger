@@ -8,25 +8,17 @@
  */
 
 import * as React from 'react';
-import {formatDuration, formatTimestamp, trimString} from './utils/formatting';
+import {
+  formatDuration,
+  formatTimestamp,
+  trimString,
+  getSchedulingEventLabel,
+} from './utils/formatting';
 import {getBatchRange} from './utils/getBatchRange';
 import useSmartTooltip from './utils/useSmartTooltip';
 import styles from './EventTooltip.css';
 
 const MAX_TOOLTIP_TEXT_LENGTH = 60;
-
-function getSchedulingEventLabel(event) {
-  switch (event.type) {
-    case 'schedule-render':
-      return 'render scheduled';
-    case 'schedule-state-update':
-      return 'state update scheduled';
-    case 'schedule-force-update':
-      return 'force update scheduled';
-    default:
-      return null;
-  }
-}
 
 function getReactMeasureLabel(type) {
   switch (type) {

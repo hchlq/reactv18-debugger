@@ -337,9 +337,6 @@ function setInitialDOMProperties(
   }
 }
 
-/**
- * 使用计算出出来的 diff 应用到 dom 节点上
- */
 function updateDOMProperties(
   domElement,
   updatePayload,
@@ -351,16 +348,12 @@ function updateDOMProperties(
     const propKey = updatePayload[i];
     const propValue = updatePayload[i + 1];
     if (propKey === STYLE) {
-      // style
       setValueForStyles(domElement, propValue);
     } else if (propKey === DANGEROUSLY_SET_INNER_HTML) {
-      // dangerouslySetInnerHTML
       setInnerHTML(domElement, propValue);
     } else if (propKey === CHILDREN) {
-      // children (string, number)
       setTextContent(domElement, propValue);
     } else {
-      // 其他的属性
       setValueForProperty(domElement, propKey, propValue, isCustomComponentTag);
     }
   }
@@ -373,23 +366,45 @@ export function createElement(
   parentNamespace,
 ) {
   let isCustomComponentTag;
-  // debugger
+
   // We create tags in the namespace of their parent container, except HTML
   // tags get no namespace.
   const ownerDocument = getOwnerDocumentFromRootContainer(rootContainerElement);
   let domElement;
   let namespaceURI = parentNamespace;
-  
   if (namespaceURI === HTML_NAMESPACE) {
     namespaceURI = getIntrinsicNamespace(type);
   }
-
   if (namespaceURI === HTML_NAMESPACE) {
+    if (__DEV__) {
+      isCustomComponentTag = isCustomComponent(type, props);
+      // Should this check be gated by parent namespace? Not sure we want to
+      // allow <SVG> or <mATH>.
+      if (!isCustomComponentTag && type !== type.toLowerCase()) {
+        console.error(
+          '<%s /> is using incorrect casing. ' +
+            'Use PascalCase for React components, ' +
+            'or lowercase for HTML elements.',
+          type,
+        );
+      }
+    }
 
     if (type === 'script') {
       // Create the script via .innerHTML so its "parser-inserted" flag is
       // set to true and it does not execute
       const div = ownerDocument.createElement('div');
+      if (__DEV__) {
+        if (enableTrustedTypesIntegration && !didWarnScriptTags) {
+          console.error(
+            'Encountered a script tag while rendering React component. ' +
+              'Scripts inside React components are never executed when rendering ' +
+              'on the client. Consider using template tag instead ' +
+              '(https://developer.mozilla.org/en-US/docs/Web/HTML/Element/template).',
+          );
+          didWarnScriptTags = true;
+        }
+      }
       div.innerHTML = '<script><' + '/script>'; // eslint-disable-line
       // This is guaranteed to yield a script element.
       const firstChild = div.firstChild;
@@ -425,6 +440,25 @@ export function createElement(
     }
   } else {
     domElement = ownerDocument.createElementNS(namespaceURI, type);
+  }
+
+  if (__DEV__) {
+    if (namespaceURI === HTML_NAMESPACE) {
+      if (
+        !isCustomComponentTag &&
+        Object.prototype.toString.call(domElement) ===
+          '[object HTMLUnknownElement]' &&
+        !hasOwnProperty.call(warnedUnknownTags, type)
+      ) {
+        warnedUnknownTags[type] = true;
+        console.error(
+          'The tag <%s> is unrecognized in this browser. ' +
+            'If you meant to render a React component, start its name with ' +
+            'an uppercase letter.',
+          type,
+        );
+      }
+    }
   }
 
   return domElement;
@@ -568,6 +602,9 @@ export function diffProperties(
   nextRawProps,
   rootContainerElement,
 ) {
+  if (__DEV__) {
+    validatePropertiesInDevelopment(tag, nextRawProps);
+  }
 
   let updatePayload = null;
 
@@ -602,28 +639,19 @@ export function diffProperties(
       break;
   }
 
-  // 校验 props
-  // assertValidProps(tag, nextProps);
+  assertValidProps(tag, nextProps);
 
   let propKey;
   let styleName;
   let styleUpdates = null;
-  // 1. 处理老的 props
   for (propKey in lastProps) {
-    // 移除新的 props 没有的属性
     if (
       nextProps.hasOwnProperty(propKey) ||
       !lastProps.hasOwnProperty(propKey) ||
       lastProps[propKey] == null
     ) {
-      // 1. 新的 props 也有该属性
-      // 2. 老的 props 本身上不存在该属性
-      // 3. 老的 props 该属性值为空
       continue;
     }
-
-    // 以下都是老的 props 有，新的 props 没有的属性
-
     if (propKey === STYLE) {
       const lastStyle = lastProps[propKey];
       for (styleName in lastStyle) {
@@ -653,12 +681,9 @@ export function diffProperties(
     } else {
       // For all other deleted properties we add it to the queue. We use
       // the allowed property list in the commit phase instead.
-      // 其他要删除的属性，值为空即可
       (updatePayload = updatePayload || []).push(propKey, null);
     }
   }
-
-  // 2. 处理新的 props
   for (propKey in nextProps) {
     const nextProp = nextProps[propKey];
     const lastProp = lastProps != null ? lastProps[propKey] : undefined;
@@ -667,18 +692,18 @@ export function diffProperties(
       nextProp === lastProp ||
       (nextProp == null && lastProp == null)
     ) {
-      // 1. 新的 props 没有该属性
-      // 2. 新老属性值一样
-      // 3. 新老属性值都为空
       continue;
     }
-
-    // 只处理 nextProps 新增的属性
-
     if (propKey === STYLE) {
+      if (__DEV__) {
+        if (nextProp) {
+          // Freeze the next style object so that we can assume it won't be
+          // mutated. We have already warned for this in the past.
+          Object.freeze(nextProp);
+        }
+      }
       if (lastProp) {
         // Unset styles on `lastProp` but not on `nextProp`.
-        // 移除老的属性值
         for (styleName in lastProp) {
           if (
             lastProp.hasOwnProperty(styleName) &&
@@ -691,7 +716,6 @@ export function diffProperties(
           }
         }
         // Update styles that changed since `lastProp`.
-        // 新老属性值不一样的，更新属性值
         for (styleName in nextProp) {
           if (
             nextProp.hasOwnProperty(styleName) &&
@@ -736,6 +760,9 @@ export function diffProperties(
     } else if (registrationNameDependencies.hasOwnProperty(propKey)) {
       if (nextProp != null) {
         // We eagerly listen to this even though we haven't committed yet.
+        if (__DEV__ && typeof nextProp !== 'function') {
+          warnForInvalidEventListener(propKey, nextProp);
+        }
         if (propKey === 'onScroll') {
           listenToNonDelegatedEvent('scroll', domElement);
         }
@@ -752,16 +779,15 @@ export function diffProperties(
       (updatePayload = updatePayload || []).push(propKey, nextProp);
     }
   }
-
-  // style 有更新
   if (styleUpdates) {
+    if (__DEV__) {
+      validateShorthandPropertyCollisionInDev(styleUpdates, nextProps[STYLE]);
+    }
     (updatePayload = updatePayload || []).push(STYLE, styleUpdates);
   }
-
   return updatePayload;
 }
 
-// 使用 diffProperties 计算的更新数据，更新到真实的 DOM
 // Apply the diff.
 export function updateProperties(
   domElement,
@@ -783,7 +809,6 @@ export function updateProperties(
 
   const wasCustomComponentTag = isCustomComponent(tag, lastRawProps);
   const isCustomComponentTag = isCustomComponent(tag, nextRawProps);
-
   // Apply the diff.
   updateDOMProperties(
     domElement,
@@ -813,6 +838,13 @@ export function updateProperties(
 }
 
 function getPossibleStandardName(propName) {
+  if (__DEV__) {
+    const lowerCasedName = propName.toLowerCase();
+    if (!possibleStandardNames.hasOwnProperty(lowerCasedName)) {
+      return null;
+    }
+    return possibleStandardNames[lowerCasedName] || null;
+  }
   return null;
 }
 
@@ -1036,7 +1068,12 @@ export function diffHydratedProperties(
       } else if (isCustomComponentTag && !enableCustomElementPropertySupport) {
         // $FlowFixMe - Should be inferred as not undefined.
         extraAttributeNames.delete(propKey.toLowerCase());
-        serverValue = getValueForAttribute(domElement, propKey, nextProp);
+        serverValue = getValueForAttribute(
+          domElement,
+          propKey,
+          nextProp,
+          isCustomComponentTag,
+        );
 
         if (nextProp !== serverValue) {
           warnForPropDifference(propKey, serverValue, nextProp);
@@ -1083,7 +1120,12 @@ export function diffHydratedProperties(
             // $FlowFixMe - Should be inferred as not undefined.
             extraAttributeNames.delete(propKey);
           }
-          serverValue = getValueForAttribute(domElement, propKey, nextProp);
+          serverValue = getValueForAttribute(
+            domElement,
+            propKey,
+            nextProp,
+            isCustomComponentTag,
+          );
         }
 
         const dontWarnCustomElement =

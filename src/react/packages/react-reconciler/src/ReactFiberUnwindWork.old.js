@@ -19,10 +19,15 @@ import {
   OffscreenComponent,
   LegacyHiddenComponent,
   CacheComponent,
+  TracingMarkerComponent,
 } from './ReactWorkTags';
 import {DidCapture, NoFlags, ShouldCapture} from './ReactFiberFlags';
 import {NoMode, ProfileMode} from './ReactTypeOfMode';
-import {enableProfilerTimer, enableCache} from 'shared/ReactFeatureFlags';
+import {
+  enableProfilerTimer,
+  enableCache,
+  enableTransitionTracing,
+} from 'shared/ReactFeatureFlags';
 
 import {popHostContainer, popHostContext} from './ReactFiberHostContext.old';
 import {popSuspenseContext} from './ReactFiberSuspenseContext.old';
@@ -38,6 +43,10 @@ import {popCacheProvider} from './ReactFiberCacheComponent.old';
 import {transferActualDuration} from './ReactProfilerTimer.old';
 import {popTreeContext} from './ReactFiberTreeContext.old';
 import {popRootTransition, popTransition} from './ReactFiberTransition.old';
+import {
+  popMarkerInstance,
+  popRootMarkerInstance,
+} from './ReactFiberTracingMarkerComponent.old';
 
 function unwindWork(current, workInProgress, renderLanes) {
   // Note: This intentionally doesn't check if we're hydrating because comparing
@@ -70,6 +79,11 @@ function unwindWork(current, workInProgress, renderLanes) {
         const cache = workInProgress.memoizedState.cache;
         popCacheProvider(workInProgress, cache);
       }
+
+      if (enableTransitionTracing) {
+        popRootMarkerInstance(workInProgress);
+      }
+
       popRootTransition(workInProgress, root, renderLanes);
       popHostContainer(workInProgress);
       popTopLevelLegacyContextObject(workInProgress);
@@ -144,6 +158,13 @@ function unwindWork(current, workInProgress, renderLanes) {
         popCacheProvider(workInProgress, cache);
       }
       return null;
+    case TracingMarkerComponent:
+      if (enableTransitionTracing) {
+        if (workInProgress.stateNode !== null) {
+          popMarkerInstance(workInProgress);
+        }
+      }
+      return null;
     default:
       return null;
   }
@@ -169,6 +190,11 @@ function unwindInterruptedWork(current, interruptedWork, renderLanes) {
         const cache = interruptedWork.memoizedState.cache;
         popCacheProvider(interruptedWork, cache);
       }
+
+      if (enableTransitionTracing) {
+        popRootMarkerInstance(interruptedWork);
+      }
+
       popRootTransition(interruptedWork, root, renderLanes);
       popHostContainer(interruptedWork);
       popTopLevelLegacyContextObject(interruptedWork);
@@ -201,6 +227,14 @@ function unwindInterruptedWork(current, interruptedWork, renderLanes) {
       if (enableCache) {
         const cache = interruptedWork.memoizedState.cache;
         popCacheProvider(interruptedWork, cache);
+      }
+      break;
+    case TracingMarkerComponent:
+      if (enableTransitionTracing) {
+        const instance = interruptedWork.stateNode;
+        if (instance !== null) {
+          popMarkerInstance(interruptedWork);
+        }
       }
       break;
     default:

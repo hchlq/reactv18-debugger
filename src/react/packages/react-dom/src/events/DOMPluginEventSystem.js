@@ -8,6 +8,7 @@
  */
 
 import {
+  SHOULD_NOT_DEFER_CLICK_FOR_FB_SUPPORT_MODE,
   IS_LEGACY_FB_SUPPORT_MODE,
   SHOULD_NOT_PROCESS_POLYFILL_EVENT_PLUGINS,
 } from './EventSystemFlags';
@@ -18,6 +19,7 @@ import {
   IS_EVENT_HANDLE_NON_MANAGED_NODE,
   IS_NON_DELEGATED,
 } from './EventSystemFlags';
+import {isReplayingEvent} from './CurrentReplayingEvent';
 
 import {
   HostRoot,
@@ -36,6 +38,7 @@ import {
 import {COMMENT_NODE} from '../shared/HTMLNodeType';
 import {batchedUpdates} from './ReactDOMUpdateBatching';
 import getListener from './getListener';
+import {passiveBrowserEventsSupported} from './checkPassiveEvents';
 
 import {
   enableLegacyFBSupport,
@@ -49,6 +52,7 @@ import {
 import {DOCUMENT_NODE} from '../shared/HTMLNodeType';
 import {createEventListenerWrapperWithPriority} from './ReactDOMEventListener';
 import {
+  removeEventListener,
   addEventCaptureListener,
   addEventBubbleListener,
   addEventBubbleListenerWithPassiveFlag,
@@ -91,7 +95,6 @@ function extractEvents(
     eventSystemFlags,
     targetContainer,
   );
-
   const shouldProcessPolyfillPlugins =
     (eventSystemFlags & SHOULD_NOT_PROCESS_POLYFILL_EVENT_PLUGINS) === 0;
   // We don't process these events unless we are in the
@@ -179,7 +182,6 @@ export const mediaEventTypes = [
   'waiting',
 ];
 
-// 不代理的事件列表
 // We should not delegate these events to the container, but rather
 // set them on the actual target element itself. This is primarily
 // because these events do not consistently bubble in the DOM.
@@ -211,10 +213,8 @@ function processDispatchQueueItemsInOrder(
 ) {
   let previousInstance;
   if (inCapturePhase) {
-    // 捕获阶段
     for (let i = dispatchListeners.length - 1; i >= 0; i--) {
       const {instance, currentTarget, listener} = dispatchListeners[i];
-      // instance !== previousInstance 总是为 true
       if (instance !== previousInstance && event.isPropagationStopped()) {
         return;
       }
@@ -222,11 +222,8 @@ function processDispatchQueueItemsInOrder(
       previousInstance = instance;
     }
   } else {
-    // 冒泡阶段
     for (let i = 0; i < dispatchListeners.length; i++) {
       const {instance, currentTarget, listener} = dispatchListeners[i];
-      // 停止了冒泡
-      // instance !== previousInstance 总是为 true
       if (instance !== previousInstance && event.isPropagationStopped()) {
         return;
       }
@@ -249,22 +246,13 @@ export function processDispatchQueue(dispatchQueue, eventSystemFlags) {
 
 function dispatchEventsForPlugins(
   domEventName,
-  eventSystemFlags, // 冒泡阶段的事件 flag 为 0
+  eventSystemFlags,
   nativeEvent,
   targetInst,
   targetContainer,
 ) {
-  // if (domEventName === 'click') {
-  //   console.log('eventSystemFlags: ', domEventName, eventSystemFlags)
-  // }
-
-  // 获取事件对象
   const nativeEventTarget = getEventTarget(nativeEvent);
-
-  // [{event, listeners}, {event2, listeners2}]
   const dispatchQueue = [];
-
-  // 提取事件
   extractEvents(
     dispatchQueue,
     domEventName,
@@ -274,11 +262,19 @@ function dispatchEventsForPlugins(
     eventSystemFlags,
     targetContainer,
   );
-
   processDispatchQueue(dispatchQueue, eventSystemFlags);
 }
 
 export function listenToNonDelegatedEvent(domEventName, targetElement) {
+  if (__DEV__) {
+    if (!nonDelegatedEvents.has(domEventName)) {
+      console.error(
+        'Did not expect a listenToNonDelegatedEvent() call for "%s". ' +
+          'This is a bug in React. Please file an issue.',
+        domEventName,
+      );
+    }
+  }
   const isCapturePhaseListener = false;
   const listenerSet = getEventListenerSet(targetElement);
   const listenerSetKey = getListenerSetKey(
@@ -296,23 +292,25 @@ export function listenToNonDelegatedEvent(domEventName, targetElement) {
   }
 }
 
-/**
- * 监听原生的事件
- */
 export function listenToNativeEvent(
   domEventName,
   isCapturePhaseListener,
   target,
 ) {
-  // 默认的事件标识是 0
+  if (__DEV__) {
+    if (nonDelegatedEvents.has(domEventName) && !isCapturePhaseListener) {
+      console.error(
+        'Did not expect a listenToNativeEvent() call for "%s" in the bubble phase. ' +
+          'This is a bug in React. Please file an issue.',
+        domEventName,
+      );
+    }
+  }
+
   let eventSystemFlags = 0;
   if (isCapturePhaseListener) {
-    // 捕获阶段触发的事件
     eventSystemFlags |= IS_CAPTURE_PHASE;
   }
-  // if (domEventName === 'click') {
-  //   console.log(eventSystemFlags)
-  // }
   addTrappedEventListener(
     target,
     domEventName,
@@ -350,27 +348,19 @@ export function listenToNativeEventForNonManagedEventTarget(
 
 const listeningMarker = '_reactListening' + Math.random().toString(36).slice(2);
 
-/**
- * 注册支持的事件
- */
 export function listenToAllSupportedEvents(rootContainerElement) {
   if (!rootContainerElement[listeningMarker]) {
     rootContainerElement[listeningMarker] = true;
-
     allNativeEvents.forEach((domEventName) => {
       // We handle selectionchange separately because it
       // doesn't bubble and needs to be on the document.
       if (domEventName !== 'selectionchange') {
-        // 如果改事件是需要事件代理，在捕获和冒泡事件都会被触发
         if (!nonDelegatedEvents.has(domEventName)) {
-          // 注册冒泡阶段事件
           listenToNativeEvent(domEventName, false, rootContainerElement);
         }
-        // 注册捕获阶段事件
         listenToNativeEvent(domEventName, true, rootContainerElement);
       }
     });
-
     const ownerDocument =
       rootContainerElement.nodeType === DOCUMENT_NODE
         ? rootContainerElement
@@ -380,16 +370,12 @@ export function listenToAllSupportedEvents(rootContainerElement) {
       // but it is attached to the document.
       if (!ownerDocument[listeningMarker]) {
         ownerDocument[listeningMarker] = true;
-        // 在 document 上注册 selectionchange，冒泡阶段触发的
         listenToNativeEvent('selectionchange', false, ownerDocument);
       }
     }
   }
 }
 
-/**
- * 添加事件监听
- */
 function addTrappedEventListener(
   targetContainer,
   domEventName,
@@ -397,19 +383,30 @@ function addTrappedEventListener(
   isCapturePhaseListener,
   isDeferredListenerForLegacyFBSupport,
 ) {
-  // 1. 创建事件函数
   let listener = createEventListenerWrapperWithPriority(
     targetContainer,
     domEventName,
     eventSystemFlags,
   );
-
   // If passive option is not supported, then the event will be
   // active and not passive.
   let isPassiveListener = undefined;
+  if (passiveBrowserEventsSupported) {
+    // Browsers introduced an intervention, making these events
+    // passive by default on document. React doesn't bind them
+    // to document anymore, but changing this now would undo
+    // the performance wins from the change. So we emulate
+    // the existing behavior manually on the roots now.
+    // https://github.com/facebook/react/issues/19651
+    if (
+      domEventName === 'touchstart' ||
+      domEventName === 'touchmove' ||
+      domEventName === 'wheel'
+    ) {
+      isPassiveListener = true;
+    }
+  }
 
-  // 2. 确定 container
-  // 一般都是 targetContainer
   targetContainer =
     enableLegacyFBSupport && isDeferredListenerForLegacyFBSupport
       ? targetContainer.ownerDocument
@@ -427,12 +424,21 @@ function addTrappedEventListener(
   // browsers do not support this today, and given this is
   // to support legacy code patterns, it's likely they'll
   // need support for such browsers.
-
-  // 3. 注册监听事件
+  if (enableLegacyFBSupport && isDeferredListenerForLegacyFBSupport) {
+    const originalListener = listener;
+    listener = function (...p) {
+      removeEventListener(
+        targetContainer,
+        domEventName,
+        unsubscribeListener,
+        isCapturePhaseListener,
+      );
+      return originalListener.apply(this, p);
+    };
+  }
   // TODO: There are too many combinations here. Consolidate them.
   if (isCapturePhaseListener) {
     if (isPassiveListener !== undefined) {
-      // capture + passive
       unsubscribeListener = addEventCaptureListenerWithPassiveFlag(
         targetContainer,
         domEventName,
@@ -440,7 +446,6 @@ function addTrappedEventListener(
         isPassiveListener,
       );
     } else {
-      // capture + non-passive
       unsubscribeListener = addEventCaptureListener(
         targetContainer,
         domEventName,
@@ -449,7 +454,6 @@ function addTrappedEventListener(
     }
   } else {
     if (isPassiveListener !== undefined) {
-      // bubble + passive
       unsubscribeListener = addEventBubbleListenerWithPassiveFlag(
         targetContainer,
         domEventName,
@@ -457,7 +461,6 @@ function addTrappedEventListener(
         isPassiveListener,
       );
     } else {
-      // bubble + non-passive
       unsubscribeListener = addEventBubbleListener(
         targetContainer,
         domEventName,
@@ -481,9 +484,6 @@ function deferClickToDocumentForLegacyFBSupport(domEventName, targetContainer) {
   );
 }
 
-/**
- * 是否匹配到了根容器
- */
 function isMatchingRootContainer(grandContainer, targetContainer) {
   return (
     grandContainer === targetContainer ||
@@ -492,9 +492,6 @@ function isMatchingRootContainer(grandContainer, targetContainer) {
   );
 }
 
-/**
- * 派发事件给插件事件系统
- */
 export function dispatchEventForPluginEventSystem(
   domEventName,
   eventSystemFlags,
@@ -507,12 +504,25 @@ export function dispatchEventForPluginEventSystem(
     (eventSystemFlags & IS_EVENT_HANDLE_NON_MANAGED_NODE) === 0 &&
     (eventSystemFlags & IS_NON_DELEGATED) === 0
   ) {
-    // 捕获阶段事件
     const targetContainerNode = targetContainer;
 
     // If we are using the legacy FB support flag, we
     // defer the event to the null with a one
     // time event listener so we can defer the event.
+    if (
+      enableLegacyFBSupport &&
+      // If our event flags match the required flags for entering
+      // FB legacy mode and we are processing the "click" event,
+      // then we can defer the event to the "document", to allow
+      // for legacy FB support, where the expected behavior was to
+      // match React < 16 behavior of delegated clicks to the doc.
+      domEventName === 'click' &&
+      (eventSystemFlags & SHOULD_NOT_DEFER_CLICK_FOR_FB_SUPPORT_MODE) === 0 &&
+      !isReplayingEvent(nativeEvent)
+    ) {
+      deferClickToDocumentForLegacyFBSupport(domEventName, targetContainer);
+      return;
+    }
     if (targetInst !== null) {
       // The below logic attempts to work out if we need to change
       // the target fiber to a different ancestor. We had similar logic
@@ -528,19 +538,15 @@ export function dispatchEventForPluginEventSystem(
       let node = targetInst;
 
       mainLoop: while (true) {
-        // 从 当前 fiber 实例开始向上查找
         if (node === null) {
           return;
         }
         const nodeTag = node.tag;
         if (nodeTag === HostRoot || nodeTag === HostPortal) {
-          // 根容器
           let container = node.stateNode.containerInfo;
           if (isMatchingRootContainer(container, targetContainerNode)) {
-            // 匹配到了根容器
             break;
           }
-
           if (nodeTag === HostPortal) {
             // The target is a portal, but it's not the rootContainer we're looking for.
             // Normally portals handle their own events all the way down to the root.
@@ -586,14 +592,12 @@ export function dispatchEventForPluginEventSystem(
     }
   }
 
-  // 事件处理需要批量更新
   batchedUpdates(() =>
-    // 增加一个 BatchedUpdateContext 上下文标记去执行 dispatchEventForPlugins
     dispatchEventsForPlugins(
       domEventName,
       eventSystemFlags,
       nativeEvent,
-      ancestorInst, // 不是多颗树的情况，ancestorInst 就是 targetInst
+      ancestorInst,
       targetContainer,
     ),
   );
@@ -607,9 +611,6 @@ function createDispatchListener(instance, listener, currentTarget) {
   };
 }
 
-/**
- * 获取单一阶段的事件处理处理函数
- */
 export function accumulateSinglePhaseListeners(
   targetFiber,
   reactName,
@@ -618,25 +619,41 @@ export function accumulateSinglePhaseListeners(
   accumulateTargetOnly,
   nativeEvent,
 ) {
-  // 捕获阶段的事件名字
   const captureName = reactName !== null ? reactName + 'Capture' : null;
-
-  // 确定捕获阶段注册的 react 事件名
   const reactEventName = inCapturePhase ? captureName : reactName;
   let listeners = [];
 
   let instance = targetFiber;
   let lastHostComponent = null;
 
-  // 收集所有的从该元素到根容器的事件处理函数
-  // e.g. <div onClick={ ... }> <h1 onClick={ ... }></h1> </div> ，会从 h1 -> div 收集
   // Accumulate all instances and listeners via the target -> root path.
   while (instance !== null) {
     const {stateNode, tag} = instance;
     // Handle listeners that are on HostComponents (i.e. <div>)
     if (tag === HostComponent && stateNode !== null) {
-      // 最后的普通元素
       lastHostComponent = stateNode;
+
+      // createEventHandle listeners
+      if (enableCreateEventHandleAPI) {
+        const eventHandlerListeners =
+          getEventHandlerListeners(lastHostComponent);
+        if (eventHandlerListeners !== null) {
+          eventHandlerListeners.forEach((entry) => {
+            if (
+              entry.type === nativeEventType &&
+              entry.capture === inCapturePhase
+            ) {
+              listeners.push(
+                createDispatchListener(
+                  instance,
+                  entry.callback,
+                  lastHostComponent,
+                ),
+              );
+            }
+          });
+        }
+      }
 
       // Standard React on* listeners, i.e. onClick or onClickCapture
       if (reactEventName !== null) {
@@ -647,16 +664,57 @@ export function accumulateSinglePhaseListeners(
           );
         }
       }
+    } else if (
+      enableCreateEventHandleAPI &&
+      enableScopeAPI &&
+      tag === ScopeComponent &&
+      lastHostComponent !== null &&
+      stateNode !== null
+    ) {
+      // Scopes
+      const reactScopeInstance = stateNode;
+      const eventHandlerListeners =
+        getEventHandlerListeners(reactScopeInstance);
+      if (eventHandlerListeners !== null) {
+        eventHandlerListeners.forEach((entry) => {
+          if (
+            entry.type === nativeEventType &&
+            entry.capture === inCapturePhase
+          ) {
+            listeners.push(
+              createDispatchListener(
+                instance,
+                entry.callback,
+                lastHostComponent,
+              ),
+            );
+          }
+        });
+      }
     }
-
     // If we are only accumulating events for the target, then we don't
     // continue to propagate through the React fiber tree to find other
     // listeners.
-    // 只需要 target 上的事件处理函数
     if (accumulateTargetOnly) {
       break;
     }
-
+    // If we are processing the onBeforeBlur event, then we need to take
+    // into consideration that part of the React tree might have been hidden
+    // or deleted (as we're invoking this event during commit). We can find
+    // this out by checking if intercept fiber set on the event matches the
+    // current instance fiber. In which case, we should clear all existing
+    // listeners.
+    if (enableCreateEventHandleAPI && nativeEvent.type === 'beforeblur') {
+      // $FlowFixMe: internal field
+      const detachedInterceptFiber = nativeEvent._detachedInterceptFiber;
+      if (
+        detachedInterceptFiber !== null &&
+        (detachedInterceptFiber === instance ||
+          detachedInterceptFiber === instance.alternate)
+      ) {
+        listeners = [];
+      }
+    }
     instance = instance.return;
   }
   return listeners;

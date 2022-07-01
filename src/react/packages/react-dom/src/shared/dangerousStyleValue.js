@@ -42,6 +42,9 @@ function dangerousStyleValue(name, value, isCustomProperty) {
     return value + 'px'; // Presumes implicit 'px' suffix for unitless numbers
   }
 
+  if (__DEV__) {
+    checkCSSPropertyStringCoercion(value, name);
+  }
   return ('' + value).trim();
 }
 

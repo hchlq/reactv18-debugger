@@ -251,9 +251,10 @@ export function parseModelTuple(response, value) {
   return value;
 }
 
-export function createResponse() {
+export function createResponse(bundlerConfig) {
   const chunks = new Map();
   const response = {
+    _bundlerConfig: bundlerConfig,
     _chunks: chunks,
     readRoot: readRoot,
   };
@@ -285,7 +286,10 @@ export function resolveModule(response, id, model) {
   const chunks = response._chunks;
   const chunk = chunks.get(id);
   const moduleMetaData = parseModel(response, model);
-  const moduleReference = resolveModuleReference(moduleMetaData);
+  const moduleReference = resolveModuleReference(
+    response._bundlerConfig,
+    moduleMetaData,
+  );
 
   // TODO: Add an option to encode modules that are lazy loaded.
   // For now we preload all modules as early as possible since it's likely

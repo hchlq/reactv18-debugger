@@ -100,6 +100,8 @@ function TimelineContextController({children}) {
     return state;
   }, [file]);
 
+  const [selectedEvent, selectEvent] = useState(null);
+
   const value = useMemo(
     () => ({
       file,
@@ -108,8 +110,18 @@ function TimelineContextController({children}) {
       searchInputContainerRef,
       setFile,
       viewState,
+      selectEvent,
+      selectedEvent,
     }),
-    [file, inMemoryTimelineData, isTimelineSupported, setFile, viewState],
+    [
+      file,
+      inMemoryTimelineData,
+      isTimelineSupported,
+      setFile,
+      viewState,
+      selectEvent,
+      selectedEvent,
+    ],
   );
 
   return (

@@ -103,7 +103,7 @@ export default function setupHighlighter(bridge, agent) {
         node.scrollIntoView({block: 'nearest', inline: 'nearest'});
       }
 
-      showOverlay(nodes, displayName, hideAfterTimeout);
+      showOverlay(nodes, displayName, agent, hideAfterTimeout);
 
       if (openNativeElementsPanel) {
         window.__REACT_DEVTOOLS_GLOBAL_HOOK__.$0 = node;
@@ -156,7 +156,7 @@ export default function setupHighlighter(bridge, agent) {
 
     // Don't pass the name explicitly.
     // It will be inferred from DOM tag and Fiber owner.
-    showOverlay([target], null, false);
+    showOverlay([target], null, agent, false);
 
     selectFiberForNode(target);
   }

@@ -110,11 +110,11 @@ function createFromJSONCallback(response) {
   };
 }
 
-export function createResponse() {
+export function createResponse(bundlerConfig) {
   // NOTE: CHECK THE COMPILER OUTPUT EACH TIME YOU CHANGE THIS.
   // It should be inlined to one object literal but minor changes can break it.
   const stringDecoder = supportsBinaryStreams ? createStringDecoder() : null;
-  const response = createResponseBase();
+  const response = createResponseBase(bundlerConfig);
   response._partialRow = '';
   if (supportsBinaryStreams) {
     response._stringDecoder = stringDecoder;

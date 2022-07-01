@@ -13,12 +13,17 @@ import {
 } from 'react-client/src/ReactFlightClient';
 
 export {
-  resolveModuleReference,
   preloadModule,
   requireModule,
 } from 'ReactFlightNativeRelayClientIntegration';
 
+import {resolveModuleReference as resolveModuleReferenceImpl} from 'ReactFlightNativeRelayClientIntegration';
+
 import isArray from 'shared/isArray';
+
+export function resolveModuleReference(bundlerConfig, moduleData) {
+  return resolveModuleReferenceImpl(moduleData);
+}
 
 function parseModelRecursively(response, parentObj, value) {
   if (typeof value === 'string') {

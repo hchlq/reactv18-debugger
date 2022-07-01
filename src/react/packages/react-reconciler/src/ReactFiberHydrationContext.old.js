@@ -485,6 +485,7 @@ function prepareToHydrateHostTextInstance(fiber) {
             textContent,
             // TODO: Delete this argument when we remove the legacy root API.
             isConcurrentMode,
+            shouldWarnIfMismatchDev,
           );
           break;
         }
@@ -502,6 +503,7 @@ function prepareToHydrateHostTextInstance(fiber) {
             textContent,
             // TODO: Delete this argument when we remove the legacy root API.
             isConcurrentMode,
+            shouldWarnIfMismatchDev,
           );
           break;
         }

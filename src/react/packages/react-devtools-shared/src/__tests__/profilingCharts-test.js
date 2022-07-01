@@ -57,6 +57,7 @@ describe('profiling charts', () => {
   }
 
   describe('flamegraph chart', () => {
+    // @reactVersion >= 16.9
     it('should contain valid data', () => {
       const Parent = (_) => {
         Scheduler.unstable_advanceTime(10);
@@ -206,6 +207,7 @@ describe('profiling charts', () => {
   });
 
   describe('ranked chart', () => {
+    // @reactVersion >= 16.9
     it('should contain valid data', () => {
       const Parent = (_) => {
         Scheduler.unstable_advanceTime(10);

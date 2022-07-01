@@ -1352,11 +1352,7 @@ describe('ReactLazy', () => {
     expect(Scheduler).toFlushAndYield(['Init B2', 'Loading...']);
     jest.runAllTimers();
 
-    gate((flags) => {
-      if (flags.enableSuspenseLayoutEffectSemantics) {
-        expect(Scheduler).toHaveYielded(['Did unmount: A', 'Did unmount: B']);
-      }
-    });
+    expect(Scheduler).toHaveYielded(['Did unmount: A', 'Did unmount: B']);
 
     // The suspense boundary should've triggered now.
     expect(root).toMatchRenderedOutput('Loading...');
@@ -1366,23 +1362,12 @@ describe('ReactLazy', () => {
     expect(Scheduler).toFlushAndYield(['Init A2']);
     await LazyChildA2;
 
-    gate((flags) => {
-      if (flags.enableSuspenseLayoutEffectSemantics) {
-        expect(Scheduler).toFlushAndYield([
-          'b',
-          'a',
-          'Did mount: b',
-          'Did mount: a',
-        ]);
-      } else {
-        expect(Scheduler).toFlushAndYield([
-          'b',
-          'a',
-          'Did update: b',
-          'Did update: a',
-        ]);
-      }
-    });
+    expect(Scheduler).toFlushAndYield([
+      'b',
+      'a',
+      'Did mount: b',
+      'Did mount: a',
+    ]);
     expect(root).toMatchRenderedOutput('ba');
   });
 

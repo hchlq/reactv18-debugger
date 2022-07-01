@@ -10,6 +10,16 @@
 import {REACT_SERVER_CONTEXT_TYPE} from 'shared/ReactSymbols';
 import {readContext as readContextImpl} from './ReactFlightNewContext';
 
+let currentRequest = null;
+
+export function prepareToUseHooksForRequest(request) {
+  currentRequest = request;
+}
+
+export function resetHooksForRequest() {
+  currentRequest = null;
+}
+
 function readContext(context) {
   if (__DEV__) {
     if (context.$$typeof !== REACT_SERVER_CONTEXT_TYPE) {
@@ -59,7 +69,7 @@ export const Dispatcher = {
   useLayoutEffect: unsupportedHook,
   useImperativeHandle: unsupportedHook,
   useEffect: unsupportedHook,
-  useId: unsupportedHook,
+  useId,
   useMutableSource: unsupportedHook,
   useSyncExternalStore: unsupportedHook,
   useCacheRefresh() {
@@ -88,4 +98,13 @@ export function setCurrentCache(cache) {
 
 export function getCurrentCache() {
   return currentCache;
+}
+
+function useId() {
+  if (currentRequest === null) {
+    throw new Error('useId can only be used while React is rendering');
+  }
+  const id = currentRequest.identifierCount++;
+  // use 'S' for Flight components to distinguish from 'R' and 'r' in Fizz/Client
+  return ':' + currentRequest.identifierPrefix + 'S' + id.toString(32) + ':';
 }

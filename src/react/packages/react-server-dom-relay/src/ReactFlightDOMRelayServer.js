@@ -18,6 +18,8 @@ function render(model, destination, config, options) {
     model,
     config,
     options ? options.onError : undefined,
+    undefined, // not currently set up to supply context overrides
+    options ? options.identifierPrefix : undefined,
   );
   startWork(request);
   startFlowing(request, destination);

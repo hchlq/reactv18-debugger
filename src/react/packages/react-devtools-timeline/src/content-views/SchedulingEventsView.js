@@ -36,6 +36,7 @@ export class SchedulingEventsView extends View {
 
   _hoveredEvent = null;
   onHover = null;
+  onClick = null;
 
   constructor(surface, frame, profilerData) {
     super(surface, frame);
@@ -234,7 +235,7 @@ export class SchedulingEventsView extends View {
         timestamp - eventTimestampAllowance <= hoverTimestamp &&
         hoverTimestamp <= timestamp + eventTimestampAllowance
       ) {
-        this.currentCursor = 'context-menu';
+        this.currentCursor = 'pointer';
         viewRefs.hoveredView = this;
         onHover(event);
         return;
@@ -244,10 +245,31 @@ export class SchedulingEventsView extends View {
     onHover(null);
   }
 
+  /**
+   * @private
+   */
+  _handleClick(interaction) {
+    const {onClick} = this;
+    if (onClick) {
+      const {
+        _profilerData: {schedulingEvents},
+      } = this;
+      const eventIndex = schedulingEvents.findIndex(
+        (event) => event === this._hoveredEvent,
+      );
+      // onHover is going to take care of all the difficult logic here of
+      // figuring out which event when they're proximity is close.
+      onClick(this._hoveredEvent, eventIndex >= 0 ? eventIndex : null);
+    }
+  }
+
   handleInteraction(interaction, viewRefs) {
     switch (interaction.type) {
       case 'mousemove':
         this._handleMouseMove(interaction, viewRefs);
+        break;
+      case 'click':
+        this._handleClick(interaction);
         break;
     }
   }

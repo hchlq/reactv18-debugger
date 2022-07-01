@@ -36,7 +36,6 @@ export function detachDeletedInstance(node) {
   delete node[internalEventHandlesSetKey];
 }
 
-// 缓存 fiber 实例
 export function precacheFiberNode(hostInst, node) {
   node[internalInstanceKey] = hostInst;
 }

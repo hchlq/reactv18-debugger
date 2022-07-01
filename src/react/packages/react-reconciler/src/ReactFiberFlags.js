@@ -24,18 +24,15 @@ export const DidCapture = /*                   */ 0b00000000000000000010000000;
 export const ForceClientRender = /*            */ 0b00000000000000000100000000;
 export const Ref = /*                          */ 0b00000000000000001000000000;
 export const Snapshot = /*                     */ 0b00000000000000010000000000;
-
-export const Passive = /*                      */ 0b00000000000000100000000000; // useEffect 会用到
+export const Passive = /*                      */ 0b00000000000000100000000000;
 export const Hydrating = /*                    */ 0b00000000000001000000000000;
 export const Visibility = /*                   */ 0b00000000000010000000000000;
 export const StoreConsistency = /*             */ 0b00000000000100000000000000;
 
-// 生命周期 effect
 export const LifecycleEffectMask =
   Passive | Update | Callback | Ref | Snapshot | StoreConsistency;
 
 // Union of all commit flags (flags with the lifetime of a particular commit)
-// 标签元素上的 effect
 export const HostEffectMask = /*               */ 0b00000000000111111111111111;
 
 // These are not really side effects, but we still reuse this field.
@@ -64,24 +61,19 @@ export const MountPassiveDev = /*              */ 0b10000000000000000000000000;
 // Groups of flags that are used in the commit phase to skip over trees that
 // don't contain effects, by checking subtreeFlags.
 
-// BeforeMutationMask | MutationMask | LayoutMask | PassiveMask
-
-// beforeMutation 的 effect
 export const BeforeMutationMask =
   // TODO: Remove Update flag from before mutation phase by re-landing Visibility
   // flag logic (see #20043)
   Update |
-  Snapshot | 0
-  // enableCreateEventHandleAPI: false
-  // (enableCreateEventHandleAPI
-  //   ? // createEventHandle needs to visit deleted and hidden trees to
-  //     // fire beforeblur
-  //     // TODO: Only need to visit Deletions during BeforeMutation phase if an
-  //     // element is focused.
-  //     ChildDeletion | Visibility
-  //   : 0);
+  Snapshot |
+  (enableCreateEventHandleAPI
+    ? // createEventHandle needs to visit deleted and hidden trees to
+      // fire beforeblur
+      // TODO: Only need to visit Deletions during BeforeMutation phase if an
+      // element is focused.
+      ChildDeletion | Visibility
+    : 0);
 
-// mutation 的 effect
 export const MutationMask =
   Placement |
   Update |
@@ -90,8 +82,6 @@ export const MutationMask =
   Ref |
   Hydrating |
   Visibility;
-
-// Layout 的 effect
 export const LayoutMask = Update | Callback | Ref | Visibility;
 
 // TODO: Split into PassiveMountMask and PassiveUnmountMask

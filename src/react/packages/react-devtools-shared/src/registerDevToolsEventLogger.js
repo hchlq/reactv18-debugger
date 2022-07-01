@@ -13,8 +13,8 @@ import {enableLogger} from 'react-devtools-feature-flags';
 let loggingIFrame = null;
 let missedEvents = [];
 
-export function registerDevToolsEventLogger(surface) {
-  function logEvent(event) {
+export function registerDevToolsEventLogger(surface, fetchAdditionalContext) {
+  async function logEvent(event) {
     if (enableLogger) {
       if (loggingIFrame != null) {
         loggingIFrame.contentWindow.postMessage(
@@ -24,6 +24,9 @@ export function registerDevToolsEventLogger(surface) {
             context: {
               surface,
               version: process.env.DEVTOOLS_VERSION,
+              ...(fetchAdditionalContext != null
+                ? await fetchAdditionalContext()
+                : {}),
             },
           },
           '*',

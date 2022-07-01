@@ -20,12 +20,19 @@ import {
   processProviderChunk,
   processSymbolChunk,
   processErrorChunk,
+  processReferenceChunk,
   resolveModuleMetaData,
   getModuleKey,
   isModuleReference,
 } from './ReactFlightServerConfig';
 
-import {Dispatcher, getCurrentCache, setCurrentCache} from './ReactFlightHooks';
+import {
+  Dispatcher,
+  getCurrentCache,
+  prepareToUseHooksForRequest,
+  resetHooksForRequest,
+  setCurrentCache,
+} from './ReactFlightHooks';
 import {
   pushProvider,
   popProvider,
@@ -47,6 +54,11 @@ import {getOrCreateServerContext} from 'shared/ReactServerContextRegistry';
 import ReactSharedInternals from 'shared/ReactSharedInternals';
 import isArray from 'shared/isArray';
 
+const PENDING = 0;
+const COMPLETED = 1;
+const ABORTED = 3;
+const ERRORED = 4;
+
 const ReactCurrentDispatcher = ReactSharedInternals.ReactCurrentDispatcher;
 
 function defaultErrorHandler(error) {
@@ -58,8 +70,15 @@ const OPEN = 0;
 const CLOSING = 1;
 const CLOSED = 2;
 
-export function createRequest(model, bundlerConfig, onError, context) {
-  const pingedSegments = [];
+export function createRequest(
+  model,
+  bundlerConfig,
+  onError,
+  context,
+  identifierPrefix,
+) {
+  const abortSet = new Set();
+  const pingedTasks = [];
   const request = {
     status: OPEN,
     fatalError: null,
@@ -68,13 +87,16 @@ export function createRequest(model, bundlerConfig, onError, context) {
     cache: new Map(),
     nextChunkId: 0,
     pendingChunks: 0,
-    pingedSegments: pingedSegments,
+    abortableTasks: abortSet,
+    pingedTasks: pingedTasks,
     completedModuleChunks: [],
     completedJSONChunks: [],
     completedErrorChunks: [],
     writtenSymbols: new Map(),
     writtenModules: new Map(),
     writtenProviders: new Map(),
+    identifierPrefix: identifierPrefix || '',
+    identifierCount: 1,
     onError: onError === undefined ? defaultErrorHandler : onError,
     toJSON: function (key, value) {
       return resolveModelToJSON(request, this, key, value);
@@ -82,8 +104,8 @@ export function createRequest(model, bundlerConfig, onError, context) {
   };
   request.pendingChunks++;
   const rootContext = createRootContext(context);
-  const rootSegment = createSegment(request, model, rootContext);
-  pingedSegments.push(rootSegment);
+  const rootTask = createTask(request, model, rootContext, abortSet);
+  pingedTasks.push(rootTask);
   return request;
 }
 
@@ -169,23 +191,25 @@ function attemptResolveElement(type, key, ref, props) {
   );
 }
 
-function pingSegment(request, segment) {
-  const pingedSegments = request.pingedSegments;
-  pingedSegments.push(segment);
-  if (pingedSegments.length === 1) {
+function pingTask(request, task) {
+  const pingedTasks = request.pingedTasks;
+  pingedTasks.push(task);
+  if (pingedTasks.length === 1) {
     scheduleWork(() => performWork(request));
   }
 }
 
-function createSegment(request, model, context) {
+function createTask(request, model, context, abortSet) {
   const id = request.nextChunkId++;
-  const segment = {
+  const task = {
     id,
+    status: PENDING,
     model,
     context,
-    ping: () => pingSegment(request, segment),
+    ping: () => pingTask(request, task),
   };
-  return segment;
+  abortSet.add(task);
+  return task;
 }
 
 function serializeByValueID(id) {
@@ -426,12 +450,17 @@ export function resolveModelToJSON(request, parent, key, value) {
       }
     } catch (x) {
       if (typeof x === 'object' && x !== null && typeof x.then === 'function') {
-        // Something suspended, we'll need to create a new segment and resolve it later.
+        // Something suspended, we'll need to create a new task and resolve it later.
         request.pendingChunks++;
-        const newSegment = createSegment(request, value, getActiveContext());
-        const ping = newSegment.ping;
+        const newTask = createTask(
+          request,
+          value,
+          getActiveContext(),
+          request.abortableTasks,
+        );
+        const ping = newTask.ping;
         x.then(ping, ping);
-        return serializeByRefID(newSegment.id);
+        return serializeByRefID(newTask.id);
       } else {
         logRecoverableError(request, x);
         // Something errored. We'll still send everything we have up until this point.
@@ -689,10 +718,14 @@ function emitProviderChunk(request, id, contextName) {
   request.completedJSONChunks.push(processedChunk);
 }
 
-function retrySegment(request, segment) {
-  switchContext(segment.context);
+function retryTask(request, task) {
+  if (task.status !== PENDING) {
+    // We completed this by other means before we had a chance to retry it.
+    return;
+  }
+  switchContext(task.context);
   try {
-    let value = segment.model;
+    let value = task.model;
     while (
       typeof value === 'object' &&
       value !== null &&
@@ -701,9 +734,9 @@ function retrySegment(request, segment) {
       // TODO: Concatenate keys of parents onto children.
       const element = value;
       // Attempt to render the server component.
-      // Doing this here lets us reuse this same segment if the next component
+      // Doing this here lets us reuse this same task if the next component
       // also suspends.
-      segment.model = value;
+      task.model = value;
       value = attemptResolveElement(
         element.type,
         element.key,
@@ -711,18 +744,22 @@ function retrySegment(request, segment) {
         element.props,
       );
     }
-    const processedChunk = processModelChunk(request, segment.id, value);
+    const processedChunk = processModelChunk(request, task.id, value);
     request.completedJSONChunks.push(processedChunk);
+    request.abortableTasks.delete(task);
+    task.status = COMPLETED;
   } catch (x) {
     if (typeof x === 'object' && x !== null && typeof x.then === 'function') {
       // Something suspended again, let's pick it back up later.
-      const ping = segment.ping;
+      const ping = task.ping;
       x.then(ping, ping);
       return;
     } else {
+      request.abortableTasks.delete(task);
+      task.status = ERRORED;
       logRecoverableError(request, x);
       // This errored, we need to serialize this error to the
-      emitErrorChunk(request, segment.id, x);
+      emitErrorChunk(request, task.id, x);
     }
   }
 }
@@ -732,13 +769,14 @@ function performWork(request) {
   const prevCache = getCurrentCache();
   ReactCurrentDispatcher.current = Dispatcher;
   setCurrentCache(request.cache);
+  prepareToUseHooksForRequest(request);
 
   try {
-    const pingedSegments = request.pingedSegments;
-    request.pingedSegments = [];
-    for (let i = 0; i < pingedSegments.length; i++) {
-      const segment = pingedSegments[i];
-      retrySegment(request, segment);
+    const pingedTasks = request.pingedTasks;
+    request.pingedTasks = [];
+    for (let i = 0; i < pingedTasks.length; i++) {
+      const task = pingedTasks[i];
+      retryTask(request, task);
     }
     if (request.destination !== null) {
       flushCompletedChunks(request, request.destination);
@@ -749,7 +787,17 @@ function performWork(request) {
   } finally {
     ReactCurrentDispatcher.current = prevDispatcher;
     setCurrentCache(prevCache);
+    resetHooksForRequest();
   }
+}
+
+function abortTask(task, request, errorId) {
+  task.status = ABORTED;
+  // Instead of emitting an error per task.id, we emit a model that only
+  // has a single value referencing the error.
+  const ref = serializeByValueID(errorId);
+  const processedChunk = processReferenceChunk(request, task.id, ref);
+  request.completedJSONChunks.push(processedChunk);
 }
 
 function flushCompletedChunks(request, destination) {
@@ -830,6 +878,34 @@ export function startFlowing(request, destination) {
   request.destination = destination;
   try {
     flushCompletedChunks(request, destination);
+  } catch (error) {
+    logRecoverableError(request, error);
+    fatalError(request, error);
+  }
+}
+
+// This is called to early terminate a request. It creates an error at all pending tasks.
+export function abort(request, reason) {
+  try {
+    const abortableTasks = request.abortableTasks;
+    if (abortableTasks.size > 0) {
+      // We have tasks to abort. We'll emit one error row and then emit a reference
+      // to that row from every row that's still remaining.
+      const error =
+        reason === undefined
+          ? new Error('The render was aborted by the server without a reason.')
+          : reason;
+
+      logRecoverableError(request, error);
+      request.pendingChunks++;
+      const errorId = request.nextChunkId++;
+      emitErrorChunk(request, errorId, error);
+      abortableTasks.forEach((task) => abortTask(task, request, errorId));
+      abortableTasks.clear();
+    }
+    if (request.destination !== null) {
+      flushCompletedChunks(request, request.destination);
+    }
   } catch (error) {
     logRecoverableError(request, error);
     fatalError(request, error);

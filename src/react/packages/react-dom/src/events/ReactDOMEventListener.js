@@ -41,15 +41,10 @@ import {
   UserBlockingPriority as UserBlockingSchedulerPriority,
 } from 'react-reconciler/src/Scheduler';
 import {
-  // 0b0001
   DiscreteEventPriority,
-  // 0b0100
   ContinuousEventPriority,
-  // 0b10000
   DefaultEventPriority,
-  // 0b0100000000000000000000000000000
   IdleEventPriority,
-
   getCurrentUpdatePriority,
   setCurrentUpdatePriority,
 } from 'react-reconciler/src/ReactEventPriorities';
@@ -84,35 +79,25 @@ export function createEventListenerWrapper(
   );
 }
 
-/**
- * 创建带优先级的事件处理函数
- */
 export function createEventListenerWrapperWithPriority(
   targetContainer,
   domEventName,
   eventSystemFlags,
 ) {
-  // 1. 确定事件优先级
   const eventPriority = getEventPriority(domEventName);
   let listenerWrapper;
-  // 根据事件的优先级，确定处理函数
   switch (eventPriority) {
     case DiscreteEventPriority:
-      // 离散的事件，比如 click
       listenerWrapper = dispatchDiscreteEvent;
       break;
     case ContinuousEventPriority:
-      // 持续的事件，比如 scroll
       listenerWrapper = dispatchContinuousEvent;
       break;
     case DefaultEventPriority:
     default:
-      // DefaultEventPriority 或者默认的优先级
       listenerWrapper = dispatchEvent;
       break;
   }
-
-  // 2. 绑定事件处理函数，首先固定三个参数
   return listenerWrapper.bind(
     null,
     domEventName,
@@ -121,23 +106,16 @@ export function createEventListenerWrapperWithPriority(
   );
 }
 
-/**
- * 离散事件的事件处理函数
- * 前三个参数已经固定了，第三个参数是真正的处理函数
- */
 function dispatchDiscreteEvent(
   domEventName,
   eventSystemFlags,
   container,
   nativeEvent,
 ) {
-  // 获取当前更新的优先，保存起来
   const previousPriority = getCurrentUpdatePriority();
-
   const prevTransition = ReactCurrentBatchConfig.transition;
   ReactCurrentBatchConfig.transition = null;
   try {
-    // 设置更新优先级，事件类型是离散的优先级
     setCurrentUpdatePriority(DiscreteEventPriority);
     dispatchEvent(domEventName, eventSystemFlags, container, nativeEvent);
   } finally {
@@ -173,7 +151,6 @@ export function dispatchEvent(
   if (!_enabled) {
     return;
   }
-  // enableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay: true
   if (enableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay) {
     dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay(
       domEventName,
@@ -287,30 +264,23 @@ function dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEve
   targetContainer,
   nativeEvent,
 ) {
-  // 查找被中断的事件
-  // e.g. Suspense, ssr 的 HostRoot
   let blockedOn = findInstanceBlockingEvent(
     domEventName,
     eventSystemFlags,
     targetContainer,
     nativeEvent,
   );
-
   if (blockedOn === null) {
-    // 没有被中断的事件
     dispatchEventForPluginEventSystem(
       domEventName,
-      eventSystemFlags, // 事件的标记
+      eventSystemFlags,
       nativeEvent,
-      return_targetInst, // fiber 实例
-      targetContainer, // 根容器
+      return_targetInst,
+      targetContainer,
     );
-    // 如果是持续的事件，需要清除一些其他的 effect
     clearIfContinuousEvent(domEventName, nativeEvent);
     return;
   }
-
-  // 有被中断的事件
 
   if (
     queueIfContinuousEvent(
@@ -321,19 +291,15 @@ function dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEve
       nativeEvent,
     )
   ) {
-    // 停止冒泡
     nativeEvent.stopPropagation();
     return;
   }
-
   // We need to clear only if we didn't queue because
   // queueing is accumulative.
   clearIfContinuousEvent(domEventName, nativeEvent);
 
   if (
-    // 1. 是捕获阶段触发的事件
     eventSystemFlags & IS_CAPTURE_PHASE &&
-    // 2. ssr 相关的离散事件
     isDiscreteEventThatRequiresHydration(domEventName)
   ) {
     while (blockedOn !== null) {
@@ -361,7 +327,6 @@ function dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEve
       }
       blockedOn = nextBlockedOn;
     }
-
     if (blockedOn !== null) {
       nativeEvent.stopPropagation();
     }
@@ -393,14 +358,10 @@ export function findInstanceBlockingEvent(
 
   return_targetInst = null;
 
-  // 获取事件目标对象
   const nativeEventTarget = getEventTarget(nativeEvent);
-
-  // 获取最近的 fiber 实例
   let targetInst = getClosestInstanceFromNode(nativeEventTarget);
 
   if (targetInst !== null) {
-    // 获取最近的已经挂载的 fiber 实例
     const nearestMounted = getNearestMountedFiber(targetInst);
     if (nearestMounted === null) {
       // This tree has been unmounted already. Dispatch without a target.
@@ -502,7 +463,6 @@ export function getEventPriority(domEventName) {
     case 'popstate':
     case 'select':
     case 'selectstart':
-      // 离散事件：1
       return DiscreteEventPriority;
     case 'drag':
     case 'dragenter':
@@ -525,24 +485,22 @@ export function getEventPriority(domEventName) {
     case 'mouseleave':
     case 'pointerenter':
     case 'pointerleave':
-      // 持续的事件：4
       return ContinuousEventPriority;
     case 'message': {
       // We might be in the Scheduler callback.
       // Eventually this mechanism will be replaced by a check
       // of the current priority on the native scheduler.
-      // 在 scheduleCallback 中
       const schedulerPriority = getCurrentSchedulerPriorityLevel();
       switch (schedulerPriority) {
-        case ImmediateSchedulerPriority: // 1
+        case ImmediateSchedulerPriority:
           return DiscreteEventPriority;
-        case UserBlockingSchedulerPriority: // 2
+        case UserBlockingSchedulerPriority:
           return ContinuousEventPriority;
-        case NormalSchedulerPriority: // 3
-        case LowSchedulerPriority: // 4
+        case NormalSchedulerPriority:
+        case LowSchedulerPriority:
           // TODO: Handle LowSchedulerPriority, somehow. Maybe the same lane as hydration.
           return DefaultEventPriority;
-        case IdleSchedulerPriority: // 5
+        case IdleSchedulerPriority:
           return IdleEventPriority;
         default:
           return DefaultEventPriority;

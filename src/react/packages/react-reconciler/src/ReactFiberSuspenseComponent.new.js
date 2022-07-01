@@ -7,7 +7,6 @@
  *
  */
 
-import {enableSuspenseAvoidThisFallback} from 'shared/ReactFeatureFlags';
 import {SuspenseComponent, SuspenseListComponent} from './ReactWorkTags';
 import {NoFlags, DidCapture} from './ReactFiberFlags';
 import {
@@ -22,34 +21,6 @@ import {
 //     isSuspenseInstanceFallback to query the reason for being dehydrated.
 // - A null dehydrated field means it's blocked by something suspending and
 //   we're currently showing a fallback instead.
-
-export function shouldCaptureSuspense(workInProgress, hasInvisibleParent) {
-  // If it was the primary children that just suspended, capture and render the
-  // fallback. Otherwise, don't capture and bubble to the next boundary.
-  const nextState = workInProgress.memoizedState;
-  if (nextState !== null) {
-    if (nextState.dehydrated !== null) {
-      // A dehydrated boundary always captures.
-      return true;
-    }
-    return false;
-  }
-  const props = workInProgress.memoizedProps;
-  // Regular boundaries always capture.
-  if (
-    !enableSuspenseAvoidThisFallback ||
-    props.unstable_avoidThisFallback !== true
-  ) {
-    return true;
-  }
-  // If it's a boundary we should avoid, then we prefer to bubble up to the
-  // parent boundary if it is currently invisible.
-  if (hasInvisibleParent) {
-    return false;
-  }
-  // If the parent is not able to handle it, we must handle it.
-  return true;
-}
 
 export function findFirstSuspended(row) {
   let node = row;

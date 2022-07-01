@@ -95,7 +95,13 @@ export function makeId(responseState, treeId, localId) {
 
 const RAW_TEXT = stringToPrecomputedChunk('RCTRawText');
 
-export function pushTextInstance(target, text, responseState) {
+export function pushTextInstance(
+  target,
+  text,
+  responseState,
+  // This Renderer does not use this argument
+  textEmbedded,
+) {
   target.push(
     INSTANCE,
     RAW_TEXT, // Type
@@ -103,6 +109,7 @@ export function pushTextInstance(target, text, responseState) {
     // TODO: props { text: text }
     END, // End of children
   );
+  return false;
 }
 
 export function pushStartInstance(
@@ -124,6 +131,14 @@ export function pushStartInstance(
 export function pushEndInstance(target, type, props) {
   target.push(END);
 }
+
+// In this Renderer this is a noop
+export function pushSegmentFinale(
+  target,
+  responseState,
+  lastPushedText,
+  textEmbedded,
+) {}
 
 export function writeCompletedRoot(destination, responseState) {
   return true;
@@ -174,6 +189,10 @@ export function writeStartPendingSuspenseBoundary(
 export function writeStartClientRenderedSuspenseBoundary(
   destination,
   responseState,
+  // TODO: encode error for native
+  errorDigest,
+  errorMessage,
+  errorComponentStack,
 ) {
   return writeChunkAndReturn(destination, SUSPENSE_CLIENT_RENDER);
 }
@@ -233,6 +252,10 @@ export function writeClientRenderBoundaryInstruction(
   destination,
   responseState,
   boundaryID,
+  // TODO: encode error for native
+  errorDigest,
+  errorMessage,
+  errorComponentStack,
 ) {
   writeChunk(destination, SUSPENSE_UPDATE_TO_CLIENT_RENDER);
   return writeChunkAndReturn(destination, formatID(boundaryID));

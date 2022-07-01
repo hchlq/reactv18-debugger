@@ -148,8 +148,9 @@ export default class Overlay {
   container;
   tip;
   rects;
+  agent;
 
-  constructor() {
+  constructor(agent) {
     // Find the root window, because overlays are positioned relative to it.
     const currentWindow = window.__REACT_DEVTOOLS_TARGET_WINDOW__ || window;
     this.window = currentWindow;
@@ -164,6 +165,8 @@ export default class Overlay {
 
     this.tip = new OverlayTip(doc, this.container);
     this.rects = [];
+
+    this.agent = agent;
 
     doc.body.appendChild(this.container);
   }
@@ -227,21 +230,18 @@ export default class Overlay {
       name = elements[0].nodeName.toLowerCase();
 
       const node = elements[0];
-      const hook =
-        node.ownerDocument.defaultView.__REACT_DEVTOOLS_GLOBAL_HOOK__;
-      if (hook != null && hook.rendererInterfaces != null) {
-        let ownerName = null;
-        // eslint-disable-next-line no-for-of-loops/no-for-of-loops
-        for (const rendererInterface of hook.rendererInterfaces.values()) {
-          const id = rendererInterface.getFiberIDForNative(node, true);
-          if (id !== null) {
-            ownerName = rendererInterface.getDisplayNameForFiberID(id, true);
-            break;
+      const rendererInterface =
+        this.agent.getBestMatchingRendererInterface(node);
+      if (rendererInterface) {
+        const id = rendererInterface.getFiberIDForNative(node, true);
+        if (id) {
+          const ownerName = rendererInterface.getDisplayNameForFiberID(
+            id,
+            true,
+          );
+          if (ownerName) {
+            name += ' (in ' + ownerName + ')';
           }
-        }
-
-        if (ownerName) {
-          name += ' (in ' + ownerName + ')';
         }
       }
     }

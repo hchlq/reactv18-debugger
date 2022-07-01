@@ -544,6 +544,7 @@ describe('ReactHooksInspectionIntegration', () => {
     function Foo(props) {
       React.useTransition();
       const memoizedValue = React.useMemo(() => 'hello', []);
+      React.useMemo(() => 'not used', []);
       return <div>{memoizedValue}</div>;
     }
     const renderer = ReactTestRenderer.create(<Foo />);
@@ -564,16 +565,24 @@ describe('ReactHooksInspectionIntegration', () => {
         value: 'hello',
         subHooks: [],
       },
+      {
+        id: 2,
+        isStateEditable: false,
+        name: 'Memo',
+        value: 'not used',
+        subHooks: [],
+      },
     ]);
   });
 
-  it('should support composite useDeferredValue hook', () => {
+  it('should support useDeferredValue hook', () => {
     function Foo(props) {
       React.useDeferredValue('abc', {
         timeoutMs: 500,
       });
-      const [state] = React.useState(() => 'hello', []);
-      return <div>{state}</div>;
+      const memoizedValue = React.useMemo(() => 1, []);
+      React.useMemo(() => 2, []);
+      return <div>{memoizedValue}</div>;
     }
     const renderer = ReactTestRenderer.create(<Foo />);
     const childFiber = renderer.root.findByType(Foo)._currentFiber();
@@ -588,9 +597,16 @@ describe('ReactHooksInspectionIntegration', () => {
       },
       {
         id: 1,
-        isStateEditable: true,
-        name: 'State',
-        value: 'hello',
+        isStateEditable: false,
+        name: 'Memo',
+        value: 1,
+        subHooks: [],
+      },
+      {
+        id: 2,
+        isStateEditable: false,
+        name: 'Memo',
+        value: 2,
         subHooks: [],
       },
     ]);
@@ -1010,6 +1026,7 @@ describe('ReactHooksInspectionIntegration', () => {
         () => {},
       );
       React.useMemo(() => 'memo', []);
+      React.useMemo(() => 'not used', []);
       return <div />;
     }
     const renderer = ReactTestRenderer.create(<Foo />);
@@ -1030,6 +1047,13 @@ describe('ReactHooksInspectionIntegration', () => {
         value: 'memo',
         subHooks: [],
       },
+      {
+        id: 2,
+        isStateEditable: false,
+        name: 'Memo',
+        value: 'not used',
+        subHooks: [],
+      },
     ]);
   });
 
@@ -1041,6 +1065,7 @@ describe('ReactHooksInspectionIntegration', () => {
         () => 'snapshot',
       );
       React.useMemo(() => 'memo', []);
+      React.useMemo(() => 'not used', []);
       return value;
     }
 
@@ -1060,6 +1085,13 @@ describe('ReactHooksInspectionIntegration', () => {
         isStateEditable: false,
         name: 'Memo',
         value: 'memo',
+        subHooks: [],
+      },
+      {
+        id: 2,
+        isStateEditable: false,
+        name: 'Memo',
+        value: 'not used',
         subHooks: [],
       },
     ]);

@@ -27,12 +27,10 @@ const setTextContent = function (node, text) {
       firstChild === node.lastChild &&
       firstChild.nodeType === TEXT_NODE
     ) {
-      // 处理只有一个文本孩子的情况
       firstChild.nodeValue = text;
       return;
     }
   }
-
   node.textContent = text;
 };
 

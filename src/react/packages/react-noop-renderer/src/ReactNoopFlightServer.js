@@ -51,14 +51,15 @@ const ReactNoopFlightServer = ReactFlightServer({
   },
 });
 
-function render(model, options, context) {
+function render(model, options) {
   const destination = [];
   const bundlerConfig = undefined;
   const request = ReactNoopFlightServer.createRequest(
     model,
     bundlerConfig,
     options ? options.onError : undefined,
-    context,
+    options ? options.context : undefined,
+    options ? options.identifierPrefix : undefined,
   );
   ReactNoopFlightServer.startWork(request);
   ReactNoopFlightServer.startFlowing(request, destination);

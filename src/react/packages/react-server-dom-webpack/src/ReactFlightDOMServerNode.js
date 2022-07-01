@@ -11,18 +11,20 @@ import {
   createRequest,
   startWork,
   startFlowing,
+  abort,
 } from 'react-server/src/ReactFlightServer';
 
 function createDrainHandler(destination, request) {
   return () => startFlowing(request, destination);
 }
 
-function renderToPipeableStream(model, webpackMap, options, context) {
+function renderToPipeableStream(model, webpackMap, options) {
   const request = createRequest(
     model,
     webpackMap,
     options ? options.onError : undefined,
-    context,
+    options ? options.context : undefined,
+    options ? options.identifierPrefix : undefined,
   );
   let hasStartedFlowing = false;
   startWork(request);
@@ -37,6 +39,9 @@ function renderToPipeableStream(model, webpackMap, options, context) {
       startFlowing(request, destination);
       destination.on('drain', createDrainHandler(destination, request));
       return destination;
+    },
+    abort(reason) {
+      abort(request, reason);
     },
   };
 }

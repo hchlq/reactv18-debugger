@@ -24,7 +24,7 @@ import {
   enableUpdaterTracking,
   enableTransitionTracing,
 } from 'shared/ReactFeatureFlags';
-import {initializeUpdateQueue} from './ReactUpdateQueue.new';
+import {initializeUpdateQueue} from './ReactFiberClassUpdateQueue.new';
 import {LegacyRoot, ConcurrentRoot} from './ReactRootTags';
 import {createCache, retainCache} from './ReactFiberCacheComponent.new';
 
@@ -59,6 +59,8 @@ function FiberRootNode(
   this.entangledLanes = NoLanes;
   this.entanglements = createLaneMap(NoLanes);
 
+  this.hiddenUpdates = createLaneMap(null);
+
   this.identifierPrefix = identifierPrefix;
   this.onRecoverableError = onRecoverableError;
 
@@ -75,6 +77,7 @@ function FiberRootNode(
     this.hydrationCallbacks = null;
   }
 
+  this.incompleteTransitions = new Map();
   if (enableTransitionTracing) {
     this.transitionCallbacks = null;
     const transitionLanesMap = (this.transitionLanes = []);
@@ -166,8 +169,6 @@ export function createFiberRoot(
       element: initialChildren,
       isDehydrated: hydrate,
       cache: initialCache,
-      transitions: null,
-      pendingSuspenseBoundaries: null,
     };
     uninitializedFiber.memoizedState = initialState;
   } else {
@@ -175,8 +176,6 @@ export function createFiberRoot(
       element: initialChildren,
       isDehydrated: hydrate,
       cache: null, // not enabled yet
-      transitions: null,
-      pendingSuspenseBoundaries: null,
     };
     uninitializedFiber.memoizedState = initialState;
   }

@@ -104,23 +104,35 @@ export function getValueForProperty(node, name, expected, propertyInfo) {
  * The third argument is used as a hint of what the expected value is. Some
  * attributes have multiple equivalent values.
  */
-export function getValueForAttribute(node, name, expected) {
-  // if (__DEV__) {
-  //   if (!isAttributeNameSafe(name)) {
-  //     return;
-  //   }
-  //   if (!node.hasAttribute(name)) {
-  //     return expected === undefined ? undefined : null;
-  //   }
-  //   const value = node.getAttribute(name);
-  //   if (__DEV__) {
-  //     checkAttributeStringCoercion(expected, name);
-  //   }
-  //   if (value === '' + expected) {
-  //     return expected;
-  //   }
-  //   return value;
-  // }
+export function getValueForAttribute(
+  node,
+  name,
+  expected,
+  isCustomComponentTag,
+) {
+  if (__DEV__) {
+    if (!isAttributeNameSafe(name)) {
+      return;
+    }
+    if (!node.hasAttribute(name)) {
+      return expected === undefined ? undefined : null;
+    }
+    const value = node.getAttribute(name);
+
+    if (enableCustomElementPropertySupport) {
+      if (isCustomComponentTag && value === '') {
+        return true;
+      }
+    }
+
+    if (__DEV__) {
+      checkAttributeStringCoercion(expected, name);
+    }
+    if (value === '' + expected) {
+      return expected;
+    }
+    return value;
+  }
 }
 
 /**
@@ -180,6 +192,11 @@ export function setValueForProperty(node, name, value, isCustomComponentTag) {
   if (shouldRemoveAttribute(name, value, propertyInfo, isCustomComponentTag)) {
     value = null;
   }
+  if (enableCustomElementPropertySupport) {
+    if (isCustomComponentTag && value === true) {
+      value = '';
+    }
+  }
 
   // If the prop isn't in the special list, treat it as a simple attribute.
   if (isCustomComponentTag || propertyInfo === null) {
@@ -188,6 +205,9 @@ export function setValueForProperty(node, name, value, isCustomComponentTag) {
       if (value === null) {
         node.removeAttribute(attributeName);
       } else {
+        if (__DEV__) {
+          checkAttributeStringCoercion(value, name);
+        }
         node.setAttribute(
           attributeName,
           enableTrustedTypesIntegration ? value : '' + value,

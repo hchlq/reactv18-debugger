@@ -33,15 +33,19 @@ function renderToReadableStream(children, options) {
     });
 
     function onShellReady() {
-      const stream = new ReadableStream({
-        type: 'bytes',
-        pull(controller) {
-          startFlowing(request, controller);
+      const stream = new ReadableStream(
+        {
+          type: 'bytes',
+          pull(controller) {
+            startFlowing(request, controller);
+          },
+          cancel(reason) {
+            abort(request);
+          },
         },
-        cancel(reason) {
-          abort(request);
-        },
-      });
+        // $FlowFixMe size() methods are not allowed on byte streams.
+        {highWaterMark: 0},
+      );
       // TODO: Move to sub-classing ReadableStream.
       stream.allReady = allReady;
       resolve(stream);
@@ -72,11 +76,15 @@ function renderToReadableStream(children, options) {
     );
     if (options && options.signal) {
       const signal = options.signal;
-      const listener = () => {
-        abort(request);
-        signal.removeEventListener('abort', listener);
-      };
-      signal.addEventListener('abort', listener);
+      if (signal.aborted) {
+        abort(request, signal.reason);
+      } else {
+        const listener = () => {
+          abort(request, signal.reason);
+          signal.removeEventListener('abort', listener);
+        };
+        signal.addEventListener('abort', listener);
+      }
     }
     startWork(request);
   });

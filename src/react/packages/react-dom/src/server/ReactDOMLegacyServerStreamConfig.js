@@ -15,22 +15,11 @@ export function flushBuffered(destination) {}
 
 export function beginWriting(destination) {}
 
-let prevWasCommentSegmenter = false;
 export function writeChunk(destination, chunk) {
   writeChunkAndReturn(destination, chunk);
 }
 
 export function writeChunkAndReturn(destination, chunk) {
-  if (prevWasCommentSegmenter) {
-    prevWasCommentSegmenter = false;
-    if (chunk[0] !== '<') {
-      destination.push('<!-- -->');
-    }
-  }
-  if (chunk === '<!-- -->') {
-    prevWasCommentSegmenter = true;
-    return true;
-  }
   return destination.push(chunk);
 }
 

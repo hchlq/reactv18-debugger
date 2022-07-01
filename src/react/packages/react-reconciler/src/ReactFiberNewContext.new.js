@@ -29,7 +29,7 @@ import {
 } from './ReactFiberFlags';
 
 import is from 'shared/objectIs';
-import {createUpdate, ForceUpdate} from './ReactUpdateQueue.new';
+import {createUpdate, ForceUpdate} from './ReactFiberClassUpdateQueue.new';
 import {markWorkInProgressReceivedUpdate} from './ReactFiberBeginWork.new';
 import {
   enableLazyContextPropagation,

@@ -56,6 +56,7 @@ describe('InspectedElementContext', () => {
     ReactDOM = require('react-dom');
   });
 
+  // @reactVersion >= 16.0
   it('should inspect the currently selected element', async () => {
     const Example = () => null;
 
@@ -83,6 +84,7 @@ describe('InspectedElementContext', () => {
     `);
   });
 
+  // @reactVersion >= 16.0
   it('should support simple data types', async () => {
     const Example = () => null;
 
@@ -134,6 +136,7 @@ describe('InspectedElementContext', () => {
     `);
   });
 
+  // @reactVersion >= 16.0
   it('should support complex data types', async () => {
     const Immutable = require('immutable');
 
@@ -318,6 +321,7 @@ describe('InspectedElementContext', () => {
     `);
   });
 
+  // @reactVersion >= 16.0
   it('should support objects with no prototype', async () => {
     const Example = () => null;
 
@@ -347,6 +351,7 @@ describe('InspectedElementContext', () => {
     `);
   });
 
+  // @reactVersion >= 16.0
   it('should support objects with overridden hasOwnProperty', async () => {
     const Example = () => null;
 
@@ -371,6 +376,7 @@ describe('InspectedElementContext', () => {
     expect(inspectedElement.props.object.hasOwnProperty).toBe(true);
   });
 
+  // @reactVersion >= 16.0
   it('should not consume iterables while inspecting', async () => {
     const Example = () => null;
 
@@ -415,6 +421,7 @@ describe('InspectedElementContext', () => {
     expect(iteratable.next().value).toBeUndefined();
   });
 
+  // @reactVersion >= 16.0
   it('should support custom objects with enumerable properties and getters', async () => {
     class CustomData {
       _number = 42;
@@ -464,6 +471,7 @@ describe('InspectedElementContext', () => {
     `);
   });
 
+  // @reactVersion >= 16.0
   it('should support objects with with inherited keys', async () => {
     const Example = () => null;
 
@@ -556,6 +564,7 @@ describe('InspectedElementContext', () => {
     `);
   });
 
+  // @reactVersion >= 16.0
   it('should allow component prop value and value`s prototype has same name params.', async () => {
     const testData = Object.create(
       {
@@ -615,6 +624,7 @@ describe('InspectedElementContext', () => {
     `);
   });
 
+  // @reactVersion >= 16.0
   it('should not dehydrate nested values until explicitly requested', async () => {
     const Example = () => null;
 
@@ -717,6 +727,7 @@ describe('InspectedElementContext', () => {
     `);
   });
 
+  // @reactVersion >= 16.0
   it('should enable inspected values to be stored as global variables', () => {
     const Example = () => null;
 
@@ -772,6 +783,7 @@ describe('InspectedElementContext', () => {
     expect(global.$reactTemp1).toBe(nestedObject.a.b);
   });
 
+  // @reactVersion >= 16.0
   it('should enable inspected values to be copied to the clipboard', () => {
     const Example = () => null;
 
@@ -828,6 +840,7 @@ describe('InspectedElementContext', () => {
     );
   });
 
+  // @reactVersion >= 16.0
   it('should enable complex values to be copied to the clipboard', () => {
     const Immutable = require('immutable');
 

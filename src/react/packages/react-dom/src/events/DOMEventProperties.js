@@ -17,7 +17,6 @@ import {
 
 import {enableCreateEventHandleAPI} from 'shared/ReactFeatureFlags';
 
-// react事件名字映射到dom事件名字
 export const topLevelEventsToReactNames = new Map();
 
 // NOTE: Capitalization is important in this list!
@@ -109,7 +108,6 @@ if (enableCreateEventHandleAPI) {
 
 function registerSimpleEvent(domEventName, reactName) {
   topLevelEventsToReactNames.set(domEventName, reactName);
-  // react 的名字 ，事件名字
   registerTwoPhaseEvent(reactName, [domEventName]);
 }
 
@@ -120,7 +118,6 @@ export function registerSimpleEvents() {
     const capitalizedEvent = eventName[0].toUpperCase() + eventName.slice(1);
     registerSimpleEvent(domEventName, 'on' + capitalizedEvent);
   }
-
   // Special cases where event names don't match.
   registerSimpleEvent(ANIMATION_END, 'onAnimationEnd');
   registerSimpleEvent(ANIMATION_ITERATION, 'onAnimationIteration');

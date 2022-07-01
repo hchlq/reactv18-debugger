@@ -9,7 +9,10 @@
 
 // eslint-disable-next-line no-unused-vars
 
-export function resolveModuleReference(moduleData) {
+export function resolveModuleReference(bundlerConfig, moduleData) {
+  if (bundlerConfig) {
+    return bundlerConfig[moduleData.id][moduleData.name];
+  }
   return moduleData;
 }
 

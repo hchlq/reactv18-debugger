@@ -30,7 +30,7 @@ import {
 import {disableLogs, reenableLogs} from './DevToolsConsolePatching';
 
 let prefix;
-export function describeBuiltInComponentFrame(name, source, ownerFn) {
+export function describeBuiltInComponentFrame(name, ownerFn) {
   if (prefix === undefined) {
     // Extract the VM specific prefix used by each line.
     try {
@@ -196,7 +196,6 @@ export function describeNativeComponentFrame(
 
 export function describeClassComponentFrame(
   ctor,
-  source,
   ownerFn,
   currentDispatcherRef,
 ) {
@@ -205,7 +204,6 @@ export function describeClassComponentFrame(
 
 export function describeFunctionComponentFrame(
   fn,
-  source,
   ownerFn,
   currentDispatcherRef,
 ) {
@@ -219,7 +217,6 @@ function shouldConstruct(Component) {
 
 export function describeUnknownElementTypeFrameInDEV(
   type,
-  source,
   ownerFn,
   currentDispatcherRef,
 ) {
@@ -237,15 +234,15 @@ export function describeUnknownElementTypeFrameInDEV(
     );
   }
   if (typeof type === 'string') {
-    return describeBuiltInComponentFrame(type, source, ownerFn);
+    return describeBuiltInComponentFrame(type, ownerFn);
   }
   switch (type) {
     case SUSPENSE_NUMBER:
     case SUSPENSE_SYMBOL_STRING:
-      return describeBuiltInComponentFrame('Suspense', source, ownerFn);
+      return describeBuiltInComponentFrame('Suspense', ownerFn);
     case SUSPENSE_LIST_NUMBER:
     case SUSPENSE_LIST_SYMBOL_STRING:
-      return describeBuiltInComponentFrame('SuspenseList', source, ownerFn);
+      return describeBuiltInComponentFrame('SuspenseList', ownerFn);
   }
   if (typeof type === 'object') {
     switch (type.$$typeof) {
@@ -253,7 +250,6 @@ export function describeUnknownElementTypeFrameInDEV(
       case FORWARD_REF_SYMBOL_STRING:
         return describeFunctionComponentFrame(
           type.render,
-          source,
           ownerFn,
           currentDispatcherRef,
         );
@@ -262,7 +258,6 @@ export function describeUnknownElementTypeFrameInDEV(
         // Memo may contain any component type so we recursively resolve it.
         return describeUnknownElementTypeFrameInDEV(
           type.type,
-          source,
           ownerFn,
           currentDispatcherRef,
         );
@@ -275,7 +270,6 @@ export function describeUnknownElementTypeFrameInDEV(
           // Lazy may contain any component type so we recursively resolve it.
           return describeUnknownElementTypeFrameInDEV(
             init(payload),
-            source,
             ownerFn,
             currentDispatcherRef,
           );

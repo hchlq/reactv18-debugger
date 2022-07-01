@@ -32,14 +32,18 @@ function startReadingFromStream(response, stream) {
   reader.read().then(progress, error);
 }
 
-function createFromReadableStream(stream) {
-  const response = createResponse();
+function createFromReadableStream(stream, options) {
+  const response = createResponse(
+    options && options.moduleMap ? options.moduleMap : null,
+  );
   startReadingFromStream(response, stream);
   return response;
 }
 
-function createFromFetch(promiseForResponse) {
-  const response = createResponse();
+function createFromFetch(promiseForResponse, options) {
+  const response = createResponse(
+    options && options.moduleMap ? options.moduleMap : null,
+  );
   promiseForResponse.then(
     function (r) {
       startReadingFromStream(response, r.body);
@@ -51,8 +55,10 @@ function createFromFetch(promiseForResponse) {
   return response;
 }
 
-function createFromXHR(request) {
-  const response = createResponse();
+function createFromXHR(request, options) {
+  const response = createResponse(
+    options && options.moduleMap ? options.moduleMap : null,
+  );
   let processedLength = 0;
   function progress(e) {
     const chunk = request.responseText;

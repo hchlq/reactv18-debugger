@@ -655,7 +655,11 @@ export function createFiberFromOffscreen(pendingProps, mode, lanes, key) {
   const fiber = createFiber(OffscreenComponent, pendingProps, key, mode);
   fiber.elementType = REACT_OFFSCREEN_TYPE;
   fiber.lanes = lanes;
-  const primaryChildInstance = {};
+  const primaryChildInstance = {
+    isHidden: false,
+    pendingMarkers: null,
+    transitions: null,
+  };
   fiber.stateNode = primaryChildInstance;
   return fiber;
 }
@@ -664,6 +668,14 @@ export function createFiberFromLegacyHidden(pendingProps, mode, lanes, key) {
   const fiber = createFiber(LegacyHiddenComponent, pendingProps, key, mode);
   fiber.elementType = REACT_LEGACY_HIDDEN_TYPE;
   fiber.lanes = lanes;
+  // Adding a stateNode for legacy hidden because it's currently using
+  // the offscreen implementation, which depends on a state node
+  const instance = {
+    isHidden: false,
+    pendingMarkers: null,
+    transitions: null,
+  };
+  fiber.stateNode = instance;
   return fiber;
 }
 
@@ -678,6 +690,11 @@ export function createFiberFromTracingMarker(pendingProps, mode, lanes, key) {
   const fiber = createFiber(TracingMarkerComponent, pendingProps, key, mode);
   fiber.elementType = REACT_TRACING_MARKER_TYPE;
   fiber.lanes = lanes;
+  const tracingMarkerInstance = {
+    transitions: null,
+    pendingSuspenseBoundaries: null,
+  };
+  fiber.stateNode = tracingMarkerInstance;
   return fiber;
 }
 

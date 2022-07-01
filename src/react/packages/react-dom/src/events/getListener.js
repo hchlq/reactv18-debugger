@@ -17,9 +17,6 @@ function isInteractive(tag) {
   );
 }
 
-/**
- * 是否应该阻止鼠标事件
- */
 function shouldPreventMouseEvent(name, type, props) {
   switch (name) {
     case 'onClick':
@@ -33,8 +30,6 @@ function shouldPreventMouseEvent(name, type, props) {
     case 'onMouseUp':
     case 'onMouseUpCapture':
     case 'onMouseEnter':
-      // tag === 'button' | 'input' | 'select' | 'textarea'
-      // e.g. <button disable onClick={ () => { doSomething... } }>
       return !!(props.disabled && isInteractive(type));
     default:
       return false;
@@ -42,7 +37,6 @@ function shouldPreventMouseEvent(name, type, props) {
 }
 
 /**
- * 从 fiber 实例中获取事件处理函数
  * @param {object} inst The instance, which is the source of events.
  * @param {string} registrationName Name of listener (e.g. `onClick`).
  * @return {?function} The stored callback.
@@ -53,15 +47,11 @@ export default function getListener(inst, registrationName) {
     // Work in progress (ex: onload events in incremental mode).
     return null;
   }
-
-  // 从元素实例中获取 props
   const props = getFiberCurrentPropsFromNode(stateNode);
-
   if (props === null) {
     // Work in progress.
     return null;
   }
-
   const listener = props[registrationName];
   if (shouldPreventMouseEvent(registrationName, inst.type, props)) {
     return null;
