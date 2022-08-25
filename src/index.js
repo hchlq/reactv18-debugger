@@ -37,6 +37,7 @@ const { Component, useEffect } = React
 
 const Func = () => {
   useEffect(() => {
+    // debugger
     console.log("func 挂载啦");
   }, []);
   return <div>func</div>;

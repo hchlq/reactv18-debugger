@@ -10,13 +10,13 @@
 import {
   warnAboutUpdateOnNotYetMountedFiberInDEV,
   throwIfInfiniteUpdateLoopDetected,
-} from './ReactFiberWorkLoop.old';
+} from './ReactFiberWorkLoop.new';
 import {
   NoLane,
   NoLanes,
   mergeLanes,
   markHiddenUpdate,
-} from './ReactFiberLane.old';
+} from './ReactFiberLane.new';
 import {NoFlags, Placement, Hydrating} from './ReactFiberFlags';
 import {HostRoot, OffscreenComponent} from './ReactWorkTags';
 
@@ -29,9 +29,6 @@ let concurrentQueuesIndex = 0;
 
 let concurrentlyUpdatedLanes = NoLanes;
 
-/**
- * 加入 Fiber 更新队列中
- */
 export function finishQueueingConcurrentUpdates() {
   const endIndex = concurrentQueuesIndex;
   concurrentQueuesIndex = 0;
@@ -49,7 +46,6 @@ export function finishQueueingConcurrentUpdates() {
     const lane = concurrentQueues[i];
     concurrentQueues[i++] = null;
 
-    // 构成循环链表
     if (queue !== null && update !== null) {
       const pending = queue.pending;
       if (pending === null) {
@@ -62,7 +58,6 @@ export function finishQueueingConcurrentUpdates() {
       queue.pending = update;
     }
 
-    // 有更新的优先级
     if (lane !== NoLane) {
       markUpdateLaneFromFiberToRoot(fiber, update, lane);
     }
@@ -73,9 +68,6 @@ export function getConcurrentlyUpdatedLanes() {
   return concurrentlyUpdatedLanes;
 }
 
-/**
- * 更新队列
- */
 function enqueueUpdate(fiber, queue, update, lane) {
   // Don't update the `childLanes` on the return path yet. If we already in
   // the middle of rendering, wait until after it has completed.
@@ -84,7 +76,6 @@ function enqueueUpdate(fiber, queue, update, lane) {
   concurrentQueues[concurrentQueuesIndex++] = update;
   concurrentQueues[concurrentQueuesIndex++] = lane;
 
-  // 合并更新优先级
   concurrentlyUpdatedLanes = mergeLanes(concurrentlyUpdatedLanes, lane);
 
   // The fiber's `lane` field is used in some places to check if any work is
@@ -100,9 +91,7 @@ function enqueueUpdate(fiber, queue, update, lane) {
 export function enqueueConcurrentHookUpdate(fiber, queue, update, lane) {
   const concurrentQueue = queue;
   const concurrentUpdate = update;
-
   enqueueUpdate(fiber, concurrentQueue, concurrentUpdate, lane);
-
   return getRootForUpdatedFiber(fiber);
 }
 
@@ -197,9 +186,6 @@ function markUpdateLaneFromFiberToRoot(sourceFiber, update, lane) {
   }
 }
 
-/**
- * 找到根 Fiber
- */
 function getRootForUpdatedFiber(sourceFiber) {
   // TODO: We will detect and infinite update loop and throw even if this fiber
   // has already unmounted. This isn't really necessary but it happens to be the
@@ -218,14 +204,11 @@ function getRootForUpdatedFiber(sourceFiber) {
   detectUpdateOnUnmountedFiber(sourceFiber, sourceFiber);
   let node = sourceFiber;
   let parent = node.return;
-
   while (parent !== null) {
     detectUpdateOnUnmountedFiber(sourceFiber, node);
-
     node = parent;
     parent = node.return;
   }
-
   return node.tag === HostRoot ? node.stateNode : null;
 }
 

@@ -42,14 +42,14 @@ import {
   markRootEntangled,
   markRootMutableRead,
   NoTimestamp,
-} from './ReactFiberLane.old';
+} from './ReactFiberLane.new';
 import {
   ContinuousEventPriority,
   getCurrentUpdatePriority,
   setCurrentUpdatePriority,
   higherEventPriority,
-} from './ReactEventPriorities.old';
-import {readContext, checkIfContextChanged} from './ReactFiberNewContext.old';
+} from './ReactEventPriorities.new';
+import {readContext, checkIfContextChanged} from './ReactFiberNewContext.new';
 import {HostRoot, CacheComponent} from './ReactWorkTags';
 import {
   LayoutStatic as LayoutStaticEffect,
@@ -74,7 +74,7 @@ import {
   requestUpdateLane,
   requestEventTime,
   markSkippedUpdateLanes,
-} from './ReactFiberWorkLoop.old';
+} from './ReactFiberWorkLoop.new';
 
 import getComponentNameFromFiber from 'react-reconciler/src/getComponentNameFromFiber';
 import is from 'shared/objectIs';
@@ -82,28 +82,28 @@ import isArray from 'shared/isArray';
 import {
   markWorkInProgressReceivedUpdate,
   checkIfWorkInProgressReceivedUpdate,
-} from './ReactFiberBeginWork.old';
-import {getIsHydrating} from './ReactFiberHydrationContext.old';
+} from './ReactFiberBeginWork.new';
+import {getIsHydrating} from './ReactFiberHydrationContext.new';
 import {
   getWorkInProgressVersion,
   markSourceAsDirty,
   setWorkInProgressVersion,
   warnAboutMultipleRenderersDEV,
-} from './ReactMutableSource.old';
+} from './ReactMutableSource.new';
 import {logStateUpdateScheduled} from './DebugTracing';
-import {markStateUpdateScheduled} from './ReactFiberDevToolsHook.old';
-import {createCache, CacheContext} from './ReactFiberCacheComponent.old';
+import {markStateUpdateScheduled} from './ReactFiberDevToolsHook.new';
+import {createCache, CacheContext} from './ReactFiberCacheComponent.new';
 import {
   createUpdate as createLegacyQueueUpdate,
   enqueueUpdate as enqueueLegacyQueueUpdate,
   entangleTransitions as entangleLegacyQueueTransitions,
-} from './ReactFiberClassUpdateQueue.old';
+} from './ReactFiberClassUpdateQueue.new';
 import {
   enqueueConcurrentHookUpdate,
   enqueueConcurrentHookUpdateAndEagerlyBailout,
   enqueueConcurrentRenderForLane,
-} from './ReactFiberConcurrentUpdates.old';
-import {getTreeId} from './ReactFiberTreeContext.old';
+} from './ReactFiberConcurrentUpdates.new';
+import {getTreeId} from './ReactFiberTreeContext.new';
 import {now} from './Scheduler';
 
 const {ReactCurrentDispatcher, ReactCurrentBatchConfig} = ReactSharedInternals;
@@ -2094,12 +2094,9 @@ function dispatchSetState(fiber, queue, action) {
     }
 
     const root = enqueueConcurrentHookUpdate(fiber, queue, update, lane);
-
     if (root !== null) {
       const eventTime = requestEventTime();
-
       scheduleUpdateOnFiber(root, fiber, lane, eventTime);
-
       entangleTransitionUpdate(root, queue, lane);
     }
   }

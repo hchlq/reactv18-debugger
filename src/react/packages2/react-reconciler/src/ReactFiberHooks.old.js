@@ -2094,12 +2094,9 @@ function dispatchSetState(fiber, queue, action) {
     }
 
     const root = enqueueConcurrentHookUpdate(fiber, queue, update, lane);
-
     if (root !== null) {
       const eventTime = requestEventTime();
-
       scheduleUpdateOnFiber(root, fiber, lane, eventTime);
-
       entangleTransitionUpdate(root, queue, lane);
     }
   }
