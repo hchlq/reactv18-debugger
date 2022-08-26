@@ -30,7 +30,7 @@ let concurrentQueuesIndex = 0;
 let concurrentlyUpdatedLanes = NoLanes;
 
 /**
- * 加入 Fiber 更新队列中
+ * 加入 Fiber 更新队列中，在协调阶段开始之前才加入，即在 prepareFreshStack 中加入
  */
 export function finishQueueingConcurrentUpdates() {
   const endIndex = concurrentQueuesIndex;
@@ -62,7 +62,7 @@ export function finishQueueingConcurrentUpdates() {
       queue.pending = update;
     }
 
-    // 有更新的优先级
+    // 有更新的优先级，更新当前到根的所有 lane
     if (lane !== NoLane) {
       markUpdateLaneFromFiberToRoot(fiber, update, lane);
     }
@@ -117,6 +117,7 @@ export function enqueueConcurrentHookUpdateAndEagerlyBailout(
   const lane = NoLane;
   const concurrentQueue = queue;
   const concurrentUpdate = update;
+
   enqueueUpdate(fiber, concurrentQueue, concurrentUpdate, lane);
 }
 

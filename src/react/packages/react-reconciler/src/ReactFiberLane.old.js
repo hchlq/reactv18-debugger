@@ -484,10 +484,15 @@ export function claimNextTransitionLane() {
   // In most cases, this means every transition gets its own lane, until we
   // run out of lanes and cycle back to the beginning.
   const lane = nextTransitionLane;
+
   nextTransitionLane <<= 1;
+
+  // 左移动到了边界了，重新从 TransitionLane1 开始
+  // 0b0000000001111111111111111000000
   if ((nextTransitionLane & TransitionLanes) === NoLanes) {
     nextTransitionLane = TransitionLane1;
   }
+
   return lane;
 }
 
@@ -500,7 +505,12 @@ export function claimNextRetryLane() {
   return lane;
 }
 
+/**
+ * 选取 lanes 中右边的 1 的大小
+ * e.g. 0b110 -> 2
+ */
 export function getHighestPriorityLane(lanes) {
+  // -lanes 的二进制：lanes 二进制取反 - 1
   return lanes & -lanes;
 }
 
@@ -509,6 +519,9 @@ export function pickArbitraryLane(lanes) {
   // doesn't matter which bit is selected; you can pick any bit without
   // affecting the algorithms where its used. Here I'm using
   // getHighestPriorityLane because it requires the fewest operations.
+
+  // 在不知道选择哪个车道之后，使用这个去选取任意的车道
+  // 可以选择任意方法去获取，使用 getHighestPriorityLane 的原因该方法最少的操作
   return getHighestPriorityLane(lanes);
 }
 

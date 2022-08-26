@@ -473,10 +473,12 @@ export function requestUpdateLane(fiber) {
 
       transition._updatedFibers.add(fiber);
     }
+
     // The algorithm for assigning an update to a lane should be stable for all
     // updates at the same priority within the same event. To do this, the
     // inputs to the algorithm must be the same.
     //
+    // 缓存同一事件的 lane
     // The trick we use is to cache the first of each of these inputs within an
     // event. Then reset the cached values once we can be sure the event is
     // over. Our heuristic for that is whenever we enter a concurrent work loop.
@@ -484,6 +486,7 @@ export function requestUpdateLane(fiber) {
       // All transitions within the same event are assigned the same lane.
       currentEventTransitionLane = claimNextTransitionLane();
     }
+
     return currentEventTransitionLane;
   }
 
@@ -602,6 +605,7 @@ export function scheduleUpdateOnFiber(root, fiber, lane, eventTime) {
       // `deferRenderPhaseUpdateToNextBatch` flag is off and this is a render
       // phase update. In that case, we don't treat render phase updates as if
       // they were interleaved, for backwards compat reasons.
+
       if (
         deferRenderPhaseUpdateToNextBatch ||
         (executionContext & RenderContext) === NoContext
@@ -611,6 +615,7 @@ export function scheduleUpdateOnFiber(root, fiber, lane, eventTime) {
           lane,
         );
       }
+
       if (workInProgressRootExitStatus === RootSuspendedWithDelay) {
         // The root already suspended with a delay, which means this render
         // definitely won't finish. Since we have a new update, let's mark it as
@@ -628,7 +633,7 @@ export function scheduleUpdateOnFiber(root, fiber, lane, eventTime) {
       executionContext === NoContext &&
       (fiber.mode & ConcurrentMode) === NoMode &&
       // Treat `act` as if it's inside `batchedUpdates`, even in legacy mode.
-      !(__DEV__ && ReactCurrentActQueue.isBatchingLegacy)
+      !(__DEV__ && ReactCurrentActzQueue.isBatchingLegacy)
     ) {
       // Flush the synchronous work now, unless we're already working or inside
       // a batch. This is intentionally inside scheduleUpdateOnFiber instead of
@@ -1466,9 +1471,9 @@ function prepareFreshStack(root, lanes) {
 
   finishQueueingConcurrentUpdates();
 
-  if (__DEV__) {
-    ReactStrictModeWarnings.discardPendingWarnings();
-  }
+  // if (__DEV__) {
+  //   ReactStrictModeWarnings.discardPendingWarnings();
+  // }
 
   return rootWorkInProgress;
 }
