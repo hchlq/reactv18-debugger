@@ -1991,16 +1991,6 @@ function refreshCache(fiber, seedKey, seedValue) {
 }
 
 function dispatchReducerAction(fiber, queue, action) {
-  if (__DEV__) {
-    if (typeof arguments[3] === 'function') {
-      console.error(
-        "State updates from the useState() and useReducer() Hooks don't support the " +
-          'second callback argument. To execute a side effect after ' +
-          'rendering, declare it in the component body with useEffect().',
-      );
-    }
-  }
-
   const lane = requestUpdateLane(fiber);
 
   const update = {
@@ -2036,6 +2026,7 @@ function dispatchSetState(fiber, queue, action) {
     }
   }
 
+  // 获取更新的车道
   const lane = requestUpdateLane(fiber);
 
   const update = {
@@ -2096,6 +2087,7 @@ function dispatchSetState(fiber, queue, action) {
     const root = enqueueConcurrentHookUpdate(fiber, queue, update, lane);
 
     if (root !== null) {
+      // 获取事件时间
       const eventTime = requestEventTime();
 
       scheduleUpdateOnFiber(root, fiber, lane, eventTime);
