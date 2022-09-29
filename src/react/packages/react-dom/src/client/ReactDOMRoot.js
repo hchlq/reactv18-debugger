@@ -58,6 +58,7 @@ ReactDOMHydrationRoot.prototype.render = ReactDOMRoot.prototype.render =
   function (children) {
     const root = this._internalRoot;
     if (root === null) {
+      // 已经卸载了
       throw new Error('Cannot update an unmounted root.');
     }
 
@@ -95,6 +96,7 @@ ReactDOMHydrationRoot.prototype.render = ReactDOMRoot.prototype.render =
         }
       }
     }
+
     updateContainer(children, root, null, null);
   };
 
@@ -193,12 +195,15 @@ export function createRoot(container, options) {
     onRecoverableError,
     transitionCallbacks,
   );
+
   markContainerAsRoot(root.current, container);
 
   const rootContainerElement =
     container.nodeType === COMMENT_NODE ? container.parentNode : container;
+
   listenToAllSupportedEvents(rootContainerElement);
 
+  // 创建 ReactDOMRoot 实例
   return new ReactDOMRoot(root);
 }
 

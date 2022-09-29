@@ -185,6 +185,7 @@ export const mediaEventTypes = [
 // We should not delegate these events to the container, but rather
 // set them on the actual target element itself. This is primarily
 // because these events do not consistently bubble in the DOM.
+// 这些事件冒泡的不一致性
 export const nonDelegatedEvents = new Set([
   'cancel',
   'close',
@@ -292,25 +293,22 @@ export function listenToNonDelegatedEvent(domEventName, targetElement) {
   }
 }
 
+/**
+ * 绑定在原生事件上
+ */
 export function listenToNativeEvent(
   domEventName,
   isCapturePhaseListener,
   target,
 ) {
-  if (__DEV__) {
-    if (nonDelegatedEvents.has(domEventName) && !isCapturePhaseListener) {
-      console.error(
-        'Did not expect a listenToNativeEvent() call for "%s" in the bubble phase. ' +
-          'This is a bug in React. Please file an issue.',
-        domEventName,
-      );
-    }
-  }
-
+  // 事件标识符
   let eventSystemFlags = 0;
+
   if (isCapturePhaseListener) {
+    // 捕获阶段触发的，加上 IS_CAPTURE_PHASE 标识符
     eventSystemFlags |= IS_CAPTURE_PHASE;
   }
+
   addTrappedEventListener(
     target,
     domEventName,
@@ -348,23 +346,37 @@ export function listenToNativeEventForNonManagedEventTarget(
 
 const listeningMarker = '_reactListening' + Math.random().toString(36).slice(2);
 
+// let delegatedEventCount = 0
 export function listenToAllSupportedEvents(rootContainerElement) {
   if (!rootContainerElement[listeningMarker]) {
+    // mark is init
     rootContainerElement[listeningMarker] = true;
+
     allNativeEvents.forEach((domEventName) => {
       // We handle selectionchange separately because it
       // doesn't bubble and needs to be on the document.
       if (domEventName !== 'selectionchange') {
         if (!nonDelegatedEvents.has(domEventName)) {
+          // delegatedEventCount++
+          // console.log('delegatedEvent -> domEventName: ', domEventName);
+          // 冒泡阶段触发，需要代理的事件
           listenToNativeEvent(domEventName, false, rootContainerElement);
         }
+        // 捕获阶段触发，相当于只绑定在元素上
         listenToNativeEvent(domEventName, true, rootContainerElement);
       }
     });
+    // console.log(allNativeEvents.size, delegatedEventCount)
+
+    // 获取 document
     const ownerDocument =
       rootContainerElement.nodeType === DOCUMENT_NODE
-        ? rootContainerElement
-        : rootContainerElement.ownerDocument;
+        ? // 根元素是 document
+          rootContainerElement
+        : // 根元素不是 document
+          rootContainerElement.ownerDocument;
+
+    // 单独绑定 selectionchange 事件
     if (ownerDocument !== null) {
       // The selectionchange event also needs deduplication
       // but it is attached to the document.
@@ -383,11 +395,13 @@ function addTrappedEventListener(
   isCapturePhaseListener,
   isDeferredListenerForLegacyFBSupport,
 ) {
+  // 创建带有优先级的事件处理函数
   let listener = createEventListenerWrapperWithPriority(
     targetContainer,
     domEventName,
     eventSystemFlags,
   );
+
   // If passive option is not supported, then the event will be
   // active and not passive.
   let isPassiveListener = undefined;
@@ -436,8 +450,9 @@ function addTrappedEventListener(
       return originalListener.apply(this, p);
     };
   }
-  // TODO: There are too many combinations here. Consolidate them.
+
   if (isCapturePhaseListener) {
+    // 捕获阶段
     if (isPassiveListener !== undefined) {
       unsubscribeListener = addEventCaptureListenerWithPassiveFlag(
         targetContainer,
@@ -453,6 +468,7 @@ function addTrappedEventListener(
       );
     }
   } else {
+    // 冒泡阶段
     if (isPassiveListener !== undefined) {
       unsubscribeListener = addEventBubbleListenerWithPassiveFlag(
         targetContainer,
