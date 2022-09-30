@@ -129,74 +129,61 @@ ReactDOMHydrationRoot.prototype.unmount = ReactDOMRoot.prototype.unmount =
   };
 
 export function createRoot(container, options) {
-  if (!isValidContainer(container)) {
-    throw new Error('createRoot(...): Target container is not a DOM element.');
-  }
-
-  warnIfReactDOMContainerInDEV(container);
-
+  // 是否启用严格模式
   let isStrictMode = false;
+  // 是否启用时间切片
   let concurrentUpdatesByDefaultOverride = false;
+
   let identifierPrefix = '';
   let onRecoverableError = defaultOnRecoverableError;
   let transitionCallbacks = null;
 
   if (options !== null && options !== undefined) {
-    if (__DEV__) {
-      if (options.hydrate) {
-        console.warn(
-          'hydrate through createRoot is deprecated. Use ReactDOMClient.hydrateRoot(container, <App />) instead.',
-        );
-      } else {
-        if (
-          typeof options === 'object' &&
-          options !== null &&
-          options.$$typeof === REACT_ELEMENT_TYPE
-        ) {
-          console.error(
-            'You passed a JSX element to createRoot. You probably meant to ' +
-              'call root.render instead. ' +
-              'Example usage:\n\n' +
-              '  let root = createRoot(domContainer);\n' +
-              '  root.render(<App />);',
-          );
-        }
-      }
-    }
     if (options.unstable_strictMode === true) {
       isStrictMode = true;
     }
+
     if (
       allowConcurrentByDefault &&
       options.unstable_concurrentUpdatesByDefault === true
     ) {
       concurrentUpdatesByDefaultOverride = true;
     }
+
     if (options.identifierPrefix !== undefined) {
       identifierPrefix = options.identifierPrefix;
     }
+
     if (options.onRecoverableError !== undefined) {
       onRecoverableError = options.onRecoverableError;
     }
+
     if (options.transitionCallbacks !== undefined) {
       transitionCallbacks = options.transitionCallbacks;
     }
   }
 
+  // 创建 fiberRoot
   const root = createContainer(
     container,
+    // mode 是 ConcurrentRoot
     ConcurrentRoot,
     null,
+
+    // options 传入的配置
     isStrictMode,
     concurrentUpdatesByDefaultOverride,
     identifierPrefix,
     onRecoverableError,
     transitionCallbacks,
   );
+  // 根容器关联根容器 fiber
+  // container['__reactContainer$xxxxx'] = root.current;
   markContainerAsRoot(root.current, container);
 
-  const rootContainerElement =
-    container.nodeType === COMMENT_NODE ? container.parentNode : container;
+  const rootContainerElement = container;
+
+  // 在根容器上注册支持的所有事件
   listenToAllSupportedEvents(rootContainerElement);
 
   return new ReactDOMRoot(root);
