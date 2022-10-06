@@ -43,6 +43,9 @@ import {IS_CAPTURE_PHASE} from '../EventSystemFlags';
 
 import {enableCreateEventHandleAPI} from 'shared/ReactFeatureFlags';
 
+/**
+ * 收集所有的事件处理函数
+ */
 function extractEvents(
   dispatchQueue,
   domEventName,
@@ -52,10 +55,17 @@ function extractEvents(
   eventSystemFlags,
   targetContainer,
 ) {
+  // 获取 eventName 对应的 React 事件名字
+  // topLevelEventsToReactName: 原生事件名字对应的 React 事件名字
+  // e.g. click -> onClick
   const reactName = topLevelEventsToReactNames.get(domEventName);
+
   if (reactName === undefined) {
     return;
   }
+
+  // 获取对应的合成事件，分为不同的事件类型
+  // e.g. Mouse、KeyBorad、Focus
   let SyntheticEventCtor = SyntheticEvent;
   let reactEventType = domEventName;
   switch (domEventName) {
@@ -86,6 +96,7 @@ function extractEvents(
     case 'click':
       // Firefox creates a click event on right mouse clicks. This removes the
       // unwanted click events.
+      // 兼容 firefox
       if (nativeEvent.button === 2) {
         return;
       }
@@ -152,61 +163,45 @@ function extractEvents(
       break;
   }
 
+  // 捕获阶段触发
   const inCapturePhase = (eventSystemFlags & IS_CAPTURE_PHASE) !== 0;
-  if (
-    enableCreateEventHandleAPI &&
-    eventSystemFlags & IS_EVENT_HANDLE_NON_MANAGED_NODE
-  ) {
-    const listeners = accumulateEventHandleNonManagedNodeListeners(
-      // TODO: this cast may not make sense for events like
-      // "focus" where React listens to e.g. "focusin".
-      reactEventType,
-      targetContainer,
-      inCapturePhase,
-    );
-    if (listeners.length > 0) {
-      // Intentionally create event lazily.
-      const event = new SyntheticEventCtor(
-        reactName,
-        reactEventType,
-        null,
-        nativeEvent,
-        nativeEventTarget,
-      );
-      dispatchQueue.push({event, listeners});
-    }
-  } else {
-    // Some events don't bubble in the browser.
-    // In the past, React has always bubbled them, but this can be surprising.
-    // We're going to try aligning closer to the browser behavior by not bubbling
-    // them in React either. We'll start by not bubbling onScroll, and then expand.
-    const accumulateTargetOnly =
-      !inCapturePhase &&
-      // TODO: ideally, we'd eventually add all events from
-      // nonDelegatedEvents list in DOMPluginEventSystem.
-      // Then we can remove this special list.
-      // This is a breaking change that can wait until React 18.
-      domEventName === 'scroll';
 
-    const listeners = accumulateSinglePhaseListeners(
-      targetInst,
+  // Some events don't bubble in the browser.
+  // In the past, React has always bubbled them, but this can be surprising.
+  // We're going to try aligning closer to the browser behavior by not bubbling
+  // them in React either. We'll start by not bubbling onScroll, and then expand.
+  // 非捕获阶段的 scroll 事件
+  const accumulateTargetOnly =
+    !inCapturePhase &&
+    // TODO: ideally, we'd eventually add all events from
+    // nonDelegatedEvents list in DOMPluginEventSystem.
+    // Then we can remove this special list.
+    // This is a breaking change that can wait until React 18.
+    domEventName === 'scroll';
+
+  // 收集单个阶段所有元素上的所有事件处理函数
+  const listeners = accumulateSinglePhaseListeners(
+    targetInst,
+    reactName,
+    nativeEvent.type,
+    inCapturePhase,
+    accumulateTargetOnly,
+    nativeEvent,
+  );
+
+  // 存在事件处理函数
+  if (listeners.length > 0) {
+    // Intentionally create event lazily.
+    // 创建对应的合成事件实例
+    const event = new SyntheticEventCtor(
       reactName,
-      nativeEvent.type,
-      inCapturePhase,
-      accumulateTargetOnly,
+      reactEventType,
+      null,
       nativeEvent,
+      nativeEventTarget,
     );
-    if (listeners.length > 0) {
-      // Intentionally create event lazily.
-      const event = new SyntheticEventCtor(
-        reactName,
-        reactEventType,
-        null,
-        nativeEvent,
-        nativeEventTarget,
-      );
-      dispatchQueue.push({event, listeners});
-    }
+    // 把本次收集到的所有事件处理函数中放入队列中
+    dispatchQueue.push({event, listeners});
   }
 }
 

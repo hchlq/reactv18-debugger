@@ -61,10 +61,12 @@ export function isContainerMarkedAsRoot(node) {
 // The same thing applies to Suspense boundaries.
 export function getClosestInstanceFromNode(targetNode) {
   let targetInst = targetNode[internalInstanceKey];
+
   if (targetInst) {
     // Don't return HostRoot or SuspenseComponent here.
     return targetInst;
   }
+
   // If the direct event target isn't a React owned DOM node, we need to look
   // to see if one of its parents is a React owned DOM node.
   let parentNode = targetNode.parentNode;

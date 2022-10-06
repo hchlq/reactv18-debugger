@@ -1302,6 +1302,9 @@ export function deferredUpdates(fn) {
   }
 }
 
+/**
+ * 批量更新上下文
+ */
 export function batchedUpdates(fn, a) {
   const prevExecutionContext = executionContext;
   executionContext |= BatchedContext;

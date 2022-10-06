@@ -79,12 +79,16 @@ export function createEventListenerWrapper(
   );
 }
 
+/**
+ * 创建事件处理函数
+ */
 export function createEventListenerWrapperWithPriority(
   targetContainer,
   domEventName,
   eventSystemFlags,
 ) {
   const eventPriority = getEventPriority(domEventName);
+
   let listenerWrapper;
   switch (eventPriority) {
     case DiscreteEventPriority:
@@ -98,6 +102,7 @@ export function createEventListenerWrapperWithPriority(
       listenerWrapper = dispatchEvent;
       break;
   }
+
   return listenerWrapper.bind(
     null,
     domEventName,
@@ -151,6 +156,7 @@ export function dispatchEvent(
   if (!_enabled) {
     return;
   }
+  // if (domEventName === 'click') debugger;
   if (enableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay) {
     dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay(
       domEventName,
@@ -179,6 +185,7 @@ function dispatchEventOriginal(
   // but now we use different bubble and capture handlers.
   // In eager mode, we attach capture listeners early, so we need
   // to filter them out until we fix the logic to handle them correctly.
+  // 不是捕获阶段触发的，就为 true
   const allowReplay = (eventSystemFlags & IS_CAPTURE_PHASE) === 0;
 
   if (
@@ -205,6 +212,7 @@ function dispatchEventOriginal(
     targetContainer,
     nativeEvent,
   );
+
   if (blockedOn === null) {
     dispatchEventForPluginEventSystem(
       domEventName,
@@ -264,12 +272,14 @@ function dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEve
   targetContainer,
   nativeEvent,
 ) {
+  // 找到被阻塞的事件
   let blockedOn = findInstanceBlockingEvent(
     domEventName,
     eventSystemFlags,
     targetContainer,
     nativeEvent,
   );
+
   if (blockedOn === null) {
     dispatchEventForPluginEventSystem(
       domEventName,
@@ -358,7 +368,10 @@ export function findInstanceBlockingEvent(
 
   return_targetInst = null;
 
+  // 获取目标元素节点
   const nativeEventTarget = getEventTarget(nativeEvent);
+
+  // 获取 Fiber 实例
   let targetInst = getClosestInstanceFromNode(nativeEventTarget);
 
   if (targetInst !== null) {
@@ -398,6 +411,7 @@ export function findInstanceBlockingEvent(
       }
     }
   }
+
   return_targetInst = targetInst;
   // We're not blocked on anything.
   return null;

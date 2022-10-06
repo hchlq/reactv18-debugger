@@ -30,6 +30,8 @@ function shouldPreventMouseEvent(name, type, props) {
     case 'onMouseUp':
     case 'onMouseUpCapture':
     case 'onMouseEnter':
+      // button、input、select、textarea 上存在 disabled 为 true
+      // e.g. <button disabled onClick={handleClick}></button>
       return !!(props.disabled && isInteractive(type));
     default:
       return false;
@@ -47,20 +49,17 @@ export default function getListener(inst, registrationName) {
     // Work in progress (ex: onload events in incremental mode).
     return null;
   }
+
+  // 从元素实例上获取 Fiber 上的 props，元素实例上存放着 props
   const props = getFiberCurrentPropsFromNode(stateNode);
   if (props === null) {
     // Work in progress.
     return null;
   }
+
   const listener = props[registrationName];
   if (shouldPreventMouseEvent(registrationName, inst.type, props)) {
     return null;
-  }
-
-  if (listener && typeof listener !== 'function') {
-    throw new Error(
-      `Expected \`${registrationName}\` listener to be a function, instead got a value of \`${typeof listener}\` type.`,
-    );
   }
 
   return listener;
