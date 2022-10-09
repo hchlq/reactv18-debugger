@@ -400,6 +400,9 @@ export function resetWorkInProgress(workInProgress, renderLanes) {
   return workInProgress;
 }
 
+/**
+ * 创建根容器 Fiber
+ */
 export function createHostRootFiber(
   tag,
   isStrictMode,
@@ -408,24 +411,30 @@ export function createHostRootFiber(
   let mode;
   if (tag === ConcurrentRoot) {
     mode = ConcurrentMode;
+
     if (isStrictMode === true) {
+      // createRoot 传入了 isStrictMode 为 true
       mode |= StrictLegacyMode;
 
       if (enableStrictEffects) {
         mode |= StrictEffectsMode;
       }
     } else if (enableStrictEffects && createRootStrictEffectsByDefault) {
+      // 1. enableStrictEffects: 开发环境 为 true
+      // 2. createRootStrictEffectsByDefault: false
       mode |= StrictLegacyMode | StrictEffectsMode;
     }
+
     if (
       // We only use this flag for our repo tests to check both behaviors.
-      // TODO: Flip this flag and rename it something like "forceConcurrentByDefaultForTesting"
       !enableSyncDefaultUpdates ||
+      // 内部的实验
       // Only for internal experiments.
       (allowConcurrentByDefault && concurrentUpdatesByDefaultOverride)
     ) {
       mode |= ConcurrentUpdatesByDefaultMode;
     }
+
   } else {
     mode = NoMode;
   }
@@ -437,6 +446,7 @@ export function createHostRootFiber(
     mode |= ProfileMode;
   }
 
+  // 创建根容器 Fiber
   return createFiber(HostRoot, null, null, mode);
 }
 

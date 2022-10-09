@@ -62,67 +62,15 @@ ReactDOMHydrationRoot.prototype.render = ReactDOMRoot.prototype.render =
       throw new Error('Cannot update an unmounted root.');
     }
 
-    if (__DEV__) {
-      if (typeof arguments[1] === 'function') {
-        console.error(
-          'render(...): does not support the second callback argument. ' +
-            'To execute a side effect after rendering, declare it in a component body with useEffect().',
-        );
-      } else if (isValidContainer(arguments[1])) {
-        console.error(
-          'You passed a container to the second argument of root.render(...). ' +
-            "You don't need to pass it again since you already passed it to create the root.",
-        );
-      } else if (typeof arguments[1] !== 'undefined') {
-        console.error(
-          'You passed a second argument to root.render(...) but it only accepts ' +
-            'one argument.',
-        );
-      }
-
-      const container = root.containerInfo;
-
-      if (container.nodeType !== COMMENT_NODE) {
-        const hostInstance = findHostInstanceWithNoPortals(root.current);
-        if (hostInstance) {
-          if (hostInstance.parentNode !== container) {
-            console.error(
-              'render(...): It looks like the React-rendered content of the ' +
-                'root container was removed without using React. This is not ' +
-                'supported and will cause errors. Instead, call ' +
-                "root.unmount() to empty a root's container.",
-            );
-          }
-        }
-      }
-    }
-
     updateContainer(children, root, null, null);
   };
 
 ReactDOMHydrationRoot.prototype.unmount = ReactDOMRoot.prototype.unmount =
   function () {
-    if (__DEV__) {
-      if (typeof arguments[0] === 'function') {
-        console.error(
-          'unmount(...): does not support a callback argument. ' +
-            'To execute a side effect after rendering, declare it in a component body with useEffect().',
-        );
-      }
-    }
     const root = this._internalRoot;
     if (root !== null) {
       this._internalRoot = null;
       const container = root.containerInfo;
-      if (__DEV__) {
-        if (isAlreadyRendering()) {
-          console.error(
-            'Attempted to synchronously unmount a root while React was already ' +
-              'rendering. React cannot finish unmounting the root until the ' +
-              'current render has completed, which may lead to a race condition.',
-          );
-        }
-      }
       flushSync(() => {
         updateContainer(null, root, null, null);
       });
@@ -179,6 +127,7 @@ export function createRoot(container, options) {
     onRecoverableError,
     transitionCallbacks,
   );
+
   // 根容器关联根容器 fiber
   // container['__reactContainer$xxxxx'] = root.current;
   markContainerAsRoot(root.current, container);

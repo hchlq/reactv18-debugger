@@ -208,6 +208,9 @@ function findHostInstanceWithWarning(component, methodName) {
   return findHostInstance(component);
 }
 
+/**
+ * 创建根容器
+ */
 export function createContainer(
   containerInfo,
   tag,
@@ -220,16 +223,36 @@ export function createContainer(
 ) {
   const hydrate = false;
   const initialChildren = null;
+
   return createFiberRoot(
+    //! 根元素
     containerInfo,
+
+    //! 模式：Concurrent
     tag,
+
+    // 是否是 ssr
     hydrate,
+
+    // 初始化孩子
     initialChildren,
+
+    // 为空
     hydrationCallbacks,
+
+    // 严格模式
     isStrictMode,
+
+    // 默认开启并发模式
     concurrentUpdatesByDefaultOverride,
+
+    // 前缀
     identifierPrefix,
+
+    // 回调函数
     onRecoverableError,
+
+    // 过渡回调
     transitionCallbacks,
   );
 }
