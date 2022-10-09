@@ -149,6 +149,7 @@ export function initializeUpdateQueue(fiber) {
     },
     effects: null,
   };
+
   fiber.updateQueue = queue;
 }
 

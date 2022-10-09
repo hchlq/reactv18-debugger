@@ -138,14 +138,17 @@ export function createFiberRoot(
   // Cyclic construction. This cheats the type system right now because
   // stateNode is any.
   const uninitializedFiber = createHostRootFiber(
+    // 根据 tag 计算出 mode
     tag,
     isStrictMode,
     concurrentUpdatesByDefaultOverride,
   );
 
+  // fiber root 和根容器关联起来
   root.current = uninitializedFiber;
   uninitializedFiber.stateNode = root;
 
+  // 根容器，初始化状态
   const initialState = {
     element: initialChildren,
     isDehydrated: hydrate,
@@ -154,6 +157,7 @@ export function createFiberRoot(
 
   uninitializedFiber.memoizedState = initialState;
 
+  // 创建根容器的更新队列
   initializeUpdateQueue(uninitializedFiber);
 
   return root;

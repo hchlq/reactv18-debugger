@@ -102,6 +102,7 @@ if (__DEV__) {
 
 function FiberNode(tag, pendingProps, key, mode) {
   // Instance
+  // 节点的标识 e.g. 根容器: HostRoot 普通元素: HostElement
   this.tag = tag;
   this.key = key;
   this.elementType = null;
@@ -159,18 +160,6 @@ function FiberNode(tag, pendingProps, key, mode) {
     this.actualStartTime = -1;
     this.selfBaseDuration = 0;
     this.treeBaseDuration = 0;
-  }
-
-  if (__DEV__) {
-    // This isn't directly used but is handy for debugging internals:
-
-    this._debugSource = null;
-    this._debugOwner = null;
-    this._debugNeedsRemount = false;
-    this._debugHookTypes = null;
-    if (!hasBadMapPolyfill && typeof Object.preventExtensions === 'function') {
-      Object.preventExtensions(this);
-    }
   }
 }
 
@@ -409,6 +398,7 @@ export function createHostRootFiber(
   concurrentUpdatesByDefaultOverride,
 ) {
   let mode;
+  // debugger
   if (tag === ConcurrentRoot) {
     mode = ConcurrentMode;
 
@@ -434,7 +424,6 @@ export function createHostRootFiber(
     ) {
       mode |= ConcurrentUpdatesByDefaultMode;
     }
-
   } else {
     mode = NoMode;
   }
