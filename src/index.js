@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import * as  React  from "react";
 import * as ReactDOM from 'react-dom/client'
 const { Component, useEffect } = React
@@ -38,3 +39,10 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <App />
   </React.StrictMode>
 )
+=======
+import * as React from "react";
+import * as ReactDOM from "react-dom/client";
+import App from "./App";
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+>>>>>>> 087a2d5336e43a2642521ab971c099ff18029ae2

@@ -139,6 +139,7 @@ export const enableUseRefAccessWarning = false;
 // Enables time slicing for updates that aren't wrapped in startTransition.
 export const enableSyncDefaultUpdates = true;
 
+// 可选的配置在没有使用 startTransition 的时候启用时间切片
 // Adds an opt-in to time slicing for updates that aren't wrapped in
 // startTransition. Only relevant when enableSyncDefaultUpdates is disabled.
 export const allowConcurrentByDefault = false;
