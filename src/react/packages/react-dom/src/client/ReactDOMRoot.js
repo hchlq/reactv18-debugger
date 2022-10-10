@@ -46,6 +46,9 @@ ReactDOMHydrationRoot.prototype.render = ReactDOMRoot.prototype.render =
       throw new Error('Cannot update an unmounted root.');
     }
 
+    // 初始渲染的入口
+    // children: 渲染的内容
+    // root: fiber root
     updateContainer(children, root, null, null);
   };
 

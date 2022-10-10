@@ -54,7 +54,7 @@ import {enqueueConcurrentRenderForLane} from './ReactFiberConcurrentUpdates.old'
 import {
   createUpdate,
   enqueueUpdate,
-  entangleTransitions,
+  entangleTransitions, UpdateState,
 } from './ReactFiberClassUpdateQueue.old';
 import {
   isRendering as ReactCurrentFiberIsRendering,
@@ -305,18 +305,21 @@ export function createHydrationContainer(
   return root;
 }
 
+/**
+ *
+ * @param element 渲染的内容
+ * @param container fiber root
+ */
 export function updateContainer(element, container, parentComponent, callback) {
-  if (__DEV__) {
-    onScheduleRoot(container, element);
-  }
   const current = container.current;
+
+  // 1. 获取执行时间戳
   const eventTime = requestEventTime();
+
+  // 2. 获取车道优先级
   const lane = requestUpdateLane(current);
 
-  if (enableSchedulingProfiler) {
-    markRenderScheduled(lane);
-  }
-
+  // 3. 为子树获取上下文
   const context = getContextForSubtree(parentComponent);
   if (container.context === null) {
     container.context = context;
@@ -324,43 +327,23 @@ export function updateContainer(element, container, parentComponent, callback) {
     container.pendingContext = context;
   }
 
-  if (__DEV__) {
-    if (
-      ReactCurrentFiberIsRendering &&
-      ReactCurrentFiberCurrent !== null &&
-      !didWarnAboutNestedUpdates
-    ) {
-      didWarnAboutNestedUpdates = true;
-      console.error(
-        'Render methods should be a pure function of props and state; ' +
-          'triggering nested component updates from render is not allowed. ' +
-          'If necessary, trigger nested updates in componentDidUpdate.\n\n' +
-          'Check the render method of %s.',
-        getComponentNameFromFiber(ReactCurrentFiberCurrent) || 'Unknown',
-      );
-    }
-  }
 
+  // 4. 创建更新任务
+  //  { eventTime, lane, payload, callback, tag, next }
   const update = createUpdate(eventTime, lane);
-  // Caution: React DevTools currently depends on this property
+
+  // payload 是 element, 比较特殊
   // being called "element".
   update.payload = {element};
 
   callback = callback === undefined ? null : callback;
   if (callback !== null) {
-    if (__DEV__) {
-      if (typeof callback !== 'function') {
-        console.error(
-          'render(...): Expected the last optional `callback` argument to be a ' +
-            'function. Instead received: %s.',
-          callback,
-        );
-      }
-    }
     update.callback = callback;
   }
 
+  // 5. 加入更新队列
   const root = enqueueUpdate(current, update, lane);
+
   if (root !== null) {
     scheduleUpdateOnFiber(root, current, lane, eventTime);
     entangleTransitions(root, current, lane);
