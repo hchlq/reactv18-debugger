@@ -8,35 +8,20 @@
  */
 
 import {queueExplicitHydrationTarget} from '../events/ReactDOMEventReplaying';
-import {REACT_ELEMENT_TYPE} from 'shared/ReactSymbols';
 
-import {
-  isContainerMarkedAsRoot,
-  markContainerAsRoot,
-  unmarkContainerAsRoot,
-} from './ReactDOMComponentTree';
+import {isContainerMarkedAsRoot, markContainerAsRoot, unmarkContainerAsRoot,} from './ReactDOMComponentTree';
 import {listenToAllSupportedEvents} from '../events/DOMPluginEventSystem';
-import {
-  ELEMENT_NODE,
-  COMMENT_NODE,
-  DOCUMENT_NODE,
-  DOCUMENT_FRAGMENT_NODE,
-} from '../shared/HTMLNodeType';
+import {COMMENT_NODE, DOCUMENT_FRAGMENT_NODE, DOCUMENT_NODE, ELEMENT_NODE,} from '../shared/HTMLNodeType';
 
 import {
   createContainer,
   createHydrationContainer,
-  updateContainer,
-  findHostInstanceWithNoPortals,
-  registerMutableSourceForHydration,
   flushSync,
-  isAlreadyRendering,
+  registerMutableSourceForHydration,
+  updateContainer,
 } from 'react-reconciler/src/ReactFiberReconciler';
 import {ConcurrentRoot} from 'react-reconciler/src/ReactRootTags';
-import {
-  allowConcurrentByDefault,
-  disableCommentsAsDOMContainers,
-} from 'shared/ReactFeatureFlags';
+import {allowConcurrentByDefault, disableCommentsAsDOMContainers,} from 'shared/ReactFeatureFlags';
 
 /* global reportError */
 const defaultOnRecoverableError =
@@ -46,7 +31,6 @@ const defaultOnRecoverableError =
       reportError
     : (error) => {
         // In older browsers and test environments, fallback to console.error.
-        // eslint-disable-next-line react-internal/no-production-logging
         console['error'](error);
       };
 
@@ -125,17 +109,15 @@ export function createRoot(container, options) {
     concurrentUpdatesByDefaultOverride,
     identifierPrefix,
     onRecoverableError,
-    transitionCallbacks,
+    transitionCallbacks ,
   );
 
   // 根容器关联根容器 fiber
   // container['__reactContainer$xxxxx'] = root.current;
   markContainerAsRoot(root.current, container);
 
-  const rootContainerElement = container;
-
   // 在根容器上注册支持的所有事件
-  listenToAllSupportedEvents(rootContainerElement);
+  listenToAllSupportedEvents(container);
 
   // 创建 ReactDOMRoot 实例
   return new ReactDOMRoot(root);
@@ -144,6 +126,7 @@ export function createRoot(container, options) {
 function ReactDOMHydrationRoot(internalRoot) {
   this._internalRoot = internalRoot;
 }
+
 function scheduleHydration(target) {
   if (target) {
     queueExplicitHydrationTarget(target);

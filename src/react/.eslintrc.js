@@ -1,5 +1,3 @@
-'use strict';
-
 const {
   es5Paths,
   esNextPaths,
@@ -11,17 +9,12 @@ const OFF = 0;
 const ERROR = 2;
 
 module.exports = {
-  extends: ['fbjs', 'prettier'],
-
   // Stop ESLint from looking for a configuration file in parent folders
   root: true,
 
   plugins: [
     'jest',
-    'no-for-of-loops',
-    'no-function-declare-after-return',
     'react',
-    'react-internal',
   ],
 
   parser: 'babel-eslint',
