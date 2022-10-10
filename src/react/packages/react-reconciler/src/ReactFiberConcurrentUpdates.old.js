@@ -7,9 +7,7 @@
  *
  */
 
-import {throwIfInfiniteUpdateLoopDetected, warnAboutUpdateOnNotYetMountedFiberInDEV,} from './ReactFiberWorkLoop.old';
 import {markHiddenUpdate, mergeLanes, NoLane, NoLanes,} from './ReactFiberLane.old';
-import {Hydrating, NoFlags, Placement} from './ReactFiberFlags';
 import {HostRoot, OffscreenComponent} from './ReactWorkTags';
 
 // If a render is in progress, and we receive an update from a concurrent event,
