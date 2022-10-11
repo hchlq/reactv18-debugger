@@ -2092,6 +2092,7 @@ function dispatchSetState(fiber, queue, action) {
 
       scheduleUpdateOnFiber(root, fiber, lane, eventTime);
 
+      // 纠缠 transition 的更新
       entangleTransitionUpdate(root, queue, lane);
     }
   }
@@ -2134,6 +2135,7 @@ function entangleTransitionUpdate(root, queue, lane) {
     // represents a superset of the actually pending lanes. In some cases we
     // may entangle more than we need to, but that's OK. In fact it's worse if
     // we *don't* entangle when we should.
+    // queueLanes & root.pendingLanes
     queueLanes = intersectLanes(queueLanes, root.pendingLanes);
 
     // Entangle the new transition lane with the other transition lanes.

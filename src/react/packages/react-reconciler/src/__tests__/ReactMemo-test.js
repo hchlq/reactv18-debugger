@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 /**
  * Copyright (c) Facebook, Inc. and its affiliates.
  *
@@ -8,7 +10,7 @@
  * @jest-environment node
  */
 
-/* eslint-disable no-func-assign */
+
 
 'use strict';
 

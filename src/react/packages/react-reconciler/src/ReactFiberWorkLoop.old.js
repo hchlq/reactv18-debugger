@@ -41,10 +41,7 @@ import {
     IdlePriority as IdleSchedulerPriority,
 } from './Scheduler';
 import {
-    flushSyncCallbacks,
-    flushSyncCallbacksOnlyInLegacyMode,
-    scheduleSyncCallback,
-    scheduleLegacySyncCallback,
+    flushSyncCallbacks, flushSyncCallbacksOnlyInLegacyMode, scheduleSyncCallback, scheduleLegacySyncCallback,
 } from './ReactFiberSyncTaskQueue.old';
 import {
     logCommitStarted,
@@ -70,8 +67,7 @@ import {
 } from './ReactFiberHostConfig';
 
 import {
-    createWorkInProgress,
-    assignFiberPropertiesInDEV,
+    createWorkInProgress, assignFiberPropertiesInDEV,
 } from './ReactFiber.old';
 import {isRootDehydrated} from './ReactFiberShellHydration';
 import {didSuspendOrErrorWhileHydratingDEV} from './ReactFiberHydrationContext.old';
@@ -149,9 +145,7 @@ import {beginWork as originalBeginWork} from './ReactFiberBeginWork.old';
 import {completeWork} from './ReactFiberCompleteWork.old';
 import {unwindWork, unwindInterruptedWork} from './ReactFiberUnwindWork.old';
 import {
-    throwException,
-    createRootErrorUpdate,
-    createClassErrorUpdate,
+    throwException, createRootErrorUpdate, createClassErrorUpdate,
 } from './ReactFiberThrow.old';
 import {
     commitBeforeMutationEffects,
@@ -169,20 +163,14 @@ import {
 import {enqueueUpdate} from './ReactFiberClassUpdateQueue.old';
 import {resetContextDependencies} from './ReactFiberNewContext.old';
 import {
-    resetHooksAfterThrow,
-    ContextOnlyDispatcher,
-    getIsUpdatingOpaqueValueInRenderPhaseInDEV,
+    resetHooksAfterThrow, ContextOnlyDispatcher, getIsUpdatingOpaqueValueInRenderPhaseInDEV,
 } from './ReactFiberHooks.old';
 import {createCapturedValueAtFiber} from './ReactCapturedValue';
 import {
-    push as pushToStack,
-    pop as popFromStack,
-    createCursor,
+    push as pushToStack, pop as popFromStack, createCursor,
 } from './ReactFiberStack.old';
 import {
-    enqueueConcurrentRenderForLane,
-    finishQueueingConcurrentUpdates,
-    getConcurrentlyUpdatedLanes,
+    enqueueConcurrentRenderForLane, finishQueueingConcurrentUpdates, getConcurrentlyUpdatedLanes,
 } from './ReactFiberConcurrentUpdates.old';
 
 import {
@@ -204,9 +192,7 @@ import {
     setCurrentFiber as setCurrentDebugFiberInDEV,
 } from './ReactCurrentFiber';
 import {
-    invokeGuardedCallback,
-    hasCaughtError,
-    clearCaughtError,
+    invokeGuardedCallback, hasCaughtError, clearCaughtError,
 } from 'shared/ReactErrorUtils';
 import {
     isDevToolsPresent,
@@ -228,18 +214,14 @@ import {
 import {onCommitRoot as onCommitRootTestSelector} from './ReactTestSelectors';
 import {releaseCache} from './ReactFiberCacheComponent.old';
 import {
-    isLegacyActEnvironment,
-    isConcurrentActEnvironment,
+    isLegacyActEnvironment, isConcurrentActEnvironment,
 } from './ReactFiberAct.old';
 import {processTransitionCallbacks} from './ReactFiberTracingMarkerComponent.old';
 
 const ceil = Math.ceil;
 
 const {
-    ReactCurrentDispatcher,
-    ReactCurrentOwner,
-    ReactCurrentBatchConfig,
-    ReactCurrentActQueue,
+    ReactCurrentDispatcher, ReactCurrentOwner, ReactCurrentBatchConfig, ReactCurrentActQueue,
 } = ReactSharedInternals;
 
 export const NoContext = /*             */ 0b000;
@@ -323,9 +305,7 @@ export function addTransitionStartCallbackToPendingTransition(transition) {
     if (enableTransitionTracing) {
         if (currentPendingTransitionCallbacks === null) {
             currentPendingTransitionCallbacks = {
-                transitionStart: [],
-                transitionComplete: null,
-                markerComplete: null,
+                transitionStart: [], transitionComplete: null, markerComplete: null,
             };
         }
 
@@ -341,9 +321,7 @@ export function addMarkerCompleteCallbackToPendingTransition(transition) {
     if (enableTransitionTracing) {
         if (currentPendingTransitionCallbacks === null) {
             currentPendingTransitionCallbacks = {
-                transitionStart: null,
-                transitionComplete: null,
-                markerComplete: [],
+                transitionStart: null, transitionComplete: null, markerComplete: [],
             };
         }
 
@@ -359,9 +337,7 @@ export function addTransitionCompleteCallbackToPendingTransition(transition) {
     if (enableTransitionTracing) {
         if (currentPendingTransitionCallbacks === null) {
             currentPendingTransitionCallbacks = {
-                transitionStart: null,
-                transitionComplete: [],
-                markerComplete: null,
+                transitionStart: null, transitionComplete: [], markerComplete: null,
             };
         }
 
@@ -442,16 +418,18 @@ export function getCurrentTime() {
     return now();
 }
 
+/**
+ * 获取更新的车道优先级
+ */
 export function requestUpdateLane(fiber) {
     // Special cases
     const mode = fiber.mode;
+
+    //! 1. 处理特殊情况
     if ((mode & ConcurrentMode) === NoMode) {
         return SyncLane;
-    } else if (
-        !deferRenderPhaseUpdateToNextBatch &&
-        (executionContext & RenderContext) !== NoContext &&
-        workInProgressRootRenderLanes !== NoLanes
-    ) {
+    } else if (!deferRenderPhaseUpdateToNextBatch && (executionContext & RenderContext) !== NoContext && workInProgressRootRenderLanes !== NoLanes) {
+        // 渲染阶段的更新
         // This is a render phase update. These are not officially supported. The
         // old behavior is to give this the same "thread" (lanes) as
         // whatever is currently rendering. So if you call `setState` on a component
@@ -464,52 +442,47 @@ export function requestUpdateLane(fiber) {
         return pickArbitraryLane(workInProgressRootRenderLanes);
     }
 
+    //! 2. Transition 优先级
     const isTransition = requestCurrentTransition() !== NoTransition;
     if (isTransition) {
-        if (__DEV__ && ReactCurrentBatchConfig.transition !== null) {
-            const transition = ReactCurrentBatchConfig.transition;
-            if (!transition._updatedFibers) {
-                transition._updatedFibers = new Set();
-            }
-
-            transition._updatedFibers.add(fiber);
-        }
-
         // The algorithm for assigning an update to a lane should be stable for all
         // updates at the same priority within the same event. To do this, the
         // inputs to the algorithm must be the same.
         //
-        // 缓存同一事件的 lane
         // The trick we use is to cache the first of each of these inputs within an
         // event. Then reset the cached values once we can be sure the event is
         // over. Our heuristic for that is whenever we enter a concurrent work loop.
+        // 首次为空时才赋值，后面都使用缓存，在确定事件完成时会清空该标识
         if (currentEventTransitionLane === NoLane) {
             // All transitions within the same event are assigned the same lane.
+            // 所有的过渡在相同的事件会赋值为相同的车道
             currentEventTransitionLane = claimNextTransitionLane();
         }
 
         return currentEventTransitionLane;
     }
 
+    //! 3. Update 优先级
+    // e.g. event handler、startTransition、flushSync ...
     // Updates originating inside certain React methods, like flushSync, have
     // their priority set by tracking it with a context variable.
     //
     // The opaque type returned by the host config is internally a lane, so we can
     // use that directly.
-    // TODO: Move this type conversion to the event priority module.
     const updateLane = getCurrentUpdatePriority();
     if (updateLane !== NoLane) {
         return updateLane;
     }
 
+    //! 4. 处理在 React 范围之外的更新
+    // 根据事件的类型来获取对应的更新优先级
     // This update originated outside React. Ask the host environment for an
     // appropriate priority, based on the type of event.
     //
     // The opaque type returned by the host config is internally a lane, so we can
     // use that directly.
-    // TODO: Move this type conversion to the event priority module.
-    const eventLane = getCurrentEventPriority();
-    return eventLane;
+    // eventLane
+    return getCurrentEventPriority();
 }
 
 function requestRetryLane(fiber) {
@@ -526,122 +499,43 @@ function requestRetryLane(fiber) {
     return claimNextRetryLane();
 }
 
+/**
+ * 主要住了两件事：
+ * 1. 标记 fiber root 有更新的任务
+ * 2. 确保 fiber root 被调度
+ */
 export function scheduleUpdateOnFiber(root, fiber, lane, eventTime) {
-    if (__DEV__) {
-        if (isRunningInsertionEffect) {
-            console.error('useInsertionEffect must not schedule updates.');
-        }
-    }
-
-    if (__DEV__) {
-        if (isFlushingPassiveEffects) {
-            didScheduleUpdateDuringPassiveEffects = true;
-        }
-    }
-
     // Mark that the root has a pending update.
+    // 1. 给 fiber root 上增加待更新的车道
     markRootUpdated(root, lane, eventTime);
 
-    if (
-        (executionContext & RenderContext) !== NoLanes &&
-        root === workInProgressRoot
-    ) {
+    // 渲染阶段更新
+    if ((executionContext & RenderContext) !== NoLanes && root === workInProgressRoot) {
         // This update was dispatched during the render phase. This is a mistake
         // if the update originates from user space (with the exception of local
         // hook updates, which are handled differently and don't reach this
         // function), but there are some internal React features that use this as
         // an implementation detail, like selective hydration.
-        warnAboutRenderPhaseUpdatesInDEV(fiber);
+        // warnAboutRenderPhaseUpdatesInDEV(fiber);
 
         // Track lanes that were updated during the render phase
-        workInProgressRootRenderPhaseUpdatedLanes = mergeLanes(
-            workInProgressRootRenderPhaseUpdatedLanes,
-            lane,
-        );
+        // 合并渲染中更新的车道
+        workInProgressRootRenderPhaseUpdatedLanes = mergeLanes(workInProgressRootRenderPhaseUpdatedLanes, lane,);
     } else {
         // This is a normal update, scheduled from outside the render phase. For
         // example, during an input event.
-        if (enableUpdaterTracking) {
-            if (isDevToolsPresent) {
-                addFiberToLanesMap(root, fiber, lane);
-            }
-        }
 
-        warnIfUpdatesNotWrappedWithActDEV(fiber);
-
-        if (enableProfilerTimer && enableProfilerNestedUpdateScheduledHook) {
-            if (
-                (executionContext & CommitContext) !== NoContext &&
-                root === rootCommittingMutationOrLayoutEffects
-            ) {
-                if (fiber.mode & ProfileMode) {
-                    let current = fiber;
-                    while (current !== null) {
-                        if (current.tag === Profiler) {
-                            const {id, onNestedUpdateScheduled} = current.memoizedProps;
-                            if (typeof onNestedUpdateScheduled === 'function') {
-                                onNestedUpdateScheduled(id);
-                            }
-                        }
-                        current = current.return;
-                    }
-                }
-            }
-        }
-
-        if (enableTransitionTracing) {
-            const transition = ReactCurrentBatchConfig.transition;
-            if (transition !== null) {
-                if (transition.startTime === -1) {
-                    transition.startTime = now();
-                }
-
-                addTransitionToLanesMap(root, transition, lane);
-            }
-        }
-
-        if (root === workInProgressRoot) {
-            // Received an update to a tree that's in the middle of rendering. Mark
-            // that there was an interleaved update work on this root. Unless the
-            // `deferRenderPhaseUpdateToNextBatch` flag is off and this is a render
-            // phase update. In that case, we don't treat render phase updates as if
-            // they were interleaved, for backwards compat reasons.
-
-            if (
-                deferRenderPhaseUpdateToNextBatch ||
-                (executionContext & RenderContext) === NoContext
-            ) {
-                workInProgressRootInterleavedUpdatedLanes = mergeLanes(
-                    workInProgressRootInterleavedUpdatedLanes,
-                    lane,
-                );
-            }
-
-            if (workInProgressRootExitStatus === RootSuspendedWithDelay) {
-                // The root already suspended with a delay, which means this render
-                // definitely won't finish. Since we have a new update, let's mark it as
-                // suspended now, right before marking the incoming update. This has the
-                // effect of interrupting the current render and switching to the update.
-                // TODO: Make sure this doesn't override pings that happen while we've
-                // already started rendering.
-                markRootSuspended(root, workInProgressRootRenderLanes);
-            }
-        }
-
+        // 2. 确保 fiber root 被调度
         ensureRootIsScheduled(root, eventTime);
-        if (
-            lane === SyncLane &&
-            executionContext === NoContext &&
-            (fiber.mode & ConcurrentMode) === NoMode &&
-            // Treat `act` as if it's inside `batchedUpdates`, even in legacy mode.
-            !(__DEV__ && ReactCurrentActzQueue.isBatchingLegacy)
-        ) {
+
+        // 兼容 render 模式的更新
+        if (lane === SyncLane && executionContext === NoContext && (fiber.mode & ConcurrentMode) === NoMode) {
             // Flush the synchronous work now, unless we're already working or inside
             // a batch. This is intentionally inside scheduleUpdateOnFiber instead of
             // scheduleCallbackForFiber to preserve the ability to schedule a callback
             // without immediately flushing it. We only do this for user-initiated
             // updates, to preserve historical behavior of legacy mode.
-            resetRenderTimer();
+            // resetRenderTimer();
             flushSyncCallbacksOnlyInLegacyMode();
         }
     }
@@ -666,13 +560,9 @@ export function scheduleInitialHydrationOnRoot(root, lane, eventTime) {
 export function isUnsafeClassRenderPhaseUpdate(fiber) {
     // Check if this is a render phase update. Only called by class components,
     // which special (deprecated) behavior for UNSAFE_componentWillReceive props.
-    return (
-        // TODO: Remove outdated deferRenderPhaseUpdateToNextBatch experiment. We
+    return (// TODO: Remove outdated deferRenderPhaseUpdateToNextBatch experiment. We
         // decided not to enable it.
-        (!deferRenderPhaseUpdateToNextBatch || (fiber.mode & ConcurrentMode) === NoMode)
-        &&
-        (executionContext & RenderContext) !== NoContext
-    );
+        (!deferRenderPhaseUpdateToNextBatch || (fiber.mode & ConcurrentMode) === NoMode) && (executionContext & RenderContext) !== NoContext);
 }
 
 // Use this function to schedule a task for a root. There's only one task per
@@ -685,15 +575,17 @@ function ensureRootIsScheduled(root, currentTime) {
 
     // Check if any lanes are being starved by other work. If so, mark them as
     // expired so we know to work on those next.
+    // 1. 标记已经过期的任务（过期的任务优先级调整到最高）
+    // - 没有过期的时间，增加过期的时间
+    // - 存在过期的时间，并且已经过期，将该车道添加到 root.expiredLanes 中
     markStarvedLanesAsExpired(root, currentTime);
 
     // Determine the next lanes to work on, and their priority.
-    const nextLanes = getNextLanes(
-        root,
-        root === workInProgressRoot ? workInProgressRootRenderLanes : NoLanes,
-    );
+    // 2. 获取更次要更新的车道，即更新的批次
+    const nextLanes = getNextLanes(root, root === workInProgressRoot ? workInProgressRootRenderLanes : NoLanes,);
 
     if (nextLanes === NoLanes) {
+        // 没有车道更新，做一些清空操作
         // Special case: There's nothing to work on.
         if (existingCallbackNode !== null) {
             cancelCallback(existingCallbackNode);
@@ -704,86 +596,67 @@ function ensureRootIsScheduled(root, currentTime) {
     }
 
     // We use the highest priority lane to represent the priority of the callback.
+    // 使用最高优先级的车道代表 callback 的优先级
+    // 根据更新的车道，获取最高的优先级等级
+    // e.g. nextLanes: 0110 newCallbackPriority: 0010
     const newCallbackPriority = getHighestPriorityLane(nextLanes);
 
     // Check if there's an existing task. We may be able to reuse it.
     const existingCallbackPriority = root.callbackPriority;
-    if (
-        existingCallbackPriority === newCallbackPriority &&
-        // Special case related to `act`. If the currently scheduled task is a
-        // Scheduler task, rather than an `act` task, cancel it and re-scheduled
-        // on the `act` queue.
-        !(
-            __DEV__ &&
-            ReactCurrentActQueue.current !== null &&
-            existingCallbackNode !== fakeActCallbackNode
-        )
-    ) {
-        if (__DEV__) {
-            // If we're going to re-use an existing task, it needs to exist.
-            // Assume that discrete update microtasks are non-cancellable and null.
-            // TODO: Temporary until we confirm this warning is not fired.
-            if (
-                existingCallbackNode == null &&
-                existingCallbackPriority !== SyncLane
-            ) {
-                console.error(
-                    'Expected scheduled callback to exist. This error is likely caused by a bug in React. Please file an issue.',
-                );
-            }
-        }
+
+    // 正在构建的优先级等于新进入的优先级，复用，不处理
+    if (existingCallbackPriority === newCallbackPriority) {
         // The priority hasn't changed. We can reuse the existing task. Exit.
+        // 前后最高优先级相同，直接返回
         return;
     }
 
+    //! 到这证明了：本次更新的车道优先级大于正在渲染的车道优先级
+
     if (existingCallbackNode != null) {
         // Cancel the existing callback. We'll schedule a new one below.
+        // 取消当前的任务，调度新的优先级高的任务
         cancelCallback(existingCallbackNode);
     }
 
+    // 3. 调度新的任务
     // Schedule a new callback.
     let newCallbackNode;
     if (newCallbackPriority === SyncLane) {
+        // 可能的情况
+        // 1. render 模式
+        // 2. 过期的任务
+
         // Special case: Sync React callbacks are scheduled on a special
         // internal queue
         if (root.tag === LegacyRoot) {
-            if (__DEV__ && ReactCurrentActQueue.isBatchingLegacy !== null) {
-                ReactCurrentActQueue.didScheduleLegacyUpdate = true;
-            }
+            // render 模式
             scheduleLegacySyncCallback(performSyncWorkOnRoot.bind(null, root));
         } else {
+            // Concurrent 模式
             scheduleSyncCallback(performSyncWorkOnRoot.bind(null, root));
         }
-        if (supportsMicrotasks) {
-            // Flush the queue in a microtask.
-            if (__DEV__ && ReactCurrentActQueue.current !== null) {
-                // Inside `act`, use our internal `act` queue so that these get flushed
-                // at the end of the current scope even when using the sync version
-                // of `act`.
-                ReactCurrentActQueue.current.push(flushSyncCallbacks);
-            } else {
-                scheduleMicrotask(() => {
-                    // In Safari, appending an iframe forces microtasks to run.
-                    // https://github.com/facebook/react/issues/22459
-                    // We don't support running callbacks in the middle of render
-                    // or commit so we need to check against that.
-                    if (
-                        (executionContext & (RenderContext | CommitContext)) ===
-                        NoContext
-                    ) {
-                        // Note that this would still prematurely flush the callbacks
-                        // if this happens outside render or commit phase (e.g. in an event).
-                        flushSyncCallbacks();
-                    }
-                });
+
+        // Flush the queue in a microtask.
+        // 在宏任务中清空这些任务
+        scheduleMicrotask(() => {
+            // In Safari, appending an iframe forces microtasks to run.
+            // https://github.com/facebook/react/issues/22459
+            // We don't support running callbacks in the middle of render
+            // or commit so we need to check against that.
+            if ((executionContext & (RenderContext | CommitContext)) === NoContext) {
+                // Note that this would still prematurely flush the callbacks
+                // if this happens outside render or commit phase (e.g. in an event).
+                flushSyncCallbacks();
             }
-        } else {
-            // Flush the queue in an Immediate task.
-            scheduleCallback(ImmediateSchedulerPriority, flushSyncCallbacks);
-        }
+        });
+
+        // 同步的更新没有 callbackNode
         newCallbackNode = null;
     } else {
+        // 异步更新
         let schedulerPriorityLevel;
+        // 获取车道对应的事件优先级
         switch (lanesToEventPriority(nextLanes)) {
             case DiscreteEventPriority:
                 schedulerPriorityLevel = ImmediateSchedulerPriority;
@@ -801,18 +674,18 @@ function ensureRootIsScheduled(root, currentTime) {
                 schedulerPriorityLevel = NormalSchedulerPriority;
                 break;
         }
-        newCallbackNode = scheduleCallback(
-            schedulerPriorityLevel,
-            performConcurrentWorkOnRoot.bind(null, root),
-        );
+        // 注册回调
+        newCallbackNode = scheduleCallback(schedulerPriorityLevel, performConcurrentWorkOnRoot.bind(null, root),);
     }
 
+    // 4. 更新优先级和任务
     root.callbackPriority = newCallbackPriority;
     root.callbackNode = newCallbackNode;
 }
 
 // This is the entry point for every concurrent task, i.e. anything that
 // goes through Scheduler.
+// 并发任务的入口点，都经过调度器调度
 function performConcurrentWorkOnRoot(root, didTimeout) {
     if (enableProfilerTimer && enableProfilerNestedUpdatePhase) {
         resetNestedUpdateFlag();
@@ -846,10 +719,7 @@ function performConcurrentWorkOnRoot(root, didTimeout) {
 
     // Determine the next lanes to work on, using the fields stored
     // on the root.
-    let lanes = getNextLanes(
-        root,
-        root === workInProgressRoot ? workInProgressRootRenderLanes : NoLanes,
-    );
+    let lanes = getNextLanes(root, root === workInProgressRoot ? workInProgressRootRenderLanes : NoLanes,);
     if (lanes === NoLanes) {
         // Defensive coding. This is never expected to happen.
         return null;
@@ -861,13 +731,8 @@ function performConcurrentWorkOnRoot(root, didTimeout) {
     // TODO: We only check `didTimeout` defensively, to account for a Scheduler
     // bug we're still investigating. Once the bug in Scheduler is fixed,
     // we can remove this, since we track expiration ourselves.
-    const shouldTimeSlice =
-        !includesBlockingLane(root, lanes) &&
-        !includesExpiredLane(root, lanes) &&
-        (disableSchedulerTimeoutInWorkLoop || !didTimeout);
-    let exitStatus = shouldTimeSlice
-        ? renderRootConcurrent(root, lanes)
-        : renderRootSync(root, lanes);
+    const shouldTimeSlice = !includesBlockingLane(root, lanes) && !includesExpiredLane(root, lanes) && (disableSchedulerTimeoutInWorkLoop || !didTimeout);
+    let exitStatus = shouldTimeSlice ? renderRootConcurrent(root, lanes) : renderRootSync(root, lanes);
     if (exitStatus !== RootInProgress) {
         if (exitStatus === RootErrored) {
             // If something threw an error, try rendering one more time. We'll
@@ -907,10 +772,7 @@ function performConcurrentWorkOnRoot(root, didTimeout) {
             // skip the consistency check in that case, too.
             const renderWasConcurrent = !includesBlockingLane(root, lanes);
             const finishedWork = root.current.alternate;
-            if (
-                renderWasConcurrent &&
-                !isRenderConsistentWithExternalStores(finishedWork)
-            ) {
+            if (renderWasConcurrent && !isRenderConsistentWithExternalStores(finishedWork)) {
                 // A store was mutated in an interleaved event. Render again,
                 // synchronously, to block further mutations.
                 exitStatus = renderRootSync(root, lanes);
@@ -1001,10 +863,7 @@ export function queueRecoverableErrors(errors) {
     if (workInProgressRootRecoverableErrors === null) {
         workInProgressRootRecoverableErrors = errors;
     } else {
-        workInProgressRootRecoverableErrors.push.apply(
-            workInProgressRootRecoverableErrors,
-            errors,
-        );
+        workInProgressRootRecoverableErrors.push.apply(workInProgressRootRecoverableErrors, errors,);
     }
 }
 
@@ -1020,11 +879,7 @@ function finishConcurrentRender(root, exitStatus, lanes) {
         case RootErrored: {
             // We should have already attempted to retry this tree. If we reached
             // this point, it errored again. Commit it.
-            commitRoot(
-                root,
-                workInProgressRootRecoverableErrors,
-                workInProgressTransitions,
-            );
+            commitRoot(root, workInProgressRootRecoverableErrors, workInProgressTransitions,);
             break;
         }
         case RootSuspended: {
@@ -1033,15 +888,11 @@ function finishConcurrentRender(root, exitStatus, lanes) {
             // We have an acceptable loading state. We need to figure out if we
             // should immediately commit it or wait a bit.
 
-            if (
-                includesOnlyRetries(lanes) &&
-                // do not delay if we're inside an act() scope
-                !shouldForceFlushFallbacksInDEV()
-            ) {
+            if (includesOnlyRetries(lanes) && // do not delay if we're inside an act() scope
+                !shouldForceFlushFallbacksInDEV()) {
                 // This render only included retries, no updates. Throttle committing
                 // retries so that we don't show too many loading states too quickly.
-                const msUntilTimeout =
-                    globalMostRecentFallbackTime + FALLBACK_THROTTLE_MS - now();
+                const msUntilTimeout = globalMostRecentFallbackTime + FALLBACK_THROTTLE_MS - now();
                 // Don't bother with a very short suspense time.
                 if (msUntilTimeout > 10) {
                     const nextLanes = getNextLanes(root, NoLanes);
@@ -1063,24 +914,12 @@ function finishConcurrentRender(root, exitStatus, lanes) {
                     // The render is suspended, it hasn't timed out, and there's no
                     // lower priority work to do. Instead of committing the fallback
                     // immediately, wait for more data to arrive.
-                    root.timeoutHandle = scheduleTimeout(
-                        commitRoot.bind(
-                            null,
-                            root,
-                            workInProgressRootRecoverableErrors,
-                            workInProgressTransitions,
-                        ),
-                        msUntilTimeout,
-                    );
+                    root.timeoutHandle = scheduleTimeout(commitRoot.bind(null, root, workInProgressRootRecoverableErrors, workInProgressTransitions,), msUntilTimeout,);
                     break;
                 }
             }
             // The work expired. Commit immediately.
-            commitRoot(
-                root,
-                workInProgressRootRecoverableErrors,
-                workInProgressTransitions,
-            );
+            commitRoot(root, workInProgressRootRecoverableErrors, workInProgressTransitions,);
             break;
         }
         case RootSuspendedWithDelay: {
@@ -1110,34 +949,18 @@ function finishConcurrentRender(root, exitStatus, lanes) {
                 if (msUntilTimeout > 10) {
                     // Instead of committing the fallback immediately, wait for more data
                     // to arrive.
-                    root.timeoutHandle = scheduleTimeout(
-                        commitRoot.bind(
-                            null,
-                            root,
-                            workInProgressRootRecoverableErrors,
-                            workInProgressTransitions,
-                        ),
-                        msUntilTimeout,
-                    );
+                    root.timeoutHandle = scheduleTimeout(commitRoot.bind(null, root, workInProgressRootRecoverableErrors, workInProgressTransitions,), msUntilTimeout,);
                     break;
                 }
             }
 
             // Commit the placeholder.
-            commitRoot(
-                root,
-                workInProgressRootRecoverableErrors,
-                workInProgressTransitions,
-            );
+            commitRoot(root, workInProgressRootRecoverableErrors, workInProgressTransitions,);
             break;
         }
         case RootCompleted: {
             // The work completed. Ready to commit.
-            commitRoot(
-                root,
-                workInProgressRootRecoverableErrors,
-                workInProgressTransitions,
-            );
+            commitRoot(root, workInProgressRootRecoverableErrors, workInProgressTransitions,);
             break;
         }
         default: {
@@ -1204,10 +1027,7 @@ function markRootSuspended(root, suspendedLanes) {
     // TODO: Lol maybe there's a better way to factor this besides this
     // obnoxiously named function :)
     suspendedLanes = removeLanes(suspendedLanes, workInProgressRootPingedLanes);
-    suspendedLanes = removeLanes(
-        suspendedLanes,
-        workInProgressRootInterleavedUpdatedLanes,
-    );
+    suspendedLanes = removeLanes(suspendedLanes, workInProgressRootInterleavedUpdatedLanes,);
     markRootSuspended_dontCallThisOneDirectly(root, suspendedLanes);
 }
 
@@ -1261,11 +1081,7 @@ function performSyncWorkOnRoot(root) {
     const finishedWork = root.current.alternate;
     root.finishedWork = finishedWork;
     root.finishedLanes = lanes;
-    commitRoot(
-        root,
-        workInProgressRootRecoverableErrors,
-        workInProgressTransitions,
-    );
+    commitRoot(root, workInProgressRootRecoverableErrors, workInProgressTransitions,);
 
     // Before exiting, make sure there's a callback scheduled for the next
     // pending level.
@@ -1309,17 +1125,14 @@ export function deferredUpdates(fn) {
 export function batchedUpdates(fn, a) {
     const prevExecutionContext = executionContext;
     executionContext |= BatchedContext;
+    // debugger
     try {
         return fn(a);
     } finally {
         executionContext = prevExecutionContext;
         // If there were legacy sync updates, flush them at the end of the outer
         // most batchedUpdates-like method.
-        if (
-            executionContext === NoContext &&
-            // Treat `act` as if it's inside `batchedUpdates`, even in legacy mode.
-            !(__DEV__ && ReactCurrentActQueue.isBatchingLegacy)
-        ) {
+        if (executionContext === NoContext) {
             resetRenderTimer();
             flushSyncCallbacksOnlyInLegacyMode();
         }
@@ -1351,11 +1164,7 @@ export function discreteUpdates(fn, a, b, c, d) {
 export function flushSync(fn) {
     // In legacy mode, we flush pending passive effects at the beginning of the
     // next event, not at the end of the previous one.
-    if (
-        rootWithPendingPassiveEffects !== null &&
-        rootWithPendingPassiveEffects.tag === LegacyRoot &&
-        (executionContext & (RenderContext | CommitContext)) === NoContext
-    ) {
+    if (rootWithPendingPassiveEffects !== null && rootWithPendingPassiveEffects.tag === LegacyRoot && (executionContext & (RenderContext | CommitContext)) === NoContext) {
         flushPassiveEffects();
     }
 
@@ -1390,10 +1199,7 @@ export function flushSync(fn) {
 export function isAlreadyRendering() {
     // Used by the renderer to print a warning if certain APIs are called from
     // the wrong context.
-    return (
-        __DEV__ &&
-        (executionContext & (RenderContext | CommitContext)) !== NoContext
-    );
+    return (__DEV__ && (executionContext & (RenderContext | CommitContext)) !== NoContext);
 }
 
 export function flushControlled(fn) {
@@ -1421,10 +1227,7 @@ export function flushControlled(fn) {
 export function pushRenderLanes(fiber, lanes) {
     pushToStack(subtreeRenderLanesCursor, subtreeRenderLanes, fiber);
     subtreeRenderLanes = mergeLanes(subtreeRenderLanes, lanes);
-    workInProgressRootIncludedLanes = mergeLanes(
-        workInProgressRootIncludedLanes,
-        lanes,
-    );
+    workInProgressRootIncludedLanes = mergeLanes(workInProgressRootIncludedLanes, lanes,);
 }
 
 export function popRenderLanes(fiber) {
@@ -1449,21 +1252,14 @@ function prepareFreshStack(root, lanes) {
         let interruptedWork = workInProgress.return;
         while (interruptedWork !== null) {
             const current = interruptedWork.alternate;
-            unwindInterruptedWork(
-                current,
-                interruptedWork,
-                workInProgressRootRenderLanes,
-            );
+            unwindInterruptedWork(current, interruptedWork, workInProgressRootRenderLanes,);
             interruptedWork = interruptedWork.return;
         }
     }
     workInProgressRoot = root;
     const rootWorkInProgress = createWorkInProgress(root.current, null);
     workInProgress = rootWorkInProgress;
-    workInProgressRootRenderLanes =
-        subtreeRenderLanes =
-            workInProgressRootIncludedLanes =
-                lanes;
+    workInProgressRootRenderLanes = subtreeRenderLanes = workInProgressRootIncludedLanes = lanes;
     workInProgressRootExitStatus = RootInProgress;
     workInProgressRootFatalError = null;
     workInProgressRootSkippedLanes = NoLanes;
@@ -1521,33 +1317,15 @@ function handleError(root, thrownValue) {
             if (enableSchedulingProfiler) {
                 markComponentRenderStopped();
 
-                if (
-                    thrownValue !== null &&
-                    typeof thrownValue === 'object' &&
-                    typeof thrownValue.then === 'function'
-                ) {
+                if (thrownValue !== null && typeof thrownValue === 'object' && typeof thrownValue.then === 'function') {
                     const wakeable = thrownValue;
-                    markComponentSuspended(
-                        erroredWork,
-                        wakeable,
-                        workInProgressRootRenderLanes,
-                    );
+                    markComponentSuspended(erroredWork, wakeable, workInProgressRootRenderLanes,);
                 } else {
-                    markComponentErrored(
-                        erroredWork,
-                        thrownValue,
-                        workInProgressRootRenderLanes,
-                    );
+                    markComponentErrored(erroredWork, thrownValue, workInProgressRootRenderLanes,);
                 }
             }
 
-            throwException(
-                root,
-                erroredWork.return,
-                erroredWork,
-                thrownValue,
-                workInProgressRootRenderLanes,
-            );
+            throwException(root, erroredWork.return, erroredWork, thrownValue, workInProgressRootRenderLanes,);
             completeUnitOfWork(erroredWork);
         } catch (yetAnotherThrownValue) {
             // Something in the return path also threw.
@@ -1589,10 +1367,7 @@ export function markCommitTimeOfFallback() {
 }
 
 export function markSkippedUpdateLanes(lane) {
-    workInProgressRootSkippedLanes = mergeLanes(
-        lane,
-        workInProgressRootSkippedLanes,
-    );
+    workInProgressRootSkippedLanes = mergeLanes(lane, workInProgressRootSkippedLanes,);
 }
 
 export function renderDidSuspend() {
@@ -1602,21 +1377,13 @@ export function renderDidSuspend() {
 }
 
 export function renderDidSuspendDelayIfPossible() {
-    if (
-        workInProgressRootExitStatus === RootInProgress ||
-        workInProgressRootExitStatus === RootSuspended ||
-        workInProgressRootExitStatus === RootErrored
-    ) {
+    if (workInProgressRootExitStatus === RootInProgress || workInProgressRootExitStatus === RootSuspended || workInProgressRootExitStatus === RootErrored) {
         workInProgressRootExitStatus = RootSuspendedWithDelay;
     }
 
     // Check if there are updates that we skipped tree that might have unblocked
     // this render.
-    if (
-        workInProgressRoot !== null &&
-        (includesNonIdleWork(workInProgressRootSkippedLanes) ||
-            includesNonIdleWork(workInProgressRootInterleavedUpdatedLanes))
-    ) {
+    if (workInProgressRoot !== null && (includesNonIdleWork(workInProgressRootSkippedLanes) || includesNonIdleWork(workInProgressRootInterleavedUpdatedLanes))) {
         // Mark the current render as suspended so that we switch to working on
         // the updates that were skipped. Usually we only suspend at the end of
         // the render phase.
@@ -1700,10 +1467,7 @@ function renderRootSync(root, lanes) {
 
     if (workInProgress !== null) {
         // This is a sync render, so we should have finished the whole tree.
-        throw new Error(
-            'Cannot commit an incomplete root. This error is likely caused by a ' +
-            'bug in React. Please file an issue.',
-        );
+        throw new Error('Cannot commit an incomplete root. This error is likely caused by a ' + 'bug in React. Please file an issue.',);
     }
 
     if (__DEV__) {
@@ -1863,10 +1627,7 @@ function completeUnitOfWork(unitOfWork) {
         if ((completedWork.flags & Incomplete) === NoFlags) {
             setCurrentDebugFiberInDEV(completedWork);
             let next;
-            if (
-                !enableProfilerTimer ||
-                (completedWork.mode & ProfileMode) === NoMode
-            ) {
+            if (!enableProfilerTimer || (completedWork.mode & ProfileMode) === NoMode) {
                 next = completeWork(current, completedWork, subtreeRenderLanes);
             } else {
                 startProfilerTimer(completedWork);
@@ -1899,10 +1660,7 @@ function completeUnitOfWork(unitOfWork) {
                 return;
             }
 
-            if (
-                enableProfilerTimer &&
-                (completedWork.mode & ProfileMode) !== NoMode
-            ) {
+            if (enableProfilerTimer && (completedWork.mode & ProfileMode) !== NoMode) {
                 // Record the render duration for the fiber that errored.
                 stopProfilerTimerIfRunningAndRecordDelta(completedWork, false);
 
@@ -1956,12 +1714,7 @@ function commitRoot(root, recoverableErrors, transitions) {
     try {
         ReactCurrentBatchConfig.transition = null;
         setCurrentUpdatePriority(DiscreteEventPriority);
-        commitRootImpl(
-            root,
-            recoverableErrors,
-            transitions,
-            previousUpdateLanePriority,
-        );
+        commitRootImpl(root, recoverableErrors, transitions, previousUpdateLanePriority,);
     } finally {
         ReactCurrentBatchConfig.transition = prevTransition;
         setCurrentUpdatePriority(previousUpdateLanePriority);
@@ -1970,12 +1723,7 @@ function commitRoot(root, recoverableErrors, transitions) {
     return null;
 }
 
-function commitRootImpl(
-    root,
-    recoverableErrors,
-    transitions,
-    renderPriorityLevel,
-) {
+function commitRootImpl(root, recoverableErrors, transitions, renderPriorityLevel,) {
     do {
         // `flushPassiveEffects` will call `flushSyncUpdateQueue` at the end, which
         // means `flushPassiveEffects` will sometimes result in additional
@@ -2019,10 +1767,7 @@ function commitRootImpl(
     } else {
         if (__DEV__) {
             if (lanes === NoLanes) {
-                console.error(
-                    'root.finishedLanes should not be empty during a commit. This is a ' +
-                    'bug in React.',
-                );
+                console.error('root.finishedLanes should not be empty during a commit. This is a ' + 'bug in React.',);
             }
         }
     }
@@ -2030,10 +1775,7 @@ function commitRootImpl(
     root.finishedLanes = NoLanes;
 
     if (finishedWork === root.current) {
-        throw new Error(
-            'Cannot commit the same tree as before. This error is likely caused by ' +
-            'a bug in React. Please file an issue.',
-        );
+        throw new Error('Cannot commit the same tree as before. This error is likely caused by ' + 'a bug in React. Please file an issue.',);
     }
 
     // commitRoot never returns a continuation; it always finishes synchronously.
@@ -2068,10 +1810,7 @@ function commitRootImpl(
     // might get scheduled in the commit phase. (See #16714.)
     // TODO: Delete all other places that schedule the passive effect callback
     // They're redundant.
-    if (
-        (finishedWork.subtreeFlags & PassiveMask) !== NoFlags ||
-        (finishedWork.flags & PassiveMask) !== NoFlags
-    ) {
+    if ((finishedWork.subtreeFlags & PassiveMask) !== NoFlags || (finishedWork.flags & PassiveMask) !== NoFlags) {
         if (!rootDoesHavePassiveEffects) {
             rootDoesHavePassiveEffects = true;
             pendingPassiveEffectsRemainingLanes = remainingLanes;
@@ -2097,14 +1836,8 @@ function commitRootImpl(
     // to check for the existence of `firstEffect` to satisfy Flow. I think the
     // only other reason this optimization exists is because it affects profiling.
     // Reconsider whether this is necessary.
-    const subtreeHasEffects =
-        (finishedWork.subtreeFlags &
-            (BeforeMutationMask | MutationMask | LayoutMask | PassiveMask)) !==
-        NoFlags;
-    const rootHasEffect =
-        (finishedWork.flags &
-            (BeforeMutationMask | MutationMask | LayoutMask | PassiveMask)) !==
-        NoFlags;
+    const subtreeHasEffects = (finishedWork.subtreeFlags & (BeforeMutationMask | MutationMask | LayoutMask | PassiveMask)) !== NoFlags;
+    const rootHasEffect = (finishedWork.flags & (BeforeMutationMask | MutationMask | LayoutMask | PassiveMask)) !== NoFlags;
 
     if (subtreeHasEffects || rootHasEffect) {
         const prevTransition = ReactCurrentBatchConfig.transition;
@@ -2125,10 +1858,7 @@ function commitRootImpl(
         // The first phase a "before mutation" phase. We use this phase to read the
         // state of the host tree right before we mutate it. This is where
         // getSnapshotBeforeUpdate is called.
-        const shouldFireAfterActiveInstanceBlur = commitBeforeMutationEffects(
-            root,
-            finishedWork,
-        );
+        const shouldFireAfterActiveInstanceBlur = commitBeforeMutationEffects(root, finishedWork,);
 
         if (enableProfilerTimer) {
             // Mark the current commit time to be shared by all Profilers in this
@@ -2290,10 +2020,7 @@ function commitRootImpl(
     // TODO: We can optimize this by not scheduling the callback earlier. Since we
     // currently schedule the callback in multiple places, will wait until those
     // are consolidated.
-    if (
-        includesSomeLane(pendingPassiveEffectsLanes, SyncLane) &&
-        root.tag !== LegacyRoot
-    ) {
+    if (includesSomeLane(pendingPassiveEffectsLanes, SyncLane) && root.tag !== LegacyRoot) {
         flushPassiveEffects();
     }
 
@@ -2470,10 +2197,7 @@ function flushPassiveEffectsImpl() {
     if (enableTransitionTracing) {
         const prevPendingTransitionCallbacks = currentPendingTransitionCallbacks;
         const prevRootTransitionCallbacks = root.transitionCallbacks;
-        if (
-            prevPendingTransitionCallbacks !== null &&
-            prevRootTransitionCallbacks !== null
-        ) {
+        if (prevPendingTransitionCallbacks !== null && prevRootTransitionCallbacks !== null) {
             // TODO(luna) Refactor this code into the Host Config
             // TODO(luna) The end time here is not necessarily accurate
             // because passive effects could be called before paint
@@ -2485,13 +2209,7 @@ function flushPassiveEffectsImpl() {
             const endTime = now();
             currentPendingTransitionCallbacks = null;
 
-            scheduleCallback(IdleSchedulerPriority, () =>
-                processTransitionCallbacks(
-                    prevPendingTransitionCallbacks,
-                    endTime,
-                    prevRootTransitionCallbacks,
-                ),
-            );
+            scheduleCallback(IdleSchedulerPriority, () => processTransitionCallbacks(prevPendingTransitionCallbacks, endTime, prevRootTransitionCallbacks,),);
         }
     }
 
@@ -2524,10 +2242,7 @@ function flushPassiveEffectsImpl() {
 }
 
 export function isAlreadyFailedLegacyErrorBoundary(instance) {
-    return (
-        legacyErrorBoundariesThatAlreadyFailed !== null &&
-        legacyErrorBoundariesThatAlreadyFailed.has(instance)
-    );
+    return (legacyErrorBoundariesThatAlreadyFailed !== null && legacyErrorBoundariesThatAlreadyFailed.has(instance));
 }
 
 export function markLegacyErrorBoundaryAsFailed(instance) {
@@ -2558,11 +2273,7 @@ function captureCommitPhaseErrorOnRoot(rootFiber, sourceFiber, error) {
     }
 }
 
-export function captureCommitPhaseError(
-    sourceFiber,
-    nearestMountedAncestor,
-    error,
-) {
+export function captureCommitPhaseError(sourceFiber, nearestMountedAncestor, error,) {
     if (__DEV__) {
         reportUncaughtErrorInDEV(error);
         setIsRunningInsertionEffect(false);
@@ -2588,11 +2299,7 @@ export function captureCommitPhaseError(
         } else if (fiber.tag === ClassComponent) {
             const ctor = fiber.type;
             const instance = fiber.stateNode;
-            if (
-                typeof ctor.getDerivedStateFromError === 'function' ||
-                (typeof instance.componentDidCatch === 'function' &&
-                    !isAlreadyFailedLegacyErrorBoundary(instance))
-            ) {
+            if (typeof ctor.getDerivedStateFromError === 'function' || (typeof instance.componentDidCatch === 'function' && !isAlreadyFailedLegacyErrorBoundary(instance))) {
                 const errorInfo = createCapturedValueAtFiber(error, sourceFiber);
                 const update = createClassErrorUpdate(fiber, errorInfo, SyncLane);
                 const root = enqueueUpdate(fiber, update, SyncLane);
@@ -2613,14 +2320,7 @@ export function captureCommitPhaseError(
         // trees. What it should instead do is propagate the error to the parent of
         // the deleted tree. In the meantime, do not add this warning to the
         // allowlist; this is only for our internal use.
-        console.error(
-            'Internal React error: Attempted to capture a commit phase error ' +
-            'inside a detached tree. This indicates a bug in React. Likely ' +
-            'causes include deleting the same fiber more than once, committing an ' +
-            'already-finished tree, or an inconsistent return pointer.\n\n' +
-            'Error message:\n\n%s',
-            error,
-        );
+        console.error('Internal React error: Attempted to capture a commit phase error ' + 'inside a detached tree. This indicates a bug in React. Likely ' + 'causes include deleting the same fiber more than once, committing an ' + 'already-finished tree, or an inconsistent return pointer.\n\n' + 'Error message:\n\n%s', error,);
     }
 }
 
@@ -2637,10 +2337,7 @@ export function pingSuspendedRoot(root, wakeable, pingedLanes) {
 
     warnIfSuspenseResolutionNotWrappedWithActDEV(root);
 
-    if (
-        workInProgressRoot === root &&
-        isSubsetOfLanes(workInProgressRootRenderLanes, pingedLanes)
-    ) {
+    if (workInProgressRoot === root && isSubsetOfLanes(workInProgressRootRenderLanes, pingedLanes)) {
         // Received a ping at the same priority level at which we're currently
         // rendering. We might want to restart this render. This should mirror
         // the logic of whether or not a root suspends once it completes.
@@ -2650,21 +2347,13 @@ export function pingSuspendedRoot(root, wakeable, pingedLanes) {
 
         // If we're suspended with delay, or if it's a retry, we'll always suspend
         // so we can always restart.
-        if (
-            workInProgressRootExitStatus === RootSuspendedWithDelay ||
-            (workInProgressRootExitStatus === RootSuspended &&
-                includesOnlyRetries(workInProgressRootRenderLanes) &&
-                now() - globalMostRecentFallbackTime < FALLBACK_THROTTLE_MS)
-        ) {
+        if (workInProgressRootExitStatus === RootSuspendedWithDelay || (workInProgressRootExitStatus === RootSuspended && includesOnlyRetries(workInProgressRootRenderLanes) && now() - globalMostRecentFallbackTime < FALLBACK_THROTTLE_MS)) {
             // Restart from the root.
             prepareFreshStack(root, NoLanes);
         } else {
             // Even though we can't restart right now, we might get an
             // opportunity later. So we mark this render as having a ping.
-            workInProgressRootPingedLanes = mergeLanes(
-                workInProgressRootPingedLanes,
-                pingedLanes,
-            );
+            workInProgressRootPingedLanes = mergeLanes(workInProgressRootPingedLanes, pingedLanes,);
         }
     }
 
@@ -2714,10 +2403,7 @@ export function resolveRetryWakeable(boundaryFiber, wakeable) {
             retryCache = boundaryFiber.stateNode;
             break;
         default:
-            throw new Error(
-                'Pinged unknown suspense boundary type. ' +
-                'This is probably a bug in React.',
-            );
+            throw new Error('Pinged unknown suspense boundary type. ' + 'This is probably a bug in React.',);
     }
 
     if (retryCache !== null) {
@@ -2739,19 +2425,7 @@ export function resolveRetryWakeable(boundaryFiber, wakeable) {
 // We pick a train model where the next boundary commits at a consistent schedule.
 // These particular numbers are vague estimates. We expect to adjust them based on research.
 function jnd(timeElapsed) {
-    return timeElapsed < 120
-        ? 120
-        : timeElapsed < 480
-            ? 480
-            : timeElapsed < 1080
-                ? 1080
-                : timeElapsed < 1920
-                    ? 1920
-                    : timeElapsed < 3000
-                        ? 3000
-                        : timeElapsed < 4320
-                            ? 4320
-                            : ceil(timeElapsed / 1960) * 1960;
+    return timeElapsed < 120 ? 120 : timeElapsed < 480 ? 480 : timeElapsed < 1080 ? 1080 : timeElapsed < 1920 ? 1920 : timeElapsed < 3000 ? 3000 : timeElapsed < 4320 ? 4320 : ceil(timeElapsed / 1960) * 1960;
 }
 
 export function throwIfInfiniteUpdateLoopDetected() {
@@ -2761,12 +2435,7 @@ export function throwIfInfiniteUpdateLoopDetected() {
         rootWithNestedUpdates = null;
         rootWithPassiveNestedUpdates = null;
 
-        throw new Error(
-            'Maximum update depth exceeded. This can happen when a component ' +
-            'repeatedly calls setState inside componentWillUpdate or ' +
-            'componentDidUpdate. React limits the number of nested updates to ' +
-            'prevent infinite loops.',
-        );
+        throw new Error('Maximum update depth exceeded. This can happen when a component ' + 'repeatedly calls setState inside componentWillUpdate or ' + 'componentDidUpdate. React limits the number of nested updates to ' + 'prevent infinite loops.',);
     }
 
     if (__DEV__) {
@@ -2774,12 +2443,7 @@ export function throwIfInfiniteUpdateLoopDetected() {
             nestedPassiveUpdateCount = 0;
             rootWithPassiveNestedUpdates = null;
 
-            console.error(
-                'Maximum update depth exceeded. This can happen when a component ' +
-                "calls setState inside useEffect, but useEffect either doesn't " +
-                'have a dependency array, or one of the dependencies changes on ' +
-                'every render.',
-            );
+            console.error('Maximum update depth exceeded. This can happen when a component ' + "calls setState inside useEffect, but useEffect either doesn't " + 'have a dependency array, or one of the dependencies changes on ' + 'every render.',);
         }
     }
 }
@@ -2803,11 +2467,7 @@ function commitDoubleInvokeEffectsInDEV(fiber, hasPassiveEffects) {
         setCurrentDebugFiberInDEV(fiber);
         invokeEffectsInDev(fiber, MountLayoutDev, invokeLayoutEffectUnmountInDEV);
         if (hasPassiveEffects) {
-            invokeEffectsInDev(
-                fiber,
-                MountPassiveDev,
-                invokePassiveEffectUnmountInDEV,
-            );
+            invokeEffectsInDev(fiber, MountPassiveDev, invokePassiveEffectUnmountInDEV,);
         }
 
         invokeEffectsInDev(fiber, MountLayoutDev, invokeLayoutEffectMountInDEV);
@@ -2827,11 +2487,7 @@ function invokeEffectsInDev(firstChild, fiberFlags, invokeEffectFn) {
         let subtreeRoot = null;
         while (current !== null) {
             const primarySubtreeFlag = current.subtreeFlags & fiberFlags;
-            if (
-                current !== subtreeRoot &&
-                current.child !== null &&
-                primarySubtreeFlag !== NoFlags
-            ) {
+            if (current !== subtreeRoot && current.child !== null && primarySubtreeFlag !== NoFlags) {
                 current = current.child;
             } else {
                 if ((current.flags & fiberFlags) !== NoFlags) {
@@ -2862,15 +2518,7 @@ export function warnAboutUpdateOnNotYetMountedFiberInDEV(fiber) {
         }
 
         const tag = fiber.tag;
-        if (
-            tag !== IndeterminateComponent &&
-            tag !== HostRoot &&
-            tag !== ClassComponent &&
-            tag !== FunctionComponent &&
-            tag !== ForwardRef &&
-            tag !== MemoComponent &&
-            tag !== SimpleMemoComponent
-        ) {
+        if (tag !== IndeterminateComponent && tag !== HostRoot && tag !== ClassComponent && tag !== FunctionComponent && tag !== ForwardRef && tag !== MemoComponent && tag !== SimpleMemoComponent) {
             // Only warn for user-defined components, not internal ones like Suspense.
             return;
         }
@@ -2890,12 +2538,7 @@ export function warnAboutUpdateOnNotYetMountedFiberInDEV(fiber) {
         const previousFiber = ReactCurrentFiberCurrent;
         try {
             setCurrentDebugFiberInDEV(fiber);
-            console.error(
-                "Can't perform a React state update on a component that hasn't mounted yet. " +
-                'This indicates that you have a side-effect in your render function that ' +
-                'asynchronously later calls tries to update the component. Move this work to ' +
-                'useEffect instead.',
-            );
+            console.error("Can't perform a React state update on a component that hasn't mounted yet. " + 'This indicates that you have a side-effect in your render function that ' + 'asynchronously later calls tries to update the component. Move this work to ' + 'useEffect instead.',);
         } finally {
             if (previousFiber) {
                 setCurrentDebugFiberInDEV(fiber);
@@ -2916,19 +2559,11 @@ if (__DEV__ && replayFailedUnitOfWorkWithInvokeGuardedCallback) {
 
         // Before entering the begin phase, copy the work-in-progress onto a dummy
         // fiber. If beginWork throws, we'll use this to reset the state.
-        const originalWorkInProgressCopy = assignFiberPropertiesInDEV(
-            dummyFiber,
-            unitOfWork,
-        );
+        const originalWorkInProgressCopy = assignFiberPropertiesInDEV(dummyFiber, unitOfWork,);
         try {
             return originalBeginWork(current, unitOfWork, lanes);
         } catch (originalError) {
-            if (
-                didSuspendOrErrorWhileHydratingDEV() ||
-                (originalError !== null &&
-                    typeof originalError === 'object' &&
-                    typeof originalError.then === 'function')
-            ) {
+            if (didSuspendOrErrorWhileHydratingDEV() || (originalError !== null && typeof originalError === 'object' && typeof originalError.then === 'function')) {
                 // Don't replay promises.
                 // Don't replay errors if we are hydrating and have already suspended or handled an error
                 throw originalError;
@@ -2953,25 +2588,11 @@ if (__DEV__ && replayFailedUnitOfWorkWithInvokeGuardedCallback) {
             }
 
             // Run beginWork again.
-            invokeGuardedCallback(
-                null,
-                originalBeginWork,
-                null,
-                current,
-                unitOfWork,
-                lanes,
-            );
+            invokeGuardedCallback(null, originalBeginWork, null, current, unitOfWork, lanes,);
 
             if (hasCaughtError()) {
                 const replayError = clearCaughtError();
-                if (
-                    typeof replayError === 'object' &&
-                    replayError !== null &&
-                    replayError._suppressLogging &&
-                    typeof originalError === 'object' &&
-                    originalError !== null &&
-                    !originalError._suppressLogging
-                ) {
+                if (typeof replayError === 'object' && replayError !== null && replayError._suppressLogging && typeof originalError === 'object' && originalError !== null && !originalError._suppressLogging) {
                     // If suppressed, let the flag carry over to the original error which is the one we'll rethrow.
                     originalError._suppressLogging = true;
                 }
@@ -2993,41 +2614,24 @@ if (__DEV__) {
 
 function warnAboutRenderPhaseUpdatesInDEV(fiber) {
     if (__DEV__) {
-        if (
-            ReactCurrentDebugFiberIsRenderingInDEV &&
-            !getIsUpdatingOpaqueValueInRenderPhaseInDEV()
-        ) {
+        if (ReactCurrentDebugFiberIsRenderingInDEV && !getIsUpdatingOpaqueValueInRenderPhaseInDEV()) {
             switch (fiber.tag) {
                 case FunctionComponent:
                 case ForwardRef:
                 case SimpleMemoComponent: {
-                    const renderingComponentName =
-                        (workInProgress && getComponentNameFromFiber(workInProgress)) ||
-                        'Unknown';
+                    const renderingComponentName = (workInProgress && getComponentNameFromFiber(workInProgress)) || 'Unknown';
                     // Dedupe by the rendering component because it's the one that needs to be fixed.
                     const dedupeKey = renderingComponentName;
                     if (!didWarnAboutUpdateInRenderForAnotherComponent.has(dedupeKey)) {
                         didWarnAboutUpdateInRenderForAnotherComponent.add(dedupeKey);
-                        const setStateComponentName =
-                            getComponentNameFromFiber(fiber) || 'Unknown';
-                        console.error(
-                            'Cannot update a component (`%s`) while rendering a ' +
-                            'different component (`%s`). To locate the bad setState() call inside `%s`, ' +
-                            'follow the stack trace as described in https://reactjs.org/link/setstate-in-render',
-                            setStateComponentName,
-                            renderingComponentName,
-                            renderingComponentName,
-                        );
+                        const setStateComponentName = getComponentNameFromFiber(fiber) || 'Unknown';
+                        console.error('Cannot update a component (`%s`) while rendering a ' + 'different component (`%s`). To locate the bad setState() call inside `%s`, ' + 'follow the stack trace as described in https://reactjs.org/link/setstate-in-render', setStateComponentName, renderingComponentName, renderingComponentName,);
                     }
                     break;
                 }
                 case ClassComponent: {
                     if (!didWarnAboutUpdateInRender) {
-                        console.error(
-                            'Cannot update during an existing state transition (such as ' +
-                            'within `render`). Render methods should be a pure ' +
-                            'function of props and state.',
-                        );
+                        console.error('Cannot update during an existing state transition (such as ' + 'within `render`). Render methods should be a pure ' + 'function of props and state.',);
                         didWarnAboutUpdateInRender = true;
                     }
                     break;
@@ -3102,11 +2706,7 @@ function warnIfUpdatesNotWrappedWithActDEV(fiber) {
                 // batchedUpdates or flushSync.
                 return;
             }
-            if (
-                fiber.tag !== FunctionComponent &&
-                fiber.tag !== ForwardRef &&
-                fiber.tag !== SimpleMemoComponent
-            ) {
+            if (fiber.tag !== FunctionComponent && fiber.tag !== ForwardRef && fiber.tag !== SimpleMemoComponent) {
                 // For backwards compatibility with pre-hooks code, legacy mode only
                 // warns for updates that originate from a hook.
                 return;
@@ -3117,19 +2717,7 @@ function warnIfUpdatesNotWrappedWithActDEV(fiber) {
             const previousFiber = ReactCurrentFiberCurrent;
             try {
                 setCurrentDebugFiberInDEV(fiber);
-                console.error(
-                    'An update to %s inside a test was not wrapped in act(...).\n\n' +
-                    'When testing, code that causes React state updates should be ' +
-                    'wrapped into act(...):\n\n' +
-                    'act(() => {\n' +
-                    '  /* fire events that update state */\n' +
-                    '});\n' +
-                    '/* assert on the output */\n\n' +
-                    "This ensures that you're testing the behavior the user would see " +
-                    'in the browser.' +
-                    ' Learn more at https://reactjs.org/link/wrap-tests-with-act',
-                    getComponentNameFromFiber(fiber),
-                );
+                console.error('An update to %s inside a test was not wrapped in act(...).\n\n' + 'When testing, code that causes React state updates should be ' + 'wrapped into act(...):\n\n' + 'act(() => {\n' + '  /* fire events that update state */\n' + '});\n' + '/* assert on the output */\n\n' + "This ensures that you're testing the behavior the user would see " + 'in the browser.' + ' Learn more at https://reactjs.org/link/wrap-tests-with-act', getComponentNameFromFiber(fiber),);
             } finally {
                 if (previousFiber) {
                     setCurrentDebugFiberInDEV(fiber);
@@ -3143,24 +2731,8 @@ function warnIfUpdatesNotWrappedWithActDEV(fiber) {
 
 function warnIfSuspenseResolutionNotWrappedWithActDEV(root) {
     if (__DEV__) {
-        if (
-            root.tag !== LegacyRoot &&
-            isConcurrentActEnvironment() &&
-            ReactCurrentActQueue.current === null
-        ) {
-            console.error(
-                'A suspended resource finished loading inside a test, but the event ' +
-                'was not wrapped in act(...).\n\n' +
-                'When testing, code that resolves suspended data should be wrapped ' +
-                'into act(...):\n\n' +
-                'act(() => {\n' +
-                '  /* finish loading suspended data */\n' +
-                '});\n' +
-                '/* assert on the output */\n\n' +
-                "This ensures that you're testing the behavior the user would see " +
-                'in the browser.' +
-                ' Learn more at https://reactjs.org/link/wrap-tests-with-act',
-            );
+        if (root.tag !== LegacyRoot && isConcurrentActEnvironment() && ReactCurrentActQueue.current === null) {
+            console.error('A suspended resource finished loading inside a test, but the event ' + 'was not wrapped in act(...).\n\n' + 'When testing, code that resolves suspended data should be wrapped ' + 'into act(...):\n\n' + 'act(() => {\n' + '  /* finish loading suspended data */\n' + '});\n' + '/* assert on the output */\n\n' + "This ensures that you're testing the behavior the user would see " + 'in the browser.' + ' Learn more at https://reactjs.org/link/wrap-tests-with-act',);
         }
     }
 }
