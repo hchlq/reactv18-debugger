@@ -61,7 +61,6 @@ import {
     noTimeout,
     afterActiveInstanceBlur,
     getCurrentEventPriority,
-    supportsMicrotasks,
     errorHydratingContainer,
     scheduleMicrotask,
 } from './ReactFiberHostConfig';
@@ -631,6 +630,7 @@ function ensureRootIsScheduled(root, currentTime) {
         // internal queue
         if (root.tag === LegacyRoot) {
             // render 模式
+            // 本质上还是调用 scheduleSyncCallback，只是在调用之前加了一个标识
             scheduleLegacySyncCallback(performSyncWorkOnRoot.bind(null, root));
         } else {
             // Concurrent 模式
@@ -645,6 +645,7 @@ function ensureRootIsScheduled(root, currentTime) {
             // We don't support running callbacks in the middle of render
             // or commit so we need to check against that.
             if ((executionContext & (RenderContext | CommitContext)) === NoContext) {
+                // 不在 Render 和 Commit 上下文中
                 // Note that this would still prematurely flush the callbacks
                 // if this happens outside render or commit phase (e.g. in an event).
                 flushSyncCallbacks();
@@ -656,8 +657,9 @@ function ensureRootIsScheduled(root, currentTime) {
     } else {
         // 异步更新
         let schedulerPriorityLevel;
-        // 获取车道对应的事件优先级
+        // 车道优先级 -> 事件优先级
         switch (lanesToEventPriority(nextLanes)) {
+            // 事件优先级 -> 调度优先级
             case DiscreteEventPriority:
                 schedulerPriorityLevel = ImmediateSchedulerPriority;
                 break;
