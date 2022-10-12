@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script>
+    const prevTime = Date.now()
+
+    const channel = new MessageChannel()
+
+    channel.port1.onmessage = () => {
+        console.log('MessageChannel 延迟时间: ', Date.now() - prevTime)
+    }
+
+
+
+
+    setTimeout(() => {
+        console.log('setTimeout 延迟时间0: ', Date.now() - prevTime)
+    }, 0)
+
+    setTimeout(() => {
+        console.log('setTimeout 延迟时间1: ', Date.now() - prevTime)
+    }, 1)
+
+    setTimeout(() => {
+        console.log('setTimeout 延迟时间2: ', Date.now() - prevTime)
+    }, 2)
+
+    setTimeout(() => {
+        console.log('setTimeout 延迟时间3: ', Date.now() - prevTime)
+    }, 3)
+
+
+    setTimeout(() => {
+        console.log('setTimeout 延迟时间4: ', Date.now() - prevTime)
+    }, 4)
+
+    channel.port2.postMessage(null)
+
+
+
+</script>
+</body>
+</html>

@@ -480,7 +480,7 @@ export function requestUpdateLane(fiber) {
     //
     // The opaque type returned by the host config is internally a lane, so we can
     // use that directly.
-    // eventLane
+    // const eventLane = getCurrentEventPriority()
     return getCurrentEventPriority();
 }
 
@@ -574,13 +574,13 @@ function ensureRootIsScheduled(root, currentTime) {
 
     // Check if any lanes are being starved by other work. If so, mark them as
     // expired so we know to work on those next.
-    // 1. 标记已经过期的任务（过期的任务优先级调整到最高）
-    // - 没有过期的时间，增加过期的时间
+    //! 1. 标记已经过期的任务（过期的任务优先级调整到最高）
+    // - 没有过期的时间，添加过期的时间
     // - 存在过期的时间，并且已经过期，将该车道添加到 root.expiredLanes 中
     markStarvedLanesAsExpired(root, currentTime);
 
     // Determine the next lanes to work on, and their priority.
-    // 2. 获取更次要更新的车道，即更新的批次
+    //! 2. 获取更次要更新的车道，即更新的批次
     const nextLanes = getNextLanes(root, root === workInProgressRoot ? workInProgressRootRenderLanes : NoLanes,);
 
     if (nextLanes === NoLanes) {
@@ -610,7 +610,7 @@ function ensureRootIsScheduled(root, currentTime) {
         return;
     }
 
-    //! 到这证明了：本次更新的车道优先级大于正在渲染的车道优先级
+    // 到这证明了：本次更新的车道优先级大于正在渲染的车道优先级
 
     if (existingCallbackNode != null) {
         // Cancel the existing callback. We'll schedule a new one below.
@@ -618,7 +618,7 @@ function ensureRootIsScheduled(root, currentTime) {
         cancelCallback(existingCallbackNode);
     }
 
-    // 3. 调度新的任务
+    //! 3. 调度新的任务
     // Schedule a new callback.
     let newCallbackNode;
     if (newCallbackPriority === SyncLane) {
@@ -680,8 +680,10 @@ function ensureRootIsScheduled(root, currentTime) {
         newCallbackNode = scheduleCallback(schedulerPriorityLevel, performConcurrentWorkOnRoot.bind(null, root),);
     }
 
-    // 4. 更新优先级和任务
+    //! 4. 更新优先级和任务
     root.callbackPriority = newCallbackPriority;
+
+    // newCallbackNode 是 scheduleCallback 的返回值
     root.callbackNode = newCallbackNode;
 }
 
