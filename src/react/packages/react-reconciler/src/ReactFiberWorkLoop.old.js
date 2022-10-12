@@ -680,6 +680,8 @@ function ensureRootIsScheduled(root, currentTime) {
 
     //! 4. 更新优先级和任务
     root.callbackPriority = newCallbackPriority;
+
+    // newCallbackNode 是 scheduleCallback 的返回值
     root.callbackNode = newCallbackNode;
 }
 
