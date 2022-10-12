@@ -28,15 +28,25 @@ export const TotalLanes = 31;
 export const NoLanes = /*                        */ 0b0000000000000000000000000000000;
 export const NoLane = /*                          */ 0b0000000000000000000000000000000;
 
+// 第 1 车道
 export const SyncLane = /*                        */ 0b0000000000000000000000000000001;
 
+// 第 2 车道
 export const InputContinuousHydrationLane = /*    */ 0b0000000000000000000000000000010;
+
+// 第 3 车道
 export const InputContinuousLane = /*             */ 0b0000000000000000000000000000100;
 
+// 第 4 车道
 export const DefaultHydrationLane = /*            */ 0b0000000000000000000000000001000;
+
+//第 5 车道
 export const DefaultLane = /*                     */ 0b0000000000000000000000000010000;
 
+// 第 6 车道
 const TransitionHydrationLane = /*                */ 0b0000000000000000000000000100000;
+
+// 第 7~22 车道
 const TransitionLanes = /*                       */ 0b0000000001111111111111111000000;
 const TransitionLane1 = /*                        */ 0b0000000000000000000000001000000;
 const TransitionLane2 = /*                        */ 0b0000000000000000000000010000000;
@@ -55,23 +65,30 @@ const TransitionLane14 = /*                       */ 0b0000000000010000000000000
 const TransitionLane15 = /*                       */ 0b0000000000100000000000000000000;
 const TransitionLane16 = /*                       */ 0b0000000001000000000000000000000;
 
-const RetryLanes = /*                            */ 0b0000111110000000000000000000000;
+// 第 23~27 车道
+const RetryLanes = /*                             */ 0b0000111110000000000000000000000;
 const RetryLane1 = /*                             */ 0b0000000010000000000000000000000;
 const RetryLane2 = /*                             */ 0b0000000100000000000000000000000;
 const RetryLane3 = /*                             */ 0b0000001000000000000000000000000;
 const RetryLane4 = /*                             */ 0b0000010000000000000000000000000;
 const RetryLane5 = /*                             */ 0b0000100000000000000000000000000;
 
-export const SomeRetryLane = RetryLane1;
-
+// 第 28 车道
 export const SelectiveHydrationLane = /*          */ 0b0001000000000000000000000000000;
 
-const NonIdleLanes = /*                          */ 0b0001111111111111111111111111111;
-
+// 第 29 车道
 export const IdleHydrationLane = /*               */ 0b0010000000000000000000000000000;
 export const IdleLane = /*                        */ 0b0100000000000000000000000000000;
 
 export const OffscreenLane = /*                   */ 0b1000000000000000000000000000000;
+
+export const SomeRetryLane = RetryLane1;
+
+
+
+const NonIdleLanes = /*                          */ 0b0001111111111111111111111111111;
+
+
 
 // This function is used for the experimental timeline (react-devtools-timeline)
 // It should be kept in sync with the Lanes values above.
