@@ -22,11 +22,7 @@ import {push, pop, peek} from '../SchedulerMinHeap';
 
 // TODO: Use symbols?
 import {
-    ImmediatePriority,
-    UserBlockingPriority,
-    NormalPriority,
-    LowPriority,
-    IdlePriority,
+    ImmediatePriority, UserBlockingPriority, NormalPriority, LowPriority, IdlePriority,
 } from '../SchedulerPriorities';
 import {
     markTaskRun,
@@ -42,8 +38,7 @@ import {
 } from '../SchedulerProfiling';
 
 let getCurrentTime;
-const hasPerformanceNow =
-    typeof performance === 'object' && typeof performance.now === 'function';
+const hasPerformanceNow = typeof performance === 'object' && typeof performance.now === 'function';
 
 if (hasPerformanceNow) {
     const localPerformance = performance;
@@ -89,17 +84,10 @@ var isHostTimeoutScheduled = false;
 
 // Capture local references to native APIs, in case a polyfill overrides them.
 const localSetTimeout = typeof setTimeout === 'function' ? setTimeout : null;
-const localClearTimeout =
-    typeof clearTimeout === 'function' ? clearTimeout : null;
-const localSetImmediate =
-    typeof setImmediate !== 'undefined' ? setImmediate : null; // IE and Node.js + jsdom
+const localClearTimeout = typeof clearTimeout === 'function' ? clearTimeout : null;
+const localSetImmediate = typeof setImmediate !== 'undefined' ? setImmediate : null; // IE and Node.js + jsdom
 
-const isInputPending =
-    typeof navigator !== 'undefined' &&
-    navigator.scheduling !== undefined &&
-    navigator.scheduling.isInputPending !== undefined
-        ? navigator.scheduling.isInputPending.bind(navigator.scheduling)
-        : null;
+const isInputPending = typeof navigator !== 'undefined' && navigator.scheduling !== undefined && navigator.scheduling.isInputPending !== undefined ? navigator.scheduling.isInputPending.bind(navigator.scheduling) : null;
 
 const continuousOptions = {includeContinuous: enableIsInputPendingContinuous};
 
@@ -144,91 +132,84 @@ function handleTimeout(currentTime) {
     }
 }
 
+/**
+ * 执行注册的回调函数
+ */
 function flushWork(hasTimeRemaining, initialTime) {
-    if (enableProfiling) {
-        markSchedulerUnsuspended(initialTime);
-    }
-
     // We'll need a host callback the next time work is scheduled.
+    // 解锁，可以调度宏任务了
     isHostCallbackScheduled = false;
+
+    // timeout，清空操作
     if (isHostTimeoutScheduled) {
         // We scheduled a timeout but it's no longer needed. Cancel it.
         isHostTimeoutScheduled = false;
         cancelHostTimeout();
     }
 
+    // 标记为正在执行回调任务
     isPerformingWork = true;
     const previousPriorityLevel = currentPriorityLevel;
     try {
-        if (enableProfiling) {
-            try {
-                return workLoop(hasTimeRemaining, initialTime);
-            } catch (error) {
-                if (currentTask !== null) {
-                    const currentTime = getCurrentTime();
-                    markTaskErrored(currentTask, currentTime);
-                    currentTask.isQueued = false;
-                }
-                throw error;
-            }
-        } else {
-            // No catch in prod code path.
-            return workLoop(hasTimeRemaining, initialTime);
-        }
+        // No catch in prod code path.
+        return workLoop(hasTimeRemaining, initialTime);
     } finally {
+        // 清空操作
         currentTask = null;
         currentPriorityLevel = previousPriorityLevel;
         isPerformingWork = false;
-        if (enableProfiling) {
-            const currentTime = getCurrentTime();
-            markSchedulerSuspended(currentTime);
-        }
     }
 }
 
+/**
+ * 循环的工作
+ */
 function workLoop(hasTimeRemaining, initialTime) {
     let currentTime = initialTime;
+
+    //! 1. 把 timerQueue 中到时间的回调任务放到 taskQueue 中
     advanceTimers(currentTime);
+
+    //! 2. 开始处理任务
     currentTask = peek(taskQueue);
-    while (
-        currentTask !== null &&
-        !(enableSchedulerDebugging && isSchedulerPaused)
-        ) {
-        if (
-            currentTask.expirationTime > currentTime &&
-            (!hasTimeRemaining || shouldYieldToHost())
+    while (currentTask !== null) {
+
+        // 1. 该任务没有到过期时间
+        // 2. 没有剩余时间了 或者有剩余时间，但是应该让出执行权给浏览器了
+        if (currentTask.expirationTime > currentTime
+            && (!hasTimeRemaining || shouldYieldToHost())
         ) {
             // This currentTask hasn't expired, and we've reached the deadline.
             break;
         }
+
         const callback = currentTask.callback;
+
+
         if (typeof callback === 'function') {
             currentTask.callback = null;
             currentPriorityLevel = currentTask.priorityLevel;
+
+            // 该任务到过期时间了
             const didUserCallbackTimeout = currentTask.expirationTime <= currentTime;
-            if (enableProfiling) {
-                markTaskRun(currentTask, currentTime);
-            }
+
             const continuationCallback = callback(didUserCallbackTimeout);
             currentTime = getCurrentTime();
             if (typeof continuationCallback === 'function') {
+                // 返回的是一个 yield 任务，继续调度
                 currentTask.callback = continuationCallback;
-                if (enableProfiling) {
-                    markTaskYield(currentTask, currentTime);
-                }
             } else {
-                if (enableProfiling) {
-                    markTaskCompleted(currentTask, currentTime);
-                    currentTask.isQueued = false;
-                }
                 if (currentTask === peek(taskQueue)) {
                     pop(taskQueue);
                 }
             }
             advanceTimers(currentTime);
         } else {
+            // callback 不是函数
             pop(taskQueue);
         }
+
+        // 处理下一个任务
         currentTask = peek(taskQueue);
     }
     // Return whether there's additional work
@@ -356,12 +337,7 @@ function unstable_scheduleCallback(priorityLevel, callback, options) {
 
     //! 2. 创建任务
     const newTask = {
-        id: taskIdCounter++,
-        callback,
-        priorityLevel,
-        startTime,
-        expirationTime,
-        sortIndex: -1,
+        id: taskIdCounter++, callback, priorityLevel, startTime, expirationTime, sortIndex: -1,
     };
 
     //! 3. 开始调度任务
@@ -390,6 +366,9 @@ function unstable_scheduleCallback(priorityLevel, callback, options) {
         // wait until the next time we yield.
         if (!isHostCallbackScheduled && !isPerformingWork) {
             isHostCallbackScheduled = true;
+            // 调用链路：
+            //!  scheduleCallback -> requestHostCallback -> schedulePerformWorkUntilDeadline -> 宏任务
+            //! -> performWorkUntilDeadline -> scheduledHostCallback（即 flushWork）
             requestHostCallback(flushWork);
         }
     }
@@ -493,12 +472,7 @@ function shouldYieldToHost() {
 }
 
 function requestPaint() {
-    if (
-        enableIsInputPending &&
-        navigator !== undefined &&
-        navigator.scheduling !== undefined &&
-        navigator.scheduling.isInputPending !== undefined
-    ) {
+    if (enableIsInputPending && navigator !== undefined && navigator.scheduling !== undefined && navigator.scheduling.isInputPending !== undefined) {
         needsPaint = true;
     }
 
@@ -508,10 +482,7 @@ function requestPaint() {
 function forceFrameRate(fps) {
     if (fps < 0 || fps > 125) {
         // Using console['error'] to evade Babel and ESLint
-        console['error'](
-            'forceFrameRate takes a positive int between 0 and 125, ' +
-            'forcing frame rates higher than 125 fps is not supported',
-        );
+        console['error']('forceFrameRate takes a positive int between 0 and 125, ' + 'forcing frame rates higher than 125 fps is not supported',);
         return;
     }
     if (fps > 0) {
@@ -522,12 +493,19 @@ function forceFrameRate(fps) {
     }
 }
 
+/**
+ * MessageChannel 调用的入口
+ */
 const performWorkUntilDeadline = () => {
     if (scheduledHostCallback !== null) {
+        // 获取当前时间
         const currentTime = getCurrentTime();
+
         // Keep track of the start time so we can measure how long the main thread
         // has been blocked.
+        // 保存当前时间当做开始时间
         startTime = currentTime;
+
         const hasTimeRemaining = true;
 
         // If a scheduler task throws, exit the current browser task so the
@@ -538,6 +516,7 @@ const performWorkUntilDeadline = () => {
         // `hasMoreWork` will remain true, and we'll continue the work loop.
         let hasMoreWork = true;
         try {
+            // 执行 flushWork
             hasMoreWork = scheduledHostCallback(hasTimeRemaining, currentTime);
         } finally {
             if (hasMoreWork) {
@@ -645,12 +624,9 @@ export {
     forceFrameRate as unstable_forceFrameRate,
 };
 
-export const unstable_Profiling = enableProfiling
-    ? {
-        startLoggingProfilingEvents,
-        stopLoggingProfilingEvents,
-    }
-    : null;
+export const unstable_Profiling = enableProfiling ? {
+    startLoggingProfilingEvents, stopLoggingProfilingEvents,
+} : null;
 
 export const unstable_setDisableYieldValue = () => {
 }
