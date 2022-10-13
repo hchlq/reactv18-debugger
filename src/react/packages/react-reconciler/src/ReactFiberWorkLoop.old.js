@@ -691,10 +691,6 @@ function ensureRootIsScheduled(root, currentTime) {
 // goes through Scheduler.
 // 并发任务的入口点，都经过调度器调度
 function performConcurrentWorkOnRoot(root, didTimeout) {
-    if (enableProfilerTimer && enableProfilerNestedUpdatePhase) {
-        resetNestedUpdateFlag();
-    }
-
     // Since we know we're in a React event, we can clear the current
     // event time. The next update will compute a new event time.
     currentEventTime = NoTimestamp;
