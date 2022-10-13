@@ -87,9 +87,9 @@ const localSetTimeout = typeof setTimeout === 'function' ? setTimeout : null;
 const localClearTimeout = typeof clearTimeout === 'function' ? clearTimeout : null;
 const localSetImmediate = typeof setImmediate !== 'undefined' ? setImmediate : null; // IE and Node.js + jsdom
 
-const isInputPending = typeof navigator !== 'undefined' && navigator.scheduling !== undefined && navigator.scheduling.isInputPending !== undefined ? navigator.scheduling.isInputPending.bind(navigator.scheduling) : null;
+// const isInputPending = typeof navigator !== 'undefined' && navigator.scheduling !== undefined && navigator.scheduling.isInputPending !== undefined ? navigator.scheduling.isInputPending.bind(navigator.scheduling) : null;
 
-const continuousOptions = {includeContinuous: enableIsInputPendingContinuous};
+// const continuousOptions = {includeContinuous: enableIsInputPendingContinuous};
 
 function advanceTimers(currentTime) {
     // Check for tasks that are no longer delayed and add them to the queue.
@@ -177,6 +177,7 @@ function workLoop(hasTimeRemaining, initialTime) {
         // 1. 该任务没有到过期时间
         // 2. 没有剩余时间了 或者有剩余时间，但是应该让出执行权给浏览器了
         if (currentTask.expirationTime > currentTime
+            // 调度传入的 hasTimeRemaining 为 true
             && (!hasTimeRemaining || shouldYieldToHost())
         ) {
             // This currentTask hasn't expired, and we've reached the deadline.
@@ -287,7 +288,11 @@ function unstable_wrapCallback(callback) {
 }
 
 /**
- * 注册回调函数
+ *  注册回调函数
+ *  回调函数执行链路：
+ *  scheduleCallback -> requestHostCallback -> schedulePerformWorkUntilDeadline -> 宏任务
+ *  -> performWorkUntilDeadline -> scheduledHostCallback（即 flushWork）
+ *  flushWork -> workLoop -> callback（执行 callback）
  */
 function unstable_scheduleCallback(priorityLevel, callback, options) {
     const currentTime = getCurrentTime();
@@ -367,8 +372,6 @@ function unstable_scheduleCallback(priorityLevel, callback, options) {
         if (!isHostCallbackScheduled && !isPerformingWork) {
             isHostCallbackScheduled = true;
             // 调用链路：
-            //!  scheduleCallback -> requestHostCallback -> schedulePerformWorkUntilDeadline -> 宏任务
-            //! -> performWorkUntilDeadline -> scheduledHostCallback（即 flushWork）
             requestHostCallback(flushWork);
         }
     }
@@ -419,15 +422,20 @@ let taskTimeoutID = -1;
 // thread, like user events. By default, it yields multiple times per frame.
 // It does not attempt to align with frame boundaries, since most tasks don't
 // need to be frame aligned; for those that do, use requestAnimationFrame.
+// 默认为 5 ms
 let frameInterval = frameYieldMs;
-const continuousInputInterval = continuousYieldMs;
-const maxInterval = maxYieldMs;
 let startTime = -1;
 
 let needsPaint = false;
 
+/**
+ * 是否让出执行权给宿主
+ */
 function shouldYieldToHost() {
+    // 执行花费的时间
     const timeElapsed = getCurrentTime() - startTime;
+
+    // 执行花费时间还没到限制
     if (timeElapsed < frameInterval) {
         // The main thread has only been blocked for a really short amount of time;
         // smaller than a single frame. Don't yield yet.
@@ -442,32 +450,33 @@ function shouldYieldToHost() {
     // eventually yield regardless, since there could be a pending paint that
     // wasn't accompanied by a call to `requestPaint`, or other main thread tasks
     // like network events.
-    if (enableIsInputPending) {
-        if (needsPaint) {
-            // There's a pending paint (signaled by `requestPaint`). Yield now.
-            return true;
-        }
-        if (timeElapsed < continuousInputInterval) {
-            // We haven't blocked the thread for that long. Only yield if there's a
-            // pending discrete input (e.g. click). It's OK if there's pending
-            // continuous input (e.g. mouseover).
-            if (isInputPending !== null) {
-                return isInputPending();
-            }
-        } else if (timeElapsed < maxInterval) {
-            // Yield if there's either a pending discrete or continuous input.
-            if (isInputPending !== null) {
-                return isInputPending(continuousOptions);
-            }
-        } else {
-            // We've blocked the thread for a long time. Even if there's no pending
-            // input, there may be some other scheduled work that we don't know about,
-            // like a network event. Yield now.
-            return true;
-        }
-    }
+    // if (enableIsInputPending) {
+    //     if (needsPaint) {
+    //         // There's a pending paint (signaled by `requestPaint`). Yield now.
+    //         return true;
+    //     }
+    //     if (timeElapsed < continuousInputInterval) {
+    //         // We haven't blocked the thread for that long. Only yield if there's a
+    //         // pending discrete input (e.g. click). It's OK if there's pending
+    //         // continuous input (e.g. mouseover).
+    //         if (isInputPending !== null) {
+    //             return isInputPending();
+    //         }
+    //     } else if (timeElapsed < maxInterval) {
+    //         // Yield if there's either a pending discrete or continuous input.
+    //         if (isInputPending !== null) {
+    //             return isInputPending(continuousOptions);
+    //         }
+    //     } else {
+    //         // We've blocked the thread for a long time. Even if there's no pending
+    //         // input, there may be some other scheduled work that we don't know about,
+    //         // like a network event. Yield now.
+    //         return true;
+    //     }
+    // }
 
     // `isInputPending` isn't available. Yield now.
+    // 让执行权给浏览器
     return true;
 }
 
@@ -479,16 +488,26 @@ function requestPaint() {
     // Since we yield every frame regardless, `requestPaint` has no effect.
 }
 
+/**
+ * 强制执行一帧的时间
+ * 范围：[5] + [8, 1000)
+ */
 function forceFrameRate(fps) {
     if (fps < 0 || fps > 125) {
         // Using console['error'] to evade Babel and ESLint
         console['error']('forceFrameRate takes a positive int between 0 and 125, ' + 'forcing frame rates higher than 125 fps is not supported',);
         return;
     }
+
+    // 0 <= fps <= 125
+
     if (fps > 0) {
+        // 0 < fps <= 125
+        // 时间范围（ms）：[8, 1000)
         frameInterval = Math.floor(1000 / fps);
     } else {
         // reset the framerate
+        // fps === 0
         frameInterval = frameYieldMs;
     }
 }
@@ -531,6 +550,7 @@ const performWorkUntilDeadline = () => {
     } else {
         isMessageLoopRunning = false;
     }
+    // 执行权让给浏览器之后，会有机会去绘制，所以重置这个变量
     // Yielding to the browser will give it a chance to paint, so we can
     // reset this.
     needsPaint = false;
