@@ -696,31 +696,38 @@ function performConcurrentWorkOnRoot(root, didTimeout) {
     currentEventTime = NoTimestamp;
     currentEventTransitionLane = NoLanes;
 
+    // 当前上下文是 RenderContext 或者 CommitContext
     if ((executionContext & (RenderContext | CommitContext)) !== NoContext) {
         throw new Error('Should not already be working.');
     }
 
+    // 在调度该车道之前把 effect 清空，防止 effect 产生额外的更新任务
     // Flush any pending passive effects before deciding which lanes to work on,
     // in case they schedule additional work.
     const originalCallbackNode = root.callbackNode;
     const didFlushPassiveEffects = flushPassiveEffects();
     if (didFlushPassiveEffects) {
+        // 这些 effect 中可能取消了任务
         // Something in the passive effect phase may have canceled the current task.
         // Check if the task node for this root was changed.
         if (root.callbackNode !== originalCallbackNode) {
             // The current task was canceled. Exit. We don't need to call
             // `ensureRootIsScheduled` because the check above implies either that
             // there's a new task, or that there's no remaining work on this root.
+            // 不需要调用 ensureRootIsScheduled，因为这代表会有一个新的任务或者没有更新任务了
             return null;
         } else {
+            // 任务没有被取消，继续调度该任务
             // Current task was not canceled. Continue.
         }
     }
 
+    // 再次决定去更新那个车道，因为之前有调度 effect 工作了
     // Determine the next lanes to work on, using the fields stored
     // on the root.
     let lanes = getNextLanes(root, root === workInProgressRoot ? workInProgressRootRenderLanes : NoLanes,);
     if (lanes === NoLanes) {
+        // 代码不会到这个分支
         // Defensive coding. This is never expected to happen.
         return null;
     }
