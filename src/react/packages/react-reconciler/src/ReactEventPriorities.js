@@ -7,7 +7,7 @@
  *
  */
 
-import {enableNewReconciler} from 'shared/ReactFeatureFlags';
+import {enableNewReconciler} from '../../shared/ReactFeatureFlags';
 
 import {
   DiscreteEventPriority as DiscreteEventPriority_old,

@@ -19,7 +19,7 @@ import {
   flushSync,
   registerMutableSourceForHydration,
   updateContainer,
-} from 'react-reconciler/src/ReactFiberReconciler';
+} from '../../../react-reconciler/src/ReactFiberReconciler';
 import {ConcurrentRoot} from 'react-reconciler/src/ReactRootTags';
 import {allowConcurrentByDefault, disableCommentsAsDOMContainers,} from 'shared/ReactFeatureFlags';
 

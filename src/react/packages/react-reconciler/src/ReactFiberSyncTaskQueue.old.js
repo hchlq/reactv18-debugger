@@ -55,7 +55,7 @@ export function flushSyncCallbacks() {
         // Prevent re-entrance.
         // 加锁
         isFlushingSyncQueue = true;
-
+        let i = 0;
         // 保存当前更新优先级
         const previousUpdatePriority = getCurrentUpdatePriority();
         try {

@@ -39,7 +39,7 @@ import {
   LowPriority as LowSchedulerPriority,
   NormalPriority as NormalSchedulerPriority,
   UserBlockingPriority as UserBlockingSchedulerPriority,
-} from 'react-reconciler/src/Scheduler';
+} from '../../../react-reconciler/src/Scheduler';
 import {
   DiscreteEventPriority,
   ContinuousEventPriority,
@@ -47,8 +47,8 @@ import {
   IdleEventPriority,
   getCurrentUpdatePriority,
   setCurrentUpdatePriority,
-} from 'react-reconciler/src/ReactEventPriorities';
-import ReactSharedInternals from 'shared/ReactSharedInternals';
+} from '../../../react-reconciler/src/ReactEventPriorities';
+import ReactSharedInternals from '../../../shared/ReactSharedInternals';
 import {isRootDehydrated} from 'react-reconciler/src/ReactFiberShellHydration';
 
 const {ReactCurrentBatchConfig} = ReactSharedInternals;

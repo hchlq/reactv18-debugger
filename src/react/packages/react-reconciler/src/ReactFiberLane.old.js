@@ -15,7 +15,7 @@ import {
     enableUpdaterTracking,
     allowConcurrentByDefault,
     enableTransitionTracing,
-} from 'shared/ReactFeatureFlags';
+} from '../../shared/ReactFeatureFlags';
 import {isDevToolsPresent} from './ReactFiberDevToolsHook.old';
 import {ConcurrentUpdatesByDefaultMode, NoMode} from './ReactTypeOfMode';
 import {clz32} from './clz32';
@@ -500,7 +500,13 @@ export function includesOnlyTransitions(lanes) {
     return (lanes & TransitionLanes) === lanes;
 }
 
+/**
+ * 是否包含阻塞的车道
+ * 在当前版本下， InputContinuousLane、 DefaultLane 会被当成阻塞的车道
+ */
 export function includesBlockingLane(root, lanes) {
+    //! 1. createRoot 传入的启动 Concurrent 模式的配置
+    // 在版本下，allowConcurrentByDefault 为 false，因此都会走到条件 2
     if (
         allowConcurrentByDefault &&
         (root.current.mode & ConcurrentUpdatesByDefaultMode) !== NoMode
@@ -508,15 +514,23 @@ export function includesBlockingLane(root, lanes) {
         // Concurrent updates by default always use time slicing.
         return false;
     }
+
+    //! 2 存在 InputContinuousLane 或者 DefaultLane
+    // 顺便提到为啥在 startTransition 中会启动使用时间切片，因为 startTransition 中的车道是 TransitionLaneX，所以下面的判断为 false
     const SyncDefaultLanes =
-        InputContinuousHydrationLane |
         InputContinuousLane |
-        DefaultHydrationLane |
         DefaultLane;
+
+    console.log('includesBlockingLane', (lanes & SyncDefaultLanes) !== NoLanes)
+
     return (lanes & SyncDefaultLanes) !== NoLanes;
 }
 
+/**
+ * 判断 lanes 是否存在过期的车道任务
+ */
 export function includesExpiredLane(root, lanes) {
+    // 独立于 includeBlockingLane 的检查，因为一个车道可以在渲染开始后过期
     // This is a separate check from includesBlockingLane because a lane can
     // expire after a render has already started.
     return (lanes & root.expiredLanes) !== NoLanes;

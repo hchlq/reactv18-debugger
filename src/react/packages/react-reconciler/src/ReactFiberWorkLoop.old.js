@@ -24,7 +24,7 @@ import {
     enableUpdaterTracking,
     enableCache,
     enableTransitionTracing,
-} from 'shared/ReactFeatureFlags';
+} from '../../shared/ReactFeatureFlags';
 import ReactSharedInternals from 'shared/ReactSharedInternals';
 import is from 'shared/objectIs';
 
@@ -469,6 +469,7 @@ export function requestUpdateLane(fiber) {
     // The opaque type returned by the host config is internally a lane, so we can
     // use that directly.
     const updateLane = getCurrentUpdatePriority();
+    // console.log('updateLane', updateLane.toString(2))
     if (updateLane !== NoLane) {
         return updateLane;
     }
@@ -618,6 +619,7 @@ function ensureRootIsScheduled(root, currentTime) {
         cancelCallback(existingCallbackNode);
     }
 
+    console.log(nextLanes.toString(2))
     //! 3. 调度新的任务
     // Schedule a new callback.
     let newCallbackNode;
@@ -690,6 +692,7 @@ function ensureRootIsScheduled(root, currentTime) {
 // This is the entry point for every concurrent task, i.e. anything that
 // goes through Scheduler.
 // 并发任务的入口点，都经过调度器调度
+// didTimeout 是 Scheduler 传入的
 function performConcurrentWorkOnRoot(root, didTimeout) {
     // Since we know we're in a React event, we can clear the current
     // event time. The next update will compute a new event time.
@@ -722,7 +725,7 @@ function performConcurrentWorkOnRoot(root, didTimeout) {
         }
     }
 
-    // 再次决定去更新那个车道，因为之前有调度 effect 工作了
+    // 再次决定去更新那个车道，因为之前有调度 effect 工作了，可能会有优先级更高的车道
     // Determine the next lanes to work on, using the fields stored
     // on the root.
     let lanes = getNextLanes(root, root === workInProgressRoot ? workInProgressRootRenderLanes : NoLanes,);
@@ -732,14 +735,28 @@ function performConcurrentWorkOnRoot(root, didTimeout) {
         return null;
     }
 
+
+    // 禁用时间切片的场景
+    // 1. 过期的任务阻塞时间比较长
+    // 2. 在 render 模式下
     // We disable time-slicing in some cases: if the work has been CPU-bound
     // for too long ("expired" work, to prevent starvation), or we're in
     // sync-updates-by-default mode.
     // TODO: We only check `didTimeout` defensively, to account for a Scheduler
     // bug we're still investigating. Once the bug in Scheduler is fixed,
     // we can remove this, since we track expiration ourselves.
-    const shouldTimeSlice = !includesBlockingLane(root, lanes) && !includesExpiredLane(root, lanes) && (disableSchedulerTimeoutInWorkLoop || !didTimeout);
+    
+    // 需要同时满足以下条件：
+    // 1. 本次更新的车道不存在阻塞的车道任务
+    // 2. 本次更新的车道不存在过期的车道任务
+    // 3. didTimeout 为 false
+    const shouldTimeSlice = !includesBlockingLane(root, lanes) && !includesExpiredLane(root, lanes) && !didTimeout; // disableSchedulerTimeoutInWorkLoop || !didTimeout
+
+    // 根据是否使用时间切片决定使用那个渲染模式
+    // 时间切片：renderRootConcurrent
+    // 非时间切片：renderRootSync
     let exitStatus = shouldTimeSlice ? renderRootConcurrent(root, lanes) : renderRootSync(root, lanes);
+
     if (exitStatus !== RootInProgress) {
         if (exitStatus === RootErrored) {
             // If something threw an error, try rendering one more time. We'll
@@ -811,7 +828,11 @@ function performConcurrentWorkOnRoot(root, didTimeout) {
         }
     }
 
+
+    // 再次确保根被重新调度
     ensureRootIsScheduled(root, now());
+
+    //~ 中断恢复的关键
     if (root.callbackNode === originalCallbackNode) {
         // The task node scheduled for this root is the same one that's
         // currently executed. Need to return a continuation.

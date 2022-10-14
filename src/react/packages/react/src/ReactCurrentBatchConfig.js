@@ -15,4 +15,5 @@ const ReactCurrentBatchConfig = {
   transition: null,
 };
 
+// transition 过渡更新的配置
 export default ReactCurrentBatchConfig;
