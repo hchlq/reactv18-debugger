@@ -502,7 +502,7 @@ export function includesOnlyTransitions(lanes) {
 
 /**
  * 是否包含阻塞的车道
- * 在当前版本下， InputContinuousLane、 DefaultLane 会被当成阻塞的车道
+ * InputContinuousLane、 DefaultLane 会被当成阻塞的车道
  */
 export function includesBlockingLane(root, lanes) {
     //! 1. createRoot 传入的启动 Concurrent 模式的配置
@@ -521,7 +521,7 @@ export function includesBlockingLane(root, lanes) {
         InputContinuousLane |
         DefaultLane;
 
-    console.log('includesBlockingLane', (lanes & SyncDefaultLanes) !== NoLanes)
+    // console.log('includesBlockingLane', (lanes & SyncDefaultLanes) !== NoLanes)
 
     return (lanes & SyncDefaultLanes) !== NoLanes;
 }

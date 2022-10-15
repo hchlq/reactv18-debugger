@@ -117,7 +117,10 @@ export function enqueueConcurrentClassUpdate(fiber, queue, update, lane) {
 }
 
 export function enqueueConcurrentRenderForLane(fiber, lane) {
+    // 加入更新队列
     enqueueUpdate(fiber, null, null, lane);
+
+    // 获取 fiber root
     return getRootForUpdatedFiber(fiber);
 }
 

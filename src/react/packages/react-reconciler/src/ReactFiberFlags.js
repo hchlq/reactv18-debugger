@@ -7,8 +7,6 @@
  *
  */
 
-import {enableCreateEventHandleAPI} from 'shared/ReactFeatureFlags';
-
 // Don't change these two values. They're used by React Dev Tools.
 export const NoFlags = /*                      */ 0b00000000000000000000000000;
 export const PerformedWork = /*                */ 0b00000000000000000000000001;
@@ -30,7 +28,7 @@ export const Visibility = /*                   */ 0b00000000000010000000000000;
 export const StoreConsistency = /*             */ 0b00000000000100000000000000;
 
 export const LifecycleEffectMask =
-  Passive | Update | Callback | Ref | Snapshot | StoreConsistency;
+    Passive | Update | Callback | Ref | Snapshot | StoreConsistency;
 
 // Union of all commit flags (flags with the lifetime of a particular commit)
 export const HostEffectMask = /*               */ 0b00000000000111111111111111;
@@ -62,26 +60,19 @@ export const MountPassiveDev = /*              */ 0b10000000000000000000000000;
 // don't contain effects, by checking subtreeFlags.
 
 export const BeforeMutationMask =
-  // TODO: Remove Update flag from before mutation phase by re-landing Visibility
-  // flag logic (see #20043)
-  Update |
-  Snapshot |
-  (enableCreateEventHandleAPI
-    ? // createEventHandle needs to visit deleted and hidden trees to
-      // fire beforeblur
-      // TODO: Only need to visit Deletions during BeforeMutation phase if an
-      // element is focused.
-      ChildDeletion | Visibility
-    : 0);
+    // TODO: Remove Update flag from before mutation phase by re-landing Visibility
+    // flag logic (see #20043)
+    Update |
+    Snapshot
 
 export const MutationMask =
-  Placement |
-  Update |
-  ChildDeletion |
-  ContentReset |
-  Ref |
-  Hydrating |
-  Visibility;
+    Placement |
+    Update |
+    ChildDeletion |
+    ContentReset |
+    Ref |
+    Hydrating |
+    Visibility;
 export const LayoutMask = Update | Callback | Ref | Visibility;
 
 // TODO: Split into PassiveMountMask and PassiveUnmountMask

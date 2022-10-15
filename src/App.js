@@ -3,6 +3,8 @@ import * as React from "react";
 function App() {
     const [state, setState] = React.useState(0)
 
+    React.useSyncExternalStore(() => {}, React.useCallback(() => 1, []))
+
     const handleClick = () => {
         // 以 Transition 的优先级更新
         React.startTransition(() => {

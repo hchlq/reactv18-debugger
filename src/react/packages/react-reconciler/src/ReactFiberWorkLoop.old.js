@@ -228,13 +228,14 @@ const BatchedContext = /*               */ 0b001;
 const RenderContext = /*                */ 0b010;
 const CommitContext = /*                */ 0b100;
 
-const RootInProgress = 0;
-const RootFatalErrored = 1;
-const RootErrored = 2;
-const RootSuspended = 3;
-const RootSuspendedWithDelay = 4;
-const RootCompleted = 5;
-const RootDidNotComplete = 6;
+// 根状态
+const RootInProgress = 0; // 进行中
+const RootFatalErrored = 1; // 致命的错误
+const RootErrored = 2; // 错误
+const RootSuspended = 3; // 挂起
+const RootSuspendedWithDelay = 4; // 延迟挂起
+const RootCompleted = 5; // 完成
+const RootDidNotComplete = 6; // 没有完成
 
 // Describes where we are in the React execution stack
 let executionContext = NoContext;
@@ -619,7 +620,7 @@ function ensureRootIsScheduled(root, currentTime) {
         cancelCallback(existingCallbackNode);
     }
 
-    console.log(nextLanes.toString(2))
+    // console.log(nextLanes.toString(2))
     //! 3. 调度新的任务
     // Schedule a new callback.
     let newCallbackNode;
@@ -745,8 +746,8 @@ function performConcurrentWorkOnRoot(root, didTimeout) {
     // TODO: We only check `didTimeout` defensively, to account for a Scheduler
     // bug we're still investigating. Once the bug in Scheduler is fixed,
     // we can remove this, since we track expiration ourselves.
-    
-    // 需要同时满足以下条件：
+
+    // 启用时间切片需要同时满足以下条件：
     // 1. 本次更新的车道不存在阻塞的车道任务
     // 2. 本次更新的车道不存在过期的车道任务
     // 3. didTimeout 为 false
@@ -755,25 +756,48 @@ function performConcurrentWorkOnRoot(root, didTimeout) {
     // 根据是否使用时间切片决定使用那个渲染模式
     // 时间切片：renderRootConcurrent
     // 非时间切片：renderRootSync
+    // exitStatus: 退出的状态
     let exitStatus = shouldTimeSlice ? renderRootConcurrent(root, lanes) : renderRootSync(root, lanes);
 
+    // console.log('exitStatus: ', exitStatus)
+    // const RootInProgress = 0; // 进行中
+    // const RootFatalErrored = 1; // 致命的错误
+    // const RootErrored = 2; // 错误
+    // const RootSuspended = 3; // 挂起
+    // const RootSuspendedWithDelay = 4; // 延迟挂起
+    // const RootCompleted = 5; // 完成
+    // const RootDidNotComplete = 6; // 没有完成
     if (exitStatus !== RootInProgress) {
+        // 不是进行中
+        // 进行中 -> 错误
+        // 进行中 -> 悬停
+        // 进行中 -> 完成
         if (exitStatus === RootErrored) {
             // If something threw an error, try rendering one more time. We'll
             // render synchronously to block concurrent data mutations, and we'll
-            // includes all pending updates are included. If it still fails after
+            // include all pending updates are included. If it still fails after
             // the second attempt, we'll give up and commit the resulting tree.
+            // 获取车道去执行同步的任务
             const errorRetryLanes = getLanesToRetrySynchronouslyOnError(root);
             if (errorRetryLanes !== NoLanes) {
                 lanes = errorRetryLanes;
                 exitStatus = recoverFromConcurrentError(root, errorRetryLanes);
             }
         }
+
+        // 严重的错误
         if (exitStatus === RootFatalErrored) {
             const fatalError = workInProgressRootFatalError;
+
+            // 准备新的 workInProgress
             prepareFreshStack(root, NoLanes);
+
+            // 标记跟悬停
             markRootSuspended(root, lanes);
+
+            // 再次确保根被调度
             ensureRootIsScheduled(root, now());
+
             throw fatalError;
         }
 
@@ -785,8 +809,13 @@ function performConcurrentWorkOnRoot(root, didTimeout) {
             // This should only happen during a concurrent render, not a discrete or
             // synchronous update. We should have already checked for this when we
             // unwound the stack.
+            // 标记根被悬停了
             markRootSuspended(root, lanes);
         } else {
+            // 到这的情况：
+            // 1. 悬停
+            // 2. 完成了
+
             // The render completed.
 
             // Check if this render may have yielded to a concurrent event, and if so,
@@ -794,8 +823,16 @@ function performConcurrentWorkOnRoot(root, didTimeout) {
             // TODO: It's possible that even a concurrent render may never have yielded
             // to the main thread, if it was fast enough, or if it expired. We could
             // skip the consistency check in that case, too.
+
+            // 判断本次是不是时间切片的调度
             const renderWasConcurrent = !includesBlockingLane(root, lanes);
+
+            // 获取完成的任务
             const finishedWork = root.current.alternate;
+
+            // 1. 是以时间切片的更新
+            // 2. 存在与外部仓库渲染不一致的情况
+            // console.log('并发模式: ', renderWasConcurrent, !isRenderConsistentWithExternalStores(finishedWork))
             if (renderWasConcurrent && !isRenderConsistentWithExternalStores(finishedWork)) {
                 // A store was mutated in an interleaved event. Render again,
                 // synchronously, to block further mutations.
@@ -838,34 +875,19 @@ function performConcurrentWorkOnRoot(root, didTimeout) {
         // currently executed. Need to return a continuation.
         return performConcurrentWorkOnRoot.bind(null, root);
     }
+
     return null;
 }
 
+/**
+ * 从 concurrent 中恢复错误
+ */
 function recoverFromConcurrentError(root, errorRetryLanes) {
     // If an error occurred during hydration, discard server response and fall
     // back to client side render.
 
     // Before rendering again, save the errors from the previous attempt.
     const errorsFromFirstAttempt = workInProgressRootConcurrentErrors;
-
-    if (isRootDehydrated(root)) {
-        // The shell failed to hydrate. Set a flag to force a client rendering
-        // during the next attempt. To do this, we call prepareFreshStack now
-        // to create the root work-in-progress fiber. This is a bit weird in terms
-        // of factoring, because it relies on renderRootSync not calling
-        // prepareFreshStack again in the call below, which happens because the
-        // root and lanes haven't changed.
-        //
-        // TODO: I think what we should do is set ForceClientRender inside
-        // throwException, like we do for nested Suspense boundaries. The reason
-        // it's here instead is so we can switch to the synchronous work loop, too.
-        // Something to consider for a future refactor.
-        const rootWorkInProgress = prepareFreshStack(root, errorRetryLanes);
-        rootWorkInProgress.flags |= ForceClientRender;
-        if (__DEV__) {
-            errorHydratingContainer(root.containerInfo);
-        }
-    }
 
     const exitStatus = renderRootSync(root, errorRetryLanes);
     if (exitStatus !== RootErrored) {
@@ -884,6 +906,7 @@ function recoverFromConcurrentError(root, errorRetryLanes) {
     } else {
         // The UI failed to recover.
     }
+
     return exitStatus;
 }
 
@@ -1003,6 +1026,7 @@ function isRenderConsistentWithExternalStores(finishedWork) {
     // loop instead of recursion so we can exit early.
     let node = finishedWork;
     while (true) {
+        // 存在读取了外部状态
         if (node.flags & StoreConsistency) {
             const updateQueue = node.updateQueue;
             if (updateQueue !== null) {
@@ -1032,18 +1056,22 @@ function isRenderConsistentWithExternalStores(finishedWork) {
             node = child;
             continue;
         }
+
         if (node === finishedWork) {
             return true;
         }
+
         while (node.sibling === null) {
             if (node.return === null || node.return === finishedWork) {
                 return true;
             }
             node = node.return;
         }
+
         node.sibling.return = node.return;
         node = node.sibling;
     }
+    
     // Flow doesn't know this is unreachable, but eslint does
     // eslint-disable-next-line no-unreachable
     return true;

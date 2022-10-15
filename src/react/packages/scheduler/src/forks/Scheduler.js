@@ -192,6 +192,7 @@ function workLoop(hasTimeRemaining, initialTime) {
             currentPriorityLevel = currentTask.priorityLevel;
 
             // 该任务到过期时间了
+            // e.g. expirationTime: 18, currentTime: 20, 结果为 true, 说明已经过期了
             const didUserCallbackTimeout = currentTask.expirationTime <= currentTime;
 
             const continuationCallback = callback(didUserCallbackTimeout);
