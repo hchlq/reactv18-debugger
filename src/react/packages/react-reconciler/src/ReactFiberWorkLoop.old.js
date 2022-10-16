@@ -832,10 +832,12 @@ function performConcurrentWorkOnRoot(root, didTimeout) {
 
             // 1. 是以时间切片的更新
             // 2. 存在与外部仓库渲染不一致的情况
-            // console.log('并发模式: ', renderWasConcurrent, !isRenderConsistentWithExternalStores(finishedWork))
+            // 在 render 过程中存在外部状态的变化
             if (renderWasConcurrent && !isRenderConsistentWithExternalStores(finishedWork)) {
+                // 在交叉的事件中被修改了
                 // A store was mutated in an interleaved event. Render again,
                 // synchronously, to block further mutations.
+                // 外部状态发生了变化，重新渲染一次
                 exitStatus = renderRootSync(root, lanes);
 
                 // We need to check again if something threw
@@ -857,6 +859,7 @@ function performConcurrentWorkOnRoot(root, didTimeout) {
                 }
             }
 
+            // 获得一致性的树了，可以提交了
             // We now have a consistent tree. The next step is either to commit it,
             // or, if something suspended, wait to commit it after a timeout.
             root.finishedWork = finishedWork;
@@ -1037,6 +1040,7 @@ function isRenderConsistentWithExternalStores(finishedWork) {
                         const getSnapshot = check.getSnapshot;
                         const renderedValue = check.value;
                         try {
+                            // 快照发生了变化，说明不一致
                             if (!is(getSnapshot(), renderedValue)) {
                                 // Found an inconsistent store.
                                 return false;
@@ -1050,6 +1054,8 @@ function isRenderConsistentWithExternalStores(finishedWork) {
                 }
             }
         }
+
+        // 处理孩子
         const child = node.child;
         if (node.subtreeFlags & StoreConsistency && child !== null) {
             child.return = node;
@@ -1061,6 +1067,7 @@ function isRenderConsistentWithExternalStores(finishedWork) {
             return true;
         }
 
+        // 没有兄弟，往上找
         while (node.sibling === null) {
             if (node.return === null || node.return === finishedWork) {
                 return true;
@@ -1068,10 +1075,11 @@ function isRenderConsistentWithExternalStores(finishedWork) {
             node = node.return;
         }
 
+        // 处理兄弟
         node.sibling.return = node.return;
         node = node.sibling;
     }
-    
+
     // Flow doesn't know this is unreachable, but eslint does
     // eslint-disable-next-line no-unreachable
     return true;

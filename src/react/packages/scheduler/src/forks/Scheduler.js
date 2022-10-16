@@ -9,13 +9,10 @@
 /* eslint-disable no-var */
 
 import {
-    enableSchedulerDebugging,
     enableProfiling,
     enableIsInputPending,
-    enableIsInputPendingContinuous,
-    frameYieldMs,
-    continuousYieldMs,
-    maxYieldMs,
+    frameYieldMs, continuousYieldMs,
+    enableIsInputPendingContinuous
 } from '../SchedulerFeatureFlags';
 
 import {push, pop, peek} from '../SchedulerMinHeap';
@@ -87,9 +84,9 @@ const localSetTimeout = typeof setTimeout === 'function' ? setTimeout : null;
 const localClearTimeout = typeof clearTimeout === 'function' ? clearTimeout : null;
 const localSetImmediate = typeof setImmediate !== 'undefined' ? setImmediate : null; // IE and Node.js + jsdom
 
-// const isInputPending = typeof navigator !== 'undefined' && navigator.scheduling !== undefined && navigator.scheduling.isInputPending !== undefined ? navigator.scheduling.isInputPending.bind(navigator.scheduling) : null;
+const isInputPending = typeof navigator !== 'undefined' && navigator.scheduling !== undefined && navigator.scheduling.isInputPending !== undefined ? navigator.scheduling.isInputPending.bind(navigator.scheduling) : null;
 
-// const continuousOptions = {includeContinuous: enableIsInputPendingContinuous};
+const continuousOptions = {includeContinuous: enableIsInputPendingContinuous};
 
 function advanceTimers(currentTime) {
     // Check for tasks that are no longer delayed and add them to the queue.
@@ -173,12 +170,15 @@ function workLoop(hasTimeRemaining, initialTime) {
     //! 2. 开始处理任务
     currentTask = peek(taskQueue);
     while (currentTask !== null) {
+        // console.log('currentTask: ', currentTask)
 
+        // 同时满足以下条件时不执行回调
         // 1. 该任务没有到过期时间
         // 2. 没有剩余时间了 或者有剩余时间，但是应该让出执行权给浏览器了
         if (currentTask.expirationTime > currentTime
             // 调度传入的 hasTimeRemaining 为 true
             && (!hasTimeRemaining || shouldYieldToHost())
+            // && shouldYieldToHost()
         ) {
             // This currentTask hasn't expired, and we've reached the deadline.
             break;
@@ -207,7 +207,7 @@ function workLoop(hasTimeRemaining, initialTime) {
             }
             advanceTimers(currentTime);
         } else {
-            // callback 不是函数
+            // callback 不是函数，说明被取消了
             pop(taskQueue);
         }
 
@@ -216,6 +216,7 @@ function workLoop(hasTimeRemaining, initialTime) {
     }
     // Return whether there's additional work
     if (currentTask !== null) {
+        // 表示还有任务没执行完成
         return true;
     } else {
         const firstTimer = peek(timerQueue);
@@ -274,10 +275,10 @@ function unstable_next(eventHandler) {
 }
 
 function unstable_wrapCallback(callback) {
-    var parentPriorityLevel = currentPriorityLevel;
+    const parentPriorityLevel = currentPriorityLevel;
     return function () {
         // This is a fork of runWithPriority, inlined for performance.
-        var previousPriorityLevel = currentPriorityLevel;
+        const previousPriorityLevel = currentPriorityLevel;
         currentPriorityLevel = parentPriorityLevel;
 
         try {
@@ -343,7 +344,12 @@ function unstable_scheduleCallback(priorityLevel, callback, options) {
 
     //! 2. 创建任务
     const newTask = {
-        id: taskIdCounter++, callback, priorityLevel, startTime, expirationTime, sortIndex: -1,
+        id: taskIdCounter++,
+        callback,
+        priorityLevel,
+        startTime,
+        expirationTime,
+        sortIndex: -1,
     };
 
     //! 3. 开始调度任务
@@ -351,6 +357,7 @@ function unstable_scheduleCallback(priorityLevel, callback, options) {
         // 延迟启动任务，放入 timerQueue 中
         // This is a delayed task.
         newTask.sortIndex = startTime;
+        //
         push(timerQueue, newTask);
         if (peek(taskQueue) === null && newTask === peek(timerQueue)) {
             // All tasks are delayed, and this is the task with the earliest delay.
@@ -397,13 +404,13 @@ function unstable_getFirstCallbackNode() {
 }
 
 function unstable_cancelCallback(task) {
-    if (enableProfiling) {
-        if (task.isQueued) {
-            const currentTime = getCurrentTime();
-            markTaskCanceled(task, currentTime);
-            task.isQueued = false;
-        }
-    }
+    // if (enableProfiling) {
+    //     if (task.isQueued) {
+    //         const currentTime = getCurrentTime();
+    //         markTaskCanceled(task, currentTime);
+    //         task.isQueued = false;
+    //     }
+    // }
 
     // Null out the callback to indicate the task has been canceled. (Can't
     // remove from the queue because you can't remove arbitrary nodes from an
@@ -451,30 +458,32 @@ function shouldYieldToHost() {
     // eventually yield regardless, since there could be a pending paint that
     // wasn't accompanied by a call to `requestPaint`, or other main thread tasks
     // like network events.
-    // if (enableIsInputPending) {
-    //     if (needsPaint) {
-    //         // There's a pending paint (signaled by `requestPaint`). Yield now.
-    //         return true;
-    //     }
-    //     if (timeElapsed < continuousInputInterval) {
-    //         // We haven't blocked the thread for that long. Only yield if there's a
-    //         // pending discrete input (e.g. click). It's OK if there's pending
-    //         // continuous input (e.g. mouseover).
-    //         if (isInputPending !== null) {
-    //             return isInputPending();
-    //         }
-    //     } else if (timeElapsed < maxInterval) {
-    //         // Yield if there's either a pending discrete or continuous input.
-    //         if (isInputPending !== null) {
-    //             return isInputPending(continuousOptions);
-    //         }
-    //     } else {
-    //         // We've blocked the thread for a long time. Even if there's no pending
-    //         // input, there may be some other scheduled work that we don't know about,
-    //         // like a network event. Yield now.
-    //         return true;
-    //     }
-    // }
+    if (enableIsInputPending) {
+        if (needsPaint) {
+            // There's a pending paint (signaled by `requestPaint`). Yield now.
+            return true;
+        }
+        if (timeElapsed < continuousYieldMs) {
+            // We haven't blocked the thread for that long. Only yield if there's a
+            // pending discrete input (e.g. click). It's OK if there's pending
+            // continuous input (e.g. mouseover).
+            if (isInputPending !== null) {
+                return isInputPending();
+            }
+        } else if (timeElapsed < maxInterval) {
+            // 时间 >= 50ms
+            // 没有离散时间和持续输入的事件
+            // Yield if there's either a pending discrete or continuous input.
+            if (isInputPending !== null) {
+                return isInputPending(continuousOptions);
+            }
+        } else {
+            // We've blocked the thread for a long time. Even if there's no pending
+            // input, there may be some other scheduled work that we don't know about,
+            // like a network event. Yield now.
+            return true;
+        }
+    }
 
     // `isInputPending` isn't available. Yield now.
     // 让执行权给浏览器
@@ -542,6 +551,7 @@ const performWorkUntilDeadline = () => {
             if (hasMoreWork) {
                 // If there's more work, schedule the next message event at the end
                 // of the preceding one.
+                // 重新调度一次
                 schedulePerformWorkUntilDeadline();
             } else {
                 isMessageLoopRunning = false;

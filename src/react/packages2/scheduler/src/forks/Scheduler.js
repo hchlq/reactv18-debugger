@@ -458,6 +458,7 @@ function shouldYieldToHost() {
       // There's a pending paint (signaled by `requestPaint`). Yield now.
       return true;
     }
+    // 事件跨度小于 50 ms
     if (timeElapsed < continuousInputInterval) {
       // We haven't blocked the thread for that long. Only yield if there's a
       // pending discrete input (e.g. click). It's OK if there's pending

@@ -1265,6 +1265,7 @@ function updateSyncExternalStore(subscribe, getSnapshot, getServerSnapshot) {
         const root = getWorkInProgressRoot();
 
         //! 不包含阻塞的车道
+        // 即不包含 InputContinuousLane 和 DefaultLane
         if (!includesBlockingLane(root, renderLanes)) {
             pushStoreConsistencyCheck(fiber, getSnapshot, nextSnapshot);
         }

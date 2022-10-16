@@ -7,6 +7,7 @@
  */
 
 export const enableSchedulerDebugging = false;
+// 开启 input 功能
 export const enableIsInputPending = false;
 export const enableProfiling = false;
 export const enableIsInputPendingContinuous = false;

@@ -1,14 +1,4 @@
-/**
- * Copyright (c) Facebook, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- *
- * @emails react-core
- * @jest-environment node
- */
-
-/* eslint-disable no-for-of-loops/no-for-of-loops */
+/* eslint-disable */
 
 'use strict';
 
@@ -153,6 +143,7 @@ describe('SchedulerPostTask', () => {
     scheduleCallback(NormalPriority, () => {
       runtime.log('A');
     });
+
     runtime.assertLog(['Post Task 0 [user-visible]']);
     runtime.flushTasks();
     runtime.assertLog(['Task 0 Fired', 'A']);
