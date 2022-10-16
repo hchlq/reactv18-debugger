@@ -29,6 +29,8 @@ export function finishQueueingConcurrentUpdates() {
     concurrentlyUpdatedLanes = NoLanes;
 
     let i = 0;
+
+    // 关联
     while (i < endIndex) {
         const fiber = concurrentQueues[i];
         concurrentQueues[i++] = null;
@@ -52,7 +54,7 @@ export function finishQueueingConcurrentUpdates() {
             queue.pending = update;
         }
 
-        // 有更新的优先级，更新当前到根的所有 lane
+        // 有更新的优先级，更新从当前节点到根的 lane
         if (lane !== NoLane) {
             markUpdateLaneFromFiberToRoot(fiber, update, lane);
         }

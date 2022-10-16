@@ -12,7 +12,7 @@ import {
     enableProfiling,
     enableIsInputPending,
     frameYieldMs, continuousYieldMs,
-    enableIsInputPendingContinuous
+    enableIsInputPendingContinuous, maxYieldMs
 } from '../SchedulerFeatureFlags';
 
 import {push, pop, peek} from '../SchedulerMinHeap';
@@ -86,7 +86,7 @@ const localSetImmediate = typeof setImmediate !== 'undefined' ? setImmediate : n
 
 const isInputPending = typeof navigator !== 'undefined' && navigator.scheduling !== undefined && navigator.scheduling.isInputPending !== undefined ? navigator.scheduling.isInputPending.bind(navigator.scheduling) : null;
 
-const continuousOptions = {includeContinuous: enableIsInputPendingContinuous};
+const continuousOptions = { includeContinuous: false };
 
 function advanceTimers(currentTime) {
     // Check for tasks that are no longer delayed and add them to the queue.
@@ -175,6 +175,7 @@ function workLoop(hasTimeRemaining, initialTime) {
         // 同时满足以下条件时不执行回调
         // 1. 该任务没有到过期时间
         // 2. 没有剩余时间了 或者有剩余时间，但是应该让出执行权给浏览器了
+        // 过期了的任务一定会执行
         if (currentTask.expirationTime > currentTime
             // 调度传入的 hasTimeRemaining 为 true
             && (!hasTimeRemaining || shouldYieldToHost())
@@ -443,8 +444,8 @@ function shouldYieldToHost() {
     // 执行花费的时间
     const timeElapsed = getCurrentTime() - startTime;
 
-    // 执行花费时间还没到限制
-    if (timeElapsed < frameInterval) {
+    //! 1. 检查一帧的时间（5ms）
+    if (timeElapsed < frameYieldMs) {
         // The main thread has only been blocked for a really short amount of time;
         // smaller than a single frame. Don't yield yet.
         return false;
@@ -463,6 +464,7 @@ function shouldYieldToHost() {
             // There's a pending paint (signaled by `requestPaint`). Yield now.
             return true;
         }
+        //! 2. 检查持续的事件（ > 5ms ）
         if (timeElapsed < continuousYieldMs) {
             // We haven't blocked the thread for that long. Only yield if there's a
             // pending discrete input (e.g. click). It's OK if there's pending
@@ -470,9 +472,9 @@ function shouldYieldToHost() {
             if (isInputPending !== null) {
                 return isInputPending();
             }
-        } else if (timeElapsed < maxInterval) {
+        } else if (timeElapsed < maxYieldMs) {
+            //! 3. 检查等待的离散和持续的输入  ( > 50ms )
             // 时间 >= 50ms
-            // 没有离散时间和持续输入的事件
             // Yield if there's either a pending discrete or continuous input.
             if (isInputPending !== null) {
                 return isInputPending(continuousOptions);

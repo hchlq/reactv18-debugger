@@ -909,6 +909,7 @@ export function getTransitionsForLanes(root, lanes) {
         return null;
     }
 
+    // 获取根的过渡车道
     const transitionsForLanes = [];
     while (lanes > 0) {
         const index = laneToIndex(lanes);

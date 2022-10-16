@@ -536,7 +536,7 @@ export function scheduleUpdateOnFiber(root, fiber, lane, eventTime) {
             // scheduleCallbackForFiber to preserve the ability to schedule a callback
             // without immediately flushing it. We only do this for user-initiated
             // updates, to preserve historical behavior of legacy mode.
-            // resetRenderTimer();
+            resetRenderTimer();
             flushSyncCallbacksOnlyInLegacyMode();
         }
     }
@@ -705,6 +705,7 @@ function performConcurrentWorkOnRoot(root, didTimeout) {
         throw new Error('Should not already be working.');
     }
 
+    //! 1. 清空 effect
     // 在调度该车道之前把 effect 清空，防止 effect 产生额外的更新任务
     // Flush any pending passive effects before deciding which lanes to work on,
     // in case they schedule additional work.
@@ -726,10 +727,11 @@ function performConcurrentWorkOnRoot(root, didTimeout) {
         }
     }
 
+    //! 2. 获取本次要更新的车道
     // 再次决定去更新那个车道，因为之前有调度 effect 工作了，可能会有优先级更高的车道
     // Determine the next lanes to work on, using the fields stored
     // on the root.
-    let lanes = getNextLanes(root, root === workInProgressRoot ? workInProgressRootRenderLanes : NoLanes,);
+    let lanes = getNextLanes(root, root === workInProgressRoot ? workInProgressRootRenderLanes : NoLanes);
     if (lanes === NoLanes) {
         // 代码不会到这个分支
         // Defensive coding. This is never expected to happen.
@@ -737,6 +739,7 @@ function performConcurrentWorkOnRoot(root, didTimeout) {
     }
 
 
+    //! 3. 决定使用时间切片还是同步方式更新
     // 禁用时间切片的场景
     // 1. 过期的任务阻塞时间比较长
     // 2. 在 render 模式下
@@ -759,7 +762,6 @@ function performConcurrentWorkOnRoot(root, didTimeout) {
     // exitStatus: 退出的状态
     let exitStatus = shouldTimeSlice ? renderRootConcurrent(root, lanes) : renderRootSync(root, lanes);
 
-    // console.log('exitStatus: ', exitStatus)
     // const RootInProgress = 0; // 进行中
     // const RootFatalErrored = 1; // 致命的错误
     // const RootErrored = 2; // 错误
@@ -767,6 +769,7 @@ function performConcurrentWorkOnRoot(root, didTimeout) {
     // const RootSuspendedWithDelay = 4; // 延迟挂起
     // const RootCompleted = 5; // 完成
     // const RootDidNotComplete = 6; // 没有完成
+    //! 4. 根据本次渲染结果的状态进行不同的处理
     if (exitStatus !== RootInProgress) {
         // 不是进行中
         // 进行中 -> 错误
@@ -869,9 +872,10 @@ function performConcurrentWorkOnRoot(root, didTimeout) {
     }
 
 
-    // 再次确保根被重新调度
+    //! 5. 再次确保根被重新调度
     ensureRootIsScheduled(root, now());
 
+    //! 6. 渲染的任务被中断了，恢复中断的任务
     //~ 中断恢复的关键
     if (root.callbackNode === originalCallbackNode) {
         // The task node scheduled for this root is the same one that's
@@ -921,6 +925,9 @@ export function queueRecoverableErrors(errors) {
     }
 }
 
+/**
+ * 完成 Concurrent 模式的渲染
+ */
 function finishConcurrentRender(root, exitStatus, lanes) {
     switch (exitStatus) {
         case RootInProgress:
@@ -933,10 +940,11 @@ function finishConcurrentRender(root, exitStatus, lanes) {
         case RootErrored: {
             // We should have already attempted to retry this tree. If we reached
             // this point, it errored again. Commit it.
-            commitRoot(root, workInProgressRootRecoverableErrors, workInProgressTransitions,);
+            commitRoot(root, workInProgressRootRecoverableErrors, workInProgressTransitions);
             break;
         }
         case RootSuspended: {
+            // 标记根悬停
             markRootSuspended(root, lanes);
 
             // We have an acceptable loading state. We need to figure out if we
@@ -972,6 +980,7 @@ function finishConcurrentRender(root, exitStatus, lanes) {
                     break;
                 }
             }
+
             // The work expired. Commit immediately.
             commitRoot(root, workInProgressRootRecoverableErrors, workInProgressTransitions,);
             break;
@@ -1014,7 +1023,7 @@ function finishConcurrentRender(root, exitStatus, lanes) {
         }
         case RootCompleted: {
             // The work completed. Ready to commit.
-            commitRoot(root, workInProgressRootRecoverableErrors, workInProgressTransitions,);
+            commitRoot(root, workInProgressRootRecoverableErrors, workInProgressTransitions);
             break;
         }
         default: {
@@ -1098,10 +1107,6 @@ function markRootSuspended(root, suspendedLanes) {
 // This is the entry point for synchronous tasks that don't go
 // through Scheduler
 function performSyncWorkOnRoot(root) {
-    if (enableProfilerTimer && enableProfilerNestedUpdatePhase) {
-        syncNestedUpdateFlag();
-    }
-
     if ((executionContext & (RenderContext | CommitContext)) !== NoContext) {
         throw new Error('Should not already be working.');
     }
@@ -1299,6 +1304,9 @@ export function popRenderLanes(fiber) {
     popFromStack(subtreeRenderLanesCursor, fiber);
 }
 
+/**
+ * 准备构建一个新的 fiber
+ */
 function prepareFreshStack(root, lanes) {
     root.finishedWork = null;
     root.finishedLanes = NoLanes;
@@ -1316,12 +1324,17 @@ function prepareFreshStack(root, lanes) {
         let interruptedWork = workInProgress.return;
         while (interruptedWork !== null) {
             const current = interruptedWork.alternate;
-            unwindInterruptedWork(current, interruptedWork, workInProgressRootRenderLanes,);
+            unwindInterruptedWork(current, interruptedWork, workInProgressRootRenderLanes);
             interruptedWork = interruptedWork.return;
         }
     }
+
     workInProgressRoot = root;
+
+    //! 1. 创建 workInProgress
     const rootWorkInProgress = createWorkInProgress(root.current, null);
+
+    //! 2. 重置全局变量
     workInProgress = rootWorkInProgress;
     workInProgressRootRenderLanes = subtreeRenderLanes = workInProgressRootIncludedLanes = lanes;
     workInProgressRootExitStatus = RootInProgress;
@@ -1333,11 +1346,8 @@ function prepareFreshStack(root, lanes) {
     workInProgressRootConcurrentErrors = null;
     workInProgressRootRecoverableErrors = null;
 
+    //! 3. 将队列关联到 fiber 的队列中
     finishQueueingConcurrentUpdates();
-
-    // if (__DEV__) {
-    //   ReactStrictModeWarnings.discardPendingWarnings();
-    // }
 
     return rootWorkInProgress;
 }
@@ -1562,43 +1572,30 @@ function workLoopSync() {
 
 function renderRootConcurrent(root, lanes) {
     const prevExecutionContext = executionContext;
+
+    // 增加 RenderContext 上下文
     executionContext |= RenderContext;
+
+    // 更新 ReactCurrentDispatcher 为 ContextDispatcher
     const prevDispatcher = pushDispatcher();
 
+    //! 1. 准备构建新的 fiber 树
+    // 根或者车道发生了变化，重新准备构建一颗心的 Fiber 树
     // If the root or lanes have changed, throw out the existing stack
     // and prepare a fresh one. Otherwise we'll continue where we left off.
     if (workInProgressRoot !== root || workInProgressRootRenderLanes !== lanes) {
-        if (enableUpdaterTracking) {
-            if (isDevToolsPresent) {
-                const memoizedUpdaters = root.memoizedUpdaters;
-                if (memoizedUpdaters.size > 0) {
-                    restorePendingUpdaters(root, workInProgressRootRenderLanes);
-                    memoizedUpdaters.clear();
-                }
-
-                // At this point, move Fibers that scheduled the upcoming work from the Map to the Set.
-                // If we bailout on this work, we'll move them back (like above).
-                // It's important to move them now in case the work spawns more work at the same priority with different updaters.
-                // That way we can keep the current update and future updates separate.
-                movePendingFibersToMemoized(root, lanes);
-            }
-        }
-
+        // 获取过渡的车道
         workInProgressTransitions = getTransitionsForLanes(root, lanes);
+
+        // 重置渲染的时间
         resetRenderTimer();
+
+        // 准备构建一个新的树
         prepareFreshStack(root, lanes);
     }
 
-    if (__DEV__) {
-        if (enableDebugTracing) {
-            logRenderStarted(lanes);
-        }
-    }
 
-    if (enableSchedulingProfiler) {
-        markRenderStarted(lanes);
-    }
-
+    //! 2.开始工作
     do {
         try {
             workLoopConcurrent();
@@ -1607,29 +1604,22 @@ function renderRootConcurrent(root, lanes) {
             handleError(root, thrownValue);
         }
     } while (true);
+
+    //! 3. 重置工作
+    // 重置 Context 的依赖
     resetContextDependencies();
 
+    // 恢复 ReactCurrentDispatcher
     popDispatcher(prevDispatcher);
-    executionContext = prevExecutionContext;
 
-    if (__DEV__) {
-        if (enableDebugTracing) {
-            logRenderStopped();
-        }
-    }
+    // 恢复之前的上下文
+    executionContext = prevExecutionContext;
 
     // Check if the tree has completed.
     if (workInProgress !== null) {
-        // Still work remaining.
-        if (enableSchedulingProfiler) {
-            markRenderYielded();
-        }
         return RootInProgress;
     } else {
         // Completed the tree.
-        if (enableSchedulingProfiler) {
-            markRenderStopped();
-        }
 
         // Set this to null to indicate there's no in-progress render.
         workInProgressRoot = null;
@@ -1640,7 +1630,9 @@ function renderRootConcurrent(root, lanes) {
     }
 }
 
-/** @noinline */
+/**
+ * 并发循环的工作
+ */
 function workLoopConcurrent() {
     // Perform work until Scheduler asks us to yield
     while (workInProgress !== null && !shouldYield()) {
