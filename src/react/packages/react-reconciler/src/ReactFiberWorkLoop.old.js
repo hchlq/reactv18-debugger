@@ -880,6 +880,9 @@ function performConcurrentWorkOnRoot(root, didTimeout) {
     //~ 中断恢复的关键
     console.log('是否返回中断的任务', root.callbackNode === originalCallbackNode)
     if (root.callbackNode === originalCallbackNode) {
+        // debugger
+    }
+    if (root.callbackNode === originalCallbackNode) {
         // The task node scheduled for this root is the same one that's
         // currently executed. Need to return a continuation.
         return performConcurrentWorkOnRoot.bind(null, root);
@@ -931,6 +934,7 @@ export function queueRecoverableErrors(errors) {
  * 完成 Concurrent 模式的渲染
  */
 function finishConcurrentRender(root, exitStatus, lanes) {
+    console.log('finish')
     switch (exitStatus) {
         case RootInProgress:
         case RootFatalErrored: {
@@ -1634,7 +1638,8 @@ function renderRootConcurrent(root, lanes) {
 
 const sleep = (ms = 5) => {
     const current = Date.now();
-    while (Date.now() - current < ms) {}
+    while (Date.now() - current < ms) {
+    }
 }
 
 /**
@@ -1642,8 +1647,11 @@ const sleep = (ms = 5) => {
  */
 function workLoopConcurrent() {
     // Perform work until Scheduler asks us to yield
-    while (workInProgress !== null && !shouldYield()) {
-        console.log('shouldYield: ', shouldYield())
+
+    // while ((console.log('shouldYield: ', !!workInProgress !== null, shouldYield()), true) && workInProgress !== null && !shouldYield()) {
+    //     performUnitOfWork(workInProgress);
+    // }
+    while (workInProgress !== null && !shouldYield(true)) {
         // 模拟耗时比较长
         sleep()
         performUnitOfWork(workInProgress);

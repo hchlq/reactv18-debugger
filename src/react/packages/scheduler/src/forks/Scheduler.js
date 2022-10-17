@@ -284,6 +284,7 @@ function unstable_wrapCallback(callback) {
  *  flushWork -> workLoop -> callback（执行 callback）
  */
 function unstable_scheduleCallback(priorityLevel, callback, options) {
+    // console.log('===========')
     const currentTime = getCurrentTime();
 
     //! 1. 确定开始时间、超时时间、过期时间
@@ -426,12 +427,12 @@ let needsPaint = false;
 /**
  * 是否让出执行权给宿主
  */
-function shouldYieldToHost() {
+function shouldYieldToHost(extra) {
     // 执行花费的时间
     const timeElapsed = getCurrentTime() - startTime;
 
     //! 1. 检查一帧的时间（5ms）
-    console.log('在 5ms 内： ', timeElapsed < frameYieldMs)
+    // console.log('在 5ms 内： ', timeElapsed < frameYieldMs)
     if (timeElapsed < frameYieldMs) {
         // The main thread has only been blocked for a really short amount of time;
         // smaller than a single frame. Don't yield yet.
@@ -476,6 +477,7 @@ function shouldYieldToHost() {
 
     // `isInputPending` isn't available. Yield now.
     // 让执行权给浏览器
+    // if (extra) debugger
     return true;
 }
 
