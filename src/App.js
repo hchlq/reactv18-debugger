@@ -1,11 +1,5 @@
 import * as React from "react";
 
-const sleep = () => {
-    return new Promise(resolve => {
-        setTimeout(resolve, 10000)
-    })
-}
-
 function App() {
     const [state, setState] = React.useState(0)
 
@@ -13,9 +7,6 @@ function App() {
     }, React.useCallback(() => 1, []))
 
     const handleClick = async () => {
-        console.log('sleep...')
-        await sleep()
-        console.log('sleep done')
         // 以 Transition 的优先级更新
         React.startTransition(() => {
             setState(state + 1)

@@ -762,6 +762,7 @@ function performConcurrentWorkOnRoot(root, didTimeout) {
     // exitStatus: 退出的状态
     let exitStatus = shouldTimeSlice ? renderRootConcurrent(root, lanes) : renderRootSync(root, lanes);
 
+
     // const RootInProgress = 0; // 进行中
     // const RootFatalErrored = 1; // 致命的错误
     // const RootErrored = 2; // 错误
@@ -877,6 +878,7 @@ function performConcurrentWorkOnRoot(root, didTimeout) {
 
     //! 6. 渲染的任务被中断了，恢复中断的任务
     //~ 中断恢复的关键
+    console.log('是否返回中断的任务', root.callbackNode === originalCallbackNode)
     if (root.callbackNode === originalCallbackNode) {
         // The task node scheduled for this root is the same one that's
         // currently executed. Need to return a continuation.
@@ -1630,12 +1632,20 @@ function renderRootConcurrent(root, lanes) {
     }
 }
 
+const sleep = (ms = 5) => {
+    const current = Date.now();
+    while (Date.now() - current < ms) {}
+}
+
 /**
  * 并发循环的工作
  */
 function workLoopConcurrent() {
     // Perform work until Scheduler asks us to yield
     while (workInProgress !== null && !shouldYield()) {
+        console.log('shouldYield: ', shouldYield())
+        // 模拟耗时比较长
+        sleep()
         performUnitOfWork(workInProgress);
     }
 }
@@ -2668,34 +2678,6 @@ if (__DEV__) {
     didWarnAboutUpdateInRenderForAnotherComponent = new Set();
 }
 
-function warnAboutRenderPhaseUpdatesInDEV(fiber) {
-    if (__DEV__) {
-        if (ReactCurrentDebugFiberIsRenderingInDEV && !getIsUpdatingOpaqueValueInRenderPhaseInDEV()) {
-            switch (fiber.tag) {
-                case FunctionComponent:
-                case ForwardRef:
-                case SimpleMemoComponent: {
-                    const renderingComponentName = (workInProgress && getComponentNameFromFiber(workInProgress)) || 'Unknown';
-                    // Dedupe by the rendering component because it's the one that needs to be fixed.
-                    const dedupeKey = renderingComponentName;
-                    if (!didWarnAboutUpdateInRenderForAnotherComponent.has(dedupeKey)) {
-                        didWarnAboutUpdateInRenderForAnotherComponent.add(dedupeKey);
-                        const setStateComponentName = getComponentNameFromFiber(fiber) || 'Unknown';
-                        console.error('Cannot update a component (`%s`) while rendering a ' + 'different component (`%s`). To locate the bad setState() call inside `%s`, ' + 'follow the stack trace as described in https://reactjs.org/link/setstate-in-render', setStateComponentName, renderingComponentName, renderingComponentName,);
-                    }
-                    break;
-                }
-                case ClassComponent: {
-                    if (!didWarnAboutUpdateInRender) {
-                        console.error('Cannot update during an existing state transition (such as ' + 'within `render`). Render methods should be a pure ' + 'function of props and state.',);
-                        didWarnAboutUpdateInRender = true;
-                    }
-                    break;
-                }
-            }
-        }
-    }
-}
 
 export function restorePendingUpdaters(root, lanes) {
     if (enableUpdaterTracking) {
@@ -2735,46 +2717,6 @@ function shouldForceFlushFallbacksInDEV() {
     return __DEV__ && ReactCurrentActQueue.current !== null;
 }
 
-function warnIfUpdatesNotWrappedWithActDEV(fiber) {
-    if (__DEV__) {
-        if (fiber.mode & ConcurrentMode) {
-            if (!isConcurrentActEnvironment()) {
-                // Not in an act environment. No need to warn.
-                return;
-            }
-        } else {
-            // Legacy mode has additional cases where we suppress a warning.
-            if (!isLegacyActEnvironment(fiber)) {
-                // Not in an act environment. No need to warn.
-                return;
-            }
-            if (executionContext !== NoContext) {
-                // Legacy mode doesn't warn if the update is batched, i.e.
-                // batchedUpdates or flushSync.
-                return;
-            }
-            if (fiber.tag !== FunctionComponent && fiber.tag !== ForwardRef && fiber.tag !== SimpleMemoComponent) {
-                // For backwards compatibility with pre-hooks code, legacy mode only
-                // warns for updates that originate from a hook.
-                return;
-            }
-        }
-
-        if (ReactCurrentActQueue.current === null) {
-            const previousFiber = ReactCurrentFiberCurrent;
-            try {
-                setCurrentDebugFiberInDEV(fiber);
-                console.error('An update to %s inside a test was not wrapped in act(...).\n\n' + 'When testing, code that causes React state updates should be ' + 'wrapped into act(...):\n\n' + 'act(() => {\n' + '  /* fire events that update state */\n' + '});\n' + '/* assert on the output */\n\n' + "This ensures that you're testing the behavior the user would see " + 'in the browser.' + ' Learn more at https://reactjs.org/link/wrap-tests-with-act', getComponentNameFromFiber(fiber),);
-            } finally {
-                if (previousFiber) {
-                    setCurrentDebugFiberInDEV(fiber);
-                } else {
-                    resetCurrentDebugFiberInDEV();
-                }
-            }
-        }
-    }
-}
 
 function warnIfSuspenseResolutionNotWrappedWithActDEV(root) {
     if (__DEV__) {

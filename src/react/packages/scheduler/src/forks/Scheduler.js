@@ -1,18 +1,10 @@
-/**
- * Copyright (c) Facebook, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- *
- */
-
-/* eslint-disable no-var */
+/* eslint-disable */
 
 import {
     enableProfiling,
     enableIsInputPending,
     frameYieldMs, continuousYieldMs,
-    enableIsInputPendingContinuous, maxYieldMs
+    maxYieldMs
 } from '../SchedulerFeatureFlags';
 
 import {push, pop, peek} from '../SchedulerMinHeap';
@@ -22,13 +14,6 @@ import {
     ImmediatePriority, UserBlockingPriority, NormalPriority, LowPriority, IdlePriority,
 } from '../SchedulerPriorities';
 import {
-    markTaskRun,
-    markTaskYield,
-    markTaskCompleted,
-    markTaskCanceled,
-    markTaskErrored,
-    markSchedulerSuspended,
-    markSchedulerUnsuspended,
     markTaskStart,
     stopLoggingProfilingEvents,
     startLoggingProfilingEvents,
@@ -86,7 +71,7 @@ const localSetImmediate = typeof setImmediate !== 'undefined' ? setImmediate : n
 
 const isInputPending = typeof navigator !== 'undefined' && navigator.scheduling !== undefined && navigator.scheduling.isInputPending !== undefined ? navigator.scheduling.isInputPending.bind(navigator.scheduling) : null;
 
-const continuousOptions = { includeContinuous: false };
+const continuousOptions = {includeContinuous: false};
 
 function advanceTimers(currentTime) {
     // Check for tasks that are no longer delayed and add them to the queue.
@@ -184,6 +169,7 @@ function workLoop(hasTimeRemaining, initialTime) {
             // This currentTask hasn't expired, and we've reached the deadline.
             break;
         }
+        // console.log('开始调度~~~')
 
         const callback = currentTask.callback;
 
@@ -445,6 +431,7 @@ function shouldYieldToHost() {
     const timeElapsed = getCurrentTime() - startTime;
 
     //! 1. 检查一帧的时间（5ms）
+    console.log('在 5ms 内： ', timeElapsed < frameYieldMs)
     if (timeElapsed < frameYieldMs) {
         // The main thread has only been blocked for a really short amount of time;
         // smaller than a single frame. Don't yield yet.
@@ -554,6 +541,7 @@ const performWorkUntilDeadline = () => {
                 // If there's more work, schedule the next message event at the end
                 // of the preceding one.
                 // 重新调度一次
+                // console.log('存在工作没执行完成--')
                 schedulePerformWorkUntilDeadline();
             } else {
                 isMessageLoopRunning = false;
