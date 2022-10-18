@@ -136,7 +136,7 @@ export const disableLegacyContext = false;
 
 export const enableUseRefAccessWarning = false;
 
-// Enables time slicing for updates that aren't wrapped in startTransition.
+// 为没有包装在startTransition中的更新启用时间切片。
 export const enableSyncDefaultUpdates = true;
 
 // Adds an opt-in to time slicing for updates that aren't wrapped in

@@ -448,6 +448,9 @@ export function markStarvedLanesAsExpired(root, currentTime) {
             ) {
                 // 不是 suspense 和 pinged
                 // Assumes timestamps are monotonically increasing.
+                // 1. SyncLane、InputContinuousLane + 250
+                // 2. TransitionLane + 5000
+                // 3. Retry、IdleLane 为 NoTimeStamp: 永远不过期
                 // 计算一个过期时间
                 expirationTimes[index] = computeExpirationTime(lane, currentTime);
             }
