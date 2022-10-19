@@ -878,7 +878,7 @@ function performConcurrentWorkOnRoot(root, didTimeout) {
 
     //! 6. 渲染的任务被中断了，恢复中断的任务
     //~ 中断恢复的关键
-    console.log('是否返回中断的任务', root.callbackNode === originalCallbackNode)
+    // console.log('是否返回中断的任务', root.callbackNode === originalCallbackNode)
     if (root.callbackNode === originalCallbackNode) {
         // debugger
     }
@@ -934,7 +934,7 @@ export function queueRecoverableErrors(errors) {
  * 完成 Concurrent 模式的渲染
  */
 function finishConcurrentRender(root, exitStatus, lanes) {
-    console.log('finish')
+    // console.log('finish')
     switch (exitStatus) {
         case RootInProgress:
         case RootFatalErrored: {
@@ -1653,7 +1653,7 @@ function workLoopConcurrent() {
     // }
     while (workInProgress !== null && !shouldYield(true)) {
         // 模拟耗时比较长
-        sleep()
+        // sleep()
         performUnitOfWork(workInProgress);
     }
 }

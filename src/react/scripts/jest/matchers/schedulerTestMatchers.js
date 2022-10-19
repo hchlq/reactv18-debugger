@@ -28,6 +28,9 @@ function assertYieldsWereCleared(Scheduler) {
     }
 }
 
+/**
+ * 清空所有的调度任务，并且让出主线程
+ */
 function toFlushAndYield(Scheduler, expectedYields) {
     assertYieldsWereCleared(Scheduler);
     Scheduler.unstable_flushAllWithoutAsserting();

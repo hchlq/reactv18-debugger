@@ -1,11 +1,4 @@
-/**
- * Copyright (c) Facebook, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- *
- * @jest-environment node
- */
+/* eslint-disable */
 
 'use strict';
 
@@ -120,6 +113,7 @@ describe('ReactExpiration', () => {
 
   it('increases priority of updates as time progresses', () => {
     if (gate((flags) => flags.enableSyncDefaultUpdates)) {
+      // 启动时间切片
       React.startTransition(() => {
         ReactNoop.render(<span prop="done" />);
       });
@@ -144,6 +138,7 @@ describe('ReactExpiration', () => {
     expect(ReactNoop.getChildren()).toEqual([span('done')]);
   });
 
+  // 同一事件中具有相同优先级的两个更新总是在同一批处理中更新
   it('two updates of like priority in the same event always flush within the same batch', () => {
     class TextClass extends React.Component {
       componentDidMount() {
@@ -159,6 +154,7 @@ describe('ReactExpiration', () => {
     }
 
     function interrupt() {
+      // 以同步的优先级执行
       ReactNoop.flushSync(() => {
         ReactNoop.renderToRootWithID(null, 'other-root');
       });
@@ -173,10 +169,14 @@ describe('ReactExpiration', () => {
     } else {
       ReactNoop.render(<TextClass text="A" />);
     }
+
     // Advance the timer.
     Scheduler.unstable_advanceTime(2000);
+
     // Partially flush the first update, then interrupt it.
+    // 执行 A 的调度，然后中断
     expect(Scheduler).toFlushAndYieldThrough(['A [render]']);
+
     interrupt();
 
     // Don't advance time by enough to expire the first update.
@@ -185,6 +185,7 @@ describe('ReactExpiration', () => {
 
     // Schedule another update.
     ReactNoop.render(<TextClass text="B" />);
+
     // Both updates are batched
     expect(Scheduler).toFlushAndYield(['B [render]', 'B [commit]']);
     expect(ReactNoop.getChildren()).toEqual([span('B')]);
@@ -193,8 +194,10 @@ describe('ReactExpiration', () => {
     // between the two updates.
     ReactNoop.render(<TextClass text="A" />);
     Scheduler.unstable_advanceTime(2000);
+
     expect(Scheduler).toHaveYielded([]);
     expect(ReactNoop.getChildren()).toEqual([span('B')]);
+
     // Schedule another update.
     ReactNoop.render(<TextClass text="B" />);
     // The updates should flush in the same batch, since as far as the scheduler
@@ -234,6 +237,7 @@ describe('ReactExpiration', () => {
       } else {
         ReactNoop.render(<TextClass text="A" />);
       }
+
       // Advance the timer.
       Scheduler.unstable_advanceTime(2000);
       // Partially flush the first update, then interrupt it.
