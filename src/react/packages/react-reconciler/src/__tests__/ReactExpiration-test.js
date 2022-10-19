@@ -249,6 +249,7 @@ describe('ReactExpiration', () => {
       expect(ReactNoop.getChildren()).toEqual([]);
 
       // Schedule another update.
+      // text 更新为 B
       ReactNoop.render(<TextClass text="B" />);
       // Both updates are batched
       expect(Scheduler).toFlushAndYield(['B [render]', 'B [commit]']);
@@ -316,6 +317,7 @@ describe('ReactExpiration', () => {
     } else {
       ReactNoop.render(<App />);
     }
+
     expect(Scheduler).toFlushAndYield([
       'initial [A] [render]',
       'initial [B] [render]',
