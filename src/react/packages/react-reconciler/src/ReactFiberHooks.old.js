@@ -1161,6 +1161,7 @@ function mountSyncExternalStore(subscribe, getSnapshot, getServerSnapshot) {
     //! 不是阻塞的车道
     // 即 renderLanes 中不存在 InputContinuousLane 和 DefaultLane
     if (!includesBlockingLane(root, renderLanes)) {
+        // 并发渲染，需要检查 store 的一致性
         pushStoreConsistencyCheck(fiber, getSnapshot, nextSnapshot);
     }
 
@@ -1179,7 +1180,7 @@ function mountSyncExternalStore(subscribe, getSnapshot, getServerSnapshot) {
     hook.queue = inst;
 
     // Schedule an effect to subscribe to the store.
-    // useEffect(subscribeToStore.bind(null, fiber, inst, subscribe), [subscribe])
+    // 只在挂载时，等同于 useEffect(subscribeToStore.bind(null, fiber, inst, subscribe), [subscribe])
     // 创建一个 useEffect hook，固定 函数 fiber、inst、订阅函数
     mountEffect(subscribeToStore.bind(null, fiber, inst, subscribe), [subscribe]);
 
@@ -1237,7 +1238,7 @@ function updateSyncExternalStore(subscribe, getSnapshot, getServerSnapshot) {
     // effect may have mutated the store.
     // 1. getSnapshot 更改了
     // 2. snapshot 更改了
-    // 3. 该 hook 又加上 HookHasEffect 的标记
+    // 3. 该 hook 加上了 HookHasEffect 的标记
     if (
         inst.getSnapshot !== getSnapshot ||
         snapshotChanged ||
@@ -1267,6 +1268,7 @@ function updateSyncExternalStore(subscribe, getSnapshot, getServerSnapshot) {
         //! 不包含阻塞的车道
         // 即不包含 InputContinuousLane 和 DefaultLane
         if (!includesBlockingLane(root, renderLanes)) {
+            // 需要检查 store 的一致性
             pushStoreConsistencyCheck(fiber, getSnapshot, nextSnapshot);
         }
     }
@@ -1332,12 +1334,14 @@ function subscribeToStore(fiber, inst, subscribe) {
     };
 
     // Subscribe to the store and return a clean-up function.
-    // 执行该函数，传入触发更新的函数，返回取消订阅的函数，即 useEffect 的销毁函数
+    // 执行用户传入的订阅函数，传入触发更新的函数，返回取消订阅的函数，即 useEffect 的销毁函数
     return subscribe(handleStoreChange);
 }
 
 /**
  * 检查快照前后的值是否发生变化
+ * 两种场景下会触发该函数
+ * 1. 用户执行订阅函数
  */
 function checkIfSnapshotChanged(inst) {
     const latestGetSnapshot = inst.getSnapshot;
