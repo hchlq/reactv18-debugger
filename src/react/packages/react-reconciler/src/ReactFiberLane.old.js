@@ -510,6 +510,7 @@ export function includesOnlyTransitions(lanes) {
 export function includesBlockingLane(root, lanes) {
     //! 1. createRoot 传入的启动 Concurrent 模式的配置
     // 在当前版本下，allowConcurrentByDefault 为 false，因此都会走到条件 2
+    console.log(allowConcurrentByDefault, (root.current.mode & ConcurrentUpdatesByDefaultMode) !== NoMode )
     if (
         allowConcurrentByDefault &&
         (root.current.mode & ConcurrentUpdatesByDefaultMode) !== NoMode

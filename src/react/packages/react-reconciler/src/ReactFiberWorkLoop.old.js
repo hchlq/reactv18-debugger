@@ -501,7 +501,7 @@ function requestRetryLane(fiber) {
 }
 
 /**
- * 主要住了两件事：
+ * 主要做了两件事：
  * 1. 标记 fiber root 有更新的任务
  * 2. 确保 fiber root 被调度
  */
@@ -536,6 +536,7 @@ export function scheduleUpdateOnFiber(root, fiber, lane, eventTime) {
             // scheduleCallbackForFiber to preserve the ability to schedule a callback
             // without immediately flushing it. We only do this for user-initiated
             // updates, to preserve historical behavior of legacy mode.
+            // 这是故意在 scheduleUpdateOnFiber 而不是在 scheduleCallbackForFiber 内部进行的，用于保留调度回调而不是立刻刷新回调
             resetRenderTimer();
             flushSyncCallbacksOnlyInLegacyMode();
         }

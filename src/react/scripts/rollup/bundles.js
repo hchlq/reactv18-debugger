@@ -7,6 +7,7 @@ const __EXPERIMENTAL__ =
     ? RELEASE_CHANNEL === 'experimental'
     : true;
 
+// 构建类型
 const bundleTypes = {
   NODE_ES2015: 'NODE_ES2015',
   UMD_DEV: 'UMD_DEV',

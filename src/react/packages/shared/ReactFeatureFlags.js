@@ -143,7 +143,7 @@ export const enableSyncDefaultUpdates = true;
 // 可选的配置在没有使用 startTransition 的时候启用时间切片
 // Adds an opt-in to time slicing for updates that aren't wrapped in
 // startTransition. Only relevant when enableSyncDefaultUpdates is disabled.
-export const allowConcurrentByDefault = false;
+export const allowConcurrentByDefault = true;
 
 // Updates that occur in the render phase are not officially supported. But when
 // they do occur, we defer them to a subsequent render by picking a lane that's
